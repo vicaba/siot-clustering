@@ -1,34 +1,47 @@
 package cluster
 
-import cluster.Point.ValueType
+import breeze.linalg._
+import cluster.Types._
 
+import scala.annotation.tailrec
 import scala.util.Random
 
-class AlgorithmElementsBuilder[T]
+class Algorithm
 {
 
-  type PointValueType = Point.ValueType[T]
-
-  def createPoint(values: ValueType[T], toSingleValue: (ValueType[T]) => T): Point[T] =
-    new Point[T](values, toSingleValue)
-
-  def createCluster(id: Int, name: String, points: Vector[Point[T]]): Cluster[T] =
-    new Cluster[T](id, name, points)
-
-
-
-  def run(numberOfClusters: Int, points: Vector[Point[T]]) =
+  def distanceTo(p: Point, cluster: Cluster): Int =
   {
-    println(randomSample(numberOfClusters, points))
+    max(p.syntheticValue) - min(p.syntheticValue)
   }
 
-  private def randomSample(take: Int, points: Seq[Point[T]]): List[Point[T]] = {
+  def run(numberOfClusters: Int, points: scala.Vector[Point]) =
+  {
+
+    val clusters = randomSample(numberOfClusters, points).zipWithIndex.map { case (point, idx) =>
+      idx -> Cluster(idx, idx.toString, Vector(point.setCluster(idx)))
+    }.toMap
+
+    @tailrec
+    def assignToClusters(clusters: Map[Int, Cluster], remainingPoints: scala.Vector[Point]): Map[Int, Cluster] =
+      remainingPoints match {
+        case p +: tail =>
+
+
+          assignToClusters(clusters, tail)
+        case IndexedSeq() => clusters
+      }
+
+    assignToClusters(clusters, points)
+
+  }
+
+
+
+  private def randomSample(take: Int, points: Seq[Point]): List[Point] =
+  {
     val r = new Random(100)
     r.shuffle(points).take(take).toList
   }
 
-}
-
-class Algorithm {
 
 }

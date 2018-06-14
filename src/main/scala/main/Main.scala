@@ -1,19 +1,21 @@
 package main
 
-import cluster.{AlgorithmElementsBuilder, Point}
+
+import breeze.linalg.DenseVector
+import cluster.Algorithm
+import cluster.Types._
 import reader.Reader
 
 object Main {
 
   def main(args: Array[String]): Unit = {
-    val algorithmBuilder = new AlgorithmElementsBuilder[Int]
-    val toSingleValue = (values: algorithmBuilder.PointValueType) => 2
-    val points = Reader.readUserRanges().map { values =>
-      algorithmBuilder.createPoint(Vector(values), toSingleValue)
-    }
-    algorithmBuilder.run(3, points)
+    val algorithmBuilder = new Algorithm()
+    val points = Reader.readUserRanges().zipWithIndex.map { case (values, idx) =>
+      EmptyData(0, ) DenseVector[Int](values:_*)
 
-    println(points)
+      Point(idx, scala.Vector(values))
+
+    val c = algorithmBuilder.run(3, points)
 
   }
 
