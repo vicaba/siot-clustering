@@ -25,6 +25,21 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [compile->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [compile->compile(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [compile->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->default]
+[debug] sbt-chain: Checking cache for: dependency: org.scalactic#scalactic_2.12;3.0.5 {compile=[default, compile, runtime, default(compile), master], runtime=[default, compile, runtime, default(compile), master], test=[default, compile, runtime(*), master(compile), runtime, default(compile), compile(*), master], compile-internal=[default, compile, runtime, default(compile), master], runtime-internal=[default, compile, runtime, default(compile), master], test-internal=[default, compile, runtime(*), master(compile), runtime, default(compile), compile(*), master]}
+[debug] sbt-chain: module revision found in cache: org.scalactic#scalactic_2.12;3.0.5
+[debug] 	found org.scalactic#scalactic_2.12;3.0.5 in sbt-chain
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->default(compile)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [compile->compile]
 [debug] sbt-chain: Checking cache for: dependency: org.typelevel#algebra_2.12;0.7.0 {compile=[compile, runtime(*), master(compile), runtime, compile(*), master], runtime=[compile, runtime(*), master(compile), runtime, compile(*), master], test=[compile, runtime(*), master(compile), runtime, compile(*), master], compile-internal=[compile, runtime(*), master(compile), runtime, compile(*), master], runtime-internal=[compile, runtime(*), master(compile), runtime, compile(*), master], test-internal=[compile, runtime(*), master(compile), runtime, compile(*), master]}
 [debug] sbt-chain: module revision found in cache: org.typelevel#algebra_2.12;0.7.0
@@ -204,17 +219,6 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [compile->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [compile->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [compile->master]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->compile]
-[debug] sbt-chain: Checking cache for: dependency: net.sourceforge.f2j#arpack_combined_all;0.1 {compile=[compile, runtime(*), master(compile), runtime, compile(*), master], runtime=[compile, runtime(*), master(compile), runtime, compile(*), master], test=[compile, runtime(*), master(compile), runtime, compile(*), master], compile-internal=[compile, runtime(*), master(compile), runtime, compile(*), master], runtime-internal=[compile, runtime(*), master(compile), runtime, compile(*), master], test-internal=[compile, runtime(*), master(compile), runtime, compile(*), master]}
-[debug] sbt-chain: module revision found in cache: net.sourceforge.f2j#arpack_combined_all;0.1
-[debug] 	found net.sourceforge.f2j#arpack_combined_all;0.1 in sbt-chain
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->runtime(*)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->master(compile)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->runtime]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->compile(*)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [compile->compile]
 [debug] sbt-chain: Checking cache for: dependency: com.chuusai#shapeless_2.12;2.3.2 {compile=[compile, runtime(*), master(compile), runtime, compile(*), master], runtime=[compile, runtime(*), master(compile), runtime, compile(*), master], test=[compile, runtime(*), master(compile), runtime, compile(*), master], compile-internal=[compile, runtime(*), master(compile), runtime, compile(*), master], runtime-internal=[compile, runtime(*), master(compile), runtime, compile(*), master], test-internal=[compile, runtime(*), master(compile), runtime, compile(*), master]}
 [debug] sbt-chain: module revision found in cache: com.chuusai#shapeless_2.12;2.3.2
@@ -280,6 +284,18 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [compile->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [compile->compile(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [compile->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->default]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->default(compile)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [compile->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [compile->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [compile->compile]
@@ -412,14 +428,6 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [compile->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [compile->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [compile->master]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->runtime(*)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->master(compile)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->runtime]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->compile(*)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [compile->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [compile->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [compile->compile]
@@ -469,6 +477,18 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [runtime->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [runtime->compile(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [runtime->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->default]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->default(compile)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [runtime->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [runtime->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [runtime->compile]
@@ -601,14 +621,6 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [runtime->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [runtime->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [runtime->master]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->runtime(*)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->master(compile)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->runtime]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->compile(*)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [runtime->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [runtime->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [runtime->compile]
@@ -662,6 +674,22 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [compile->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [compile->compile(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [compile->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->default]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->default(compile)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->runtime(*)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->master(compile)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->compile(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [compile->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [compile->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [compile->compile]
@@ -794,14 +822,6 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [compile->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [compile->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [compile->master]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->runtime(*)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->master(compile)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->runtime]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->compile(*)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [compile->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [compile->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [compile->compile]
@@ -851,6 +871,18 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [runtime->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [runtime->compile(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [runtime->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->default]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->default(compile)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [runtime->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [runtime->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [runtime->compile]
@@ -983,14 +1015,6 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [runtime->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [runtime->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [runtime->master]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->runtime(*)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->master(compile)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->runtime]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->compile(*)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [runtime->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [runtime->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [runtime->compile]
@@ -1023,6 +1047,21 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-reflect;2.12.6 [runtime->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-reflect;2.12.6 [runtime->compile(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-reflect;2.12.6 [runtime->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test->default]
+[debug] sbt-chain: Checking cache for: dependency: org.scalatest#scalatest_2.12;3.0.5 {test=[default, compile, runtime, default(compile), master], test-internal=[default, compile, runtime, default(compile), master]}
+[debug] sbt-chain: module revision found in cache: org.scalatest#scalatest_2.12;3.0.5
+[debug] 	found org.scalatest#scalatest_2.12;3.0.5 in sbt-chain
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test->default(compile)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [test->default]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [test->runtime]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [test->compile]
@@ -1040,6 +1079,22 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [test->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [test->compile(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [test->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->default]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->runtime(*)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->master(compile)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->default(compile)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->compile(*)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [test->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [test->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [test->compile]
@@ -1088,6 +1143,17 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sf.opencsv#opencsv;2.3 [test->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sf.opencsv#opencsv;2.3 [test->compile(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sf.opencsv#opencsv;2.3 [test->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang.modules#scala-xml_2.12;1.0.6 [test->compile]
+[debug] sbt-chain: Checking cache for: dependency: org.scala-lang.modules#scala-xml_2.12;1.0.6 {test=[compile, runtime(*), master(compile), runtime, compile(*), master], test-internal=[compile, runtime(*), master(compile), runtime, compile(*), master], scala-tool=[master(*), compile, runtime(*), runtime, compile(*), master]}
+[debug] sbt-chain: module revision found in cache: org.scala-lang.modules#scala-xml_2.12;1.0.6
+[debug] 	found org.scala-lang.modules#scala-xml_2.12;1.0.6 in sbt-chain
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang.modules#scala-xml_2.12;1.0.6 [test->runtime(*)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang.modules#scala-xml_2.12;1.0.6 [test->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang.modules#scala-xml_2.12;1.0.6 [test->master(compile)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang.modules#scala-xml_2.12;1.0.6 [test->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang.modules#scala-xml_2.12;1.0.6 [test->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang.modules#scala-xml_2.12;1.0.6 [test->compile(*)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang.modules#scala-xml_2.12;1.0.6 [test->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.spire-math#spire-macros_2.12;0.13.0 [test->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.spire-math#spire-macros_2.12;0.13.0 [test->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.spire-math#spire-macros_2.12;0.13.0 [test->compile]
@@ -1172,14 +1238,6 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [test->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [test->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [test->master]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [test->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [test->runtime(*)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [test->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [test->master(compile)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [test->runtime]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [test->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [test->compile(*)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [test->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [test->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [test->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [test->compile]
@@ -1236,6 +1294,18 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [compile->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [compile->compile(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [compile->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->default]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->default(compile)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [compile->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [compile->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [compile->compile]
@@ -1368,14 +1438,6 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [compile->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [compile->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [compile->master]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->runtime(*)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->master(compile)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->runtime]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->compile(*)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [compile->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [compile->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [compile->compile]
@@ -1427,6 +1489,18 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [compile-internal->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [compile-internal->compile(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [compile-internal->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile-internal->default]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile-internal->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile-internal->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile-internal->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile-internal->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile-internal->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile-internal->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile-internal->default(compile)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile-internal->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile-internal->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile-internal->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile-internal->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [compile-internal->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [compile-internal->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [compile-internal->compile]
@@ -1559,14 +1633,6 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [compile-internal->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [compile-internal->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [compile-internal->master]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile-internal->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile-internal->runtime(*)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile-internal->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile-internal->master(compile)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile-internal->runtime]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile-internal->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile-internal->compile(*)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile-internal->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [compile-internal->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [compile-internal->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [compile-internal->compile]
@@ -1620,6 +1686,18 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [compile->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [compile->compile(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [compile->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->default]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->default(compile)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [compile->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [compile->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [compile->compile]
@@ -1752,14 +1830,6 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [compile->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [compile->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [compile->master]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->runtime(*)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->master(compile)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->runtime]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->compile(*)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [compile->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [compile->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [compile->compile]
@@ -1809,6 +1879,18 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [runtime->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [runtime->compile(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [runtime->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->default]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->default(compile)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [runtime->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [runtime->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [runtime->compile]
@@ -1941,14 +2023,6 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [runtime->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [runtime->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [runtime->master]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->runtime(*)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->master(compile)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->runtime]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->compile(*)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [runtime->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [runtime->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [runtime->compile]
@@ -1999,6 +2073,18 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [runtime-internal->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [runtime-internal->compile(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [runtime-internal->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime-internal->default]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime-internal->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime-internal->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime-internal->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime-internal->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime-internal->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime-internal->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime-internal->default(compile)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime-internal->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime-internal->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime-internal->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime-internal->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [runtime-internal->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [runtime-internal->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [runtime-internal->compile]
@@ -2131,14 +2217,6 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [runtime-internal->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [runtime-internal->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [runtime-internal->master]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime-internal->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime-internal->runtime(*)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime-internal->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime-internal->master(compile)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime-internal->runtime]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime-internal->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime-internal->compile(*)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime-internal->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [runtime-internal->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [runtime-internal->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [runtime-internal->compile]
@@ -2193,6 +2271,18 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [compile->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [compile->compile(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [compile->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->default]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->default(compile)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [compile->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [compile->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [compile->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [compile->compile]
@@ -2325,14 +2415,6 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [compile->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [compile->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [compile->master]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->runtime(*)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->master(compile)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->runtime]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->compile(*)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [compile->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [compile->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [compile->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [compile->compile]
@@ -2382,6 +2464,18 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [runtime->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [runtime->compile(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [runtime->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->default]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->default(compile)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [runtime->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [runtime->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [runtime->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [runtime->compile]
@@ -2514,14 +2608,6 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [runtime->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [runtime->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [runtime->master]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->runtime(*)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->master(compile)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->runtime]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->compile(*)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [runtime->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [runtime->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [runtime->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [runtime->compile]
@@ -2554,6 +2640,18 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-reflect;2.12.6 [runtime->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-reflect;2.12.6 [runtime->compile(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-reflect;2.12.6 [runtime->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test->default]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test->default(compile)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [test->default]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [test->runtime]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [test->compile]
@@ -2571,6 +2669,22 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [test->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [test->compile(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [test->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->default]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->runtime(*)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->master(compile)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->default(compile)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->compile(*)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [test->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [test->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [test->compile]
@@ -2619,6 +2733,14 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sf.opencsv#opencsv;2.3 [test->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sf.opencsv#opencsv;2.3 [test->compile(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sf.opencsv#opencsv;2.3 [test->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang.modules#scala-xml_2.12;1.0.6 [test->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang.modules#scala-xml_2.12;1.0.6 [test->runtime(*)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang.modules#scala-xml_2.12;1.0.6 [test->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang.modules#scala-xml_2.12;1.0.6 [test->master(compile)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang.modules#scala-xml_2.12;1.0.6 [test->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang.modules#scala-xml_2.12;1.0.6 [test->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang.modules#scala-xml_2.12;1.0.6 [test->compile(*)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang.modules#scala-xml_2.12;1.0.6 [test->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.spire-math#spire-macros_2.12;0.13.0 [test->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.spire-math#spire-macros_2.12;0.13.0 [test->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.spire-math#spire-macros_2.12;0.13.0 [test->compile]
@@ -2703,14 +2825,6 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [test->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [test->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [test->master]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [test->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [test->runtime(*)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [test->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [test->master(compile)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [test->runtime]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [test->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [test->compile(*)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [test->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [test->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [test->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [test->compile]
@@ -2745,6 +2859,18 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-reflect;2.12.6 [test->master]
 [debug] == resolving dependencies for default#siot-clustering$sources;0.1 [optional]
 [debug] == resolving dependencies for default#siot-clustering$sources;0.1 [provided]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test-internal->default]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test-internal->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test-internal->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test-internal->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test-internal->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test-internal->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test-internal->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test-internal->default(compile)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test-internal->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test-internal->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test-internal->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalatest#scalatest_2.12;3.0.5 [test-internal->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [test-internal->default]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [test-internal->runtime]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [test-internal->compile]
@@ -2762,6 +2888,22 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [test-internal->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [test-internal->compile(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-library;2.12.6 [test-internal->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test-internal->default]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test-internal->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test-internal->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test-internal->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test-internal->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test-internal->runtime(*)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test-internal->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test-internal->master(compile)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test-internal->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test-internal->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test-internal->default(compile)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test-internal->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test-internal->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test-internal->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test-internal->compile(*)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalactic#scalactic_2.12;3.0.5 [test-internal->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [test-internal->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [test-internal->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.typelevel#algebra_2.12;0.7.0 [test-internal->compile]
@@ -2810,6 +2952,14 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sf.opencsv#opencsv;2.3 [test-internal->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sf.opencsv#opencsv;2.3 [test-internal->compile(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sf.opencsv#opencsv;2.3 [test-internal->master]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang.modules#scala-xml_2.12;1.0.6 [test-internal->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang.modules#scala-xml_2.12;1.0.6 [test-internal->runtime(*)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang.modules#scala-xml_2.12;1.0.6 [test-internal->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang.modules#scala-xml_2.12;1.0.6 [test-internal->master(compile)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang.modules#scala-xml_2.12;1.0.6 [test-internal->runtime]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang.modules#scala-xml_2.12;1.0.6 [test-internal->compile]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang.modules#scala-xml_2.12;1.0.6 [test-internal->compile(*)]
+[debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang.modules#scala-xml_2.12;1.0.6 [test-internal->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.spire-math#spire-macros_2.12;0.13.0 [test-internal->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.spire-math#spire-macros_2.12;0.13.0 [test-internal->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.spire-math#spire-macros_2.12;0.13.0 [test-internal->compile]
@@ -2894,14 +3044,6 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [test-internal->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [test-internal->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scalanlp#breeze_2.12;0.13.2 [test-internal->master]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [test-internal->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [test-internal->runtime(*)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [test-internal->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [test-internal->master(compile)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [test-internal->runtime]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [test-internal->compile]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [test-internal->compile(*)]
-[debug] == resolving dependencies default#siot-clustering$sources;0.1->net.sourceforge.f2j#arpack_combined_all;0.1 [test-internal->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [test-internal->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [test-internal->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->com.chuusai#shapeless_2.12;2.3.2 [test-internal->compile]
@@ -2968,9 +3110,6 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-compiler;2.12.6 [scala-tool->optional(default)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-compiler;2.12.6 [scala-tool->master]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang.modules#scala-xml_2.12;1.0.6 [scala-tool->master(*)]
-[debug] sbt-chain: Checking cache for: dependency: org.scala-lang.modules#scala-xml_2.12;1.0.6 {scala-tool=[master(*), compile, runtime(*), runtime, compile(*), master]}
-[debug] sbt-chain: module revision found in cache: org.scala-lang.modules#scala-xml_2.12;1.0.6
-[debug] 	found org.scala-lang.modules#scala-xml_2.12;1.0.6 in sbt-chain
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang.modules#scala-xml_2.12;1.0.6 [scala-tool->compile]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang.modules#scala-xml_2.12;1.0.6 [scala-tool->runtime(*)]
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang.modules#scala-xml_2.12;1.0.6 [scala-tool->compile]
@@ -2995,42 +3134,101 @@
 [debug] == resolving dependencies default#siot-clustering$sources;0.1->org.scala-lang#scala-reflect;2.12.6 [scala-tool->master]
 [debug] 	resolved ivy file produced in cache
 [debug] :: downloading artifacts ::
+[debug] 	[NOT REQUIRED] org.apache.commons#commons-math3;3.2!commons-math3.jar(src)
+[debug] 	[NOT REQUIRED] net.sf.opencsv#opencsv;2.3!opencsv.jar(src)
+[debug] 	[NOT REQUIRED] org.apache.commons#commons-csv;1.4!commons-csv.jar(src)
 [debug] 	[NOT REQUIRED] org.scala-lang#scala-library;2.12.6!scala-library.jar(src)
-[debug] 	[NOT REQUIRED] org.typelevel#algebra_2.12;0.7.0!algebra_2.12.jar(src)
-[debug] 		tried /home/vcaballero/.ivy2/local/net.sf.opencsv/opencsv/2.3/srcs/opencsv-sources.jar
-[debug] 		tried https://repo1.maven.org/maven2/net/sf/opencsv/opencsv/2.3/opencsv-2.3-sources.jar
-[debug] 		tried /home/vcaballero/.ivy2/local/org.scalanlp/breeze-macros_2.12/0.13.2/srcs/breeze-macros_2.12-sources.jar
-[debug] 		tried https://repo1.maven.org/maven2/org/scalanlp/breeze-macros_2.12/0.13.2/breeze-macros_2.12-0.13.2-sources.jar
-[debug] 		tried /home/vcaballero/.ivy2/local/org.typelevel/machinist_2.12/0.6.1/srcs/machinist_2.12-sources.jar
-[debug] 		tried https://repo1.maven.org/maven2/org/typelevel/machinist_2.12/0.6.1/machinist_2.12-0.6.1-sources.jar
-[info] downloading https://repo1.maven.org/maven2/net/sf/opencsv/opencsv/2.3/opencsv-2.3-sources.jar ...
-[debug] 	public: downloading https://repo1.maven.org/maven2/net/sf/opencsv/opencsv/2.3/opencsv-2.3-sources.jar
-[debug] 	[NOT REQUIRED] com.twitter#algebird-core_2.12;0.13.4!algebird-core_2.12.jar(src)
-[debug] 	[NOT REQUIRED] org.scala-lang#scala-reflect;2.12.6!scala-reflect.jar(src)
+[debug] 	[NOT REQUIRED] com.github.fommil.netlib#core;1.1.2!core.jar(src)
+[debug] 	[NOT REQUIRED] org.scalactic#scalactic_2.12;3.0.5!scalactic_2.12.jar(src)
+[debug] 	[NOT REQUIRED] org.spire-math#spire-macros_2.12;0.13.0!spire-macros_2.12.jar(src)
+[debug] 	[NOT REQUIRED] org.scalanlp#breeze-macros_2.12;0.13.2!breeze-macros_2.12.jar(src)
 [debug] no default ivy user dir defined: set to /home/vcaballero/.ivy2
-[info] downloading https://repo1.maven.org/maven2/org/typelevel/machinist_2.12/0.6.1/machinist_2.12-0.6.1-sources.jar ...
-[debug] 	public: downloading https://repo1.maven.org/maven2/org/typelevel/machinist_2.12/0.6.1/machinist_2.12-0.6.1-sources.jar
+[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-public.xml
+[debug] no default cache defined: set to /home/vcaballero/.ivy2/cache
+[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-shared.xml
+[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-local.xml
+[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-main-chain.xml
+[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-default-chain.xml
+[debug] settings loaded (40ms)
+[debug] 	default cache: /home/vcaballero/.ivy2/cache
+[debug] 	default resolver: default
+[debug] 	-- 5 resolvers:
+[debug] 	shared [file]
+[debug] 	default [chain] [local, main]
+[debug] 	public [ibiblio]
+[debug] 	main [chain] [shared, public]
+[debug] 	local [file]
+[debug] 	[NOT REQUIRED] org.scalatest#scalatest_2.12;3.0.5!scalatest_2.12.jar(src)
+[debug] 	[NOT REQUIRED] org.typelevel#cats-kernel_2.12;0.9.0!cats-kernel_2.12.jar(src)
+[debug] no default ivy user dir defined: set to /home/vcaballero/.ivy2
+[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-public.xml
+[debug] no default cache defined: set to /home/vcaballero/.ivy2/cache
+[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-shared.xml
+[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-local.xml
+[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-main-chain.xml
+[debug] 	[NOT REQUIRED] org.scala-lang#scala-compiler;2.12.6!scala-compiler.jar(src)
+[debug] no default ivy user dir defined: set to /home/vcaballero/.ivy2
+[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-public.xml
+[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-default-chain.xml
+[debug] no default cache defined: set to /home/vcaballero/.ivy2/cache
+[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-shared.xml
+[debug] settings loaded (12ms)
+[debug] 	default cache: /home/vcaballero/.ivy2/cache
+[debug] 	default resolver: default
+[debug] 	-- 5 resolvers:
+[debug] 	shared [file]
+[debug] 	default [chain] [local, main]
+[debug] 	public [ibiblio]
+[debug] 	main [chain] [shared, public]
+[debug] 	local [file]
+[debug] 	[NOT REQUIRED] org.typelevel#machinist_2.12;0.6.1!machinist_2.12.jar(src)
+[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-local.xml
+[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-main-chain.xml
+[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-default-chain.xml
+[debug] 	[NOT REQUIRED] org.slf4j#slf4j-api;1.7.5!slf4j-api.jar(src)
+[debug] no default ivy user dir defined: set to /home/vcaballero/.ivy2
+[debug] settings loaded (30ms)
+[debug] 	default cache: /home/vcaballero/.ivy2/cache
+[debug] 	default resolver: default
+[debug] 	-- 5 resolvers:
+[debug] 	shared [file]
+[debug] 	default [chain] [local, main]
+[debug] 	public [ibiblio]
+[debug] 	main [chain] [shared, public]
+[debug] 	local [file]
+[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-public.xml
+[debug] 	[NOT REQUIRED] com.twitter#algebird-core_2.12;0.13.4!algebird-core_2.12.jar(src)
+[debug] no default ivy user dir defined: set to /home/vcaballero/.ivy2
+[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-public.xml
+[debug] no default cache defined: set to /home/vcaballero/.ivy2/cache
+[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-shared.xml
+[debug] 	[NOT REQUIRED] org.typelevel#macro-compat_2.12;1.1.1!macro-compat_2.12.jar(src)
+[debug] no default ivy user dir defined: set to /home/vcaballero/.ivy2
+[debug] 	[NOT REQUIRED] jline#jline;2.14.6!jline.jar(src)
+[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-local.xml
 [debug] 	[NOT REQUIRED] com.googlecode.javaewah#JavaEWAH;1.1.4!JavaEWAH.jar(src)
 [debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-public.xml
-[debug] no default ivy user dir defined: set to /home/vcaballero/.ivy2
 [debug] no default cache defined: set to /home/vcaballero/.ivy2/cache
 [debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-shared.xml
-[debug] 	[NOT REQUIRED] org.scala-lang#scala-compiler;2.12.6!scala-compiler.jar(src)
 [debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-local.xml
-[debug] no default ivy user dir defined: set to /home/vcaballero/.ivy2
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-public.xml
 [debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-main-chain.xml
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-public.xml
-[debug] no default cache defined: set to /home/vcaballero/.ivy2/cache
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-shared.xml
+[debug] 	[NOT REQUIRED] com.github.rwl#jtransforms;2.4.0!jtransforms.jar(src)
 [debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-default-chain.xml
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-local.xml
 [debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-main-chain.xml
 [debug] no default cache defined: set to /home/vcaballero/.ivy2/cache
 [debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-shared.xml
+[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-local.xml
+[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-main-chain.xml
+[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-default-chain.xml
+[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-default-chain.xml
 [debug] settings loaded (29ms)
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-default-chain.xml
-[debug] settings loaded (10ms)
+[debug] 	default cache: /home/vcaballero/.ivy2/cache
+[debug] 	default resolver: default
+[debug] 	-- 5 resolvers:
+[debug] 	shared [file]
+[debug] 	default [chain] [local, main]
+[debug] 	public [ibiblio]
+[debug] settings loaded (44ms)
 [debug] 	default cache: /home/vcaballero/.ivy2/cache
 [debug] 	default resolver: default
 [debug] 	-- 5 resolvers:
@@ -3039,28 +3237,14 @@
 [debug] 	public [ibiblio]
 [debug] 	main [chain] [shared, public]
 [debug] 	local [file]
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-local.xml
-[debug] 	default cache: /home/vcaballero/.ivy2/cache
-[debug] 	default resolver: default
-[debug] 	-- 5 resolvers:
-[debug] 	shared [file]
-[debug] 	default [chain] [local, main]
-[debug] 	[NOT REQUIRED] org.typelevel#cats-kernel_2.12;0.9.0!cats-kernel_2.12.jar(src)
-[debug] 	public [ibiblio]
 [debug] 	main [chain] [shared, public]
 [debug] 	local [file]
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-main-chain.xml
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-default-chain.xml
-[debug] 	[NOT REQUIRED] org.typelevel#macro-compat_2.12;1.1.1!macro-compat_2.12.jar(src)
-[debug] 		tried /home/vcaballero/.ivy2/local/junit/junit/4.8.2/srcs/junit-sources.jar
-[debug] 		tried /home/vcaballero/.ivy2/local/org.slf4j/slf4j-api/1.7.5/srcs/slf4j-api-sources.jar
-[debug] 		tried https://repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.5/slf4j-api-1.7.5-sources.jar
-[debug] no default ivy user dir defined: set to /home/vcaballero/.ivy2
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-public.xml
-[debug] no default cache defined: set to /home/vcaballero/.ivy2/cache
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-shared.xml
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-local.xml
-[debug] settings loaded (48ms)
+[debug] 	[NOT REQUIRED] junit#junit;4.8.2!junit.jar(src)
+[debug] 	[NOT REQUIRED] org.typelevel#algebra_2.12;0.7.0!algebra_2.12.jar(src)
+[debug] 	[NOT REQUIRED] org.scala-lang#scala-reflect;2.12.6!scala-reflect.jar(src)
+[debug] 	[NOT REQUIRED] org.scalanlp#breeze_2.12;0.13.2!breeze_2.12.jar(src)
+[debug] 	[NOT REQUIRED] com.chuusai#shapeless_2.12;2.3.2!shapeless_2.12.jar(src)
+[debug] settings loaded (30ms)
 [debug] 	default cache: /home/vcaballero/.ivy2/cache
 [debug] 	default resolver: default
 [debug] 	-- 5 resolvers:
@@ -3069,123 +3253,16 @@
 [debug] 	public [ibiblio]
 [debug] 	main [chain] [shared, public]
 [debug] 	local [file]
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-main-chain.xml
-[debug] 		tried /home/vcaballero/.ivy2/local/org.scalanlp/breeze_2.12/0.13.2/srcs/breeze_2.12-sources.jar
-[debug] no default ivy user dir defined: set to /home/vcaballero/.ivy2
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-default-chain.xml
-[debug] settings loaded (25ms)
-[debug] 	default cache: /home/vcaballero/.ivy2/cache
-[debug] 	default resolver: default
-[debug] 	-- 5 resolvers:
-[debug] 	shared [file]
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-public.xml
-[debug] 		tried /home/vcaballero/.ivy2/local/com.github.rwl/jtransforms/2.4.0/srcs/jtransforms-sources.jar
-[debug] no default ivy user dir defined: set to /home/vcaballero/.ivy2
-[debug] no default cache defined: set to /home/vcaballero/.ivy2/cache
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-public.xml
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-shared.xml
-[debug] 	default [chain] [local, main]
-[debug] 	public [ibiblio]
-[debug] 	main [chain] [shared, public]
-[debug] 	local [file]
-[debug] no default cache defined: set to /home/vcaballero/.ivy2/cache
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-shared.xml
-[debug] 		tried /home/vcaballero/.ivy2/local/org.apache.commons/commons-math3/3.2/srcs/commons-math3-sources.jar
-[debug] 		tried https://repo1.maven.org/maven2/junit/junit/4.8.2/junit-4.8.2-sources.jar
-[debug] 		tried https://repo1.maven.org/maven2/org/apache/commons/commons-math3/3.2/commons-math3-3.2-sources.jar
-[info] downloading https://repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.5/slf4j-api-1.7.5-sources.jar ...
-[debug] 	public: downloading https://repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.5/slf4j-api-1.7.5-sources.jar
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-local.xml
-[info] downloading https://repo1.maven.org/maven2/org/scalanlp/breeze-macros_2.12/0.13.2/breeze-macros_2.12-0.13.2-sources.jar ...
-[debug] 	public: downloading https://repo1.maven.org/maven2/org/scalanlp/breeze-macros_2.12/0.13.2/breeze-macros_2.12-0.13.2-sources.jar
-[debug] 		tried /home/vcaballero/.ivy2/local/org.spire-math/spire-macros_2.12/0.13.0/srcs/spire-macros_2.12-sources.jar
-[debug] 		tried https://repo1.maven.org/maven2/org/spire-math/spire-macros_2.12/0.13.0/spire-macros_2.12-0.13.0-sources.jar
-[debug] 	public: downloading https://repo1.maven.org/maven2/org/typelevel/machinist_2.12/0.6.1/machinist_2.12-0.6.1-sources.jar.sha1
-[debug] 	public: downloading https://repo1.maven.org/maven2/net/sf/opencsv/opencsv/2.3/opencsv-2.3-sources.jar.sha1
-[debug] 		tried /home/vcaballero/.ivy2/local/com.chuusai/shapeless_2.12/2.3.2/srcs/shapeless_2.12-sources.jar
 [debug] 	[NOT REQUIRED] org.scala-lang.modules#scala-xml_2.12;1.0.6!scala-xml_2.12.jar(src)
-[debug] 	[NOT REQUIRED] jline#jline;2.14.6!jline.jar(src)
-[debug] 		tried /home/vcaballero/.ivy2/local/org.spire-math/spire_2.12/0.13.0/srcs/spire_2.12-sources.jar
 [debug] no default ivy user dir defined: set to /home/vcaballero/.ivy2
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-local.xml
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-main-chain.xml
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-public.xml
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-main-chain.xml
-[debug] no default cache defined: set to /home/vcaballero/.ivy2/cache
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-shared.xml
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-default-chain.xml
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-default-chain.xml
-[debug] 	[NOT REQUIRED] org.apache.commons#commons-csv;1.4!commons-csv.jar(src)
-[debug] 		tried /home/vcaballero/.ivy2/local/net.sourceforge.f2j/arpack_combined_all/0.1/srcs/arpack_combined_all-sources.jar
-[debug] no default ivy user dir defined: set to /home/vcaballero/.ivy2
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-local.xml
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-public.xml
-[debug] settings loaded (103ms)
-[debug] 	default cache: /home/vcaballero/.ivy2/cache
-[debug] 	default resolver: default
-[debug] 	-- 5 resolvers:
-[debug] 	shared [file]
-[debug] 	default [chain] [local, main]
-[debug] 	public [ibiblio]
-[debug] 	main [chain] [shared, public]
-[debug] 	local [file]
-[debug] 		tried https://repo1.maven.org/maven2/com/github/rwl/jtransforms/2.4.0/jtransforms-2.4.0-sources.jar
-[debug] no default cache defined: set to /home/vcaballero/.ivy2/cache
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-shared.xml
-[debug] 	public: downloading https://repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.5/slf4j-api-1.7.5-sources.jar.sha1
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-main-chain.xml
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-local.xml
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-default-chain.xml
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-main-chain.xml
-[debug] settings loaded (26ms)
-[debug] 	default cache: /home/vcaballero/.ivy2/cache
-[debug] 	default resolver: default
-[debug] 	-- 5 resolvers:
-[debug] 	shared [file]
-[debug] 	default [chain] [local, main]
-[debug] 	public [ibiblio]
-[debug] 	main [chain] [shared, public]
-[debug] 	local [file]
-[debug] 		tried https://repo1.maven.org/maven2/com/chuusai/shapeless_2.12/2.3.2/shapeless_2.12-2.3.2-sources.jar
-[debug] 		tried /home/vcaballero/.ivy2/local/com.github.fommil.netlib/core/1.1.2/srcs/core-sources.jar
-[debug] 		tried https://repo1.maven.org/maven2/com/github/fommil/netlib/core/1.1.2/core-1.1.2-sources.jar
-[debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-default-chain.xml
-[debug] settings loaded (130ms)
-[debug] 	default cache: /home/vcaballero/.ivy2/cache
-[debug] 	default resolver: default
-[debug] 	-- 5 resolvers:
-[debug] 	shared [file]
-[debug] 	default [chain] [local, main]
-[debug] 	public [ibiblio]
-[debug] 	main [chain] [shared, public]
-[debug] 	local [file]
-[debug] 		tried https://repo1.maven.org/maven2/org/scalanlp/breeze_2.12/0.13.2/breeze_2.12-0.13.2-sources.jar
-[debug] sha1 OK for https://repo1.maven.org/maven2/org/typelevel/machinist_2.12/0.6.1/machinist_2.12-0.6.1-sources.jar
-[debug] sha1 OK for https://repo1.maven.org/maven2/net/sf/opencsv/opencsv/2.3/opencsv-2.3-sources.jar
-[info] 	[SUCCESSFUL ] net.sf.opencsv#opencsv;2.3!opencsv.jar(src) (262ms)
-[info] 	[SUCCESSFUL ] org.typelevel#machinist_2.12;0.6.1!machinist_2.12.jar(src) (258ms)
-[debug] settings loaded (52ms)
-[debug] 	default cache: /home/vcaballero/.ivy2/cache
-[debug] 	default resolver: default
-[debug] 	-- 5 resolvers:
-[debug] 	shared [file]
-[debug] 	default [chain] [local, main]
-[debug] 	public [ibiblio]
-[debug] 	main [chain] [shared, public]
-[debug] 	local [file]
-[debug] no default ivy user dir defined: set to /home/vcaballero/.ivy2
-[debug] 		tried https://repo1.maven.org/maven2/org/spire-math/spire_2.12/0.13.0/spire_2.12-0.13.0-sources.jar
+[debug] 	[NOT REQUIRED] org.spire-math#spire_2.12;0.13.0!spire_2.12.jar(src)
 [debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-public.xml
 [debug] no default cache defined: set to /home/vcaballero/.ivy2/cache
 [debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-shared.xml
-[debug] sha1 OK for https://repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.5/slf4j-api-1.7.5-sources.jar
 [debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-local.xml
-[info] 	[SUCCESSFUL ] org.slf4j#slf4j-api;1.7.5!slf4j-api.jar(src) (200ms)
 [debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-main-chain.xml
-[info] downloading https://repo1.maven.org/maven2/org/spire-math/spire_2.12/0.13.0/spire_2.12-0.13.0-sources.jar ...
-[debug] 	public: downloading https://repo1.maven.org/maven2/org/spire-math/spire_2.12/0.13.0/spire_2.12-0.13.0-sources.jar
 [debug] including url: jar:file:/home/vcaballero/.sbt/boot/scala-2.12.6/org.scala-sbt/sbt/1.1.6/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar!/org/apache/ivy/core/settings/ivysettings-default-chain.xml
-[debug] settings loaded (29ms)
+[debug] settings loaded (22ms)
 [debug] 	default cache: /home/vcaballero/.ivy2/cache
 [debug] 	default resolver: default
 [debug] 	-- 5 resolvers:
@@ -3194,66 +3271,7 @@
 [debug] 	public [ibiblio]
 [debug] 	main [chain] [shared, public]
 [debug] 	local [file]
-[info] downloading https://repo1.maven.org/maven2/junit/junit/4.8.2/junit-4.8.2-sources.jar ...
-[debug] 	public: downloading https://repo1.maven.org/maven2/junit/junit/4.8.2/junit-4.8.2-sources.jar
-[debug] 		tried https://repo1.maven.org/maven2/net/sourceforge/f2j/arpack_combined_all/0.1/arpack_combined_all-0.1-sources.jar
-[info] downloading https://repo1.maven.org/maven2/org/apache/commons/commons-math3/3.2/commons-math3-3.2-sources.jar ...
-[debug] 	public: downloading https://repo1.maven.org/maven2/org/apache/commons/commons-math3/3.2/commons-math3-3.2-sources.jar
-[debug] CLIENT ERROR: Not Found url=https://repo1.maven.org/maven2/net/sourceforge/f2j/arpack_combined_all/0.1/arpack_combined_all-0.1-sources.jar
-[debug] 		tried /home/vcaballero/.sbt/preloaded/net.sourceforge.f2j/arpack_combined_all/0.1/srcs/arpack_combined_all-sources.jar
-[debug] 		tried file:////home/vcaballero/.sbt/preloaded/net/sourceforge/f2j/arpack_combined_all/0.1/arpack_combined_all-0.1-sources.jar
-[warn] 	Detected merged artifact: [FAILED     ] net.sourceforge.f2j#arpack_combined_all;0.1!arpack_combined_all.jar(src):  (0ms).
-[warn] ==== local: tried
-[warn] ==== public: tried
-[warn]   https://repo1.maven.org/maven2/net/sourceforge/f2j/arpack_combined_all/0.1/arpack_combined_all-0.1-sources.jar
-[warn] ==== local-preloaded-ivy: tried
-[warn]   /home/vcaballero/.sbt/preloaded/net.sourceforge.f2j/arpack_combined_all/0.1/srcs/arpack_combined_all-sources.jar
-[warn] ==== local-preloaded: tried
-[warn]   file:////home/vcaballero/.sbt/preloaded/net/sourceforge/f2j/arpack_combined_all/0.1/arpack_combined_all-0.1-sources.jar
-[debug] 	public: downloading https://repo1.maven.org/maven2/org/scalanlp/breeze-macros_2.12/0.13.2/breeze-macros_2.12-0.13.2-sources.jar.sha1
-[info] downloading https://repo1.maven.org/maven2/com/github/rwl/jtransforms/2.4.0/jtransforms-2.4.0-sources.jar ...
-[debug] 	public: downloading https://repo1.maven.org/maven2/com/github/rwl/jtransforms/2.4.0/jtransforms-2.4.0-sources.jar
-[info] downloading https://repo1.maven.org/maven2/com/github/fommil/netlib/core/1.1.2/core-1.1.2-sources.jar ...
-[debug] 	public: downloading https://repo1.maven.org/maven2/com/github/fommil/netlib/core/1.1.2/core-1.1.2-sources.jar
-[info] downloading https://repo1.maven.org/maven2/com/chuusai/shapeless_2.12/2.3.2/shapeless_2.12-2.3.2-sources.jar ...
-[debug] 	public: downloading https://repo1.maven.org/maven2/com/chuusai/shapeless_2.12/2.3.2/shapeless_2.12-2.3.2-sources.jar
-[debug] sha1 OK for https://repo1.maven.org/maven2/org/scalanlp/breeze-macros_2.12/0.13.2/breeze-macros_2.12-0.13.2-sources.jar
-[info] 	[SUCCESSFUL ] org.scalanlp#breeze-macros_2.12;0.13.2!breeze-macros_2.12.jar(src) (407ms)
-[info] downloading https://repo1.maven.org/maven2/org/spire-math/spire-macros_2.12/0.13.0/spire-macros_2.12-0.13.0-sources.jar ...
-[debug] 	public: downloading https://repo1.maven.org/maven2/org/spire-math/spire-macros_2.12/0.13.0/spire-macros_2.12-0.13.0-sources.jar
-[debug] 	public: downloading https://repo1.maven.org/maven2/junit/junit/4.8.2/junit-4.8.2-sources.jar.sha1
-[debug] 	public: downloading https://repo1.maven.org/maven2/org/spire-math/spire-macros_2.12/0.13.0/spire-macros_2.12-0.13.0-sources.jar.sha1
-[debug] 	public: downloading https://repo1.maven.org/maven2/com/github/rwl/jtransforms/2.4.0/jtransforms-2.4.0-sources.jar.sha1
-[debug] 	public: downloading https://repo1.maven.org/maven2/com/chuusai/shapeless_2.12/2.3.2/shapeless_2.12-2.3.2-sources.jar.sha1
-[debug] sha1 OK for https://repo1.maven.org/maven2/org/spire-math/spire-macros_2.12/0.13.0/spire-macros_2.12-0.13.0-sources.jar
-[debug] sha1 OK for https://repo1.maven.org/maven2/junit/junit/4.8.2/junit-4.8.2-sources.jar
-[info] 	[SUCCESSFUL ] junit#junit;4.8.2!junit.jar(src) (407ms)
-[info] downloading https://repo1.maven.org/maven2/org/scalanlp/breeze_2.12/0.13.2/breeze_2.12-0.13.2-sources.jar ...
-[debug] 	public: downloading https://repo1.maven.org/maven2/org/scalanlp/breeze_2.12/0.13.2/breeze_2.12-0.13.2-sources.jar
-[info] 	[SUCCESSFUL ] org.spire-math#spire-macros_2.12;0.13.0!spire-macros_2.12.jar(src) (335ms)
-[debug] sha1 OK for https://repo1.maven.org/maven2/com/github/rwl/jtransforms/2.4.0/jtransforms-2.4.0-sources.jar
-[info] 	[SUCCESSFUL ] com.github.rwl#jtransforms;2.4.0!jtransforms.jar(src) (329ms)
-[debug] sha1 OK for https://repo1.maven.org/maven2/com/chuusai/shapeless_2.12/2.3.2/shapeless_2.12-2.3.2-sources.jar
-[info] 	[SUCCESSFUL ] com.chuusai#shapeless_2.12;2.3.2!shapeless_2.12.jar(src) (326ms)
-[debug] 	public: downloading https://repo1.maven.org/maven2/org/spire-math/spire_2.12/0.13.0/spire_2.12-0.13.0-sources.jar.sha1
-[debug] sha1 OK for https://repo1.maven.org/maven2/org/spire-math/spire_2.12/0.13.0/spire_2.12-0.13.0-sources.jar
-[info] 	[SUCCESSFUL ] org.spire-math#spire_2.12;0.13.0!spire_2.12.jar(src) (365ms)
-[debug] 	public: downloading https://repo1.maven.org/maven2/com/github/fommil/netlib/core/1.1.2/core-1.1.2-sources.jar.sha1
-[debug] sha1 OK for https://repo1.maven.org/maven2/com/github/fommil/netlib/core/1.1.2/core-1.1.2-sources.jar
-[info] 	[SUCCESSFUL ] com.github.fommil.netlib#core;1.1.2!core.jar(src) (542ms)
-[debug] 	public: downloading https://repo1.maven.org/maven2/org/scalanlp/breeze_2.12/0.13.2/breeze_2.12-0.13.2-sources.jar.sha1
-[debug] 	public: downloading https://repo1.maven.org/maven2/org/apache/commons/commons-math3/3.2/commons-math3-3.2-sources.jar.sha1
-[debug] sha1 OK for https://repo1.maven.org/maven2/org/scalanlp/breeze_2.12/0.13.2/breeze_2.12-0.13.2-sources.jar
-[info] 	[SUCCESSFUL ] org.scalanlp#breeze_2.12;0.13.2!breeze_2.12.jar(src) (755ms)
-[debug] sha1 OK for https://repo1.maven.org/maven2/org/apache/commons/commons-math3/3.2/commons-math3-3.2-sources.jar
-[info] 	[SUCCESSFUL ] org.apache.commons#commons-math3;3.2!commons-math3.jar(src) (920ms)
-[debug] :: resolution report :: resolve 1091ms :: artifacts dl 1077ms
-[warn] 	::::::::::::::::::::::::::::::::::::::::::::::
-[warn] 	::              FAILED DOWNLOADS            ::
-[warn] 	:: ^ see resolution messages for details  ^ ::
-[warn] 	::::::::::::::::::::::::::::::::::::::::::::::
-[warn] 	:: net.sourceforge.f2j#arpack_combined_all;0.1!arpack_combined_all.jar(src)
-[warn] 	::::::::::::::::::::::::::::::::::::::::::::::
+[debug] :: resolution report :: resolve 494ms :: artifacts dl 227ms
 [debug] 	report for default#siot-clustering$sources;0.1 compile produced in /home/vcaballero/Projects/siot-clustering/target/scala-2.12/resolution-cache/reports/default-siot-clustering$sources-compile.xml
 [debug] 	report for default#siot-clustering$sources;0.1 runtime produced in /home/vcaballero/Projects/siot-clustering/target/scala-2.12/resolution-cache/reports/default-siot-clustering$sources-runtime.xml
 [debug] 	report for default#siot-clustering$sources;0.1 test produced in /home/vcaballero/Projects/siot-clustering/target/scala-2.12/resolution-cache/reports/default-siot-clustering$sources-test.xml
@@ -3265,4 +3283,4 @@
 [debug] 	report for default#siot-clustering$sources;0.1 plugin produced in /home/vcaballero/Projects/siot-clustering/target/scala-2.12/resolution-cache/reports/default-siot-clustering$sources-plugin.xml
 [debug] 	report for default#siot-clustering$sources;0.1 pom produced in /home/vcaballero/Projects/siot-clustering/target/scala-2.12/resolution-cache/reports/default-siot-clustering$sources-pom.xml
 [debug] 	report for default#siot-clustering$sources;0.1 scala-tool produced in /home/vcaballero/Projects/siot-clustering/target/scala-2.12/resolution-cache/reports/default-siot-clustering$sources-scala-tool.xml
-[debug] 	resolve done (1091ms resolve - 1077ms download)
+[debug] 	resolve done (494ms resolve - 227ms download)

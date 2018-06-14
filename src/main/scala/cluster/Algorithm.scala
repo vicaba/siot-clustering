@@ -2,23 +2,21 @@ package cluster
 
 import breeze.linalg._
 import cluster.Types._
+import metrics.Metrics
 
 import scala.annotation.tailrec
 import scala.util.Random
 
-class Algorithm
-{
+class Algorithm {
 
-  def distanceTo(p: Point, cluster: Cluster): Int =
-  {
-    max(p.syntheticValue) - min(p.syntheticValue)
-  }
+  def distanceTo(point: Point, cluster: Cluster): Double =
+    Metrics.par(point.syntheticValue, cluster.syntheticCenter)
 
-  def run(numberOfClusters: Int, points: scala.Vector[Point]) =
-  {
+
+  def run(numberOfClusters: Int, points: scala.Vector[Point]) = {
 
     val clusters = randomSample(numberOfClusters, points).zipWithIndex.map { case (point, idx) =>
-      idx -> Cluster(idx, idx.toString, Vector(point.setCluster(idx)))
+      idx -> Cluster(idx, idx.toString, Set(point.setCluster(idx)))
     }.toMap
 
     @tailrec
@@ -26,6 +24,13 @@ class Algorithm
       remainingPoints match {
         case p +: tail =>
 
+          val bestCluster = clusters.values.minBy { cluster =>
+            if (p.isAssignedToCluster) {
+              distanceTo(p, cluster - p)
+            } else {
+              distanceTo(p, cluster)
+            }
+          }
 
           assignToClusters(clusters, tail)
         case IndexedSeq() => clusters
@@ -36,9 +41,7 @@ class Algorithm
   }
 
 
-
-  private def randomSample(take: Int, points: Seq[Point]): List[Point] =
-  {
+  private def randomSample(take: Int, points: Seq[Point]): List[Point] = {
     val r = new Random(100)
     r.shuffle(points).take(take).toList
   }

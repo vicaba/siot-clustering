@@ -2,8 +2,7 @@ package cluster
 
 import breeze.linalg._
 
-object Types
-{
+object Types {
 
   /**
    * Rows correspond to each appliance, columns correspond to each time interval
@@ -12,14 +11,17 @@ object Types
 
   type SyntheticDataType = DenseVector[Int]
 
-  val EmptyData: DataType = DenseMatrix.zeros[Int](25, 5)
+  val Rows = 1
 
-  val EmptySyntheticData: SyntheticDataType = sum(EmptyData, Axis._1)
+  val Columns = 25
+
+  def EmptyData(): DataType = DenseMatrix.zeros[Int](Rows, Columns)
+
+  def EmptySyntheticData(): SyntheticDataType = sum(EmptyData(), Axis._0).inner
 
   def synthesizeValues(values: DataType): SyntheticDataType = sum(values, Axis._1)
 
-  case class Point(id: Int, values: DataType, assignedToCluster: Option[Int] = None)
-  {
+  case class Point(id: Int, values: DataType, assignedToCluster: Option[Int] = None) {
 
     def setCluster(clusterId: Int): Point = this.copy(assignedToCluster = Some(clusterId))
 
@@ -27,29 +29,29 @@ object Types
 
     def setValues(values: DataType): Point = this.copy(values = values)
 
-    def syntheticValue: SyntheticDataType = this.synthesizeValues(this.values)
+    def syntheticValue: SyntheticDataType = synthesizeValues(this.values)
 
   }
 
-  case class Cluster(id: Int, name: String, points: scala.Vector[Point])
-  {
+  case class Cluster(id: Int, name: String, points: Set[Point]) {
 
-    def addPoint(point: Point): Cluster = this.copy(points = point +: this.points)
+    def +(point: Point): Cluster = this.copy(points = this.points + point)
 
-    def addPoints(points: Seq[Point]): Cluster = this.copy(points = points ++: this.points)
+    def ++(points: Seq[Point]): Cluster = this.copy(points = this.points ++ points)
 
-    def setPoints(points: Seq[Point]): Cluster = this.copy(points = points.toVector)
+    def setPoints(points: Seq[Point]): Cluster = this.copy(points = points.toSet)
+
+    def -(point: Point): Cluster = this.copy(points = points - point)
 
     def syntheticCenter: SyntheticDataType = {
-      this.points.map(_.syntheticValue).fold(EmptyData)(_ + _)
+      this.points.map(_.syntheticValue).fold(EmptySyntheticData())(_ + _)
     }
 
   }
 
-  object Cluster
-  {
+  object Cluster {
 
-    val Empty = Cluster(-1, "empty", scala.Vector.empty)
+    val Empty = Cluster(-1, "empty", Set.empty)
 
   }
 

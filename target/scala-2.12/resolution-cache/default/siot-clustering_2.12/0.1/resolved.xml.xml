@@ -4,7 +4,7 @@
 		module="siot-clustering_2.12"
 		revision="0.1"
 		status="integration"
-		publication="20180614091930"
+		publication="20180614155841"
 	>
 		<description>
 		siot-clustering
@@ -35,5 +35,7 @@
 		<dependency org="org.apache.commons" name="commons-csv" rev="1.4" conf="compile->default(compile)"/>
 		<dependency org="com.twitter" name="algebird-core_2.12" rev="0.13.4" conf="compile->default(compile)"/>
 		<dependency org="org.scalanlp" name="breeze_2.12" rev="0.13.2" conf="compile->default(compile)"/>
+		<dependency org="org.scalactic" name="scalactic_2.12" rev="3.0.5" conf="compile->default(compile)"/>
+		<dependency org="org.scalatest" name="scalatest_2.12" rev="3.0.5" conf="test->default(compile)"/>
 	</dependencies>
 </ivy-module>
