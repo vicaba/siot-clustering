@@ -7,15 +7,15 @@ object Types {
   /**
    * Rows correspond to each appliance, columns correspond to each time interval
    */
-  type DataType = DenseMatrix[Int]
+  type DataType = DenseMatrix[Double]
 
-  type SyntheticDataType = DenseVector[Int]
+  type SyntheticDataType = DenseVector[Double]
 
   val Rows = 1
 
   val Columns = 25
 
-  def EmptyData(): DataType = DenseMatrix.zeros[Int](Rows, Columns)
+  def EmptyData(): DataType = DenseMatrix.zeros[Double](Rows, Columns)
 
   def EmptySyntheticData(): SyntheticDataType = sum(EmptyData(), Axis._0).inner
 

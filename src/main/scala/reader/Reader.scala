@@ -8,12 +8,12 @@ import scala.collection.JavaConverters._
 
 object Reader {
 
-  def readUserRanges(): Vector[Vector[Int]] = {
+  def readUserRanges(): Vector[Vector[Double]] = {
     val in = new FileReader("./src/main/resources/UserRanges.csv")
     val records = CSVFormat.DEFAULT.parse(in)
     records.getRecords.asScala.map { c =>
       (for (i <- 0 until c.size()) yield {
-        c.get(i).toInt
+        c.get(i).toDouble
       }).toVector
     }.toVector
   }
