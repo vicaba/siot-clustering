@@ -28,7 +28,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
       Then("the new vector contributes in minimizing overall distanceFunction")
       val originalCompatibility = Metrics.par(u, v)
 
-      val betterCompatibility = Metrics.par(result, v)
+      val betterCompatibility = Metrics.par(result.vector, v)
 
       betterCompatibility should be < originalCompatibility
     }
@@ -46,9 +46,9 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
       Then("the new vector is the only solution (in this simple case) that minimizes overall distanceFunction")
       val originalCompatibility = Metrics.par(u, v)
-      val betterCompatibility = Metrics.par(result, v)
+      val betterCompatibility = Metrics.par(result.vector, v)
 
-      result shouldEqual vector1Solution
+      result.vector shouldEqual vector1Solution
     }
   }
 

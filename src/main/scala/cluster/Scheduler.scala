@@ -17,8 +17,9 @@ object Scheduler {
     }
   }
 
-  class VectorResult[T](val vector: DenseVector[T], val distanceBeforeReschedule: Double, val distanceAfterReschedule: Double)
-  class MatrixResult[T](val matrix: DenseVector[T], val row: Int, val column: Int, val distanceBeforeReschedule: Double, val distanceAfterReschedule: Double)
+  class ChangedComponent(val from: Int, val to: Int)
+  class VectorResult[T](val vector: DenseVector[T], changedComponent: ChangedComponent, val distanceBeforeReschedule: Double, val distanceAfterReschedule: Double)
+  class MatrixResult[T](val matrix: DenseVector[T], val row: Int, val changedComponent: ChangedComponent, val distanceBeforeReschedule: Double, val distanceAfterReschedule: Double)
 
   def swap(fromIndex: Int, toIndex: Int, vector: DenseVector[Double]): DenseVector[Double] =
     Mutable.swap(fromIndex, toIndex, vector.copy)
@@ -36,6 +37,7 @@ object Scheduler {
     val biggest = Metrics.par(vectorToReschedule, fixedVector)
     var smallest = biggest
     var bestSolution = vectorToReschedule
+    var changedComponent = null.asInstanceOf[ChangedComponent]
     val length = vectorToReschedule.length
     var i = 0
     var j = 0
@@ -47,6 +49,7 @@ object Scheduler {
         if (distance < smallest) {
           smallest = distance
           bestSolution = vector
+          changedComponent = new ChangedComponent(i, j)
         } else {
           vector
         }
@@ -55,7 +58,7 @@ object Scheduler {
       i = i + 1
     }
 
-    new VectorResult(bestSolution, biggest, smallest)
+    new VectorResult(bestSolution, changedComponent, biggest, smallest)
 
   }
 
@@ -77,21 +80,26 @@ object Scheduler {
     val rowIterator = matrixToReschedule(*, ::).iterator
 
     var smallest = 0.0
-    var bestSolution: DenseVector[Double] = null
+    var bestSolutionRow = 0
+    var bestSolution = null.asInstanceOf[VectorResult[Double]]
     var first = true
 
 
-    rowIterator.foreach { vector =>
+    rowIterator.zipWithIndex.foreach { case (vector, rowNumber) =>
       val distance = rescheduleVector(vector, fixedVector)
 
       if (first || distance.distanceAfterReschedule < smallest) {
         first = false
+
+        bestSolutionRow = rowNumber
         smallest = distance.distanceAfterReschedule
-        bestSolution = distance.vector
+        bestSolution = distance
       }
     }
 
+    matrixToReschedule(bestSolutionRow, ::) = bestSolution.vector
 
+    // new MatrixResult[Double](matrixToReschedule(bestSolutionRow, ::) )
 
   }
 
