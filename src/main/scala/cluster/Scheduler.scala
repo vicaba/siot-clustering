@@ -18,8 +18,8 @@ object Scheduler {
   }
 
   class ChangedComponent(val from: Int, val to: Int)
-  class VectorResult[T](val vector: DenseVector[T], changedComponent: ChangedComponent, val distanceBeforeReschedule: Double, val distanceAfterReschedule: Double)
-  class MatrixResult[T](val matrix: DenseVector[T], val row: Int, val changedComponent: ChangedComponent, val distanceBeforeReschedule: Double, val distanceAfterReschedule: Double)
+  class VectorResult[T](val vector: DenseVector[T], val changedComponent: ChangedComponent, val distanceBeforeReschedule: Double, val distanceAfterReschedule: Double)
+  class MatrixResult[T](val matrix: DenseMatrix[T], val row: Int, val changedComponent: ChangedComponent, val distanceBeforeReschedule: Double, val distanceAfterReschedule: Double)
 
   def swap(fromIndex: Int, toIndex: Int, vector: DenseVector[Double]): DenseVector[Double] =
     Mutable.swap(fromIndex, toIndex, vector.copy)
@@ -68,10 +68,10 @@ object Scheduler {
    * @param fixedVector
    * @return
    */
-  def rescheduleMatrix(matrixToReschedule: DenseMatrix[Double], fixedVector: DenseVector[Double]): DenseMatrix[Double] =
+  def rescheduleMatrix(matrixToReschedule: DenseMatrix[Double], fixedVector: DenseVector[Double]): MatrixResult[Double] =
   {
 
-    assert(matrixToReschedule.rows == fixedVector.length, "matrix rows and vector length are not equal")
+    assert(matrixToReschedule.cols == fixedVector.length, "matrix rows and vector length are not equal")
 
     /*
     Compute metric for each row and take the first smallest one
@@ -97,9 +97,11 @@ object Scheduler {
       }
     }
 
-    matrixToReschedule(bestSolutionRow, ::) = bestSolution.vector
+    val result = matrixToReschedule.copy
 
-    // new MatrixResult[Double](matrixToReschedule(bestSolutionRow, ::) )
+    result(bestSolutionRow, ::) := bestSolution.vector.t
+
+    new MatrixResult[Double](result, bestSolutionRow, bestSolution.changedComponent, bestSolution.distanceBeforeReschedule, bestSolution.distanceAfterReschedule )
 
   }
 

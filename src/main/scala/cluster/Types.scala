@@ -19,7 +19,7 @@ object Types {
 
   def EmptySyntheticData(): SyntheticDataType = sum(EmptyData(), Axis._0).inner
 
-  def synthesizeValues(values: DataType): SyntheticDataType = sum(values, Axis._1)
+  def synthesizeValues(values: DataType): SyntheticDataType = sum(values, Axis._0).inner
 
   case class Point(id: Int, values: DataType, assignedToCluster: Option[Int] = None) {
 
