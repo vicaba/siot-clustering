@@ -1,19 +1,21 @@
-package scheduler
+package cluster.scheduler
 
 import breeze.linalg.{DenseMatrix, DenseVector}
-import cluster.{Scheduler, Types}
-import metrics.Metrics
+import cluster.Types
+import metrics._
 import org.scalatest._
 import org.scalatest.Matchers._
 
 
-class SchedulerSpec extends FeatureSpec with GivenWhenThen {
+class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
+
+  val metric = Metric.maxMin
 
   val vector1 = DenseVector(2.0, 1.0, 2.0, 1.0)
   val vector1Solution = DenseVector(1.0, 2.0, 2.0, 1.0)
   val vector2 = DenseVector(2.0, 1.0, 1.0, 2.0)
 
-  feature("Vector scheduler") {
+  feature("Vector cluster.scheduler.Rescheduler") {
     scenario("schedules vector minimizing distanceFunction") {
 
       Given("a variable vector")
@@ -23,11 +25,11 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
       val v = vector2.copy
 
       When("asked to reschedule")
-      val result = Scheduler.reschedule(u, v)
+      val result = Rescheduler.reschedule(u, v, metric)
 
       Then("the new vector contributes in minimizing overall distanceFunction")
-      val originalCompatibility = Metrics.par(u, v)
-      val betterCompatibility = Metrics.par(result.vector, v)
+      val originalCompatibility = metric(u, v)
+      val betterCompatibility = metric(result.vector, v)
 
       betterCompatibility should be < originalCompatibility
 
@@ -41,7 +43,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
   val matrix1Solution = DenseMatrix((0.0, 3.0, 3.0, 0.0), (4.0, 0.0, 4.0, 0.0))
   val vector = DenseVector(0.0, 7.0, 0.0, 7.0)
 
-  feature("Matrix scheduler") {
+  feature("Matrix cluster.scheduler") {
     scenario("schedules matrix minimazing the distanceFunction") {
 
       Given("a variable matrix")
@@ -51,11 +53,11 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
       val u = vector.copy
 
       When("asked to reschedule")
-      val result = Scheduler.reschedule(m, u)
+      val result = Rescheduler.reschedule(m, u, metric)
 
       Then("the new matrix contributes in minimizing overall distance function")
-      val originalCompatibility = Metrics.par(Types.synthesizeValues(m), u)
-      val betterCompatibility = Metrics.par(Types.synthesizeValues(result.matrix), u)
+      val originalCompatibility = metric(Types.synthesizeValues(m), u)
+      val betterCompatibility = metric(Types.synthesizeValues(result.matrix), u)
 
       betterCompatibility should be < originalCompatibility
 

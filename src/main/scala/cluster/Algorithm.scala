@@ -1,8 +1,7 @@
 package cluster
 
-import breeze.linalg._
 import cluster.Types._
-import metrics.Metrics
+import metrics.Metric
 
 import scala.annotation.tailrec
 import scala.util.Random
@@ -10,7 +9,7 @@ import scala.util.Random
 class Algorithm {
 
   def distanceTo(point: Point, cluster: Cluster): Double =
-    Metrics.par(point.syntheticValue, cluster.syntheticCenter)
+    Metric.par(point.syntheticValue, cluster.syntheticCenter)
 
 
   def run(numberOfClusters: Int, points: scala.Vector[Point]) = {

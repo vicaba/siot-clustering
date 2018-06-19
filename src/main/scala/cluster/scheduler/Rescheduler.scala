@@ -1,10 +1,13 @@
-package cluster
+package cluster.scheduler
 
 import breeze.linalg._
-import cluster.Types.{Cluster, Point}
-import metrics.Metrics
+import metrics.Metric
 
-object Scheduler {
+object Rescheduler {
+
+  class ChangedComponent(val from: Int, val to: Int)
+  class VectorResult[T](val vector: DenseVector[T], val changedComponent: ChangedComponent, val distanceBeforeReschedule: Double, val distanceAfterReschedule: Double)
+  class MatrixResult[T](val matrix: DenseMatrix[T], val row: Int, val changedComponent: ChangedComponent, val distanceBeforeReschedule: Double, val distanceAfterReschedule: Double)
 
   object Mutable {
     def swap(fromIndex: Int, toIndex: Int, vector: DenseVector[Double]): DenseVector[Double] =
@@ -17,10 +20,6 @@ object Scheduler {
     }
   }
 
-  class ChangedComponent(val from: Int, val to: Int)
-  class VectorResult[T](val vector: DenseVector[T], val changedComponent: ChangedComponent, val distanceBeforeReschedule: Double, val distanceAfterReschedule: Double)
-  class MatrixResult[T](val matrix: DenseMatrix[T], val row: Int, val changedComponent: ChangedComponent, val distanceBeforeReschedule: Double, val distanceAfterReschedule: Double)
-
   def swap(fromIndex: Int, toIndex: Int, vector: DenseVector[Double]): DenseVector[Double] =
     Mutable.swap(fromIndex, toIndex, vector.copy)
 
@@ -30,11 +29,11 @@ object Scheduler {
    * @param fixedVector
    * @return
    */
-  def reschedule(vectorToReschedule: DenseVector[Double], fixedVector: DenseVector[Double]): VectorResult[Double] = {
+  def reschedule(vectorToReschedule: DenseVector[Double], fixedVector: DenseVector[Double], metric: Metric): VectorResult[Double] = {
 
     assert(vectorToReschedule.length == fixedVector.length, "vector lengths are not equal")
 
-    val biggest = Metrics.par(vectorToReschedule, fixedVector)
+    val biggest = metric(vectorToReschedule, fixedVector)
     var smallest = biggest
     var bestSolution = vectorToReschedule
     var changedComponent = null.asInstanceOf[ChangedComponent]
@@ -45,7 +44,7 @@ object Scheduler {
       j = i + 1
       while (j < length) {
         val vector = swap(i, j, vectorToReschedule)
-        val distance = Metrics.par(vector, fixedVector)
+        val distance = metric(vector, fixedVector)
         if (distance < smallest) {
           smallest = distance
           bestSolution = vector
@@ -68,7 +67,7 @@ object Scheduler {
    * @param fixedVector
    * @return
    */
-  def reschedule(matrixToReschedule: DenseMatrix[Double], fixedVector: DenseVector[Double]): MatrixResult[Double] =
+  def reschedule(matrixToReschedule: DenseMatrix[Double], fixedVector: DenseVector[Double], metric: Metric): MatrixResult[Double] =
   {
 
     assert(matrixToReschedule.cols == fixedVector.length, "matrix rows and vector length are not equal")
@@ -86,7 +85,7 @@ object Scheduler {
 
 
     rowIterator.zipWithIndex.foreach { case (vector, rowNumber) =>
-      val distance = reschedule(vector, fixedVector)
+      val distance = reschedule(vector, fixedVector, metric)
 
       if (first || distance.distanceAfterReschedule < smallest) {
         first = false

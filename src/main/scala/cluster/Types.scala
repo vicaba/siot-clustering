@@ -23,6 +23,12 @@ object Types {
 
   case class Point(id: Int, values: DataType, assignedToCluster: Option[Int] = None) {
 
+    /**
+     * Used for Set operations
+     * @return a unique identifier of this point
+     */
+    override def hashCode(): Int = 1
+
     def setCluster(clusterId: Int): Point = this.copy(assignedToCluster = Some(clusterId))
 
     def isAssignedToCluster: Boolean = this.assignedToCluster.isDefined
@@ -44,14 +50,21 @@ object Types {
     def -(point: Point): Cluster = this.copy(points = points - point)
 
     def syntheticCenter: SyntheticDataType = {
-      this.points.map(_.syntheticValue).fold(EmptySyntheticData())(_ + _)
+      val syntheticValues = this.points.toList.map(_.syntheticValue)
+      if (syntheticValues.size >= 2) syntheticValues.reduce(_ + _)
+      else syntheticValues.fold(EmptySyntheticData())(_ + _)
     }
 
   }
 
   object Cluster {
 
+    import scala.language.implicitConversions
+
+
     val Empty = Cluster(-1, "empty", Set.empty)
+
+    implicit def clusterToVector(c: Cluster): SyntheticDataType = c.syntheticCenter
 
   }
 
