@@ -30,7 +30,7 @@ object Scheduler {
    * @param fixedVector
    * @return
    */
-  def rescheduleVector(vectorToReschedule: DenseVector[Double], fixedVector: DenseVector[Double]): VectorResult[Double] = {
+  def reschedule(vectorToReschedule: DenseVector[Double], fixedVector: DenseVector[Double]): VectorResult[Double] = {
 
     assert(vectorToReschedule.length == fixedVector.length, "vector lengths are not equal")
 
@@ -68,7 +68,7 @@ object Scheduler {
    * @param fixedVector
    * @return
    */
-  def rescheduleMatrix(matrixToReschedule: DenseMatrix[Double], fixedVector: DenseVector[Double]): MatrixResult[Double] =
+  def reschedule(matrixToReschedule: DenseMatrix[Double], fixedVector: DenseVector[Double]): MatrixResult[Double] =
   {
 
     assert(matrixToReschedule.cols == fixedVector.length, "matrix rows and vector length are not equal")
@@ -86,7 +86,7 @@ object Scheduler {
 
 
     rowIterator.zipWithIndex.foreach { case (vector, rowNumber) =>
-      val distance = rescheduleVector(vector, fixedVector)
+      val distance = reschedule(vector, fixedVector)
 
       if (first || distance.distanceAfterReschedule < smallest) {
         first = false

@@ -23,7 +23,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
       val v = vector2.copy
 
       When("asked to reschedule")
-      val result = Scheduler.rescheduleVector(u, v)
+      val result = Scheduler.reschedule(u, v)
 
       Then("the new vector contributes in minimizing overall distanceFunction")
       val originalCompatibility = Metrics.par(u, v)
@@ -51,7 +51,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
       val u = vector.copy
 
       When("asked to reschedule")
-      val result = Scheduler.rescheduleMatrix(m, u)
+      val result = Scheduler.reschedule(m, u)
 
       Then("the new matrix contributes in minimizing overall distance function")
       val originalCompatibility = Metrics.par(Types.synthesizeValues(m), u)

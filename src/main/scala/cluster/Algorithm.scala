@@ -32,7 +32,7 @@ class Algorithm {
             }
           }
 
-          assignToClusters(clusters, tail)
+          assignToClusters(clusters + (bestCluster.id -> (bestCluster + p)), tail)
         case IndexedSeq() => clusters
       }
 
