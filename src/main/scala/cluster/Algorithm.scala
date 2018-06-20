@@ -8,8 +8,8 @@ import scala.util.Random
 
 class Algorithm {
 
-  def distanceTo(point: Point, cluster: Cluster): Double =
-    Metric.par(point.syntheticValue, cluster.syntheticCenter)
+  def distanceTo(cluster: Cluster): Double =
+    Metric.maxMin(cluster.syntheticCenter)
 
 
   def run(numberOfClusters: Int, points: scala.Vector[Point]) = {
@@ -25,9 +25,9 @@ class Algorithm {
 
           val bestCluster = clusters.values.minBy { cluster =>
             if (p.isAssignedToCluster) {
-              distanceTo(p, cluster - p)
+              distanceTo(cluster - p)
             } else {
-              distanceTo(p, cluster)
+              distanceTo(cluster)
             }
           }
 

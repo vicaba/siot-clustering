@@ -27,7 +27,12 @@ object Types {
      * Used for Set operations
      * @return a unique identifier of this point
      */
-    override def hashCode(): Int = 1
+    override def hashCode(): Int = this.id
+
+    override def equals(obj: scala.Any): Boolean = obj match {
+      case p: Point => this.id == p.id
+      case _ => false
+    }
 
     def setCluster(clusterId: Int): Point = this.copy(assignedToCluster = Some(clusterId))
 
@@ -41,9 +46,9 @@ object Types {
 
   case class Cluster(id: Int, name: String, points: Set[Point]) {
 
-    def +(point: Point): Cluster = this.copy(points = this.points + point)
+    def +(point: Point): Cluster = this.copy(points = (this.points - point) + point)
 
-    def ++(points: Seq[Point]): Cluster = this.copy(points = this.points ++ points)
+    def ++(points: Seq[Point]): Cluster = this.copy(points = (this.points -- points) ++ points)
 
     def setPoints(points: Seq[Point]): Cluster = this.copy(points = points.toSet)
 

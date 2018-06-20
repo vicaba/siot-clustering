@@ -33,7 +33,7 @@ object Rescheduler {
 
     assert(vectorToReschedule.length == fixedVector.length, "vector lengths are not equal")
 
-    val biggest = metric(vectorToReschedule, fixedVector)
+    val biggest = metric(vectorToReschedule + fixedVector)
     var smallest = biggest
     var bestSolution = vectorToReschedule
     var changedComponent = null.asInstanceOf[ChangedComponent]
@@ -44,7 +44,7 @@ object Rescheduler {
       j = i + 1
       while (j < length) {
         val vector = swap(i, j, vectorToReschedule)
-        val distance = metric(vector, fixedVector)
+        val distance = metric(vector + fixedVector)
         if (distance < smallest) {
           smallest = distance
           bestSolution = vector

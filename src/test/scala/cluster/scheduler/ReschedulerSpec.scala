@@ -28,8 +28,8 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
       val result = Rescheduler.reschedule(u, v, metric)
 
       Then("the new vector contributes in minimizing overall distanceFunction")
-      val originalCompatibility = metric(u, v)
-      val betterCompatibility = metric(result.vector, v)
+      val originalCompatibility = metric(u + v)
+      val betterCompatibility = metric(result.vector + v)
 
       betterCompatibility should be < originalCompatibility
 
@@ -56,8 +56,8 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
       val result = Rescheduler.reschedule(m, u, metric)
 
       Then("the new matrix contributes in minimizing overall distance function")
-      val originalCompatibility = metric(Types.synthesizeValues(m), u)
-      val betterCompatibility = metric(Types.synthesizeValues(result.matrix), u)
+      val originalCompatibility = metric(Types.synthesizeValues(m) + u)
+      val betterCompatibility = metric(Types.synthesizeValues(result.matrix) + u)
 
       betterCompatibility should be < originalCompatibility
 
