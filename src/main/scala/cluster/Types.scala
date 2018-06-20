@@ -2,6 +2,8 @@ package cluster
 
 import breeze.linalg._
 
+import scala.annotation.tailrec
+
 object Types {
 
   /**
@@ -22,12 +24,6 @@ object Types {
   def synthesizeValues(values: DataType): SyntheticDataType = sum(values, Axis._0).inner
 
   case class Point(id: Int, values: DataType, assignedToCluster: Option[Int] = None) {
-
-    /**
-     * Used for Set operations
-     * @return a unique identifier of this point
-     */
-    override def hashCode(): Int = this.id
 
     override def equals(obj: scala.Any): Boolean = obj match {
       case p: Point => this.id == p.id
@@ -54,10 +50,22 @@ object Types {
 
     def -(point: Point): Cluster = this.copy(points = points - point)
 
+    /**
+     * Calling this method without any point is unsafe
+     * @return
+     */
     def syntheticCenter: SyntheticDataType = {
+
+        @tailrec
+        def sumVectors(remaining: List[SyntheticDataType], accum: SyntheticDataType): SyntheticDataType = remaining match {
+          case e :: tail => sumVectors(tail, accum + e)
+          case Nil => accum
+        }
+
       val syntheticValues = this.points.toList.map(_.syntheticValue)
-      if (syntheticValues.size >= 2) syntheticValues.reduce(_ + _)
-      else syntheticValues.fold(EmptySyntheticData())(_ + _)
+
+      sumVectors(syntheticValues, syntheticValues.head - syntheticValues.head)
+      //syntheticValues.fold(EmptySyntheticData())(_ + _)
     }
 
   }

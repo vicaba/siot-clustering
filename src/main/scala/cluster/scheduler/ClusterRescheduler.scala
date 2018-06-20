@@ -49,13 +49,13 @@ object ClusterRescheduler {
       }
     }
 
-    reschedule(initialMetric, Memory(3), cluster, List.empty)
+    reschedule(0, Memory(3), cluster, List.empty)
 
   }
 
   def rescheduleOnePoint(cluster: Cluster, metric: Metric): PointChange = {
     val pointToReschedule = cluster.points.maxBy { point =>
-      metric(point.syntheticValue + cluster.syntheticCenter)
+      metric(cluster) - metric(cluster - point)
     }
     val rescheduleResult = Rescheduler.reschedule(pointToReschedule.values, cluster.syntheticCenter, metric)
     val rescheduledPoint = pointToReschedule.copy(values = rescheduleResult.matrix)

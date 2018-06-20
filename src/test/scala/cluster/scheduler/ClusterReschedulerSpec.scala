@@ -1,6 +1,6 @@
 package cluster.scheduler
 
-import breeze.linalg.DenseMatrix
+import breeze.linalg.{DenseMatrix, DenseVector}
 import cluster.Types.{Cluster, Point}
 import metrics._
 import org.scalatest.Matchers._
@@ -52,6 +52,10 @@ class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
       val cluster = Cluster(0, "0", points)
 
+      And("a vector solution")
+      val vector = DenseVector(7.0, 7.0, 7.0, 7.0)
+
+
       When("asked to reschedule one point")
 
       val (betterCluster, scheduleResult) = ClusterRescheduler.rescheduleCluster(cluster, metric, 1)
@@ -62,6 +66,8 @@ class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
       betterCompatibility should be < originalCompatibility
 
+      And("the syntheticValue should be equal to the only possible solution")
+      betterCluster.syntheticCenter shouldEqual vector
     }
   }
 
