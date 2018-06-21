@@ -3,25 +3,11 @@ package cluster.scheduler
 import cluster.Types.{Cluster, Point}
 import cluster.scheduler.Rescheduler.MatrixResult
 import metrics.Metric
+import collection._
 
 import scala.annotation.tailrec
 
 object ClusterRescheduler {
-
-  private[ClusterRescheduler] class Memory[T](val list: Vector[T], val max: Int) {
-
-    def areAllElementsEqual(): Boolean = if (list.size >= max) !list.exists(_ != list.head) else false
-
-    def +:(e: T): Memory[T] = {
-      val newList = if (list.size >= max) e +: list.dropRight(1) else e +: list
-
-      new Memory[T](newList, max)
-    }
-  }
-
-  object Memory {
-    def apply[T](max: Int): Memory[T] = new Memory[T](Vector[T](), max)
-  }
 
   private[ClusterRescheduler] class PointChange(val cluster: Cluster, val point: Point, val change: MatrixResult[Double])
 
@@ -49,7 +35,7 @@ object ClusterRescheduler {
       }
     }
 
-    reschedule(0, Memory(3), cluster, List.empty)
+    reschedule(0, Memory(10), cluster, List.empty)
 
   }
 

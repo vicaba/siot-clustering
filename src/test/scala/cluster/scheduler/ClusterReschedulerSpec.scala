@@ -17,7 +17,7 @@ class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
       val points = List(
         DenseMatrix((0.0, 3.0, 3.0, 0.0), (0.0, 4.0, 4.0, 0.0))
-        , DenseMatrix((0.0, 3.0, 0.0, 3.0), (0.0, 4.0, 0.0, 4.0))
+        , DenseMatrix((0.0, 0.0, 3.0, 3.0), (0.0, 4.0, 4.0, 0.0))
       ).zipWithIndex.map { case (m, idx) =>
         Point(idx, m, Some(0))
       }.toSet
@@ -43,7 +43,7 @@ class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
       val points = List(
         DenseMatrix((0.0, 3.0, 3.0, 0.0), (0.0, 4.0, 4.0, 0.0))
-        , DenseMatrix((0.0, 3.0, 0.0, 3.0), (0.0, 4.0, 0.0, 4.0))
+        , DenseMatrix((0.0, 0.0, 3.0, 3.0), (0.0, 4.0, 4.0, 0.0))
       ).zipWithIndex.map { case (m, idx) =>
         Point(idx, m, Some(0))
       }.toSet
