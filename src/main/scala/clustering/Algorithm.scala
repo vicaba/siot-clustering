@@ -1,7 +1,8 @@
-package cluster
+package clustering
 
-import cluster.Types._
+import types._
 import metrics.Metric
+import types.{Cluster, Point}
 
 import scala.annotation.tailrec
 import scala.util.Random

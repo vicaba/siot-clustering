@@ -1,4 +1,4 @@
-package cluster.scheduler
+package clustering.scheduler
 
 import breeze.linalg._
 import metrics.Metric

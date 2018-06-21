@@ -1,9 +1,10 @@
-package cluster.scheduler
+package clustering.scheduler
 
-import cluster.Types.{Cluster, Point}
-import cluster.scheduler.Rescheduler.MatrixResult
+import types._
+import clustering.scheduler.Rescheduler.MatrixResult
 import metrics.Metric
 import collection._
+import types.{Cluster, Point}
 
 import scala.annotation.tailrec
 

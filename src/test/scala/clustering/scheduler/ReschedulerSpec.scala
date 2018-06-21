@@ -1,10 +1,10 @@
-package cluster.scheduler
+package clustering.scheduler
 
 import breeze.linalg.{DenseMatrix, DenseVector}
-import cluster.Types
 import metrics._
 import org.scalatest._
 import org.scalatest.Matchers._
+import types.Types
 
 
 class ReschedulerSpec extends FeatureSpec with GivenWhenThen {

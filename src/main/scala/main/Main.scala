@@ -2,10 +2,12 @@ package main
 
 
 import breeze.linalg.DenseVector
-import cluster.Algorithm
-import cluster.Types._
+import clustering.Algorithm
+import types._
+import types.Types._
 import config.Configuration
 import reader.Reader
+import types.Point
 
 object Main {
 

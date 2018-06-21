@@ -1,7 +1,7 @@
-package cluster.scheduler
+package clustering.scheduler
 
 import breeze.linalg.{DenseMatrix, DenseVector}
-import cluster.Types.{Cluster, Point}
+import types._
 import metrics._
 import org.scalatest.Matchers._
 import org.scalatest.{FeatureSpec, GivenWhenThen}
