@@ -12,7 +12,7 @@ class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
   val globalPoints = List(
     DenseMatrix((0.0, 3.0, 3.0, 0.0), (0.0, 4.0, 4.0, 0.0))
-    , DenseMatrix((0.0, 0.0, 3.0, 3.0), (0.0, 4.0, 4.0, 0.0))
+    , DenseMatrix((0.0, 3.0, 3.0, 0.0), (0.0, 4.0, 4.0, 0.0))
   ).zipWithIndex.map { case (m, idx) =>
     Point(idx, m, Some(0))
   }.toSet
@@ -21,6 +21,7 @@ class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
 
   feature("Vector cluster.scheduler.ClusterRescheduler") {
+
     scenario("schedules point best that minimizes overall distanceFunction") {
 
       Given("A cluster with two points in it")

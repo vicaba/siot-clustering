@@ -30,19 +30,21 @@ object Algorithm {
       remainingPoints match {
         case p +: tail =>
 
-          val bestCluster = clusters.values.minBy { cluster =>
-            if (p.isAssignedToCluster) {
-              distanceTo(cluster - p)
-            } else {
-              distanceTo(cluster)
-            }
+          val bestClusterToAssign = clusters.values.minBy { cluster =>
+            if (p.isAssignedToCluster) distanceTo(cluster - p) else distanceTo(cluster)
           }
 
-          assignToClusters(clusters + (bestCluster.id -> (bestCluster + p)), tail, currentImprovement)
+          p.assignedToCluster.map(clusters(_))
+
+          // TODO: Remove point from old cluster
+          // TODO: When adding the point to the cluster, set the new clusterId to the point
+          // TODO: What happens if the Map already has the key?
+
+          assignToClusters(clusters + (bestClusterToAssign.id -> (bestClusterToAssign + p)), tail, currentImprovement)
         case IndexedSeq() =>
           val currentMetric = clusters.values.foldLeft(0.0) { case (accum, cluster) => accum + metric(cluster) }
           val improvedEnough = currentImprovement(currentMetric) < improvement
-          // TODO: ADD memory
+          // TODO: add memory
           if (!improvedEnough) assignToClusters(clusters, points, currentImprovement) else clusters.values.toList
       }
 
