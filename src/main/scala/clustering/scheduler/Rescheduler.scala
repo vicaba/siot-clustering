@@ -45,7 +45,7 @@ object Rescheduler {
       while (j < length) {
         val vector = swap(i, j, vectorToReschedule)
         val distance = metric(vector + fixedVector)
-        val progression = metric.progression(fixedVector + vectorToReschedule, fixedVector + vector)
+        val progression = metric.progression(vectorToReschedule + fixedVector, vector + fixedVector)
         if ((distance < smallest) | progression.positive()) {
           smallest = distance
           bestSolution = vector
@@ -83,7 +83,6 @@ object Rescheduler {
     var bestSolutionRow = 0
     var bestSolution = null.asInstanceOf[VectorResult[Double]]
     var first = true
-
 
     rowIterator.zipWithIndex.foreach { case (vector, rowNumber) =>
       val distance = reschedule(vector, fixedVector, metric)

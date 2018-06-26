@@ -28,7 +28,7 @@ case class Cluster(id: Int, name: String, points: Set[Point]) {
 
     val syntheticValues = this.points.toList.map(_.syntheticValue)
 
-    sumVectors(syntheticValues, syntheticValues.head - syntheticValues.head)
+    sumVectors(syntheticValues, Types.EmptySyntheticData())
     //syntheticValues.fold(EmptySyntheticData())(_ + _)
   }
 

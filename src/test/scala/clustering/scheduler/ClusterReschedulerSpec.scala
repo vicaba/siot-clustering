@@ -24,7 +24,7 @@ class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
     scenario("schedules point best that minimizes overall distanceFunction") {
 
-      Given("A cluster with two points in it")
+      Given("some points")
 
       val points = globalPoints
 
@@ -45,7 +45,8 @@ class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
     }
 
     scenario("schedules cluster best that minimizes overall distanceFunction") {
-      Given("A cluster with two points in it")
+
+      Given("some points")
 
       val points = globalPoints
 

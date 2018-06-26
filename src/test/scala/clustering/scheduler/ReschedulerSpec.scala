@@ -1,7 +1,7 @@
 package clustering.scheduler
 
 import breeze.linalg.{DenseMatrix, DenseVector}
-import clustering.scheduler.Rescheduler.VectorResult
+import clustering.scheduler.Rescheduler.{MatrixResult, VectorResult}
 import metrics._
 import org.scalatest.Matchers._
 import org.scalatest._
@@ -31,7 +31,24 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
     _rescheduleTimes(times, vectorToReschedule, List.empty)
   }
 
-  feature("Vector cluster.scheduler.Rescheduler") {
+  def rescheduleTimes(times: Int
+    , vectorToReschedule: DenseMatrix[Double]
+    , fixedVector: DenseVector[Double]
+    , metric: Metric): List[MatrixResult[Double]] = {
+
+    @tailrec
+    def _rescheduleTimes(times: Int, vectorToReschedule: DenseMatrix[Double], accum: List[MatrixResult[Double]]):
+    List[MatrixResult[Double]] = times match {
+      case 0 => accum
+      case t =>
+        val result = Rescheduler.reschedule(vectorToReschedule, fixedVector, metric)
+        _rescheduleTimes(t - 1, result.matrix, result +: accum)
+    }
+
+    _rescheduleTimes(times, vectorToReschedule, List.empty)
+  }
+
+  /*feature("Vector cluster.scheduler.Rescheduler") {
     scenario("schedules vector minimizing distanceFunction (1 change)") {
 
       Given("a variable vector")
@@ -75,7 +92,7 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
       result.vector shouldEqual DenseVector(1.0, 2.0, 2.0, 1.0)
     }
 
-  }
+  }*/
 
   feature("Matrix cluster.scheduler") {
     scenario("schedules matrix minimizing the distanceFunction (1 change)") {
@@ -87,7 +104,7 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
       val u = DenseVector(0.0, 7.0, 0.0, 7.0)
 
       When("asked to reschedule")
-      val result = Rescheduler.reschedule(m, u, metric)
+      val result = rescheduleTimes(10, m, u, metric).head
 
       Then("the new matrix contributes in minimizing overall distance function")
       val originalCompatibility = metric(Types.synthesizeValues(m) + u)

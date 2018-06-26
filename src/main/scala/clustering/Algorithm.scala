@@ -1,6 +1,7 @@
 package clustering
 
 import clustering.util.Improvement
+import collection.Memory
 import types._
 import metrics.Metric
 import types.{Cluster, Point}
@@ -11,44 +12,53 @@ import scala.util.Random
 object Algorithm {
 
   def distanceTo(cluster: Cluster): Double =
-    Metric.maxMin(cluster.syntheticCenter)
-
-  /*  def apply(numberOfClusters: Int, points: scala.Vector[Point], metric: Metric, iterations: Int): List[Cluster] = {
-
-  }*/
+    Metric.par(cluster.syntheticCenter)
 
   def run(numberOfClusters: Int, points: scala.Vector[Point], metric: Metric, improvement: Double): List[Cluster] = {
 
-    val _clusters = randomSample(numberOfClusters, points).zipWithIndex.map { case (point, idx) =>
+    val randomSamplePoints = randomSample(numberOfClusters, points)
+
+    val _clusters = randomSamplePoints.zipWithIndex.map { case (point, idx) =>
       idx -> Cluster(idx, idx.toString, Set(point.setCluster(idx)))
     }.toMap
 
     val initialMetric = _clusters.values.foldLeft(0.0) { case (accum, cluster) => accum + metric(cluster) }
 
+    implicit def clusterToTuple(c: Cluster): (Int, Cluster) = c.id -> c
+
     @tailrec
-    def assignToClusters(clusters: Map[Int, Cluster], remainingPoints: scala.Vector[Point], currentImprovement: Improvement): List[Cluster] =
+    def assignToClusters(clusters: Map[Int, Cluster], remainingPoints: scala.Vector[Point], memory: Memory[Double], currentImprovement: Improvement): List[Cluster] =
       remainingPoints match {
         case p +: tail =>
 
           val bestClusterToAssign = clusters.values.minBy { cluster =>
-            if (p.isAssignedToCluster) distanceTo(cluster - p) else distanceTo(cluster)
+            if (p.isAssignedToCluster) distanceTo(cluster - p + p) else distanceTo(cluster + p)
           }
 
-          p.assignedToCluster.map(clusters(_))
+          if (p.assignedToCluster.isDefined) {
 
-          // TODO: Remove point from old cluster
-          // TODO: When adding the point to the cluster, set the new clusterId to the point
-          // TODO: What happens if the Map already has the key?
+            val pointAssignedToCluster = p.assignedToCluster.get
 
-          assignToClusters(clusters + (bestClusterToAssign.id -> (bestClusterToAssign + p)), tail, currentImprovement)
+            if (pointAssignedToCluster == bestClusterToAssign.id) assignToClusters(clusters, tail, memory, currentImprovement)
+            else assignToClusters(
+              clusters ++ Map(clusters(p.assignedToCluster.get) - p, bestClusterToAssign + p)
+              , tail
+              , memory
+              , currentImprovement)
+          } else assignToClusters(
+            clusters + (bestClusterToAssign + p.setCluster(bestClusterToAssign.id))
+            , tail
+            , memory
+            , currentImprovement)
         case IndexedSeq() =>
           val currentMetric = clusters.values.foldLeft(0.0) { case (accum, cluster) => accum + metric(cluster) }
-          val improvedEnough = currentImprovement(currentMetric) < improvement
+          val improvedEnough = improvement < currentImprovement(currentMetric) || memory.areAllElementsEqual()
           // TODO: add memory
-          if (!improvedEnough) assignToClusters(clusters, points, currentImprovement) else clusters.values.toList
+          if (!improvedEnough) assignToClusters(clusters, points, currentMetric +: memory, currentImprovement) else clusters.values.toList
       }
 
-    assignToClusters(_clusters, points, new Improvement(initialMetric))
+    // First round without the points assigned to each cluster
+    assignToClusters(_clusters, (points.toSet -- randomSamplePoints.toSet).toVector, Memory(3), new Improvement(initialMetric))
 
   }
 

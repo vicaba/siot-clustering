@@ -75,7 +75,7 @@ object Par extends Metric {
       after.toScalaVector().count(_ == maxAfter) < before.toScalaVector().count(_ == maxBefore)
     }
 
-    if (betterParThanBefore | lessMaxsThanBefore)
+    if (betterParThanBefore | (lessMaxsThanBefore && maxIsLowerThanBefore))
       Progression.Positive
     else
       Progression.Negative
