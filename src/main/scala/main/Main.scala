@@ -19,7 +19,7 @@ object Main {
       v(0, ::) := DenseVector[Double](values: _*).t
       Point(idx, v)
     }
-    val c = algorithmBuilder.run(3, points, Metric.maxMin, 1.0)
+    val c = algorithmBuilder.run(3, points, Metric.par, 1.0)
 
   }
 

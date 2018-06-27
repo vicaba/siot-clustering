@@ -9,6 +9,8 @@ case class Point(id: Int, values: DataType, assignedToCluster: Option[Int] = Non
     case _ => false
   }
 
+  override def toString: String = s"Point($id, $syntheticValue, $assignedToCluster)"
+
   def setCluster(clusterId: Int): Point = this.copy(assignedToCluster = Some(clusterId))
 
   def isAssignedToCluster: Boolean = this.assignedToCluster.isDefined

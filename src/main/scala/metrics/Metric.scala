@@ -6,7 +6,6 @@ import metrics.Metric.{MetricResult, Progression}
 
 object Metric {
   def par: Par.type = Par
-  def maxMin: MaxMin.type = MaxMin
 
   case class MetricResult(distance: Double, progression: Progression)
 
@@ -33,37 +32,19 @@ object Metric {
 
 trait Metric {
 
+  val Highest: Double
+
+  val Lowest: Double
+
   def apply(e: DenseVector[Double]): Double
 
   def progression(before: DenseVector[Double], after: DenseVector[Double]): Progression
 
 }
 
-object MaxMin extends Metric {
-
-  override def apply(e: DenseVector[Double]): Double = max(e) - min(e)
-
-  override def progression(before: DenseVector[Double], after: DenseVector[Double]): Progression = {
-
-    val betterParThanBefore = Par(before) > Par(after)
-    val maxIsLowerThanBefore = max(after) < max(before)
-    val lessMaxsThanBefore = {
-      val maxBefore = max(before)
-      val maxAfter = max(after)
-      after.toScalaVector().count(_ == maxAfter) < after.toScalaVector().count(_ == maxBefore)
-    }
-
-    if (betterParThanBefore | lessMaxsThanBefore)
-      Progression.Positive
-    else
-      Progression.Negative
-  }
-
-}
-
 object Par extends Metric {
 
-  override def apply(e: DenseVector[Double]): Double = max(e) /  mean(e)
+  override def apply(e: DenseVector[Double]): Double = (max(e) /  mean(e)) - 1
 
   override def progression(before: DenseVector[Double], after: DenseVector[Double]): Progression = {
 
@@ -82,4 +63,7 @@ object Par extends Metric {
 
   }
 
+  override val Highest: Double = 1.0
+
+  override val Lowest: Double = 0.0
 }

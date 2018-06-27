@@ -6,11 +6,11 @@ import scala.annotation.tailrec
 
 case class Cluster(id: Int, name: String, points: Set[Point]) {
 
-  def +(point: Point): Cluster = this.copy(points = (this.points - point) + point)
+  def +(point: Point): Cluster = this.copy(points = (this.points - point) + point.setCluster(id))
 
-  def ++(points: Seq[Point]): Cluster = this.copy(points = (this.points -- points) ++ points)
+  def ++(points: Seq[Point]): Cluster = this.copy(points = (this.points -- points) ++ points.map(_.setCluster(id)))
 
-  def setPoints(points: Seq[Point]): Cluster = this.copy(points = points.toSet)
+  def setPoints(points: Seq[Point]): Cluster = this.copy(points = points.map(_.setCluster(id)).toSet)
 
   def -(point: Point): Cluster = this.copy(points = points - point)
 

@@ -11,6 +11,19 @@ import scala.util.Random
 
 object Algorithm {
 
+  case class Run(numberOfClusters: Int, points: scala.Vector[Point], metric: Metric, improvement: Double) {
+    def apply(): List[Cluster] = run(numberOfClusters, points, metric, improvement)
+  }
+
+  def runIterative(run: Run, times: Int): List[Cluster] = {
+
+    def aggregateErrorOf(clusters: List[Cluster]): Double =
+      clusters.foldLeft(0.0) { case (accum, cluster) => accum + run.metric(cluster) }
+
+    val highestError = run.metric.Highest * run.numberOfClusters
+    (for (i <- 0 until times) yield run()).minBy(cl => aggregateErrorOf(cl))
+  }
+
   def distanceTo(cluster: Cluster): Double =
     Metric.par(cluster.syntheticCenter)
 
@@ -25,6 +38,11 @@ object Algorithm {
     val initialMetric = _clusters.values.foldLeft(0.0) { case (accum, cluster) => accum + metric(cluster) }
 
     implicit def clusterToTuple(c: Cluster): (Int, Cluster) = c.id -> c
+
+    def collectPoints(clusters: Traversable[Cluster]): scala.Vector[Point] =
+      clusters.foldLeft(clusters.head.points) {
+      case (accum, cluster) => accum ++ cluster.points
+    }.toVector
 
     @tailrec
     def assignToClusters(clusters: Map[Int, Cluster], remainingPoints: scala.Vector[Point], memory: Memory[Double], currentImprovement: Improvement): List[Cluster] =
@@ -46,7 +64,7 @@ object Algorithm {
               , memory
               , currentImprovement)
           } else assignToClusters(
-            clusters + (bestClusterToAssign + p.setCluster(bestClusterToAssign.id))
+            clusters + (bestClusterToAssign + p)
             , tail
             , memory
             , currentImprovement)
@@ -54,7 +72,7 @@ object Algorithm {
           val currentMetric = clusters.values.foldLeft(0.0) { case (accum, cluster) => accum + metric(cluster) }
           val improvedEnough = improvement < currentImprovement(currentMetric) || memory.areAllElementsEqual()
           // TODO: add memory
-          if (!improvedEnough) assignToClusters(clusters, points, currentMetric +: memory, currentImprovement) else clusters.values.toList
+          if (!improvedEnough) assignToClusters(clusters, collectPoints(clusters.values), currentMetric +: memory, currentImprovement) else clusters.values.toList
       }
 
     // First round without the points assigned to each cluster
@@ -63,7 +81,7 @@ object Algorithm {
   }
 
   private def randomSample(take: Int, points: Seq[Point]): List[Point] = {
-    val r = new Random(100)
+    val r = new Random(System.currentTimeMillis)
     r.shuffle(points).take(take).toList
   }
 

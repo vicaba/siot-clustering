@@ -8,7 +8,7 @@ import org.scalatest.{FeatureSpec, GivenWhenThen}
 
 class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
-  val metric = Metric.maxMin
+  val metric = Metric.par
 
   val globalPoints = List(
     DenseMatrix((0.0, 3.0, 3.0, 0.0), (0.0, 4.0, 4.0, 0.0))
