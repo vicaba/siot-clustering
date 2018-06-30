@@ -22,7 +22,7 @@ class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
   feature("Vector cluster.scheduler.ClusterRescheduler") {
 
-    scenario("schedules point best that minimizes overall distanceFunction") {
+    /*scenario("schedules point best that minimizes overall distanceFunction") {
 
       Given("some points")
 
@@ -38,11 +38,11 @@ class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
       Then("the cluster improves distanceFunction")
       val originalCompatibility = metric(cluster)
-      val betterCompatibility = metric(scheduleResult.cluster)
+      val betterCompatibility = metric(scheduleResult.get.cluster)
 
       betterCompatibility should be < originalCompatibility
 
-    }
+    }*/
 
     scenario("schedules cluster best that minimizes overall distanceFunction") {
 
@@ -67,8 +67,8 @@ class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
       betterCompatibility should be < originalCompatibility
 
-      //And("the syntheticCenter should be equal to the only possible solution")
-      //betterCluster.syntheticCenter shouldEqual vector
+      And("the syntheticCenter should be equal to the only possible solution")
+      betterCluster.syntheticCenter shouldEqual vector
     }
   }
 

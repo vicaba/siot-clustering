@@ -41,7 +41,7 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
     List[MatrixResult[Double]] = times match {
       case 0 => accum
       case t =>
-        val result = Rescheduler.reschedule(matrixToReschedule, fixedVector, metric
+        val result = Rescheduler.reschedule(matrixToReschedule, fixedVector, metric)
         if (result.isDefined) {
           _rescheduleTimes(t - 1, result.get.matrix, result.get +: accum)
         } else {
@@ -52,8 +52,9 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
     _rescheduleTimes(times, matrixToReschedule, List.empty)
   }
 
-  /*feature("Vector cluster.scheduler.Rescheduler") {
-    scenario("schedules vector minimizing distanceFunction (1 change)") {
+  feature("Vector rescheduler minimizes distance function") {
+
+    scenario("schedules vector minimizing distance function (1 change)") {
 
       Given("a variable vector")
       val u = DenseVector(2.0, 1.0, 2.0, 1.0)
@@ -61,10 +62,10 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
       And("a fixed vector")
       val v = DenseVector(2.0, 1.0, 1.0, 2.0)
 
-      When("asked to reschedule")
+      When("asked to reschedule 1 time")
       val result = Rescheduler.reschedule(u, v, metric)
 
-      Then("the new vector contributes in minimizing overall distanceFunction")
+      Then("the new vector contributes in minimizing overall distance function")
       val originalCompatibility = metric(u + v)
       val betterCompatibility = metric(result.vector + v)
 
@@ -75,7 +76,7 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
     }
 
-    scenario("schedules vector minimizing distanceFunction (2 changes)") {
+    scenario("schedules vector minimizing distance function (2 changes)") {
 
       Given("a variable vector")
       val u = DenseVector(2.0, 1.0, 1.0, 2.0)
@@ -83,10 +84,10 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
       And("a fixed vector")
       val v = DenseVector(2.0, 1.0, 1.0, 2.0)
 
-      When("asked to reschedule")
+      When("asked to reschedule 2 times")
       val result = rescheduleTimes(times = 2, u, v, metric).head
 
-      Then("the new vector contributes in minimizing overall distanceFunction")
+      Then("the new vector contributes in minimizing overall distance function")
       val originalCompatibility = metric(u + v)
       val betterCompatibility = metric(result.vector + v)
 
@@ -96,10 +97,11 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
       result.vector shouldEqual DenseVector(1.0, 2.0, 2.0, 1.0)
     }
 
-  }*/
+  }
 
-  feature("Matrix cluster.scheduler") {
-    scenario("schedules matrix minimizing the distanceFunction (1 change)") {
+  feature("Matrix rescheduler minimizes distance function") {
+
+    scenario("schedules matrix minimizing the distance function (2 changes)") {
 
       Given("a variable matrix")
       val m = DenseMatrix((0.0, 3.0, 0.0, 3.0), (0.0, 4.0, 0.0, 4.0))
@@ -107,14 +109,32 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
       And("a fixed vector")
       val u = DenseVector(0.0, 7.0, 0.0, 7.0)
 
-      When("asked to reschedule")
-      val result = rescheduleTimes(10, m, u, metric).head
+      When("asked to reschedule 2 times")
+      val result = rescheduleTimes(times = 4, m, u, metric).head
 
       Then("the new matrix contributes in minimizing overall distance function")
       val originalCompatibility = metric(Types.synthesizeValues(m) + u)
       val betterCompatibility = metric(Types.synthesizeValues(result.matrix) + u)
 
       betterCompatibility should be < originalCompatibility
+
+    }
+
+    scenario("Schedules matrix minimizing the distance function (4 changes)") {
+
+      Given("a variable matrix")
+      val m = DenseMatrix((0.0, 3.0, 0.0, 3.0), (0.0, 4.0, 0.0, 4.0))
+
+      And("a fixed vector")
+      val u = DenseVector(0.0, 7.0, 0.0, 7.0)
+
+      When("asked to reschedule 4 times")
+      val result = rescheduleTimes(times = 4, m, u, metric).head
+
+      Then("the new matrix contributes in minimizing overall distance function")
+      val betterCompatibility = metric(Types.synthesizeValues(result.matrix) + u)
+
+      betterCompatibility should equal (metric.Lowest)
 
       And("the new vector should be equal to the only possible solution")
       result.matrix shouldEqual DenseMatrix((3.0, 0.0, 3.0, 0.0), (4.0, 0.0, 4.0, 0.0))
