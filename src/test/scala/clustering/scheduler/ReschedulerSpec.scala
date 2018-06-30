@@ -32,20 +32,24 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
   }
 
   def rescheduleTimes(times: Int
-    , vectorToReschedule: DenseMatrix[Double]
+    , matrixToReschedule: DenseMatrix[Double]
     , fixedVector: DenseVector[Double]
     , metric: Metric): List[MatrixResult[Double]] = {
 
     @tailrec
-    def _rescheduleTimes(times: Int, vectorToReschedule: DenseMatrix[Double], accum: List[MatrixResult[Double]]):
+    def _rescheduleTimes(times: Int, matrixToReschedule: DenseMatrix[Double], accum: List[MatrixResult[Double]]):
     List[MatrixResult[Double]] = times match {
       case 0 => accum
       case t =>
-        val result = Rescheduler.reschedule(vectorToReschedule, fixedVector, metric)
-        _rescheduleTimes(t - 1, result.matrix, result +: accum)
+        val result = Rescheduler.reschedule(matrixToReschedule, fixedVector, metric
+        if (result.isDefined) {
+          _rescheduleTimes(t - 1, result.get.matrix, result.get +: accum)
+        } else {
+          _rescheduleTimes(0, matrixToReschedule, accum)
+        }
     }
 
-    _rescheduleTimes(times, vectorToReschedule, List.empty)
+    _rescheduleTimes(times, matrixToReschedule, List.empty)
   }
 
   /*feature("Vector cluster.scheduler.Rescheduler") {
@@ -113,7 +117,7 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
       betterCompatibility should be < originalCompatibility
 
       And("the new vector should be equal to the only possible solution")
-      result.matrix shouldEqual DenseMatrix((0.0, 3.0, 3.0, 0.0), (4.0, 0.0, 4.0, 0.0))
+      result.matrix shouldEqual DenseMatrix((3.0, 0.0, 3.0, 0.0), (4.0, 0.0, 4.0, 0.0))
     }
   }
 }

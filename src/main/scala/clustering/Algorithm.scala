@@ -24,10 +24,12 @@ object Algorithm {
     (for (i <- 0 until times) yield run()).minBy(cl => aggregateErrorOf(cl))
   }
 
-  def distanceTo(cluster: Cluster): Double =
-    Metric.par(cluster.syntheticCenter)
+  def distanceTo(cluster: Cluster, averagePointsPerCluster: Int): Double =
+    0.6 * Metric.par(cluster) + 0.4 * cluster.points.size / averagePointsPerCluster
 
   def run(numberOfClusters: Int, points: scala.Vector[Point], metric: Metric, improvement: Double): List[Cluster] = {
+
+    val averagePointsPerCluster = points.length / numberOfClusters
 
     val randomSamplePoints = randomSample(numberOfClusters, points)
 
@@ -35,14 +37,14 @@ object Algorithm {
       idx -> Cluster(idx, idx.toString, Set(point.setCluster(idx)))
     }.toMap
 
-    val initialMetric = _clusters.values.foldLeft(0.0) { case (accum, cluster) => accum + metric(cluster) }
+    val initialMetric = metric(Cluster.Empty ++ points)
 
     implicit def clusterToTuple(c: Cluster): (Int, Cluster) = c.id -> c
 
     def collectPoints(clusters: Traversable[Cluster]): scala.Vector[Point] =
       clusters.foldLeft(clusters.head.points) {
-      case (accum, cluster) => accum ++ cluster.points
-    }.toVector
+        case (accum, cluster) => accum ++ cluster.points
+      }.toVector
 
     @tailrec
     def assignToClusters(clusters: Map[Int, Cluster], remainingPoints: scala.Vector[Point], memory: Memory[Double], currentImprovement: Improvement): List[Cluster] =
@@ -50,7 +52,7 @@ object Algorithm {
         case p +: tail =>
 
           val bestClusterToAssign = clusters.values.minBy { cluster =>
-            if (p.isAssignedToCluster) distanceTo(cluster - p + p) else distanceTo(cluster + p)
+            if (p.isAssignedToCluster) distanceTo(cluster, averagePointsPerCluster) else distanceTo(cluster + p, averagePointsPerCluster)
           }
 
           if (p.assignedToCluster.isDefined) {
@@ -69,7 +71,7 @@ object Algorithm {
             , memory
             , currentImprovement)
         case IndexedSeq() =>
-          val currentMetric = clusters.values.foldLeft(0.0) { case (accum, cluster) => accum + metric(cluster) }
+          val currentMetric = clusters.values.foldLeft(0.0) { case (accum, cluster) => accum + metric(cluster) } / clusters.size
           val improvedEnough = improvement < currentImprovement(currentMetric) || memory.areAllElementsEqual()
           // TODO: add memory
           if (!improvedEnough) assignToClusters(clusters, collectPoints(clusters.values), currentMetric +: memory, currentImprovement) else clusters.values.toList

@@ -13,7 +13,7 @@ class AlgorithmSpec extends FeatureSpec with GivenWhenThen {
 
 
   feature("cluster.Algorithm") {
-    scenario("Assigns load profiles minimizing the distance function with perfectly compatible points") {
+    /*scenario("Assigns load profiles minimizing the distance function with perfectly compatible points") {
 
       Given("4 points that are perfectly compatible")
       val points = List(
@@ -32,10 +32,10 @@ class AlgorithmSpec extends FeatureSpec with GivenWhenThen {
       result.foreach { cluster =>
         metric(cluster) shouldBe metric.Lowest
       }
-    }
+    }*/
 
 
-    /*scenario("Assigns load profiles minimizing the distance function") {
+    scenario("Assigns load profiles minimizing the distance function") {
 
       Given("10 compatible points")
       val points = List(
@@ -54,7 +54,7 @@ class AlgorithmSpec extends FeatureSpec with GivenWhenThen {
       }.toVector
 
       When("asked to assign each point to a cluster, given 2 clusters")
-      val run = Run(5, points, Metric.par, 1)
+      val run = Run(5, points, Metric.par, 0.5)
       val result = Algorithm.runIterative(run, 50)
 
       Then("the two clusters have a PAR of 1")
@@ -68,7 +68,7 @@ class AlgorithmSpec extends FeatureSpec with GivenWhenThen {
         cluster.points.size should be < 2
       }
 
-    }*/
+    }
 
   }
 }

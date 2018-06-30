@@ -46,12 +46,14 @@ object Rescheduler {
         val vector = swap(i, j, vectorToReschedule)
         val distance = metric(vector + fixedVector)
         val progression = metric.progression(vectorToReschedule + fixedVector, vector + fixedVector)
-        if ((distance < smallest) | progression.positive()) {
+        if (distance < smallest) {
           smallest = distance
           bestSolution = vector
           changedComponent = new ChangedComponent(i, j)
-        } else {
-          vector
+        } else if (progression.positive()) {
+          smallest = distance
+          bestSolution = vector
+          changedComponent = new ChangedComponent(i, j)
         }
         j = j + 1
       }
@@ -68,7 +70,7 @@ object Rescheduler {
    * @param fixedVector
    * @return
    */
-  def reschedule(matrixToReschedule: DenseMatrix[Double], fixedVector: DenseVector[Double], metric: Metric): MatrixResult[Double] =
+  def reschedule(matrixToReschedule: DenseMatrix[Double], fixedVector: DenseVector[Double], metric: Metric): Option[MatrixResult[Double]] =
   {
 
     assert(matrixToReschedule.cols == fixedVector.length, "matrix rows and vector length are not equal")
@@ -87,7 +89,9 @@ object Rescheduler {
     rowIterator.zipWithIndex.foreach { case (vector, rowNumber) =>
       val distance = reschedule(vector, fixedVector, metric)
 
-      if (first || distance.distanceAfterReschedule < smallest) {
+      // si la component canviada es igual a la d'abans, passa (si el vector es igual al d'abans passa)
+
+      if ((first || distance.distanceAfterReschedule < smallest) && vector != distance.vector) {
         first = false
 
         bestSolutionRow = rowNumber
@@ -96,11 +100,15 @@ object Rescheduler {
       }
     }
 
-    val result = matrixToReschedule.copy
+    if (bestSolution == null) None else {
 
-    result(bestSolutionRow, ::) := bestSolution.vector.t
+      val result = matrixToReschedule.copy
 
-    new MatrixResult[Double](result, bestSolutionRow, bestSolution.changedComponent, bestSolution.distanceBeforeReschedule, bestSolution.distanceAfterReschedule )
+      result(bestSolutionRow, ::) := bestSolution.vector.t
+
+      Some(new MatrixResult[Double](result, bestSolutionRow, bestSolution.changedComponent, bestSolution.distanceBeforeReschedule, bestSolution.distanceAfterReschedule))
+    }
+
 
   }
 

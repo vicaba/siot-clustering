@@ -44,19 +44,20 @@ trait Metric {
 
 object Par extends Metric {
 
-  override def apply(e: DenseVector[Double]): Double = (max(e) /  mean(e)) - 1
+  override def apply(e: DenseVector[Double]): Double = if (!e.forall(_ == 0)) (max(e) /  mean(e)) - 1 else 0
 
   override def progression(before: DenseVector[Double], after: DenseVector[Double]): Progression = {
 
     val betterParThanBefore = Par(before) > Par(after)
     val maxIsLowerThanBefore = max(after) < max(before)
+    val maxIsEqualAsBefore = max(after) == max(before)
     val lessMaxsThanBefore = {
       val maxBefore = max(before)
       val maxAfter = max(after)
       after.toScalaVector().count(_ == maxAfter) < before.toScalaVector().count(_ == maxBefore)
     }
 
-    if (betterParThanBefore | (lessMaxsThanBefore && maxIsLowerThanBefore))
+    if (lessMaxsThanBefore && maxIsEqualAsBefore | maxIsLowerThanBefore)
       Progression.Positive
     else
       Progression.Negative
