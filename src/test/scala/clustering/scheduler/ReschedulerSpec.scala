@@ -54,6 +54,7 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
   feature("Vector rescheduler minimizes distance function") {
 
+
     scenario("schedules vector minimizing distance function (1 change)") {
 
       Given("a variable vector")
@@ -134,10 +135,33 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
       Then("the new matrix contributes in minimizing overall distance function")
       val betterCompatibility = metric(Types.synthesizeValues(result.matrix) + u)
 
-      betterCompatibility should equal (metric.Lowest)
+      betterCompatibility should equal(metric.Lowest)
 
       And("the new vector should be equal to the only possible solution")
       result.matrix shouldEqual DenseMatrix((3.0, 0.0, 3.0, 0.0), (4.0, 0.0, 4.0, 0.0))
     }
+
+
+    // TODO: Current algorithm doesn't improve this
+    /*scenario("Schedules matrix minimizing the distance function (4 changes). sum(matrix) == vector. Reorder matrix") {
+
+      Given("a variable matrix")
+      val m = DenseMatrix((3.0, 0.0, 0.0, 3.0), (0.0, 4.0, 4.0, 0.0))
+
+      And("a fixed vector")
+      val u = DenseVector(3.0, 4.0, 4.0, 3.0)
+
+      When("asked to reschedule 4 times")
+      val result = rescheduleTimes(times = 4, m, u, metric).head
+
+      Then("the new matrix contributes in minimizing overall distance function")
+      val betterCompatibility = metric(Types.synthesizeValues(result.matrix) + u)
+
+      betterCompatibility should equal (metric.Lowest)
+
+      And("the new vector should be equal to the only possible solution")
+      result.matrix shouldEqual DenseMatrix((3.0, 0.0, 3.0, 0.0), (4.0, 0.0, 4.0, 0.0))
+    }*/
+
   }
 }

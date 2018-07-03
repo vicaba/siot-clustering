@@ -87,9 +87,7 @@ object Rescheduler {
     var first = true
 
     rowIterator.zipWithIndex.foreach { case (vector, rowNumber) =>
-      val distance = reschedule(vector, fixedVector, metric)
-
-      // si la component canviada es igual a la d'abans, passa (si el vector es igual al d'abans passa)
+      val distance = reschedule(vector, fixedVector + sum(matrixToReschedule, Axis._0).inner - vector, metric)
 
       if ((first || distance.distanceAfterReschedule < smallest) && vector != distance.vector) {
         first = false
@@ -100,6 +98,7 @@ object Rescheduler {
       }
     }
 
+    // If best solution is null, nothing else can be changed
     if (bestSolution == null) None else {
 
       val result = matrixToReschedule.copy

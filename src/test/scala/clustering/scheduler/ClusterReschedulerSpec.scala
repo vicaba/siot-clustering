@@ -1,12 +1,54 @@
 package clustering.scheduler
 
 import breeze.linalg.{DenseMatrix, DenseVector}
+import clustering.scheduler.ClusterRescheduler.PointChange
 import types._
 import metrics._
 import org.scalatest.Matchers._
 import org.scalatest.{FeatureSpec, GivenWhenThen}
 
+import scala.annotation.tailrec
+
 class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
+
+  /*def rescheduleTimes(times: Int
+    , vectorToReschedule: DenseVector[Double]
+    , fixedVector: DenseVector[Double]
+    , metric: Metric): List[VectorResult[Double]] = {
+
+    @tailrec
+    def _rescheduleTimes(times: Int, vectorToReschedule: DenseVector[Double], accum: List[VectorResult[Double]]):
+    List[VectorResult[Double]] = times match {
+      case 0 => accum
+      case t =>
+        val result = Rescheduler.reschedule(vectorToReschedule, fixedVector, metric)
+        _rescheduleTimes(t - 1, result.vector, result +: accum)
+    }
+
+    _rescheduleTimes(times, vectorToReschedule, List.empty)
+  }*/
+
+  def rescheduleTimes(times: Int
+    , clusterToReschedule: Cluster
+  , metric: Metric): List[PointChange] = {
+
+    @tailrec
+    def _rescheduleTimes(times: Int, clusterToReschedule: Cluster, accum: List[PointChange]): List[PointChange] = {
+      times match {
+        case 0 => accum
+        case t =>
+          val result = ClusterRescheduler.rescheduleOnePoint(clusterToReschedule, metric)
+          if (result.isDefined) {
+            _rescheduleTimes(t - 1, result.get.cluster, result.get +: accum)
+          } else {
+            _rescheduleTimes(t - 1, clusterToReschedule, accum)
+          }
+      }
+    }
+
+    _rescheduleTimes(times, clusterToReschedule, List.empty)
+
+  }
 
   val metric = Metric.par
 
@@ -19,10 +61,9 @@ class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
   val globalCluster = Cluster(0, "0", globalPoints)
 
-
   feature("Vector cluster.scheduler.ClusterRescheduler") {
 
-    /*scenario("schedules point best that minimizes overall distanceFunction") {
+    scenario("schedules point best that minimizes overall distanceFunction") {
 
       Given("some points")
 
@@ -34,15 +75,16 @@ class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
       When("asked to reschedule one point")
 
-      val scheduleResult = ClusterRescheduler.rescheduleOnePoint(cluster, metric)
+      val scheduleResult = rescheduleTimes(11, cluster, metric)
 
       Then("the cluster improves distanceFunction")
       val originalCompatibility = metric(cluster)
-      val betterCompatibility = metric(scheduleResult.get.cluster)
+      val betterCompatibility = metric(scheduleResult.head.cluster)
 
       betterCompatibility should be < originalCompatibility
 
-    }*/
+    }
+
 
     scenario("schedules cluster best that minimizes overall distanceFunction") {
 
@@ -67,9 +109,8 @@ class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
       betterCompatibility should be < originalCompatibility
 
-      And("the syntheticCenter should be equal to the only possible solution")
-      betterCluster.syntheticCenter shouldEqual vector
     }
+
   }
 
 }

@@ -10,7 +10,7 @@ import scala.annotation.tailrec
 
 object ClusterRescheduler {
 
-  private[ClusterRescheduler] class PointChange(val cluster: Cluster, val point: Point, val change: MatrixResult[Double])
+  class PointChange(val cluster: Cluster, val point: Point, val change: MatrixResult[Double])
 
   class PointChanged(val point: Point, val change: MatrixResult[Double])
 
