@@ -20,12 +20,11 @@ object Algorithm {
     def aggregateErrorOf(clusters: List[Cluster]): Double =
       clusters.foldLeft(0.0) { case (accum, cluster) => accum + run.metric(cluster) }
 
-    val highestError = run.metric.Highest * run.numberOfClusters
     (for (i <- 0 until times) yield run()).minBy(cl => aggregateErrorOf(cl))
   }
 
   def distanceTo(cluster: Cluster, averagePointsPerCluster: Int): Double =
-    Metric.par(cluster)
+    0.7*Metric.par(cluster) + 0.3*cluster.points.size/averagePointsPerCluster
 
   def run(numberOfClusters: Int, points: scala.Vector[Point], metric: Metric, improvement: Double): List[Cluster] = {
 

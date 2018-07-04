@@ -9,12 +9,14 @@ object ClusterJsonSerializer {
   val ClusterIdKey = "id"
   val ClusterNameKey = "name"
   val ClusterSyntheticCenterKey = "syntheticCenter"
+  val pointsKey = "points"
 
   implicit val clusterWrites: Writes[Cluster] = new Writes[Cluster] {
     override def writes(o: Cluster): JsValue = Json.obj(
       ClusterIdKey -> o.id,
       ClusterNameKey -> o.name,
-      ClusterSyntheticCenterKey -> o.syntheticCenter
+      ClusterSyntheticCenterKey -> o.syntheticCenter,
+      pointsKey ->o.points.map {p => p.syntheticValue}
     )
   }
 
