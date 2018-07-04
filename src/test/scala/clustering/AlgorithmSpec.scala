@@ -55,7 +55,7 @@ class AlgorithmSpec extends FeatureSpec with GivenWhenThen {
 
       When("asked to assign each point to a cluster, given 2 clusters")
       val run = Run(5, points, Metric.par, 0.5)
-      val result = Algorithm.runIterative(run, 50)
+      val result = Algorithm.runIterative(run, 10)
 
       Then("the two clusters have a PAR of 1")
       val metricBefore = metric(Cluster.Empty ++ points)

@@ -3,6 +3,9 @@ package metrics
 import breeze.linalg._
 import breeze.stats._
 import metrics.Metric.{MetricResult, Progression}
+import types.Point
+import breeze.linalg._
+import breeze.numerics._
 
 object Metric {
   def par: Par.type = Par

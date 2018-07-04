@@ -25,13 +25,15 @@ object Algorithm {
   }
 
   def distanceTo(cluster: Cluster, averagePointsPerCluster: Int): Double =
-    0.6 * Metric.par(cluster) + 0.4 * cluster.points.size / averagePointsPerCluster
+    Metric.par(cluster)
 
   def run(numberOfClusters: Int, points: scala.Vector[Point], metric: Metric, improvement: Double): List[Cluster] = {
 
     val averagePointsPerCluster = points.length / numberOfClusters
 
     val randomSamplePoints = randomSample(numberOfClusters, points)
+    val r = new Random(System.currentTimeMillis)
+    val shuffledPointsWithoutClusterSeeds = r.shuffle((points.toSet -- randomSamplePoints.toSet).toVector)
 
     val _clusters = randomSamplePoints.zipWithIndex.map { case (point, idx) =>
       idx -> Cluster(idx, idx.toString, Set(point.setCluster(idx)))
@@ -73,12 +75,11 @@ object Algorithm {
         case IndexedSeq() =>
           val currentMetric = clusters.values.foldLeft(0.0) { case (accum, cluster) => accum + metric(cluster) } / clusters.size
           val improvedEnough = improvement < currentImprovement(currentMetric) || memory.areAllElementsEqual()
-          // TODO: add memory
-          if (!improvedEnough) assignToClusters(clusters, collectPoints(clusters.values), currentMetric +: memory, currentImprovement) else clusters.values.toList
+          clusters.values.toList
       }
 
     // First round without the points assigned to each cluster
-    assignToClusters(_clusters, (points.toSet -- randomSamplePoints.toSet).toVector, Memory(3), new Improvement(initialMetric))
+    assignToClusters(_clusters, shuffledPointsWithoutClusterSeeds, Memory(3), new Improvement(initialMetric))
 
   }
 
@@ -88,5 +89,3 @@ object Algorithm {
   }
 
 }
-
-
