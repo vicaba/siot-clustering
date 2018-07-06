@@ -1,7 +1,7 @@
-package clustering.scheduler
+package algorithm.scheduler
 
 import breeze.linalg.{DenseMatrix, DenseVector}
-import clustering.scheduler.Rescheduler.{MatrixResult, VectorResult}
+import algorithm.scheduler.Rescheduler.{MatrixResult, VectorResult}
 import metrics._
 import org.scalatest.Matchers._
 import org.scalatest._

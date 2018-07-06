@@ -1,32 +1,28 @@
-package clustering
+package algorithm
 
-import clustering.util.Improvement
-import collection.Memory
-import types._
 import metrics.Metric
-import types.{Cluster, Point}
+import types._
 
 import scala.annotation.tailrec
 import scala.util.Random
 
-object Algorithm {
+object Clusterer {
 
-  case class Run(numberOfClusters: Int, points: scala.Vector[Point], metric: Metric, improvement: Double) {
-    def apply(): List[Cluster] = run(numberOfClusters, points, metric, improvement)
-  }
+  case class Settings(numberOfClusters: Int, points: scala.Vector[Point], metric: Metric, times: Int = 1)
 
-  def runIterative(run: Run, times: Int): List[Cluster] = {
+  def apply(settings: Settings): List[Cluster] = {
 
     def aggregateErrorOf(clusters: List[Cluster]): Double =
-      clusters.foldLeft(0.0) { case (accum, cluster) => accum + run.metric(cluster) }
+      clusters.foldLeft(0.0) { case (accum, cluster) => accum + settings.metric(cluster) }
 
-    (for (i <- 0 until times) yield run()).minBy(cl => aggregateErrorOf(cl))
+    (for (i <- 0 until settings.times)
+      yield runOnce(settings.numberOfClusters, settings.points, settings.metric)).minBy(cl => aggregateErrorOf(cl))
   }
 
   def distanceTo(cluster: Cluster, averagePointsPerCluster: Int): Double =
     0.7*Metric.par(cluster) + 0.3*cluster.points.size/averagePointsPerCluster
 
-  def run(numberOfClusters: Int, points: scala.Vector[Point], metric: Metric, improvement: Double): List[Cluster] = {
+  private def runOnce(numberOfClusters: Int, points: scala.Vector[Point], metric: Metric): List[Cluster] = {
 
     val averagePointsPerCluster = points.length / numberOfClusters
 
@@ -48,7 +44,7 @@ object Algorithm {
       }.toVector
 
     @tailrec
-    def assignToClusters(clusters: Map[Int, Cluster], remainingPoints: scala.Vector[Point], memory: Memory[Double], currentImprovement: Improvement): List[Cluster] =
+    def assignToClusters(clusters: Map[Int, Cluster], remainingPoints: scala.Vector[Point]): List[Cluster] =
       remainingPoints match {
         case p +: tail =>
 
@@ -60,25 +56,20 @@ object Algorithm {
 
             val pointAssignedToCluster = p.assignedToCluster.get
 
-            if (pointAssignedToCluster == bestClusterToAssign.id) assignToClusters(clusters, tail, memory, currentImprovement)
+            if (pointAssignedToCluster == bestClusterToAssign.id) assignToClusters(clusters, tail)
             else assignToClusters(
               clusters ++ Map(clusters(p.assignedToCluster.get) - p, bestClusterToAssign + p)
-              , tail
-              , memory
-              , currentImprovement)
+              , tail)
           } else assignToClusters(
             clusters + (bestClusterToAssign + p)
-            , tail
-            , memory
-            , currentImprovement)
+            , tail)
         case IndexedSeq() =>
           val currentMetric = clusters.values.foldLeft(0.0) { case (accum, cluster) => accum + metric(cluster) } / clusters.size
-          val improvedEnough = improvement < currentImprovement(currentMetric) || memory.areAllElementsEqual()
           clusters.values.toList
       }
 
     // First round without the points assigned to each cluster
-    assignToClusters(_clusters, shuffledPointsWithoutClusterSeeds, Memory(3), new Improvement(initialMetric))
+    assignToClusters(_clusters, shuffledPointsWithoutClusterSeeds)
 
   }
 

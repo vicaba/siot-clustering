@@ -1,13 +1,13 @@
-package clustering
+package algorithm
 
 import breeze.linalg.{DenseMatrix, DenseVector}
-import clustering.Algorithm.Run
+import algorithm.Clusterer.Settings
 import metrics.Metric
 import org.scalatest.Matchers._
 import org.scalatest.{FeatureSpec, GivenWhenThen}
 import types.{Cluster, Point, Types}
 
-class AlgorithmSpec extends FeatureSpec with GivenWhenThen {
+class ClustererSpec extends FeatureSpec with GivenWhenThen {
 
   val metric = Metric.par
 
@@ -54,8 +54,8 @@ class AlgorithmSpec extends FeatureSpec with GivenWhenThen {
       }.toVector
 
       When("asked to assign each point to a cluster, given 2 clusters")
-      val run = Run(5, points, Metric.par, 0.5)
-      val result = Algorithm.runIterative(run, 100)
+      val runSettings = Settings(5, points, Metric.par, times = 100)
+      val result = Clusterer(runSettings)
 
       Then("the two clusters have a PAR of 1")
       val metricBefore = metric(Cluster.Empty ++ points)
@@ -65,7 +65,7 @@ class AlgorithmSpec extends FeatureSpec with GivenWhenThen {
       }
 
       result.foreach { cluster =>
-        cluster.points.size should be < 2
+        cluster.points.size should be <= 2
       }
 
     }

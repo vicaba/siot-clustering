@@ -1,7 +1,7 @@
-package clustering.scheduler
+package algorithm.scheduler
 
 import types._
-import clustering.scheduler.Rescheduler.MatrixResult
+import algorithm.scheduler.Rescheduler.MatrixResult
 import metrics.Metric
 import collection._
 import types.{Cluster, Point}
@@ -10,9 +10,14 @@ import scala.annotation.tailrec
 
 object ClusterRescheduler {
 
+  case class Settings(metric: Metric, improvement: Double, memory: Int = 2)
+
   class PointChange(val cluster: Cluster, val point: Point, val change: MatrixResult[Double])
 
   class PointChanged(val point: Point, val change: MatrixResult[Double])
+
+  def apply(cluster: Cluster, settings: Settings): (Cluster, List[PointChanged]) =
+    rescheduleCluster(cluster, settings.metric, settings.improvement, settings.memory)
 
   /**
    * Reschedules the points inside the cluster in order to minimize the metric function.
@@ -49,7 +54,7 @@ object ClusterRescheduler {
       }
     }
 
-    reschedule(0, Memory(cluster.points.size), cluster, List.empty)
+    reschedule(initialMetric, Memory(cluster.points.size), cluster, List.empty)
 
   }
 

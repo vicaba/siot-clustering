@@ -13,7 +13,7 @@ object Types {
 
   val Rows = 1
 
-  val Columns = 25
+  val Columns = 4
 
   def EmptyData(): DataType = DenseMatrix.zeros[Double](Rows, Columns)
 

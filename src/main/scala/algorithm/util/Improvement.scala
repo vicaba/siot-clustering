@@ -1,4 +1,4 @@
-package clustering.util
+package algorithm.util
 
 class Improvement(val initialMetric: Double) {
 
