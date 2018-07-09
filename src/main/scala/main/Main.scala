@@ -20,11 +20,11 @@ object Main {
 
   def main(args: Array[String]): Unit = {
     val algorithmBuilder = Clusterer
-    /*val points = Reader.readUserRanges(Configuration.userProfilesFile).zipWithIndex.map { case (values, idx) =>
+    val points = Reader.readUserRanges(Configuration.userProfilesFile).zipWithIndex.map { case (values, idx) =>
       val v = EmptyData()
       v(0, ::) := DenseVector[Double](values: _*).t
       Point(idx, v)
-    }*/
+    }
 
     /*val points = List(
       DenseMatrix((0.0, 3.0, 3.0, 0.0), (0.0, 4.0, 4.0, 0.0))
@@ -41,14 +41,14 @@ object Main {
       Point(idx, m, None)
     }.toVector*/
 
-    val points = List(
+    /*val points = List(
       DenseMatrix((0.0, 3.0, 1.0, 3.0), (0.0, 3.0, 0.0, 4.0))
       , DenseMatrix((3.0, 0.0 , 4.0, 0.0), (3.0, 0.0, 3.0, 0.0))
     ).zipWithIndex.map { case (m, idx) =>
       Point(idx, m, None)
-    }.toVector
+    }.toVector*/
 
-    val runSettings = Clusterer.Settings(1, points, Metric.par, times = points.size * 2)
+    val runSettings = Clusterer.Settings(numberOfClusters = 1, points, Metric.par, times = points.size * 2)
 
     val reschedulerSettings = ClusterRescheduler.Settings(Metric.par, 0.5, memory = 2)
 

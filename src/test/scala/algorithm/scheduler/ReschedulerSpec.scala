@@ -98,6 +98,24 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
       result.vector shouldEqual DenseVector(1.0, 2.0, 2.0, 1.0)
     }
 
+    scenario("schedules vector minimizing distance function when the vector to reschedule has lower distance function") {
+      Given("a variable vector")
+      val u = DenseVector(0.0, 6.0, 1.0, 7.0)
+
+      And("a fixed vector")
+      val v = DenseVector(6.0, 0.0, 7.0, 0.0)
+
+      When("asked to reschedule 2 times")
+      val result = rescheduleTimes(times = 1, u, v, metric).head
+
+      Then("the new vector contributes in minimizing overall distance function")
+      val originalCompatibility = metric(u + v)
+      val betterCompatibility = metric(result.vector + v)
+
+      betterCompatibility should be < originalCompatibility
+
+    }
+
   }
 
   feature("Matrix rescheduler minimizes distance function") {

@@ -1,7 +1,6 @@
 package algorithm
 
 import algorithm.scheduler.ClusterRescheduler
-import metrics.Metric
 import types.{Cluster, Point}
 
 import scala.collection.mutable.ListBuffer
@@ -21,7 +20,7 @@ object Algorithm {
 
     val rescheduleResult = preClusterResult.map(ClusterRescheduler(_, reschedulerSettings)._1)
 
-    steps.+=(Step(2, preClusterResult))
+    steps.+=(Step(2, rescheduleResult))
 
     steps.toList
 

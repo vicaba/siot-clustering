@@ -67,7 +67,7 @@ object Par extends Metric {
 
   }
 
-  override val Highest: Double = 1.0
+  override val Highest: Double = Double.PositiveInfinity
 
   override val Lowest: Double = 0.0
 }
