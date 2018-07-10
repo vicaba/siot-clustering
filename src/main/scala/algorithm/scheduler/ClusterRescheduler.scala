@@ -41,7 +41,11 @@ object ClusterRescheduler {
 
       val improvedEnough = improvementPercentage(currentClusterMetric) > improvement
 
-      if (improvedEnough || memory.areAllElementsEqual()) (cluster, changes)
+      if (improvedEnough || memory.areAllElementsEqual())
+        if (improvedEnough)
+          (cluster, changes)
+        else
+          (cluster, changes)
       else {
         val pointChange = rescheduleOnePoint(cluster, metric)
         if (pointChange.isDefined) {
@@ -59,6 +63,7 @@ object ClusterRescheduler {
   }
 
   def rescheduleOnePoint(cluster: Cluster, metric: Metric): Option[PointChange] = {
+
     val pointToReschedule = cluster.points.maxBy { point =>
       metric(cluster) - metric(cluster - point)
     }
@@ -66,7 +71,7 @@ object ClusterRescheduler {
     val rescheduleResult = Rescheduler.reschedule(pointToReschedule.values, cluster - pointToReschedule, metric)
 
     rescheduleResult.map { result =>
-      val rescheduledPoint = pointToReschedule.copy(values = result.matrix)
+      val rescheduledPoint = pointToReschedule.copy(values = result.matrix)(pointToReschedule.types)
       val rescheduledCluster = cluster + rescheduledPoint
 
       new PointChange(rescheduledCluster, rescheduledPoint, result)

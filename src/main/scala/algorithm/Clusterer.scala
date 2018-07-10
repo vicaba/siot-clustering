@@ -16,25 +16,15 @@ object Clusterer {
       clusters.foldLeft(0.0) { case (accum, cluster) => accum + settings.metric(cluster) }
 
     (for (i <- 0 until settings.times)
-      yield runOnce(settings.numberOfClusters, settings.points, settings.metric)).minBy(cl => aggregateErrorOf(cl))
+      yield {
+        runOnce(settings.numberOfClusters, settings.points, settings.metric)
+      }).minBy(cl => aggregateErrorOf(cl))
   }
 
   def distanceTo(cluster: Cluster, averagePointsPerCluster: Int): Double =
     0.7*Metric.par(cluster) + 0.3*cluster.points.size/averagePointsPerCluster
 
   private def runOnce(numberOfClusters: Int, points: scala.Vector[Point], metric: Metric): List[Cluster] = {
-
-    val averagePointsPerCluster = points.length / numberOfClusters
-
-    val randomSamplePoints = randomSample(numberOfClusters, points)
-    val r = new Random(System.currentTimeMillis)
-    val shuffledPointsWithoutClusterSeeds = r.shuffle((points.toSet -- randomSamplePoints.toSet).toVector)
-
-    val _clusters = randomSamplePoints.zipWithIndex.map { case (point, idx) =>
-      idx -> Cluster(idx, idx.toString, Set(point.setCluster(idx)))
-    }.toMap
-
-    val initialMetric = metric(Cluster.Empty ++ points)
 
     implicit def clusterToTuple(c: Cluster): (Int, Cluster) = c.id -> c
 
@@ -44,32 +34,48 @@ object Clusterer {
       }.toVector
 
     @tailrec
-    def assignToClusters(clusters: Map[Int, Cluster], remainingPoints: scala.Vector[Point]): List[Cluster] =
+    def assignToClusters(clusters: Map[Int, Cluster], remainingPoints: scala.Vector[Point], distanceF: Cluster => Double): List[Cluster] =
       remainingPoints match {
         case p +: tail =>
 
           val bestClusterToAssign = clusters.values.minBy { cluster =>
-            if (p.isAssignedToCluster) distanceTo(cluster, averagePointsPerCluster) else distanceTo(cluster + p, averagePointsPerCluster)
+            if (p.isAssignedToCluster) distanceF(cluster) else distanceF(cluster + p)
           }
 
           if (p.assignedToCluster.isDefined) {
 
             val pointAssignedToCluster = p.assignedToCluster.get
 
-            if (pointAssignedToCluster == bestClusterToAssign.id) assignToClusters(clusters, tail)
+            if (pointAssignedToCluster == bestClusterToAssign.id) assignToClusters(clusters, tail, distanceF)
             else assignToClusters(
               clusters ++ Map(clusters(p.assignedToCluster.get) - p, bestClusterToAssign + p)
-              , tail)
+              , tail, distanceF)
           } else assignToClusters(
             clusters + (bestClusterToAssign + p)
-            , tail)
+            , tail, distanceF)
         case IndexedSeq() =>
           val currentMetric = clusters.values.foldLeft(0.0) { case (accum, cluster) => accum + metric(cluster) } / clusters.size
           clusters.values.toList
       }
 
-    // First round without the points assigned to each cluster
-    assignToClusters(_clusters, shuffledPointsWithoutClusterSeeds)
+    if (points.nonEmpty) {
+
+      implicit val types: TypesT = points.head.types
+
+      val averagePointsPerCluster = points.length / numberOfClusters
+
+      val randomSamplePoints = randomSample(numberOfClusters, points)
+      val r = new Random(System.currentTimeMillis)
+      val shuffledPointsWithoutClusterSeeds = r.shuffle((points.toSet -- randomSamplePoints.toSet).toVector)
+
+      val _clusters = randomSamplePoints.zipWithIndex.map { case (point, idx) =>
+        idx -> Cluster(idx, idx.toString, Set(point.setCluster(idx)))
+      }.toMap
+
+      // First round without the points assigned to each cluster
+      assignToClusters(_clusters, shuffledPointsWithoutClusterSeeds, distanceTo(_, averagePointsPerCluster))
+
+    } else Nil
 
   }
 

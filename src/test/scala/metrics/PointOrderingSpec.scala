@@ -2,7 +2,7 @@ package metrics
 
 import breeze.linalg.DenseMatrix
 import org.scalatest.{FeatureSpec, GivenWhenThen}
-import types.Point
+import types.{Point, Types4}
 
 class PointOrderingSpec extends FeatureSpec with GivenWhenThen {
 
@@ -21,7 +21,7 @@ class PointOrderingSpec extends FeatureSpec with GivenWhenThen {
         , DenseMatrix((10.0, 10.0, 10.0, 10.0), (1.0, 1.0, 1.0, 1.0), (17.0, 0.0, 1.0, 6.0))
         , DenseMatrix((0.0, 12.0, 12.0, 12.0))
       ).zipWithIndex.map { case (m, idx) =>
-        Point(idx, m, None)
+        Point(idx, m, None)(Types4)
       }.toVector
       When("asked to order")
       points.sorted(PointOrdering)

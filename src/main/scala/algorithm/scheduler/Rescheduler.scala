@@ -87,7 +87,8 @@ object Rescheduler {
     var first = true
 
     rowIterator.zipWithIndex.foreach { case (vector, rowNumber) =>
-      val distance = reschedule(vector, fixedVector + sum(matrixToReschedule, Axis._0).inner - vector, metric)
+      val fixedValue = fixedVector + sum(matrixToReschedule, Axis._0).inner - vector
+      val distance = reschedule(vector, fixedValue, metric)
 
       if ((first || distance.distanceAfterReschedule < smallest) && vector != distance.vector) {
         first = false

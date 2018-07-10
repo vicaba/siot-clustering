@@ -5,9 +5,11 @@ import algorithm.Clusterer.Settings
 import metrics.Metric
 import org.scalatest.Matchers._
 import org.scalatest.{FeatureSpec, GivenWhenThen}
-import types.{Cluster, Point, Types}
+import types.{Cluster, Point, Types, Types4}
 
 class ClustererSpec extends FeatureSpec with GivenWhenThen {
+
+  implicit val types = Types4
 
   val metric = Metric.par
 

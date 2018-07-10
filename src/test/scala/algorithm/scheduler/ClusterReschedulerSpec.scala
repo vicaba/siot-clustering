@@ -11,6 +11,9 @@ import scala.annotation.tailrec
 
 class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
+  implicit val types = Types4
+
+
   /*def rescheduleTimes(times: Int
     , vectorToReschedule: DenseVector[Double]
     , fixedVector: DenseVector[Double]
