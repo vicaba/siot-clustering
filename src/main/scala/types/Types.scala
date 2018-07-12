@@ -42,6 +42,6 @@ object Types4 extends TypesT {
   override val Columns: Int = 4
 }
 
-object Types25 extends TypesT {
-  override val Columns: Int = 25
+object Types24 extends TypesT {
+  override val Columns: Int = 24
 }

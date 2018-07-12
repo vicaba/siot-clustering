@@ -33,7 +33,7 @@ object Main {
 
   def main(args: Array[String]): Unit = {
     val points = Reader.readUserRanges(Configuration.userProfilesFile).zipWithIndex.map { case (values, idx) =>
-      implicit val types: TypesT = Types25
+      implicit val types: TypesT = Types24
       val v = EmptyData()
       v(0, ::) := DenseVector[Double](values: _*).t
       Point(idx, v)

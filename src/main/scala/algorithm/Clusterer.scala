@@ -39,6 +39,7 @@ object Clusterer {
         case p +: tail =>
 
           val bestClusterToAssign = clusters.values.minBy { cluster =>
+            // TODO: p isAssignedToCluster, what cluster? And if it is assigned to the same cluster?
             if (p.isAssignedToCluster) distanceF(cluster) else distanceF(cluster + p)
           }
 
