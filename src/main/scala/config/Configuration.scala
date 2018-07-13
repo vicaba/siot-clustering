@@ -11,6 +11,8 @@ trait Configuration {
 
   val reschedulerFile: String
 
+  val batchRunFile: String
+
 }
 
 object Configuration extends Configuration  {
@@ -22,5 +24,7 @@ object Configuration extends Configuration  {
   override val clustererFile: String = conf.getString("output.clustererFile")
 
   override val reschedulerFile: String = conf.getString("output.reschedulerFile")
+
+  override val batchRunFile: String = conf.getString("output.batchRunFile")
 
 }

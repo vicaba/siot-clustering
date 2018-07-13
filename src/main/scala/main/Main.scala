@@ -6,8 +6,10 @@ import java.io.{File, FileInputStream, FileOutputStream, PrintWriter}
 import algorithm.Algorithm
 import breeze.linalg.{DenseMatrix, DenseVector}
 import algorithm.clusterer.Clusterer
-import algorithm.clusterer.Clusterer.Settings
+import algorithm.serialization.AlgorithmJsonSerializer._
 import algorithm.scheduler.ClusterRescheduler
+import batch.BatchRun
+import batch.BatchRun.BatchRunSettingsBuilder
 import types._
 import types.Types._
 import config.Configuration
@@ -33,14 +35,14 @@ object Main {
   }
 
   def main(args: Array[String]): Unit = {
-    val points = Reader.readUserRanges(Configuration.userProfilesFile).zipWithIndex.map { case (values, idx) =>
+/*    val points = Reader.readUserRanges(Configuration.userProfilesFile).zipWithIndex.map { case (values, idx) =>
       implicit val types: TypesT = Types24
       val v = EmptyData()
       v(0, ::) := DenseVector[Double](values: _*).t
       Point(idx, v)
-    }
+    }*/
 
-    /*val points = List(
+    val points = List(
       DenseMatrix((0.0, 3.0, 3.0, 0.0), (0.0, 4.0, 4.0, 0.0))
       , DenseMatrix((5.0, 0.0 , 5.0, 0.0), (5.0, 0.0, 5.0, 0.0))
       , DenseMatrix((3.0, 0.0 , 0.0, 3.0), (4.0, 0.0, 0.0, 4.0))
@@ -53,24 +55,40 @@ object Main {
       , DenseMatrix((0.0, 12.0, 12.0, 12.0))
     ).zipWithIndex.map { case (m, idx) =>
       Point(idx, m, None)(Types4)
-    }.toVector*/
+    }.toVector
 
-    val runSettings = Clusterer.Settings(numberOfClusters = 2, points.take(6), Metric.par, times = points.take(2).size * 100)
+    val batchRunnerSettingsBuilder = new BatchRunSettingsBuilder(points, (5 to 5).toList, List(Metric.par), (points, k) => points.size * 100 * k)
 
-    val reschedulerSettings = ClusterRescheduler.Settings(Metric.par, 0.5, memory = 2)
+    val stepsList = BatchRun(batchRunnerSettingsBuilder).zipWithIndex
 
-    val steps = Algorithm(runSettings, reschedulerSettings)
+    Some(new PrintWriter(Configuration.batchRunFile)).foreach { p =>
+      val jsonList = stepsList.map { case (steps, idx) =>
+        Json.obj(
+          "run" -> idx,
+          "steps" -> Json.toJson(steps)
+        )
+      }
 
-    Some(new PrintWriter(Configuration.clustererFile)).foreach{ p =>
-      p.write(Json.toJson(steps._1.clusters).toString()); p.close
+      p.write(Json.prettyPrint(Json.toJson(jsonList)).toString())
+      p.close()
     }
 
-    Some(new PrintWriter(Configuration.reschedulerFile)).foreach{ p =>
-      p.write(Json.toJson(steps._2.clusters).toString()); p.close
-    }
+    /*    val runSettings = Clusterer.Settings(numberOfClusters = 2, points.take(30), Metric.par, times = points.take(30).size * 100)
 
-    copyFile(Configuration.clustererFile, "/home/vcaballero/Projects/jupyter-datascience.d/files/")
-    copyFile(Configuration.reschedulerFile, "/home/vcaballero/Projects/jupyter-datascience.d/files/")
+        val reschedulerSettings = ClusterRescheduler.Settings(Metric.par, 0.5, memory = 2)
+
+        val steps = Algorithm(runSettings, reschedulerSettings)
+
+        Some(new PrintWriter(Configuration.clustererFile)).foreach{ p =>
+          p.write(Json.toJson(steps._1.clusters).toString()); p.close
+        }
+
+        Some(new PrintWriter(Configuration.reschedulerFile)).foreach{ p =>
+          p.write(Json.toJson(steps._2.clusters).toString()); p.close
+        }
+
+        copyFile(Configuration.clustererFile, "/home/vcaballero/Projects/jupyter-datascience.d/files/")
+        copyFile(Configuration.reschedulerFile, "/home/vcaballero/Projects/jupyter-datascience.d/files/")*/
 
   }
 
