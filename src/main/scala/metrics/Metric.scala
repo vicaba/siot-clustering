@@ -1,33 +1,36 @@
 package metrics
 
-import breeze.linalg._
 import breeze.stats._
-import metrics.Metric.{MetricResult, Progression}
-import types.Point
+import metrics.Metric.Progression
 import breeze.linalg._
-import breeze.numerics._
 
 object Metric {
+
   def par: Par.type = Par
 
   case class MetricResult(distance: Double, progression: Progression)
 
   sealed trait Progression {
 
-    def positive(): Boolean = Progression.positive(this)
+    def isPositive: Boolean = Progression.isPositive(this)
 
-    def negative(): Boolean = Progression.negative(this)
+    def isNegative: Boolean = Progression.isNegative(this)
+
+    def isUndefined(p: Progression): Boolean = Progression.isUndefined(this)
 
   }
 
   object Progression {
+
     object Positive extends Progression
     object Negative extends Progression
     object Undefined extends Progression
 
-    def positive(p: Progression): Boolean = if (p == Positive) true else false
+    def isPositive(p: Progression): Boolean = if (p == Positive) true else false
 
-    def negative(p: Progression): Boolean = !positive(p)
+    def isNegative(p: Progression): Boolean = if (p == Negative) true else false
+
+    def isUndefined(p: Progression): Boolean = if (p == Undefined) true else false
 
   }
 
@@ -43,9 +46,18 @@ trait Metric {
 
   def progression(before: DenseVector[Double], after: DenseVector[Double]): Progression
 
+  def aggregateOf[T: DenseVectorRepr](list: List[T]): Double
+}
+
+trait DenseVectorRepr[T] {
+  def apply(t: T): DenseVector[Double]
 }
 
 object Par extends Metric {
+
+  override val Highest: Double = Double.PositiveInfinity
+
+  override val Lowest: Double = 0.0
 
   override def apply(e: DenseVector[Double]): Double = if (!e.forall(_ == 0)) (max(e) /  mean(e)) - 1 else 0
 
@@ -67,7 +79,11 @@ object Par extends Metric {
 
   }
 
-  override val Highest: Double = Double.PositiveInfinity
+  override def toString: String = "par"
 
-  override val Lowest: Double = 0.0
+  override def aggregateOf[T: DenseVectorRepr](list: List[T]): Double = {
+    val toVector = implicitly[DenseVectorRepr[T]]
+    list.foldLeft(0.0) { case (accum, t) => accum + this(toVector(t)) }
+  }
+
 }

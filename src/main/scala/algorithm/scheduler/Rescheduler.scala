@@ -50,7 +50,7 @@ object Rescheduler {
           smallest = distance
           bestSolution = vector
           changedComponent = new ChangedComponent(i, j)
-        } else if (progression.positive()) {
+        } else if (progression.isPositive) {
           smallest = distance
           bestSolution = vector
           changedComponent = new ChangedComponent(i, j)

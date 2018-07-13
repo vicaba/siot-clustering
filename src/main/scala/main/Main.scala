@@ -3,9 +3,10 @@ package main
 
 import java.io.{File, FileInputStream, FileOutputStream, PrintWriter}
 
+import algorithm.Algorithm
 import breeze.linalg.{DenseMatrix, DenseVector}
-import algorithm.{Algorithm, Clusterer}
-import algorithm.Clusterer.Settings
+import algorithm.clusterer.Clusterer
+import algorithm.clusterer.Clusterer.Settings
 import algorithm.scheduler.ClusterRescheduler
 import types._
 import types.Types._
@@ -54,18 +55,18 @@ object Main {
       Point(idx, m, None)(Types4)
     }.toVector*/
 
-    val runSettings = Clusterer.Settings(numberOfClusters = 2, points, Metric.par, times = points.size * 100)
+    val runSettings = Clusterer.Settings(numberOfClusters = 2, points.take(6), Metric.par, times = points.take(2).size * 100)
 
     val reschedulerSettings = ClusterRescheduler.Settings(Metric.par, 0.5, memory = 2)
 
-    val steps = Algorithm.apply(runSettings, reschedulerSettings)
+    val steps = Algorithm(runSettings, reschedulerSettings)
 
     Some(new PrintWriter(Configuration.clustererFile)).foreach{ p =>
-      p.write(Json.toJson(steps(0).clusters).toString()); p.close
+      p.write(Json.toJson(steps._1.clusters).toString()); p.close
     }
 
     Some(new PrintWriter(Configuration.reschedulerFile)).foreach{ p =>
-      p.write(Json.toJson(steps(1).clusters).toString()); p.close
+      p.write(Json.toJson(steps._2.clusters).toString()); p.close
     }
 
     copyFile(Configuration.clustererFile, "/home/vcaballero/Projects/jupyter-datascience.d/files/")

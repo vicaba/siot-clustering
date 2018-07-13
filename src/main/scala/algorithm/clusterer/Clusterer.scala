@@ -1,4 +1,4 @@
-package algorithm
+package algorithm.clusterer
 
 import metrics.Metric
 import types._
@@ -12,8 +12,7 @@ object Clusterer {
 
   def apply(settings: Settings): List[Cluster] = {
 
-    def aggregateErrorOf(clusters: List[Cluster]): Double =
-      clusters.foldLeft(0.0) { case (accum, cluster) => accum + settings.metric(cluster) }
+    def aggregateErrorOf(clusters: List[Cluster]): Double = settings.metric.aggregateOf(clusters)
 
     (for (i <- 0 until settings.times)
       yield {

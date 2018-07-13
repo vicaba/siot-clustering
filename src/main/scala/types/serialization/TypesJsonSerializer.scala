@@ -5,9 +5,7 @@ import types.Types._
 
 object TypesJsonSerializer {
 
-  implicit val SyntheticDataTypeWrites: Writes[SyntheticDataType] = new Writes[SyntheticDataType] {
-    override def writes(o: SyntheticDataType): JsValue = Json.toJson(o.toScalaVector())
-  }
-
+  implicit val SyntheticDataTypeWrites: Writes[SyntheticDataType] =
+    (o: SyntheticDataType) => Json.toJson(o.toScalaVector())
 
 }

@@ -1,7 +1,8 @@
 package algorithm
 
+import algorithm.clusterer.Clusterer
 import breeze.linalg.{DenseMatrix, DenseVector}
-import algorithm.Clusterer.Settings
+import algorithm.clusterer.Clusterer.Settings
 import metrics.Metric
 import org.scalatest.Matchers._
 import org.scalatest.{FeatureSpec, GivenWhenThen}

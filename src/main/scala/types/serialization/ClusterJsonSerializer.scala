@@ -18,7 +18,7 @@ object ClusterJsonSerializer {
       ClusterIdKey -> o.id,
       ClusterNameKey -> o.name,
       ClusterSyntheticCenterKey -> o.syntheticCenter,
-      pointsKey -> o.points.map {p => p.syntheticValue},
+      pointsKey -> o.points.map(_.syntheticValue),
       metricKey -> Metric.par(o)
     )
   }

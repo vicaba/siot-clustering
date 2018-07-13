@@ -1,5 +1,7 @@
 package types
 
+import breeze.linalg.DenseVector
+import metrics.DenseVectorRepr
 import types.Types.SyntheticDataType
 
 import scala.annotation.tailrec
@@ -48,5 +50,7 @@ object Cluster {
   def Empty: Cluster  = Cluster(-1, "empty", Set.empty)
 
   implicit def clusterToVector(c: Cluster): SyntheticDataType = c.syntheticCenter
+
+  implicit val toVector: DenseVectorRepr[Cluster] = (t: Cluster) => clusterToVector(t)
 
 }
