@@ -13,23 +13,7 @@ class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
   implicit val types = Types4
 
-
-  /*def rescheduleTimes(times: Int
-    , vectorToReschedule: DenseVector[Double]
-    , fixedVector: DenseVector[Double]
-    , metric: Metric): List[VectorResult[Double]] = {
-
-    @tailrec
-    def _rescheduleTimes(times: Int, vectorToReschedule: DenseVector[Double], accum: List[VectorResult[Double]]):
-    List[VectorResult[Double]] = times match {
-      case 0 => accum
-      case t =>
-        val result = Rescheduler.reschedule(vectorToReschedule, fixedVector, metric)
-        _rescheduleTimes(t - 1, result.vector, result +: accum)
-    }
-
-    _rescheduleTimes(times, vectorToReschedule, List.empty)
-  }*/
+  val metric = Metric.par
 
   def rescheduleTimes(times: Int
     , clusterToReschedule: Cluster
@@ -52,8 +36,6 @@ class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
     _rescheduleTimes(times, clusterToReschedule, List.empty)
 
   }
-
-  val metric = Metric.par
 
   val globalPoints = List(
     DenseMatrix((0.0, 3.0, 3.0, 0.0), (0.0, 4.0, 4.0, 0.0))

@@ -6,7 +6,7 @@ import types.Types.SyntheticDataType
 
 import scala.annotation.tailrec
 
-case class Cluster(id: Int, name: String, points: Set[Point]) {
+case class Cluster(id: Int, name: String, points: Set[Point])(implicit val types: TypesT) {
 
   def isEmpty: Boolean = points.isEmpty
 
@@ -26,8 +26,6 @@ case class Cluster(id: Int, name: String, points: Set[Point]) {
    */
   def syntheticCenter: SyntheticDataType = {
 
-    implicit val types: TypesT = this.points.head.types
-
     @tailrec
     def sumVectors(remaining: List[SyntheticDataType], accum: SyntheticDataType): SyntheticDataType = remaining match {
       case e :: tail => sumVectors(tail, accum + e)
@@ -37,7 +35,6 @@ case class Cluster(id: Int, name: String, points: Set[Point]) {
     val syntheticValues = this.points.toList.map(_.syntheticValue)
 
     sumVectors(syntheticValues, types.EmptySyntheticData())
-    //syntheticValues.fold(EmptySyntheticData())(_ + _)
   }
 
 }
@@ -47,7 +44,7 @@ object Cluster {
   import scala.language.implicitConversions
 
 
-  def Empty: Cluster  = Cluster(-1, "empty", Set.empty)
+  def Empty(implicit types: TypesT): Cluster  = Cluster(-1, "empty", Set.empty)(types)
 
   implicit def clusterToVector(c: Cluster): SyntheticDataType = c.syntheticCenter
 
