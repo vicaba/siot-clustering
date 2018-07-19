@@ -46,11 +46,12 @@ trait Metric {
 
   def progression(before: DenseVector[Double], after: DenseVector[Double]): Progression
 
-  def aggregateOf[T: DenseVectorRepr](list: List[T]): Double
+  def aggregateOf[T: DenseVectorReprOps](list: List[T]): Double
 }
 
-trait DenseVectorRepr[T] {
+trait DenseVectorReprOps[T] {
   def apply(t: T): DenseVector[Double]
+  def zero(t: T): DenseVector[Double]
 }
 
 object Par extends Metric {
@@ -59,7 +60,7 @@ object Par extends Metric {
 
   override val Lowest: Double = 0.0
 
-  override def apply(e: DenseVector[Double]): Double = if (!e.forall(_ == 0)) (max(e) /  mean(e)) - 1 else 0
+  override def apply(e: DenseVector[Double]): Double = if (!e.forall(_ == 0)) (max(e) /  mean(e)) else 0
 
   override def progression(before: DenseVector[Double], after: DenseVector[Double]): Progression = {
 
@@ -81,9 +82,13 @@ object Par extends Metric {
 
   override def toString: String = "par"
 
-  override def aggregateOf[T: DenseVectorRepr](list: List[T]): Double = {
-    val toVector = implicitly[DenseVectorRepr[T]]
-    list.foldLeft(0.0) { case (accum, t) => accum + this(toVector(t)) }
-  }
+  override def aggregateOf[T: DenseVectorReprOps](list: List[T]): Double = {
+    val toVectorOps = implicitly[DenseVectorReprOps[T]]
+    if (list.size == 1) this(toVectorOps(list.head)) else {
+      val metricVector = DenseVector[Double](list.map { t =>
+        this(toVectorOps(t))
+      }:_*)
+      this(metricVector)
+    }}
 
 }

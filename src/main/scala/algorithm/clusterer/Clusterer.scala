@@ -21,7 +21,7 @@ object Clusterer {
   }
 
   def distanceTo(cluster: Cluster, averagePointsPerCluster: Int): Double =
-    0.7*Metric.par(cluster) + 0.3*cluster.points.size/averagePointsPerCluster
+    Metric.par(cluster)
 
   private def runOnce(numberOfClusters: Int, points: scala.Vector[Point], metric: Metric): List[Cluster] = {
 
