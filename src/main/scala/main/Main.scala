@@ -4,7 +4,7 @@ package main
 import java.io._
 
 import algorithm.Algorithm
-import breeze.linalg.{DenseMatrix, DenseVector}
+import breeze.linalg.{DenseMatrix, DenseVector, max}
 import algorithm.clusterer.Clusterer
 import algorithm.serialization.AlgorithmJsonSerializer._
 import algorithm.scheduler.ClusterRescheduler
@@ -76,24 +76,24 @@ object Main {
           Point(idx, v)
         }*/
 
-        /*val points = List(
-          DenseMatrix((0.0, 3.0, 3.0, 0.0), (0.0, 4.0, 4.0, 0.0))
-          , DenseMatrix((5.0, 0.0, 5.0, 0.0), (5.0, 0.0, 5.0, 0.0))
-          , DenseMatrix((3.0, 0.0, 0.0, 3.0), (4.0, 0.0, 0.0, 4.0))
-          , DenseMatrix((0.0, 5.0, 0.0, 5.0), (0.0, 5.0, 0.0, 5.0))
-          , DenseMatrix((1.0, 5.0, 5.0, 5.0), (0.0, 2.0, 3.0, 5.0))
-          , DenseMatrix((8.0, 1.0, 0.0, 0.0), (0.0, 1.0, 0.0, 1.0))
-          , DenseMatrix((1.0, 0.0, 2.0, 0.0))
-          , DenseMatrix((4.0, 1.0, 3.0, 7.0))
-          , DenseMatrix((10.0, 10.0, 10.0, 10.0), (1.0, 1.0, 1.0, 1.0), (0.0, 17.0, 1.0, 6.0))
-          , DenseMatrix((0.0, 12.0, 12.0, 12.0))
-        ).zipWithIndex.map { case (m, idx) =>
-          Point(idx, m, None)(Types4)
-        }.toVector*/
+    /*val points = List(
+      DenseMatrix((0.0, 3.0, 3.0, 0.0), (0.0, 4.0, 4.0, 0.0))
+      , DenseMatrix((10.0, 10.0, 10.0, 10.0), (1.0, 1.0, 1.0, 1.0), (0.0, 17.0, 1.0, 6.0))
+      , DenseMatrix((5.0, 0.0, 5.0, 0.0), (5.0, 0.0, 5.0, 0.0))
+      , DenseMatrix((1.0, 5.0, 5.0, 5.0), (0.0, 2.0, 3.0, 5.0))
+      , DenseMatrix((3.0, 0.0, 0.0, 3.0), (4.0, 0.0, 0.0, 4.0))
+      , DenseMatrix((0.0, 5.0, 0.0, 5.0), (0.0, 5.0, 0.0, 5.0))
+      , DenseMatrix((8.0, 1.0, 0.0, 0.0), (0.0, 1.0, 0.0, 1.0))
+      , DenseMatrix((1.0, 0.0, 2.0, 0.0))
+      , DenseMatrix((4.0, 1.0, 3.0, 7.0))
+      , DenseMatrix((0.0, 12.0, 12.0, 12.0))
+    ).zipWithIndex.map { case (m, idx) =>
+      Point(idx, m, None)(Types4)
+    }.toVector*/
 
     val points = readEgaugeData("files/input/egauge.json")
 
-    val batchRunnerSettingsBuilder = new BatchRunSettingsBuilder(points, (1 to 5).toList, List(Metric.par), (points, k) => points.size * 10 * k)
+    val batchRunnerSettingsBuilder = new BatchRunSettingsBuilder(points, (1 to 6).toList, List(Metric.par), (points, k) => points.size * 10 * k)
 
     val stepsList = BatchRun(batchRunnerSettingsBuilder).zipWithIndex
 
@@ -114,8 +114,11 @@ object Main {
         Json.obj(
           "k in" -> steps._1.settings.numberOfClusters,
           "k out" -> steps._1.clusters.size,
+          "points" -> steps._1.clusters.map(_.points.size),
           "m1" -> steps._1.aggregatedMetric,
-          "m2" -> steps._2.aggregatedMetric
+          "1 max energy" -> max(steps._1.clusters.maxBy(c => max(c.syntheticCenter)).syntheticCenter),
+          "m2" -> steps._2.aggregatedMetric,
+          "2 max energy" -> max(steps._2.clusters.maxBy(c => max(c.syntheticCenter)).syntheticCenter)
         )
       }
 
