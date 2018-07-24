@@ -23,7 +23,9 @@ object Metric {
   object Progression {
 
     object Positive extends Progression
+
     object Negative extends Progression
+
     object Undefined extends Progression
 
     def isPositive(p: Progression): Boolean = if (p == Positive) true else false
@@ -38,19 +40,51 @@ object Metric {
 
 trait Metric {
 
+  /**
+    * The highest value the metric can take
+    */
   val Highest: Double
 
+  /**
+    * The lowest value the metric can take
+    */
   val Lowest: Double
 
+  /**
+    * Apply this metric to the vector
+    * @param e the vector
+    * @return the metric
+    */
   def apply(e: DenseVector[Double]): Double
 
+  /**
+    * Apply this metric to element e
+    * @param e the element
+    * @tparam T the type of element, context bounded by a representation of the element as a vector
+    * @return the metric
+    */
+  def apply[T: DenseVectorReprOps](e: T): Double = apply(implicitly[DenseVectorReprOps[T]].apply(e))
+
+  /**
+    * Is "after" vector better than the "before" vector, will it improve the metric?
+    * @param before
+    * @param after
+    * @return
+    */
   def progression(before: DenseVector[Double], after: DenseVector[Double]): Progression
 
+  /**
+    * Aggregate metric of a list of elements that can be represented as a vector
+    * @param list
+    * @tparam T
+    * @return
+    */
   def aggregateOf[T: DenseVectorReprOps](list: List[T]): Double
 }
 
 trait DenseVectorReprOps[T] {
   def apply(t: T): DenseVector[Double]
+
   def zero(t: T): DenseVector[Double]
 }
 
@@ -60,7 +94,7 @@ object Par extends Metric {
 
   override val Lowest: Double = 0.0
 
-  override def apply(e: DenseVector[Double]): Double = if (!e.forall(_ == 0)) (max(e) /  mean(e)) else 0
+  override def apply(e: DenseVector[Double]): Double = if (!e.forall(_ == 0)) (max(e) / mean(e)) else 0
 
   override def progression(before: DenseVector[Double], after: DenseVector[Double]): Progression = {
 
@@ -82,13 +116,27 @@ object Par extends Metric {
 
   override def toString: String = "par"
 
+  /**
+    * PAR
+    */
+  /*  override def aggregateOf[T: DenseVectorReprOps](list: List[T]): Double = {
+      val toVectorOps = implicitly[DenseVectorReprOps[T]]
+      if (list.size == 1) this(toVectorOps(list.head)) else {
+        val metricVector = DenseVector[Double](list.map { t =>
+          this(toVectorOps(t))
+        }:_*)
+        this(metricVector)
+      }}*/
+
+  /**
+    * Average
+    * @param list
+    * @tparam T
+    * @return
+    */
   override def aggregateOf[T: DenseVectorReprOps](list: List[T]): Double = {
     val toVectorOps = implicitly[DenseVectorReprOps[T]]
-    if (list.size == 1) this(toVectorOps(list.head)) else {
-      val metricVector = DenseVector[Double](list.map { t =>
-        this(toVectorOps(t))
-      }:_*)
-      this(metricVector)
-    }}
+    list.foldLeft(this (toVectorOps.zero(list.head))) { case (accum, v) => accum + this (v) } / list.size
+  }
 
 }

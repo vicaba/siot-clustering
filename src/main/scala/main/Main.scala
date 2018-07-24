@@ -93,7 +93,7 @@ object Main {
 
     val points = readEgaugeData("files/input/egauge.json")
 
-    val batchRunnerSettingsBuilder = new BatchRunSettingsBuilder(points, (1 to 6).toList, List(Metric.par), (points, k) => points.size * 10 * k)
+    val batchRunnerSettingsBuilder = new BatchRunSettingsBuilder(points, (1 to 10).toList, List(Metric.par), (points, k) => points.size * 10 * k)
 
     val stepsList = BatchRun(batchRunnerSettingsBuilder).zipWithIndex
 
@@ -112,15 +112,17 @@ object Main {
     Some(new PrintWriter(Configuration.summaryBatchRunFile)).foreach { p =>
       val jsonList = stepsList.map { case (steps, idx) =>
         Json.obj(
-          "k in" -> steps._1.settings.numberOfClusters,
-          "k out" -> steps._1.clusters.size,
-          "points" -> steps._1.clusters.map(_.points.size),
-          "m1" -> steps._1.aggregatedMetric,
-          "1 max energy" -> max(steps._1.clusters.maxBy(c => max(c.syntheticCenter)).syntheticCenter),
-          "m2" -> steps._2.aggregatedMetric,
-          "2 max energy" -> max(steps._2.clusters.maxBy(c => max(c.syntheticCenter)).syntheticCenter)
+          "k" -> steps._1.settings.numberOfClusters,
+          "s1. peak" -> max(steps._1.clusters.maxBy(c => max(c.syntheticCenter)).syntheticCenter),
+          "s1. agg m" -> steps._1.aggregatedMetric,
+          "s1. max m" -> steps._1.clusters.map(steps._2.settings.metric(_)).max,
+          "s2. peak" -> max(steps._2.clusters.maxBy(c => max(c.syntheticCenter)).syntheticCenter),
+          "s2. agg m" -> steps._2.aggregatedMetric,
+          "s2. max m" -> steps._2.clusters.map(steps._2.settings.metric(_)).max,
+          "total m" -> Point.pointListToVector(steps._2.clusters.flatMap(_.points)).map(vec => steps._2.settings.metric(vec))
         )
       }
+
 
       p.write(Json.prettyPrint(Json.toJson(jsonList)).toString())
       p.close()
