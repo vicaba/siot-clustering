@@ -39,7 +39,9 @@ object Clusterer {
 
           val bestClusterToAssign = clusters.values.minBy { cluster =>
             // TODO: p isAssignedToCluster, what cluster? And if it is assigned to the same cluster?
-            if (p.isAssignedToCluster) distanceF(cluster) else distanceF(cluster + p)
+            p.assignedToCluster.map { cId =>
+              if (cId == cluster.id) distanceF(cluster - p) else  distanceF(cluster + p)
+            }.getOrElse(distanceF(cluster + p))
           }
 
           if (p.assignedToCluster.isDefined) {
@@ -54,6 +56,7 @@ object Clusterer {
             clusters + (bestClusterToAssign + p)
             , tail, distanceF)
         case IndexedSeq() =>
+          // TODO: Change currentMetric
           val currentMetric = clusters.values.foldLeft(0.0) { case (accum, cluster) => accum + metric(cluster) } / clusters.size
           clusters.values.toList
       }
