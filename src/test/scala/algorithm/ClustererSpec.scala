@@ -37,7 +37,7 @@ class ClustererSpec extends FeatureSpec with GivenWhenThen {
       }
     }*/
 
-    scenario("Manual test") {
+/*    scenario("Manual test") {
 
       val cluster1Points = Set(
         Point(1, DenseMatrix((5.0, 5.0, 0.0, 0.0)), Some(1)),
@@ -57,7 +57,7 @@ class ClustererSpec extends FeatureSpec with GivenWhenThen {
       info(s"metric c2: ${metric(cluster2)}")
       info(s"metric c1+c2: ${metric.aggregateOf(List(cluster1, cluster2))}")
 
-    }
+    }*/
 
     scenario("Assigns load profiles minimizing the distance function") {
 

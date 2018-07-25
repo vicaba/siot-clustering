@@ -33,12 +33,11 @@ object Clusterer {
       }.toVector
 
     @tailrec
-    def assignToClusters(clusters: Map[Int, Cluster], remainingPoints: scala.Vector[Point], distanceF: Cluster => Double): List[Cluster] =
+    def assignToClusters(clusters: Map[Int, Cluster], remainingPoints: scala.Vector[Point], distanceF: Cluster => Double, metrics: List[Double]): List[Cluster] =
       remainingPoints match {
         case p +: tail =>
 
           val bestClusterToAssign = clusters.values.minBy { cluster =>
-            // TODO: p isAssignedToCluster, what cluster? And if it is assigned to the same cluster?
             p.assignedToCluster.map { cId =>
               if (cId == cluster.id) distanceF(cluster - p) else  distanceF(cluster + p)
             }.getOrElse(distanceF(cluster + p))
@@ -48,17 +47,17 @@ object Clusterer {
 
             val pointAssignedToCluster = p.assignedToCluster.get
 
-            if (pointAssignedToCluster == bestClusterToAssign.id) assignToClusters(clusters, tail, distanceF)
+            if (pointAssignedToCluster == bestClusterToAssign.id) assignToClusters(clusters, tail, distanceF, metrics)
             else assignToClusters(
               clusters ++ Map(clusters(p.assignedToCluster.get) - p, bestClusterToAssign + p)
-              , tail, distanceF)
+              , tail, distanceF, metrics)
           } else assignToClusters(
             clusters + (bestClusterToAssign + p)
-            , tail, distanceF)
+            , tail, distanceF, metrics)
         case IndexedSeq() =>
-          // TODO: Change currentMetric
-          val currentMetric = clusters.values.foldLeft(0.0) { case (accum, cluster) => accum + metric(cluster) } / clusters.size
-          clusters.values.toList
+          val currentMetric = metric.aggregateOf(clusters.values.toList)
+          if (metrics.contains(currentMetric)) clusters.values.toList
+          else assignToClusters(clusters, collectPoints(clusters.values), distanceF, metrics :+ currentMetric)
       }
 
     if (points.nonEmpty) {
@@ -76,7 +75,7 @@ object Clusterer {
       }.toMap
 
       // First round without the points assigned to each cluster
-      assignToClusters(_clusters, shuffledPointsWithoutClusterSeeds, distanceTo(_, averagePointsPerCluster))
+      assignToClusters(_clusters, shuffledPointsWithoutClusterSeeds, distanceTo(_, averagePointsPerCluster), Nil)
 
     } else Nil
 
