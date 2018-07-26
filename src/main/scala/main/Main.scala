@@ -2,7 +2,12 @@ package main
 
 
 import java.io._
+import java.nio.file.Paths
 
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
+import akka.stream.scaladsl.{FileIO, Keep, Sink, Source}
+import akka.util.ByteString
 import algorithm.Algorithm
 import breeze.linalg.{DenseMatrix, DenseVector, max}
 import algorithm.clusterer.Clusterer
@@ -73,37 +78,40 @@ object Main {
 
   }
 
-  case class IterationLogger() extends Subscriber {
+  case class IterationLogger(actorSystem: ActorSystem, fileName: String) extends Subscriber {
 
-    val map = new mutable.HashMap[Int, ListBuffer[(Clusterer.Settings, List[Cluster])]]()
+    val bufferSize = 100
+    val overflowStrategy = akka.stream.OverflowStrategy.dropHead
+
+    implicit val materializer = ActorMaterializer()(actorSystem)
+
+    val queue = Source.queue[(Clusterer.Settings, List[Cluster])](bufferSize, overflowStrategy)
+      .map(tupleToJson)
+      .map(Json.prettyPrint)
+      .map(json => ByteString(json + ", "))
+      .toMat(FileIO.toPath(Paths.get(fileName)))(Keep.left).run()
 
     override def onEvent(topic: String, event: Object): Unit = topic match {
       case "iteration" =>
         val iteration = event.asInstanceOf[(Clusterer.Settings, List[Cluster])]
-        val iterationList = map.applyOrElse(iteration._1.numberOfClusters, { _: Int => ListBuffer[(Clusterer.Settings, List[Cluster])]() })
-        iterationList.+=(iteration)
-        map.+=(iteration._1.numberOfClusters -> iterationList)
+        queue offer iteration
       case _ =>
     }
 
-    def toJson: JsValue = JsArray(map.map { it =>
+    private def tupleToJson(iteration: (Clusterer.Settings, List[Cluster])): JsObject = {
+      val oppositeMetric =
+        if (iteration._1.metric == Par.withAverageAggregate) Par.withParAggregate
+        else Par.withAverageAggregate
       Json.obj(
-        it._1.toString -> it._2.map { itList =>
-          val oppositeMetric =
-            if (itList._1.metric == Par.withAverageAggregate) Par.withParAggregate
-            else Par.withAverageAggregate
-          Json.obj(
-            "settings" -> itList._1,
-            "clusters" -> itList._2,
-            "clusterPoints" -> itList._2.map(_.points.size),
-            "aggregatedMetric" -> itList._1.metric.aggregateOf(itList._2),
-            "aggregateMetricName" -> itList._1.metric.aggregateOf.toString,
-            "aggregatedMetric2" -> oppositeMetric.aggregateOf(itList._2),
-            "aggregateMetric2Name" -> oppositeMetric.toString
-          )
-        }.toList
+        "settings" -> iteration._1,
+        "clusters" -> iteration._2,
+        "clusterPoints" -> iteration._2.map(_.points.size),
+        "aggregatedMetric" -> iteration._1.metric.aggregateOf(iteration._2),
+        "aggregateMetricName" -> iteration._1.metric.aggregateOf.toString,
+        "aggregatedMetric2" -> oppositeMetric.aggregateOf(iteration._2),
+        "aggregateMetric2Name" -> oppositeMetric.toString
       )
-    }.toList)
+    }
 
   }
 
@@ -137,10 +145,6 @@ object Main {
   }
 
   def batchRun(points: scala.Vector[Point]) = {
-
-    // Create subscribers
-    val iterationLogger = IterationLogger()
-    EventManager.singleton.subscribe("iteration", iterationLogger)
 
     val batchRunnerSettingsBuilder = new BatchRunSettingsBuilder(points, (1 to 5).toList, List(Metric.par), (points, k) => points.size * k)
 
@@ -186,7 +190,7 @@ object Main {
   def iterationRun(points: scala.Vector[Point]): Unit = {
 
     // Create subscribers
-    val iterationLogger = IterationLogger()
+    val iterationLogger = IterationLogger(ActorSystem(), Configuration.clustererFile)
     EventManager.singleton.subscribe("iteration", iterationLogger)
 
     val batchRunnerSettingsBuilder = new BatchRunSettingsBuilder(points, (1 to 5).toList, List(Par.withParAggregate, Par.withAverageAggregate), (points, k) => points.size * k)
@@ -199,11 +203,6 @@ object Main {
       logger.info("done")
       r
     })
-
-    Some(new PrintWriter(Configuration.clustererFile)).foreach { p =>
-      p.write(Json.prettyPrint(iterationLogger.toJson))
-      p.close()
-    }
 
   }
 
