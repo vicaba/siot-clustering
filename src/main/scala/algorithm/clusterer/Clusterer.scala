@@ -46,23 +46,36 @@ object Clusterer {
       remainingPoints match {
         case p +: tail =>
 
-          val bestClusterToAssign = clusters.values.minBy { cluster =>
+          val bestClusterToAssignLocally = clusters.values.minBy { cluster =>
             p.assignedToCluster.map { cId =>
               if (cId == cluster.id) distanceF(cluster) else distanceF(cluster + p)
             }.getOrElse(distanceF(cluster + p))
           }
 
-          if (p.assignedToCluster.isDefined) {
+          val newClusters =
+            if (p.assignedToCluster.isDefined)
+              if (p.assignedToCluster.get == bestClusterToAssignLocally.id)
+                clusters
+              else
+                clusters ++ Map(bestClusterToAssignLocally + p, clusters(p.assignedToCluster.get) - p)
+            else
+              clusters + (bestClusterToAssignLocally + p)
 
-            val pointAssignedToCluster = p.assignedToCluster.get
+          val oldMetric = metric.aggregateOf(clusters.values.toList)
+          val newMetric = metric.aggregateOf(newClusters.values.toList)
 
-            if (pointAssignedToCluster == bestClusterToAssign.id) assignToClusters(clusters, tail, distanceF, metrics, bestConfiguration)
-            else assignToClusters(
-              clusters ++ Map(clusters(p.assignedToCluster.get) - p, bestClusterToAssign + p)
-              , tail, distanceF, metrics, bestConfiguration)
-          } else assignToClusters(
-            clusters + (bestClusterToAssign + p)
-            , tail, distanceF, metrics, bestConfiguration)
+          val nextClusters =
+            if ((newMetric <= oldMetric) || collectPoints(clusters.values).size != points.size) newClusters
+            else clusters
+
+          assignToClusters(
+            nextClusters,
+            tail,
+            distanceF,
+            metrics,
+            bestConfiguration
+          )
+
         case IndexedSeq() =>
           val currentMetric = metric.aggregateOf(clusters.values.toList)
           val _bestConfiguration = if (currentMetric < bestConfiguration.aggregatedMetric)
@@ -91,7 +104,7 @@ object Clusterer {
       }.toMap
 
       // First round without the points assigned to each cluster
-      assignToClusters(_clusters, shuffledPointsWithoutClusterSeeds, distanceTo(_, averagePointsPerCluster),  metric.Highest :: Nil, BestConfiguration.empty(metric))
+      assignToClusters(_clusters, shuffledPointsWithoutClusterSeeds, distanceTo(_, averagePointsPerCluster), metric.Highest :: Nil, BestConfiguration.empty(metric))
 
     } else Nil
 

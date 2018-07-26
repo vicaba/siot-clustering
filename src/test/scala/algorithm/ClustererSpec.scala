@@ -3,16 +3,16 @@ package algorithm
 import algorithm.clusterer.Clusterer
 import breeze.linalg.{DenseMatrix, DenseVector}
 import algorithm.clusterer.Clusterer.Settings
-import metrics.Metric
+import metrics.{Metric, Par}
 import org.scalatest.Matchers._
 import org.scalatest.{FeatureSpec, GivenWhenThen}
-import types.{Cluster, Point, Types, Types4}
+import types._
 
 class ClustererSpec extends FeatureSpec with GivenWhenThen {
 
-  implicit val types = Types4
+  implicit val types: TypesT = Types4
 
-  val metric = Metric.par
+  val metric = Par.withParAggregate
 
 
   feature("cluster.Algorithm") {
