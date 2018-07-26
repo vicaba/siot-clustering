@@ -1,5 +1,6 @@
 package algorithm.clusterer
 
+import eventmanager.EventManager
 import metrics.Metric
 import types._
 
@@ -16,7 +17,9 @@ object Clusterer {
 
     (for (i <- 0 until settings.times)
       yield {
-        runOnce(settings.numberOfClusters, settings.points, settings.metric)
+        val result = runOnce(settings.numberOfClusters, settings.points, settings.metric)
+        EventManager.singleton.publish("iteration", (settings, result))
+        result
       }).minBy(cl => aggregateErrorOf(cl))
   }
 
@@ -27,19 +30,25 @@ object Clusterer {
 
     implicit def clusterToTuple(c: Cluster): (Int, Cluster) = c.id -> c
 
-    def collectPoints(clusters: Traversable[Cluster]): scala.Vector[Point] =
+    def collectPoints(clusters: Iterable[Cluster]): scala.Vector[Point] =
       clusters.foldLeft(clusters.head.points) {
         case (accum, cluster) => accum ++ cluster.points
       }.toVector
 
+    case class BestConfiguration(clusters: Iterable[Cluster], aggregatedMetric: Double)
+
+    object BestConfiguration {
+      def empty(metric: Metric): BestConfiguration = BestConfiguration(Nil, aggregatedMetric = metric.Highest)
+    }
+
     @tailrec
-    def assignToClusters(clusters: Map[Int, Cluster], remainingPoints: scala.Vector[Point], distanceF: Cluster => Double, metrics: List[Double]): List[Cluster] =
+    def assignToClusters(clusters: Map[Int, Cluster], remainingPoints: scala.Vector[Point], distanceF: Cluster => Double, metrics: List[Double], bestConfiguration: BestConfiguration): List[Cluster] =
       remainingPoints match {
         case p +: tail =>
 
           val bestClusterToAssign = clusters.values.minBy { cluster =>
             p.assignedToCluster.map { cId =>
-              if (cId == cluster.id) distanceF(cluster - p) else  distanceF(cluster + p)
+              if (cId == cluster.id) distanceF(cluster) else distanceF(cluster + p)
             }.getOrElse(distanceF(cluster + p))
           }
 
@@ -47,17 +56,24 @@ object Clusterer {
 
             val pointAssignedToCluster = p.assignedToCluster.get
 
-            if (pointAssignedToCluster == bestClusterToAssign.id) assignToClusters(clusters, tail, distanceF, metrics)
+            if (pointAssignedToCluster == bestClusterToAssign.id) assignToClusters(clusters, tail, distanceF, metrics, bestConfiguration)
             else assignToClusters(
               clusters ++ Map(clusters(p.assignedToCluster.get) - p, bestClusterToAssign + p)
-              , tail, distanceF, metrics)
+              , tail, distanceF, metrics, bestConfiguration)
           } else assignToClusters(
             clusters + (bestClusterToAssign + p)
-            , tail, distanceF, metrics)
+            , tail, distanceF, metrics, bestConfiguration)
         case IndexedSeq() =>
           val currentMetric = metric.aggregateOf(clusters.values.toList)
-          if (metrics.contains(currentMetric)) clusters.values.toList
-          else assignToClusters(clusters, collectPoints(clusters.values), distanceF, metrics :+ currentMetric)
+          val _bestConfiguration = if (currentMetric < bestConfiguration.aggregatedMetric)
+            BestConfiguration(clusters.values, currentMetric)
+          else
+            bestConfiguration
+
+          if (metrics.contains(currentMetric) && _bestConfiguration == bestConfiguration)
+            bestConfiguration.clusters.toList
+          else
+            assignToClusters(clusters, collectPoints(clusters.values), distanceF, metrics :+ currentMetric, _bestConfiguration)
       }
 
     if (points.nonEmpty) {
@@ -75,7 +91,7 @@ object Clusterer {
       }.toMap
 
       // First round without the points assigned to each cluster
-      assignToClusters(_clusters, shuffledPointsWithoutClusterSeeds, distanceTo(_, averagePointsPerCluster), Nil)
+      assignToClusters(_clusters, shuffledPointsWithoutClusterSeeds, distanceTo(_, averagePointsPerCluster),  metric.Highest :: Nil, BestConfiguration.empty(metric))
 
     } else Nil
 

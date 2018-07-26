@@ -2,9 +2,12 @@ package algorithm
 
 import algorithm.clusterer.Clusterer
 import algorithm.scheduler.ClusterRescheduler
+import com.typesafe.scalalogging.Logger
 import types.Cluster
 
 object Algorithm {
+
+  val logger = Logger("algorithm")
 
   case class Step(id: Int, clusters: List[Cluster])
 
@@ -31,9 +34,15 @@ object Algorithm {
     clustererSettings: Clusterer.Settings,
     reschedulerSettings: ClusterRescheduler.Settings): Steps = {
 
+    logger.info("clusterer")
+
     val clustererResult = Clusterer(clustererSettings)
 
-    val reschedulerResult = clustererResult.map(ClusterRescheduler(_, reschedulerSettings)._1)
+    logger.info("rescheduler")
+
+    val reschedulerResult = clustererResult.map(ClusterRescheduler(_, reschedulerSettings)._1).toList
+
+    logger.info("end")
 
     Steps(
       _1 = Step1(clustererSettings, clustererResult, clustererSettings.metric.aggregateOf(clustererResult)),

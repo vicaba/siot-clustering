@@ -4,11 +4,19 @@ import breeze.stats._
 import metrics.Metric.Progression
 import breeze.linalg._
 
+trait DenseVectorReprOps[T] {
+
+  def apply(t: T): DenseVector[Double]
+
+  def zero(t: T): DenseVector[Double]
+
+}
+
 object Metric {
 
-  def par: Par.type = Par
+  def par: Metric = Par.default
 
-  case class MetricResult(distance: Double, progression: Progression)
+  case class ProgressionResult(distance: Double, progression: Progression)
 
   sealed trait Progression {
 
@@ -38,6 +46,16 @@ object Metric {
 
 }
 
+trait MetricCompanion {
+
+  val default: Metric
+
+  trait AggregateOf {
+    def apply[T: DenseVectorReprOps](metric: Metric, list: List[T]): Double
+  }
+
+}
+
 trait Metric {
 
   /**
@@ -49,6 +67,8 @@ trait Metric {
     * The lowest value the metric can take
     */
   val Lowest: Double
+
+  val aggregateOf: MetricCompanion#AggregateOf
 
   /**
     * Apply this metric to the vector
@@ -79,26 +99,61 @@ trait Metric {
     * @tparam T
     * @return
     */
-  def aggregateOf[T: DenseVectorReprOps](list: List[T]): Double
+  def aggregateOf[T: DenseVectorReprOps](list: List[T]): Double = aggregateOf.apply(this, list)
+
 }
 
-trait DenseVectorReprOps[T] {
-  def apply(t: T): DenseVector[Double]
+object Par extends MetricCompanion {
 
-  def zero(t: T): DenseVector[Double]
+  val withAverageAggregate: Par = new Par {
+    override val aggregateOf: AggregateOf = AverageAggregate
+  }
+
+  val withParAggregate: Par = new Par {
+    override val aggregateOf: AggregateOf = ParAggregate
+  }
+
+  override val default: Metric = withParAggregate
+
+  object ParAggregate extends AggregateOf {
+
+    override def apply[T: DenseVectorReprOps](metric: Metric, list: List[T]): Double = {
+      val toVectorOps = implicitly[DenseVectorReprOps[T]]
+      if (list.size == 1) metric(toVectorOps(list.head)) else {
+        val metricVector = DenseVector[Double](list.map { t =>
+          metric(toVectorOps(t))
+        }:_*)
+        metric(metricVector)
+      }}
+
+    override def toString: String = "par"
+
+  }
+
+  object AverageAggregate extends AggregateOf {
+
+    override def apply[T: DenseVectorReprOps](metric: Metric, list: List[T]): Double = {
+      val toVectorOps = implicitly[DenseVectorReprOps[T]]
+      list.foldLeft(metric (toVectorOps.zero(list.head))) { case (accum, v) => accum + metric (v) } / list.size
+    }
+
+    override def toString: String = "average"
+
+  }
+
 }
 
-object Par extends Metric {
+trait Par extends Metric {
 
   override val Highest: Double = Double.PositiveInfinity
 
-  override val Lowest: Double = 0.0
+  override val Lowest: Double = 1.0
 
-  override def apply(e: DenseVector[Double]): Double = if (!e.forall(_ == 0)) (max(e) / mean(e)) else 0
+  override def apply(e: DenseVector[Double]): Double = if (!e.forall(_ == 0)) (max(e) / mean(e)) else this.Lowest
 
   override def progression(before: DenseVector[Double], after: DenseVector[Double]): Progression = {
 
-    val betterParThanBefore = Par(before) > Par(after)
+    val betterParThanBefore = this(before) > this(after)
     val maxIsLowerThanBefore = max(after) < max(before)
     val maxIsEqualAsBefore = max(after) == max(before)
     val lessMaxsThanBefore = {
@@ -114,29 +169,6 @@ object Par extends Metric {
 
   }
 
-  override def toString: String = "par"
-
-  /**
-    * PAR
-    */
-  /*  override def aggregateOf[T: DenseVectorReprOps](list: List[T]): Double = {
-      val toVectorOps = implicitly[DenseVectorReprOps[T]]
-      if (list.size == 1) this(toVectorOps(list.head)) else {
-        val metricVector = DenseVector[Double](list.map { t =>
-          this(toVectorOps(t))
-        }:_*)
-        this(metricVector)
-      }}*/
-
-  /**
-    * Average
-    * @param list
-    * @tparam T
-    * @return
-    */
-  override def aggregateOf[T: DenseVectorReprOps](list: List[T]): Double = {
-    val toVectorOps = implicitly[DenseVectorReprOps[T]]
-    list.foldLeft(this (toVectorOps.zero(list.head))) { case (accum, v) => accum + this (v) } / list.size
-  }
+  override def toString: String = "par, " + aggregateOf.toString
 
 }

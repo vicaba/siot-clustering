@@ -87,15 +87,20 @@ object Rescheduler {
     var first = true
 
     rowIterator.zipWithIndex.foreach { case (vector, rowNumber) =>
-      val fixedValue = fixedVector + sum(matrixToReschedule, Axis._0).inner - vector
-      val distance = reschedule(vector, fixedValue, metric)
+      // If it is a zero vector, END
+      if (!vector.data.forall(_ == 0)) {
 
-      if ((first || distance.distanceAfterReschedule < smallest) && vector != distance.vector) {
-        first = false
+        val fixedValue = fixedVector + sum(matrixToReschedule, Axis._0).inner - vector
+        val distance = reschedule(vector, fixedValue, metric)
 
-        bestSolutionRow = rowNumber
-        smallest = distance.distanceAfterReschedule
-        bestSolution = distance
+        if ((first || distance.distanceAfterReschedule < smallest) && vector != distance.vector) {
+          first = false
+
+          bestSolutionRow = rowNumber
+          smallest = distance.distanceAfterReschedule
+          bestSolution = distance
+        }
+
       }
     }
 

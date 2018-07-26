@@ -6,10 +6,13 @@ import algorithm.Algorithm.Steps
 import algorithm._
 import algorithm.clusterer.Clusterer
 import algorithm.scheduler.ClusterRescheduler
+import com.typesafe.scalalogging.Logger
 import metrics.Metric
-import types.Point
+import types.{Cluster, Point}
 
 object BatchRun {
+
+  val logger = Logger("batch")
 
   class BatchRunSettingsBuilder(
     points: Vector[Point],
@@ -26,9 +29,15 @@ object BatchRun {
 
   }
 
+  def apply(clustererSettingsBuilder: BatchRunSettingsBuilder, run: Clusterer.Settings => List[Cluster]): List[List[Cluster]] =
+    clustererSettingsBuilder.build.map(run)
+
+
   def apply(clustererSettingsBuilder: BatchRunSettingsBuilder): List[Steps] = {
 
     clustererSettingsBuilder.build.map { clustererSettings =>
+
+      logger.info("Running Batch with: {}", clustererSettings.toString)
 
       val reschedulerSettings = ClusterRescheduler.Settings(clustererSettings.metric, 0.5, memory = 3)
 

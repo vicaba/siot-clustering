@@ -13,13 +13,18 @@ import batch.BatchRun.BatchRunSettingsBuilder
 import types._
 import types.Types._
 import config.Configuration
-import metrics.Metric
+import eventmanager.{EventManager, Subscriber}
+import metrics.{Metric, Par}
 import org.apache.commons.csv.CSVFormat
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsArray, JsObject, JsValue, Json}
 import reader.Reader
 import types.Point
 import types.serialization.ClusterJsonSerializer._
+import algorithm.serialization.ClustererJsonSerializer._
+import com.typesafe.scalalogging.Logger
 
+import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 import scala.util.Try
 
 object Main {
@@ -68,6 +73,40 @@ object Main {
 
   }
 
+  case class IterationLogger() extends Subscriber {
+
+    val map = new mutable.HashMap[Int, ListBuffer[(Clusterer.Settings, List[Cluster])]]()
+
+    override def onEvent(topic: String, event: Object): Unit = topic match {
+      case "iteration" =>
+        val iteration = event.asInstanceOf[(Clusterer.Settings, List[Cluster])]
+        val iterationList = map.applyOrElse(iteration._1.numberOfClusters, { _: Int => ListBuffer[(Clusterer.Settings, List[Cluster])]() })
+        iterationList.+=(iteration)
+        map.+=(iteration._1.numberOfClusters -> iterationList)
+      case _ =>
+    }
+
+    def toJson: JsValue = JsArray(map.map { it =>
+      Json.obj(
+        it._1.toString -> it._2.map { itList =>
+          val oppositeMetric =
+            if (itList._1.metric == Par.withAverageAggregate) Par.withParAggregate
+            else Par.withAverageAggregate
+          Json.obj(
+            "settings" -> itList._1,
+            "clusters" -> itList._2,
+            "clusterPoints" -> itList._2.map(_.points.size),
+            "aggregatedMetric" -> itList._1.metric.aggregateOf(itList._2),
+            "aggregateMetricName" -> itList._1.metric.aggregateOf.toString,
+            "aggregatedMetric2" -> oppositeMetric.aggregateOf(itList._2),
+            "aggregateMetric2Name" -> oppositeMetric.toString
+          )
+        }.toList
+      )
+    }.toList)
+
+  }
+
   def main(args: Array[String]): Unit = {
     /*    val points = Reader.readUserRanges(Configuration.userProfilesFile).zipWithIndex.map { case (values, idx) =>
           implicit val types: TypesT = Types24
@@ -93,7 +132,17 @@ object Main {
 
     val points = readEgaugeData("files/input/egauge.json")
 
-    val batchRunnerSettingsBuilder = new BatchRunSettingsBuilder(points, (1 to 10).toList, List(Metric.par), (points, k) => points.size * 10 * k)
+    iterationRun(points)
+
+  }
+
+  def batchRun(points: scala.Vector[Point]) = {
+
+    // Create subscribers
+    val iterationLogger = IterationLogger()
+    EventManager.singleton.subscribe("iteration", iterationLogger)
+
+    val batchRunnerSettingsBuilder = new BatchRunSettingsBuilder(points, (1 to 5).toList, List(Metric.par), (points, k) => points.size * k)
 
     val stepsList = BatchRun(batchRunnerSettingsBuilder).zipWithIndex
 
@@ -119,7 +168,8 @@ object Main {
           "s2. peak" -> max(steps._2.clusters.maxBy(c => max(c.syntheticCenter)).syntheticCenter),
           "s2. agg m" -> steps._2.aggregatedMetric,
           "s2. max m" -> steps._2.clusters.map(steps._2.settings.metric(_)).max,
-          "total m" -> Point.pointListToVector(steps._2.clusters.flatMap(_.points)).map(vec => steps._2.settings.metric(vec))
+          "total m" -> Point.pointListToVector(steps._2.clusters.flatMap(_.points)).map(vec => steps._2.settings.metric(vec)),
+          "clusters" -> steps._1.clusters.map(_.points.size)
         )
       }
 
@@ -128,27 +178,32 @@ object Main {
       p.close()
     }
 
-    copyFile(Configuration.summaryBatchRunFile, "/Users/vcaballero/Projects/jupyter-notebook/siot-clustering-viz/")
-    copyFile(Configuration.batchRunFile, "/Users/vcaballero/Projects/jupyter-notebook/siot-clustering-viz/")
+    copyFile(Configuration.summaryBatchRunFile, "/Users/vicaba/Projects/jupyter/shared/siot-clustering-viz/")
+    copyFile(Configuration.batchRunFile, "/Users/vicaba/Projects/jupyter/shared/siot-clustering-viz/")
 
+  }
 
+  def iterationRun(points: scala.Vector[Point]): Unit = {
 
-    /*    val runSettings = Clusterer.Settings(numberOfClusters = 2, points.take(30), Metric.par, times = points.take(30).size * 100)
+    // Create subscribers
+    val iterationLogger = IterationLogger()
+    EventManager.singleton.subscribe("iteration", iterationLogger)
 
-        val reschedulerSettings = ClusterRescheduler.Settings(Metric.par, 0.5, memory = 2)
+    val batchRunnerSettingsBuilder = new BatchRunSettingsBuilder(points, (1 to 5).toList, List(Par.withParAggregate, Par.withAverageAggregate), (points, k) => points.size * k)
 
-        val steps = Algorithm(runSettings, reschedulerSettings)
+    val logger = Logger("iteration")
 
-        Some(new PrintWriter(Configuration.clustererFile)).foreach{ p =>
-          p.write(Json.toJson(steps._1.clusters).toString()); p.close
-        }
+    BatchRun(batchRunnerSettingsBuilder, { clustererSettings =>
+      logger.info("clusterer settings: {}", clustererSettings)
+      val r = Clusterer(clustererSettings)
+      logger.info("done")
+      r
+    })
 
-        Some(new PrintWriter(Configuration.reschedulerFile)).foreach{ p =>
-          p.write(Json.toJson(steps._2.clusters).toString()); p.close
-        }
-
-        copyFile(Configuration.clustererFile, "/home/vcaballero/Projects/jupyter-datascience.d/files/")
-        copyFile(Configuration.reschedulerFile, "/home/vcaballero/Projects/jupyter-datascience.d/files/")*/
+    Some(new PrintWriter(Configuration.clustererFile)).foreach { p =>
+      p.write(Json.prettyPrint(iterationLogger.toJson))
+      p.close()
+    }
 
   }
 
