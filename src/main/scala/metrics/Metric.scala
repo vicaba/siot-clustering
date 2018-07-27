@@ -51,7 +51,7 @@ trait MetricCompanion {
   val default: Metric
 
   trait AggregateOf {
-    def apply[T: DenseVectorReprOps](metric: Metric, list: List[T]): Double
+    def apply[T: DenseVectorReprOps](metric: Metric, list: Iterable[T]): Double
   }
 
 }
@@ -99,7 +99,7 @@ trait Metric {
     * @tparam T
     * @return
     */
-  def aggregateOf[T: DenseVectorReprOps](list: List[T]): Double = aggregateOf.apply(this, list)
+  def aggregateOf[T: DenseVectorReprOps](list: Iterable[T]): Double = aggregateOf.apply(this, list)
 
 }
 
@@ -117,12 +117,12 @@ object Par extends MetricCompanion {
 
   object ParAggregate extends AggregateOf {
 
-    override def apply[T: DenseVectorReprOps](metric: Metric, list: List[T]): Double = {
+    override def apply[T: DenseVectorReprOps](metric: Metric, list: Iterable[T]): Double = {
       val toVectorOps = implicitly[DenseVectorReprOps[T]]
       if (list.size == 1) metric(toVectorOps(list.head)) else {
         val metricVector = DenseVector[Double](list.map { t =>
           metric(toVectorOps(t))
-        }:_*)
+        }.toList:_*)
         metric(metricVector)
       }}
 
@@ -132,7 +132,7 @@ object Par extends MetricCompanion {
 
   object AverageAggregate extends AggregateOf {
 
-    override def apply[T: DenseVectorReprOps](metric: Metric, list: List[T]): Double = {
+    override def apply[T: DenseVectorReprOps](metric: Metric, list: Iterable[T]): Double = {
       val toVectorOps = implicitly[DenseVectorReprOps[T]]
       list.foldLeft(metric (toVectorOps.zero(list.head))) { case (accum, v) => accum + metric (v) } / list.size
     }

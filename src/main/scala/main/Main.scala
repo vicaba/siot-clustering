@@ -140,13 +140,13 @@ object Main {
 
     val points = readEgaugeData("files/input/egauge.json")
 
-    iterationRun(points)
+    batchRun(points)
 
   }
 
   def batchRun(points: scala.Vector[Point]) = {
 
-    val batchRunnerSettingsBuilder = new BatchRunSettingsBuilder(points, (1 to 5).toList, List(Metric.par), (points, k) => points.size * k)
+    val batchRunnerSettingsBuilder = new BatchRunSettingsBuilder(points, (1 to 6).toList, List(Metric.par), (points, k) => points.size * k)
 
     val stepsList = BatchRun(batchRunnerSettingsBuilder).zipWithIndex
 
@@ -182,8 +182,8 @@ object Main {
       p.close()
     }
 
-    copyFile(Configuration.summaryBatchRunFile, "/Users/vicaba/Projects/jupyter/shared/siot-clustering-viz/")
-    copyFile(Configuration.batchRunFile, "/Users/vicaba/Projects/jupyter/shared/siot-clustering-viz/")
+    copyFile(Configuration.summaryBatchRunFile, "/Users/vcaballero/Projects/jupyter-notebook/siot-clustering-viz/")
+    copyFile(Configuration.batchRunFile, "/Users/vcaballero/Projects/jupyter-notebook/siot-clustering-viz/")
 
   }
 

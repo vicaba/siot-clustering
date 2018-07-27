@@ -52,14 +52,22 @@ object Clusterer {
             }.getOrElse(distanceF(cluster + p))
           }
 
+          val bestClusterToAssignGlobally = clusters.values.minBy { cluster =>
+            p.assignedToCluster.map { cId =>
+              if (cId == cluster.id) metric.aggregateOf(clusters.values) else metric.aggregateOf((clusters + (cluster + p)).values)
+            }.getOrElse(metric.aggregateOf((clusters + (cluster + p)).values))
+          }
+
+          val bestClusterToAssign = bestClusterToAssignGlobally
+
           val newClusters =
             if (p.assignedToCluster.isDefined)
-              if (p.assignedToCluster.get == bestClusterToAssignLocally.id)
+              if (p.assignedToCluster.get == bestClusterToAssign.id)
                 clusters
               else
-                clusters ++ Map(bestClusterToAssignLocally + p, clusters(p.assignedToCluster.get) - p)
+                clusters ++ Map(bestClusterToAssign + p, clusters(p.assignedToCluster.get) - p)
             else
-              clusters + (bestClusterToAssignLocally + p)
+              clusters + (bestClusterToAssign + p)
 
           val oldMetric = metric.aggregateOf(clusters.values.toList)
           val newMetric = metric.aggregateOf(newClusters.values.toList)
