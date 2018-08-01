@@ -1,11 +1,11 @@
-package algorithm.util
+package util
 import scala.annotation.tailrec
 
 object Slicer {
 
   case class RangeT[T](start: T, end: T)
 
-  def slice[T: Numeric](start: T, end: T)(step: T): List[RangeT[T]] = {
+  def slice[T: Numeric](start: T, end: T, step: T): List[RangeT[T]] = {
 
     val numeric = implicitly[Numeric[T]]
 
@@ -19,17 +19,17 @@ object Slicer {
           else
             acc
         case x if x == 0 => RangeT[T](start, shift) :: acc
-        case x if x < 0 => _slice(shift, end, RangeT[T](start, shift) :: acc)
+        case x if x < 0  => _slice(shift, end, RangeT(start, shift) :: acc)
       }
     }
 
-    _slice(start, end, List[RangeT[T]]())
+    _slice(start, end, List[RangeT[T]]()).reverse
 
   }
 
   def main(args: Array[String]): Unit = {
 
-    println(slice(BigDecimal(1), BigDecimal(4))(BigDecimal(0.5)))
+    println(slice(BigDecimal(1), BigDecimal(4), BigDecimal(0.5)))
 
   }
 

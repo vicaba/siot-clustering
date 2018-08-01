@@ -3,6 +3,7 @@ package metrics
 import breeze.stats._
 import metrics.Metric.Progression
 import breeze.linalg._
+import util.Slicer
 
 trait DenseVectorReprOps[T] {
 
@@ -105,12 +106,20 @@ trait Metric {
 
 object Par extends MetricCompanion {
 
+  val withParAggregate: Par = new Par {
+    override val aggregateOf: AggregateOf = ParAggregate
+  }
+
   val withAverageAggregate: Par = new Par {
     override val aggregateOf: AggregateOf = AverageAggregate
   }
 
-  val withParAggregate: Par = new Par {
-    override val aggregateOf: AggregateOf = ParAggregate
+  val withGeometricAverageAggregate: Par = new Par {
+    override val aggregateOf: AggregateOf = GeometricAverageAggregate
+  }
+
+  val withGroupedGeometricAverageAggregate: Par = new Par {
+    override val aggregateOf: AggregateOf = GroupedGeometricAverageAggregate
   }
 
   override val default: Metric = withParAggregate
@@ -119,10 +128,10 @@ object Par extends MetricCompanion {
 
     override def apply[T: DenseVectorReprOps](metric: Metric, list: Iterable[T]): Double = {
       val toVectorOps = implicitly[DenseVectorReprOps[T]]
-      if (list.size == 1) metric(toVectorOps(list.head))
+      if (list.size == 1) metric(list.head)
       else {
         val metricVector = DenseVector[Double](list.map { t =>
-          metric(toVectorOps(t))
+          metric(t)
         }.toList: _*)
         metric(metricVector)
       }
@@ -141,6 +150,44 @@ object Par extends MetricCompanion {
 
     override def toString: String = "average"
 
+  }
+
+  object GeometricAverageAggregate extends AggregateOf {
+
+    override def apply[T: DenseVectorReprOps](metric: Metric, list: Iterable[T]): Double =
+      (list.zipWithIndex
+        .map {
+          case (e, i) =>
+            BigDecimal(metric.apply(e)).pow(i + 1)
+        }
+        .fold(BigDecimal(0))(_ + _) / list.size).toDouble
+
+    override def toString: String = "grouped geometric average"
+
+  }
+
+  object GroupedGeometricAverageAggregate extends AggregateOf {
+    override def apply[T: DenseVectorReprOps](metric: Metric, list: Iterable[T]): Double = {
+      val l     = list.map(metric(_)).map(BigDecimal(_))
+      val lMax  = l.max
+      val lMin  = if (l.size != 1) l.min else BigDecimal(0)
+      val steps = (l.size / 2) + 1
+      val step  = (lMax - lMin) / steps
+
+      /* Group ranges so elements of the metric list can be compared */
+      val groupedRanges = Slicer.slice(lMin, lMax, step)
+      val lGeometricGrouped = l.groupBy { e =>
+        groupedRanges.find { r =>
+          r.start <= e && r.end >= e
+        }.get
+      }
+      (lGeometricGrouped.zipWithIndex
+        .map {
+          case ((r, e), i) =>
+            e.fold(BigDecimal(1))(_ + _.pow(i + 1))
+        }
+        .fold(BigDecimal(0))(_ + _) / l.size).toDouble
+    }
   }
 
 }
