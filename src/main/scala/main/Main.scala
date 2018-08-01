@@ -206,10 +206,11 @@ object Main {
     val iterationLogger = IterationLogger(ActorSystem(), Configuration.clustererFile)
     EventManager.singleton.subscribe("iteration", iterationLogger)
 
-    val batchRunnerSettingsBuilder = new BatchRunSettingsBuilder(points,
-                                                                 (1 to 5).toList,
-                                                                 List(Par.withParAggregate, Par.withAverageAggregate),
-                                                                 (points, k) => points.size * k)
+    val batchRunnerSettingsBuilder =
+      new BatchRunSettingsBuilder(points,
+                                  (1 to 5).toList,
+                                  List(Par.withParAggregate, Par.withAverageAggregate),
+                                  (points, k) => points.size * k)
 
     val logger = Logger("iteration")
 
