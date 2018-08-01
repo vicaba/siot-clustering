@@ -1,6 +1,5 @@
 package main
 
-
 import java.io._
 import java.nio.file.Paths
 
@@ -35,7 +34,7 @@ import scala.util.Try
 object Main {
 
   def copyFile(srcFile: String, dstFile: String): Unit = {
-    val src = new File(srcFile)
+    val src   = new File(srcFile)
     val _dest = new File(dstFile)
     val dest =
       if (_dest.isFile) _dest
@@ -43,53 +42,61 @@ object Main {
 
     println(dest.getAbsolutePath)
 
-    new FileOutputStream(dest) getChannel() transferFrom(
-      new FileInputStream(src) getChannel(), 0, Long.MaxValue)
+    new FileOutputStream(dest) getChannel () transferFrom (new FileInputStream(src) getChannel (), 0, Long.MaxValue)
   }
 
   def readEgaugeData(file: String): Vector[Point] = {
 
     val stream = new FileInputStream(file)
-    Try(Json.parse(stream)).fold(_ => {
-      stream.close()
-      Vector.empty[Point]
-    },
+    Try(Json.parse(stream)).fold(
+      _ => {
+        stream.close()
+        Vector.empty[Point]
+      },
       jsval => {
         stream.close()
-        jsval.validate[List[JsValue]].fold(_ => Vector.empty[Point], jsList => {
-          jsList.map { jsPoint =>
-            val dataid = (jsPoint \ "dataid").validate[Int].get
-            val vectorList = (jsPoint \ "data").validate[List[List[Double]]].get.map { applianceList =>
-              val vector = DenseVector(applianceList: _*)
-              if (vector.length == 0) {
-                vector
-              } else {
-                vector
-              }
+        jsval
+          .validate[List[JsValue]]
+          .fold(
+            _ => Vector.empty[Point],
+            jsList => {
+              jsList.map { jsPoint =>
+                val dataid = (jsPoint \ "dataid").validate[Int].get
+                val vectorList = (jsPoint \ "data").validate[List[List[Double]]].get.map { applianceList =>
+                  val vector = DenseVector(applianceList: _*)
+                  if (vector.length == 0) {
+                    vector
+                  } else {
+                    vector
+                  }
+                }
+                val data = DenseMatrix(vectorList: _*)
+
+                val point = Point(dataid, data, None)(Types67_24)
+
+                point
+              }.toVector
             }
-            val data = DenseMatrix(vectorList: _*)
-
-            val point = Point(dataid, data, None)(Types67_24)
-
-            point
-          }.toVector
-        })
-      })
+          )
+      }
+    )
 
   }
 
   case class IterationLogger(actorSystem: ActorSystem, fileName: String) extends Subscriber {
 
-    val bufferSize = 100
+    val bufferSize       = 100
     val overflowStrategy = akka.stream.OverflowStrategy.dropHead
 
     implicit val materializer = ActorMaterializer()(actorSystem)
 
-    val queue = Source.queue[(Clusterer.Settings, List[Cluster])](bufferSize, overflowStrategy)
+    val queue = Source
+      .queue[(Clusterer.Settings, List[Cluster])](bufferSize, overflowStrategy)
       .map(tupleToJson)
       .map(Json.prettyPrint)
       .map(json => ByteString(json + ", "))
-      .toMat(FileIO.toPath(Paths.get(fileName)))(Keep.left).run()
+      .toMat(FileIO.toPath(Paths.get(fileName)))(Keep.left)
+      .run()
 
     override def onEvent(topic: String, event: Object): Unit = topic match {
       case "iteration" =>
@@ -103,12 +110,12 @@ object Main {
         if (iteration._1.metric == Par.withAverageAggregate) Par.withParAggregate
         else Par.withAverageAggregate
       Json.obj(
-        "settings" -> iteration._1,
-        "clusters" -> iteration._2,
-        "clusterPoints" -> iteration._2.map(_.points.size),
-        "aggregatedMetric" -> iteration._1.metric.aggregateOf(iteration._2),
-        "aggregateMetricName" -> iteration._1.metric.aggregateOf.toString,
-        "aggregatedMetric2" -> oppositeMetric.aggregateOf(iteration._2),
+        "settings"             -> iteration._1,
+        "clusters"             -> iteration._2,
+        "clusterPoints"        -> iteration._2.map(_.points.size),
+        "aggregatedMetric"     -> iteration._1.metric.aggregateOf(iteration._2),
+        "aggregateMetricName"  -> iteration._1.metric.aggregateOf.toString,
+        "aggregatedMetric2"    -> oppositeMetric.aggregateOf(iteration._2),
         "aggregateMetric2Name" -> oppositeMetric.toString
       )
     }
@@ -146,16 +153,20 @@ object Main {
 
   def batchRun(points: scala.Vector[Point]) = {
 
-    val batchRunnerSettingsBuilder = new BatchRunSettingsBuilder(points, (1 to 6).toList, List(Metric.par), (points, k) => points.size * k)
+    val batchRunnerSettingsBuilder = new BatchRunSettingsBuilder(points,
+                                                                 (1 to 6).toList,
+                                                                 List(Par.withAverageAggregate),
+                                                                 (points, k) => points.size * k)
 
     val stepsList = BatchRun(batchRunnerSettingsBuilder).zipWithIndex
 
     Some(new PrintWriter(Configuration.batchRunFile)).foreach { p =>
-      val jsonList = stepsList.map { case (steps, idx) =>
-        Json.obj(
-          "run" -> idx,
-          "steps" -> Json.toJson(steps)
-        )
+      val jsonList = stepsList.map {
+        case (steps, idx) =>
+          Json.obj(
+            "run"   -> idx,
+            "steps" -> Json.toJson(steps)
+          )
       }
 
       p.write(Json.prettyPrint(Json.toJson(jsonList)).toString())
@@ -163,27 +174,29 @@ object Main {
     }
 
     Some(new PrintWriter(Configuration.summaryBatchRunFile)).foreach { p =>
-      val jsonList = stepsList.map { case (steps, idx) =>
-        Json.obj(
-          "k" -> steps._1.settings.numberOfClusters,
-          "s1. peak" -> max(steps._1.clusters.maxBy(c => max(c.syntheticCenter)).syntheticCenter),
-          "s1. agg m" -> steps._1.aggregatedMetric,
-          "s1. max m" -> steps._1.clusters.map(steps._2.settings.metric(_)).max,
-          "s2. peak" -> max(steps._2.clusters.maxBy(c => max(c.syntheticCenter)).syntheticCenter),
-          "s2. agg m" -> steps._2.aggregatedMetric,
-          "s2. max m" -> steps._2.clusters.map(steps._2.settings.metric(_)).max,
-          "total m" -> Point.pointListToVector(steps._2.clusters.flatMap(_.points)).map(vec => steps._2.settings.metric(vec)),
-          "clusters" -> steps._1.clusters.map(_.points.size)
-        )
+      val jsonList = stepsList.map {
+        case (steps, idx) =>
+          Json.obj(
+            "k"         -> steps._1.settings.numberOfClusters,
+            "s1. peak"  -> max(steps._1.clusters.maxBy(c => max(c.syntheticCenter)).syntheticCenter),
+            "s1. agg m" -> steps._1.aggregatedMetric,
+            "s1. max m" -> steps._1.clusters.map(steps._2.settings.metric(_)).max,
+            "s2. peak"  -> max(steps._2.clusters.maxBy(c => max(c.syntheticCenter)).syntheticCenter),
+            "s2. agg m" -> steps._2.aggregatedMetric,
+            "s2. max m" -> steps._2.clusters.map(steps._2.settings.metric(_)).max,
+            "total m" -> Point
+              .pointListToVector(steps._2.clusters.flatMap(_.points))
+              .map(vec => steps._2.settings.metric(vec)),
+            "clusters" -> steps._1.clusters.map(_.points.size)
+          )
       }
-
 
       p.write(Json.prettyPrint(Json.toJson(jsonList)).toString())
       p.close()
     }
 
-    copyFile(Configuration.summaryBatchRunFile, "/Users/vcaballero/Projects/jupyter-notebook/siot-clustering-viz/")
-    copyFile(Configuration.batchRunFile, "/Users/vcaballero/Projects/jupyter-notebook/siot-clustering-viz/")
+    //copyFile(Configuration.summaryBatchRunFile, "/Users/vcaballero/Projects/jupyter-notebook/siot-clustering-viz/")
+    //copyFile(Configuration.batchRunFile, "/Users/vcaballero/Projects/jupyter-notebook/siot-clustering-viz/")
 
   }
 
@@ -193,16 +206,21 @@ object Main {
     val iterationLogger = IterationLogger(ActorSystem(), Configuration.clustererFile)
     EventManager.singleton.subscribe("iteration", iterationLogger)
 
-    val batchRunnerSettingsBuilder = new BatchRunSettingsBuilder(points, (1 to 5).toList, List(Par.withParAggregate, Par.withAverageAggregate), (points, k) => points.size * k)
+    val batchRunnerSettingsBuilder = new BatchRunSettingsBuilder(points,
+                                                                 (1 to 5).toList,
+                                                                 List(Par.withParAggregate, Par.withAverageAggregate),
+                                                                 (points, k) => points.size * k)
 
     val logger = Logger("iteration")
 
-    BatchRun(batchRunnerSettingsBuilder, { clustererSettings =>
-      logger.info("clusterer settings: {}", clustererSettings)
-      val r = Clusterer(clustererSettings)
-      logger.info("done")
-      r
-    })
+    BatchRun(
+      batchRunnerSettingsBuilder, { clustererSettings =>
+        logger.info("clusterer settings: {}", clustererSettings)
+        val r = Clusterer(clustererSettings)
+        logger.info("done")
+        r
+      }
+    )
 
   }
 

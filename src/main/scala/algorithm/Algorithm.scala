@@ -16,23 +16,20 @@ object Algorithm {
     val aggregatedMetric: Double
   }
 
-  case class Step1(
-    settings: Clusterer.Settings,
-    override val clusters: List[Cluster],
-    override val aggregatedMetric: Double)
-    extends StepT
+  case class Step1(settings: Clusterer.Settings,
+                   override val clusters: List[Cluster],
+                   override val aggregatedMetric: Double)
+      extends StepT
 
   case class Step2(
-    settings: ClusterRescheduler.Settings,
-    override val clusters: List[Cluster],
-    override val aggregatedMetric: Double
+      settings: ClusterRescheduler.Settings,
+      override val clusters: List[Cluster],
+      override val aggregatedMetric: Double
   ) extends StepT
 
   case class Steps(_1: Step1, _2: Step2)
 
-  def apply(
-    clustererSettings: Clusterer.Settings,
-    reschedulerSettings: ClusterRescheduler.Settings): Steps = {
+  def apply(clustererSettings: Clusterer.Settings, reschedulerSettings: ClusterRescheduler.Settings): Steps = {
 
     logger.info("clusterer")
 

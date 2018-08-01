@@ -21,15 +21,15 @@ case class Cluster(id: Int, name: String, points: Set[Point])(implicit val types
   def -(point: Point): Cluster = this.copy(points = points - point)
 
   /**
-   * Calling this method without any point in the cluster is unsafe
-   * @return
-   */
+    * Calling this method without any point in the cluster is unsafe
+    * @return
+    */
   def syntheticCenter: SyntheticDataType = {
 
     @tailrec
     def sumVectors(remaining: List[SyntheticDataType], accum: SyntheticDataType): SyntheticDataType = remaining match {
       case e :: tail => sumVectors(tail, accum + e)
-      case Nil => accum
+      case Nil       => accum
     }
 
     val syntheticValues = this.points.toList.map(_.syntheticValue)
@@ -43,8 +43,7 @@ object Cluster {
 
   import scala.language.implicitConversions
 
-
-  def Empty(implicit types: TypesT): Cluster  = Cluster(-1, "empty", Set.empty)(types)
+  def Empty(implicit types: TypesT): Cluster = Cluster(-1, "empty", Set.empty)(types)
 
   implicit def clusterToVector(c: Cluster): SyntheticDataType = c.syntheticCenter
 

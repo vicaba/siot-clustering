@@ -17,7 +17,7 @@ trait Configuration {
 
 }
 
-object Configuration extends Configuration  {
+object Configuration extends Configuration {
 
   private lazy val conf: Config = ConfigFactory.load("Application.conf")
 

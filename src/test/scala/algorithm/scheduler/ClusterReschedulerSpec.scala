@@ -15,9 +15,7 @@ class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
   val metric = Metric.par
 
-  def rescheduleTimes(times: Int
-    , clusterToReschedule: Cluster
-  , metric: Metric): List[PointChange] = {
+  def rescheduleTimes(times: Int, clusterToReschedule: Cluster, metric: Metric): List[PointChange] = {
 
     @tailrec
     def _rescheduleTimes(times: Int, clusterToReschedule: Cluster, accum: List[PointChange]): List[PointChange] = {
@@ -38,10 +36,11 @@ class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
   }
 
   val globalPoints = List(
+    DenseMatrix((0.0, 3.0, 3.0, 0.0), (0.0, 4.0, 4.0, 0.0)),
     DenseMatrix((0.0, 3.0, 3.0, 0.0), (0.0, 4.0, 4.0, 0.0))
-    , DenseMatrix((0.0, 3.0, 3.0, 0.0), (0.0, 4.0, 4.0, 0.0))
-  ).zipWithIndex.map { case (m, idx) =>
-    Point(idx, m, Some(0))
+  ).zipWithIndex.map {
+    case (m, idx) =>
+      Point(idx, m, Some(0))
   }.toSet
 
   val globalCluster = Cluster(0, "0", globalPoints)
@@ -64,12 +63,11 @@ class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
       Then("the cluster improves distanceFunction")
       val originalCompatibility = metric(cluster)
-      val betterCompatibility = metric(scheduleResult.head.cluster)
+      val betterCompatibility   = metric(scheduleResult.head.cluster)
 
       betterCompatibility should be < originalCompatibility
 
     }
-
 
     scenario("schedules cluster best that minimizes overall distanceFunction") {
 
@@ -90,7 +88,7 @@ class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
       Then("the cluster improves distanceFunction")
       val originalCompatibility = metric(cluster)
-      val betterCompatibility = metric(betterCluster)
+      val betterCompatibility   = metric(betterCluster)
 
       betterCompatibility should be < originalCompatibility
 

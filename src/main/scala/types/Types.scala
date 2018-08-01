@@ -3,9 +3,10 @@ package types
 import breeze.linalg._
 
 trait TypesT {
+
   /**
-   * Rows correspond to each appliance, columns correspond to each time interval
-   */
+    * Rows correspond to each appliance, columns correspond to each time interval
+    */
   type DataType = DenseMatrix[Double]
 
   type SyntheticDataType = DenseVector[Double]
@@ -24,8 +25,8 @@ trait TypesT {
 object Types {
 
   /**
-   * Rows correspond to each appliance, columns correspond to each time interval
-   */
+    * Rows correspond to each appliance, columns correspond to each time interval
+    */
   type DataType = DenseMatrix[Double]
 
   type SyntheticDataType = DenseVector[Double]

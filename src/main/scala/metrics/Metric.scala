@@ -119,12 +119,14 @@ object Par extends MetricCompanion {
 
     override def apply[T: DenseVectorReprOps](metric: Metric, list: Iterable[T]): Double = {
       val toVectorOps = implicitly[DenseVectorReprOps[T]]
-      if (list.size == 1) metric(toVectorOps(list.head)) else {
+      if (list.size == 1) metric(toVectorOps(list.head))
+      else {
         val metricVector = DenseVector[Double](list.map { t =>
           metric(toVectorOps(t))
-        }.toList:_*)
+        }.toList: _*)
         metric(metricVector)
-      }}
+      }
+    }
 
     override def toString: String = "par"
 
@@ -134,7 +136,7 @@ object Par extends MetricCompanion {
 
     override def apply[T: DenseVectorReprOps](metric: Metric, list: Iterable[T]): Double = {
       val toVectorOps = implicitly[DenseVectorReprOps[T]]
-      list.foldLeft(metric (toVectorOps.zero(list.head))) { case (accum, v) => accum + metric (v) } / list.size
+      list.foldLeft(metric(toVectorOps.zero(list.head))) { case (accum, v) => accum + metric(v) } / list.size
     }
 
     override def toString: String = "average"
@@ -153,12 +155,12 @@ trait Par extends Metric {
 
   override def progression(before: DenseVector[Double], after: DenseVector[Double]): Progression = {
 
-    val betterParThanBefore = this(before) > this(after)
+    val betterParThanBefore  = this(before) > this(after)
     val maxIsLowerThanBefore = max(after) < max(before)
-    val maxIsEqualAsBefore = max(after) == max(before)
+    val maxIsEqualAsBefore   = max(after) == max(before)
     val lessMaxsThanBefore = {
       val maxBefore = max(before)
-      val maxAfter = max(after)
+      val maxAfter  = max(after)
       after.toScalaVector().count(_ == maxAfter) < before.toScalaVector().count(_ == maxBefore)
     }
 

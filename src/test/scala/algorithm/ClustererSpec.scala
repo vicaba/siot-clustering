@@ -14,7 +14,6 @@ class ClustererSpec extends FeatureSpec with GivenWhenThen {
 
   val metric = Par.withParAggregate
 
-
   feature("cluster.Algorithm") {
     /*scenario("Assigns load profiles minimizing the distance function with perfectly compatible points") {
 
@@ -37,7 +36,7 @@ class ClustererSpec extends FeatureSpec with GivenWhenThen {
       }
     }*/
 
-/*    scenario("Manual test") {
+    /*    scenario("Manual test") {
 
       val cluster1Points = Set(
         Point(1, DenseMatrix((5.0, 5.0, 0.0, 0.0)), Some(1)),
@@ -63,23 +62,24 @@ class ClustererSpec extends FeatureSpec with GivenWhenThen {
 
       Given("10 compatible points")
       val points = List(
-        DenseMatrix((0.0, 3.0, 3.0, 0.0), (0.0, 4.0, 4.0, 0.0))
-        , DenseMatrix((5.0, 0.0, 5.0, 0.0), (5.0, 0.0, 5.0, 0.0))
-        , DenseMatrix((3.0, 0.0, 0.0, 3.0), (4.0, 0.0, 0.0, 4.0))
-        , DenseMatrix((0.0, 5.0, 0.0, 5.0), (0.0, 5.0, 0.0, 5.0))
-        , DenseMatrix((1.0, 5.0, 5.0, 5.0), (0.0, 2.0, 3.0, 5.0))
-        , DenseMatrix((8.0, 1.0, 0.0, 0.0), (0.0, 1.0, 0.0, 1.0))
-        , DenseMatrix((1.0, 0.0, 2.0, 0.0))
-        , DenseMatrix((4.0, 3.0, 1.0, 7.0))
-        , DenseMatrix((10.0, 10.0, 10.0, 10.0), (1.0, 1.0, 1.0, 1.0), (17.0, 0.0, 1.0, 6.0))
-        , DenseMatrix((0.0, 12.0, 12.0, 12.0))
-      ).zipWithIndex.map { case (m, idx) =>
-        Point(idx, m, None)
+        DenseMatrix((0.0, 3.0, 3.0, 0.0), (0.0, 4.0, 4.0, 0.0)),
+        DenseMatrix((5.0, 0.0, 5.0, 0.0), (5.0, 0.0, 5.0, 0.0)),
+        DenseMatrix((3.0, 0.0, 0.0, 3.0), (4.0, 0.0, 0.0, 4.0)),
+        DenseMatrix((0.0, 5.0, 0.0, 5.0), (0.0, 5.0, 0.0, 5.0)),
+        DenseMatrix((1.0, 5.0, 5.0, 5.0), (0.0, 2.0, 3.0, 5.0)),
+        DenseMatrix((8.0, 1.0, 0.0, 0.0), (0.0, 1.0, 0.0, 1.0)),
+        DenseMatrix((1.0, 0.0, 2.0, 0.0)),
+        DenseMatrix((4.0, 3.0, 1.0, 7.0)),
+        DenseMatrix((10.0, 10.0, 10.0, 10.0), (1.0, 1.0, 1.0, 1.0), (17.0, 0.0, 1.0, 6.0)),
+        DenseMatrix((0.0, 12.0, 12.0, 12.0))
+      ).zipWithIndex.map {
+        case (m, idx) =>
+          Point(idx, m, None)
       }.toVector
 
       When("asked to assign each point to a cluster, given 2 clusters")
       val runSettings = Settings(5, points, Metric.par, times = 100)
-      val result = Clusterer(runSettings)
+      val result      = Clusterer(runSettings)
 
       Then("the two clusters have a PAR of 1")
       val metricBefore = metric(Cluster.Empty ++ points)

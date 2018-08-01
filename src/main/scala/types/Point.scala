@@ -8,7 +8,7 @@ case class Point(id: Int, values: DataType, assignedToCluster: Option[Int] = Non
 
   override def equals(obj: scala.Any): Boolean = obj match {
     case p: Point => this.id == p.id
-    case _ => false
+    case _        => false
   }
 
   override def hashCode(): Int = this.id
@@ -30,8 +30,8 @@ object Point {
   import scala.language.implicitConversions
 
   implicit def pointListToVector(list: List[Point]): Option[SyntheticDataType] = list.map(_.syntheticValue) match {
-    case Nil => None
-    case _list => Some(_list.tail.foldLeft(_list.head){case (accum, vector) => accum + vector})
+    case Nil   => None
+    case _list => Some(_list.tail.foldLeft(_list.head) { case (accum, vector) => accum + vector })
   }
 
   implicit def pointToVector(p: Point): SyntheticDataType = toVector.apply(p)
@@ -44,4 +44,3 @@ object Point {
   }
 
 }
-
