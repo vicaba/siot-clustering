@@ -68,7 +68,7 @@ object Clusterer {
               .getOrElse(metric.aggregateOf((clusters + (cluster + p)).values))
           }
 
-          val bestClusterToAssign = bestClusterToAssignLocally
+          val bestClusterToAssign = bestClusterToAssignGlobally
 
           val newClusters =
             if (p.assignedToCluster.isDefined)
