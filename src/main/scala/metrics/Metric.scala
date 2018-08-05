@@ -146,9 +146,9 @@ object Par extends MetricCompanion {
     override def apply[T: DenseVectorReprOps](metric: Metric, list: Iterable[T]): Double = {
       val toVectorOps = implicitly[DenseVectorReprOps[T]]
       if (list.size == 1) metric(list.head) else {
+        list.foldLeft(0.0) { case (accum, v) => accum + metric(v) } / list.size
 
       }
-      list.foldLeft(0.0) { case (accum, v) => accum + metric(v) } / list.size
     }
 
     override def toString: String = "average"
