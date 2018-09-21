@@ -20,8 +20,15 @@ case class Cluster(id: Int, name: String, points: Set[Point])(implicit val types
 
   def -(point: Point): Cluster = this.copy(points = points - point)
 
+  def centroid: SyntheticDataType =
+    points.foldLeft(types.EmptySyntheticData()) {
+      case (accum, p) =>
+        accum + p.syntheticValue
+    } / points.size.toDouble
+
   /**
     * Calling this method without any point in the cluster is unsafe
+    *
     * @return
     */
   def syntheticCenter: SyntheticDataType = {
