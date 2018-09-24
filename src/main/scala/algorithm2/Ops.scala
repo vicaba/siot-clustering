@@ -2,14 +2,21 @@ package algorithm2
 
 import java.io.PrintWriter
 
+import akka.actor.ProviderSelection
 import breeze.linalg.{max, _}
 import config.Configuration
-import play.api.libs.json.Json
+import eventmanager.{EventManager, Subscriber}
+import main.Main.readEgaugeData
+import play.api.libs.json.{Json, Writes}
 import types.{Cluster, Point, Types2}
 import types.Point._
 import types.Types.SyntheticDataType
 import types.serialization.TypesJsonSerializer._
+import types.serialization.ClusterJsonSerializer._
+import util.FileUtils
 
+import scala.annotation.tailrec
+import scala.collection.immutable.LinearSeq
 import scala.math._
 import scala.util.Random
 
@@ -33,7 +40,9 @@ object Ops {
     * @param points the set of points to find the closest to the image of point A
     * @return the closest mirror image
     */
-  def findClosestMirror(origin: Point, center: SyntheticDataType, points: IndexedSeq[Point]): IndexedSeq[(Double, Point)] = {
+  def findClosestMirrors(origin: Point,
+                         center: SyntheticDataType,
+                         points: IndexedSeq[Point]): IndexedSeq[(Double, Point)] = {
 
     val idealMirror = findMirror(origin, center)
 
@@ -53,9 +62,9 @@ object Ops {
     * @param points the set of points to find the closest to the image of point A
     * @return the closest mirror image
     */
-  def findClosestMirror(origin: SyntheticDataType,
-                        center: SyntheticDataType,
-                        points: IndexedSeq[SyntheticDataType]): IndexedSeq[(Double, SyntheticDataType)] = {
+  def findClosestMirrors(origin: SyntheticDataType,
+                         center: SyntheticDataType,
+                         points: IndexedSeq[SyntheticDataType]): IndexedSeq[(Double, SyntheticDataType)] = {
 
     val idealMirror = findMirror(origin, center)
 
@@ -67,46 +76,78 @@ object Ops {
       .sortBy(_._1)
   }
 
-  def centroid(points: IndexedSeq[Point]): types.Types.SyntheticDataType =
+  def findClosestMirror(origin: SyntheticDataType,
+                        center: SyntheticDataType,
+                        points: IndexedSeq[SyntheticDataType]): Option[SyntheticDataType] =
+    findClosestMirrors(origin, center, points).headOption.map(_._2)
+
+  def centroidOf(points: Seq[Point]): types.Types.SyntheticDataType =
     points.foldLeft(points.head.types.EmptySyntheticData()) {
       case (accum, p) =>
         accum + p.syntheticValue
     } / points.length.toDouble
 
-
-  def createClusters(clusters: List[Cluster], freePoints: scala.Vector[Point]): Unit = {
-
-    val centroid = if (clusters.isEmpty) centroid(freePoints) else clusters.foldLeft(clusters.head.types.EmptySyntheticData()) {
-      case (accum, c) => accum + c.centroid
+  @tailrec
+  def clustersToClusters(centroid: SyntheticDataType,
+                         freeClusters: IndexedSeq[Cluster],
+                         clusters: LinearSeq[Cluster] = LinearSeq()): LinearSeq[Cluster] = {
+    freeClusters match {
+      case c +: tail =>
+        val closestMirror = findClosestMirror(c.centroid, centroid, tail.map(_.centroid))
+        if (closestMirror.isEmpty) c +: clusters
+        else {
+          val mirrorIndex =
+            tail.indexWhere(_.centroid == closestMirror.get)
+          val mirror             = tail(mirrorIndex)
+          val remainingClusters  = tail.patch(mirrorIndex, IndexedSeq(), 1)
+          val lastCreatedCluster = clusters.headOption.map(_.id).getOrElse(1)
+          val cluster =
+            Cluster(lastCreatedCluster + 1, s"${lastCreatedCluster + 1}", c.points ++ mirror.points)(c.types)
+          clustersToClusters(centroid, remainingClusters, cluster +: clusters)
+        }
+      case IndexedSeq() => clusters
     }
+  }
 
-    freePoints match {
-      case p +: tail =>
-        val remainingPoints = tail - p
-        val mirror = findClosestMirror(p, centroid, remainingPoints)
-        val lastCreatedCluster = clusters.head.id
-        val cluster = Cluster(lastCreatedCluster + 1, s"${lastCreatedCluster + 1}", p + mirror)(p.types)
-        createClusters(cluster :: clusters, remainingPoints)
-      case IndexedSeq() =>
+  def cluster(stopAtKClusters: Int, stopAtIterationCount: Int, clusters: LinearSeq[Cluster]): LinearSeq[Cluster] = {
+
+    val points   = clusters.flatMap(_.points)
+    val centroid = centroidOf(points)
+
+    var iterations              = 0
+    var kClusters               = clusters.size
+    var _clusters: Seq[Cluster] = clusters
+
+    if (clusters.isEmpty) return Nil
+    if (stopAtKClusters == 1) return List(Cluster(1, "1", points.toSet)(clusters.head.types))
+
+    EventManager.singleton.publish("clusters", _clusters.toList)
+
+    while (iterations < stopAtIterationCount && kClusters > stopAtKClusters) {
+
+      _clusters = clustersToClusters(centroid, _clusters.toVector, Nil)
+      iterations = iterations + 1
+      kClusters = _clusters.size
+
+      EventManager.singleton.publish("clusters", _clusters.toList)
+
     }
+    _clusters.toList
 
   }
 
-    points match {
-    case p :+ tail =>
-      findClosestMirror()
-    case IndexedSeq() =>
-  }
+  def generateRandom2DPoints(center: Vector[Double],
+                             radius: Double,
+                             numberOfPoints: Int,
+                             angle: Double): IndexedSeq[Vector[Double]] = {
 
-  def generateRandom2DPoints(center: Vector[Double], radius: Double, numberOfPoints: Int, angle: Double): IndexedSeq[Vector[Double]] = {
-
-    for (_ <- 0 to numberOfPoints) yield {
+    for (_ <- 1 to numberOfPoints) yield {
       // Random from [0, 1]
       val random = () => Random.nextDouble()
-      val angle = 2 * Pi * random()
-      val r = radius * sqrt(random())
-      val x = r * cos(angle) + center(0)
-      val y = r * sin(angle) + center(1)
+      val angle  = 2 * Pi * random()
+      val r      = radius * sqrt(random())
+      val x      = r * cos(angle) + center(0)
+      val y      = r * sin(angle) + center(1)
       Vector[Double](x, y)
     }
 
@@ -114,43 +155,36 @@ object Ops {
 
   def main(args: Array[String]): Unit = {
 
-    val genPoints = generateRandom2DPoints(Vector(0.0, 0.0), 5, 100, 5).zipWithIndex.map {
+    val genPoints = generateRandom2DPoints(Vector(0.0, 0.0), 5, 10, 5).zipWithIndex.map {
       case (m, idx) =>
-        Point(idx, m.toDenseVector.asDenseMatrix, None)(Types2)
-    }.toVector
+        Cluster(idx, idx.toString, Set(Point(idx, m.toDenseVector.asDenseMatrix, None)(Types2)))(Types2)
+    }.toList
 
-    Some(new PrintWriter("files/output/genPoints.json")).foreach { p =>
-      p.write(Json.prettyPrint(Json.toJson(genPoints.toList.map(_.syntheticValue))).toString())
+    var clustersBuffer: List[List[Cluster]] = Nil
+    EventManager.singleton
+      .subscribe("clusters",
+                 (topic: String, event: Object) => clustersBuffer = event.asInstanceOf[List[Cluster]] :: clustersBuffer)
+
+/*    readEgaugeData("files/input/egauge.json").map { p =>
+      Cluster(p.id, p.id.toString, Set(p))(p.types)
+    }.toList.take(10)*/
+
+    val clusters = cluster(2, 1, genPoints)
+    println(clusters.flatMap(_.points).size)
+
+    Some(new PrintWriter("files/output/cluster.json")).foreach { p =>
+      val json = clustersBuffer.zipWithIndex.map {
+        case (clusteringIteration, idx) =>
+          Json.obj(
+            "iteration" -> idx,
+            "clusters"  -> Json.toJson(clusteringIteration.toList)
+          )
+      }
+      p.write(Json.prettyPrint(Json.toJson(json)).toString)
       p.close()
     }
 
-
-    val points = List(
-      DenseMatrix((5.0, 7.0)),
-      DenseMatrix((7.0, 10.0)),
-      DenseMatrix((9.0, 13.0))
-    ).zipWithIndex.map {
-      case (m, idx) =>
-        Point(idx, m, None)(Types2)
-    }.toVector
-
-    val pointsWithoutExactMirror = List(
-      DenseMatrix((5.0, 7.0)),
-      DenseMatrix((7.0, 10.0)),
-      DenseMatrix((10.0, 13.0))
-    ).zipWithIndex.map {
-      case (m, idx) =>
-        Point(idx, m, None)(Types2)
-    }.toVector
-
-    assert(Vector(9.0, 13.0) == findMirror(points(0), points(1)))
-
-    val cm = findClosestMirror(points(0), points(1), pointsWithoutExactMirror)
-
-    assert(pointsWithoutExactMirror(2).syntheticValue == findClosestMirror(
-      points(0),
-      points(1),
-      pointsWithoutExactMirror).head._2.syntheticValue)
+    FileUtils.copyFile("files/output/cluster.json", "/Users/vicaba/Projects/jupyter/shared/siot-eclustering-viz/files")
 
   }
 

@@ -10,6 +10,7 @@ object ClusterJsonSerializer {
   val ClusterIdKey              = "id"
   val ClusterNameKey            = "name"
   val ClusterSyntheticCenterKey = "syntheticCenter"
+  val ClusterCentriodKey        = "centroid"
   val pointsKey                 = "points"
   val metricKey                 = "metric"
 
@@ -18,6 +19,7 @@ object ClusterJsonSerializer {
       ClusterIdKey              -> o.id,
       ClusterNameKey            -> o.name,
       ClusterSyntheticCenterKey -> o.syntheticCenter,
+      ClusterCentriodKey        -> o.centroid,
       pointsKey                 -> o.points.map(_.syntheticValue),
       metricKey                 -> Metric.par(o)
     )

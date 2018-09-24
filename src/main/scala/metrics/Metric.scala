@@ -147,7 +147,6 @@ object Par extends MetricCompanion {
       val toVectorOps = implicitly[DenseVectorReprOps[T]]
       if (list.size == 1) metric(list.head) else {
         list.foldLeft(0.0) { case (accum, v) => accum + metric(v) } / list.size
-
       }
     }
 

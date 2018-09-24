@@ -12,7 +12,7 @@ trait Subscriber {
 
 class EventManager {
 
-  val topicToSubscribers: scala.collection.mutable.Map[String, List[Subscriber]] =
+  private val topicToSubscribers: scala.collection.mutable.Map[String, List[Subscriber]] =
     scala.collection.mutable.Map[String, List[Subscriber]]()
 
   def subscribe(topic: String, subscriber: Subscriber): Unit = {

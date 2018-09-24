@@ -26,6 +26,7 @@ import types.Point
 import types.serialization.ClusterJsonSerializer._
 import algorithm.serialization.ClustererJsonSerializer._
 import com.typesafe.scalalogging.Logger
+import util.FileUtils
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -33,17 +34,7 @@ import scala.util.Try
 
 object Main {
 
-  def copyFile(srcFile: String, dstFile: String): Unit = {
-    val src   = new File(srcFile)
-    val _dest = new File(dstFile)
-    val dest =
-      if (_dest.isFile) _dest
-      else new File(_dest.getAbsolutePath + "/" + src.getName)
-
-    println(dest.getAbsolutePath)
-
-    new FileOutputStream(dest) getChannel () transferFrom (new FileInputStream(src) getChannel (), 0, Long.MaxValue)
-  }
+  def copyFile(srcFile: String, dstFile: String): Unit = FileUtils.copyFile(srcFile, dstFile)
 
   def readEgaugeData(file: String): Vector[Point] = {
 

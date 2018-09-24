@@ -48,10 +48,10 @@ class OpsSpec extends FeatureSpec with GivenWhenThen {
       val c = pointsWithoutExactMirror(1)
 
       When("finding the closest mirror image")
-      val result = findClosestMirror(p, c, pointsWithoutExactMirror)
+      val result = findClosestMirror(p, c, pointsWithoutExactMirror.map(_.syntheticValue))
 
       Then("the result is the expected")
-      result.head._2 shouldBe pointsWithoutExactMirror(2)
+      result.get shouldBe pointsWithoutExactMirror(2)
     }
 
   }
