@@ -72,10 +72,10 @@ object ClusterRescheduler {
       metric(cluster) - metric(cluster - point)
     }
 
-    val rescheduleResult = Rescheduler.reschedule(pointToReschedule.values, cluster - pointToReschedule, metric)
+    val rescheduleResult = Rescheduler.reschedule(pointToReschedule.data, cluster - pointToReschedule, metric)
 
     rescheduleResult.map { result =>
-      val rescheduledPoint   = pointToReschedule.copy(values = result.matrix)(pointToReschedule.types)
+      val rescheduledPoint   = pointToReschedule.copy(data = result.matrix)(pointToReschedule.types)
       val rescheduledCluster = cluster + rescheduledPoint
 
       new PointChange(rescheduledCluster, rescheduledPoint, result)

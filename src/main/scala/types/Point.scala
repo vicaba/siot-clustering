@@ -1,10 +1,10 @@
 package types
 
-import breeze.linalg.DenseVector
+import breeze.linalg.{DenseVector, sum}
 import metrics.DenseVectorReprOps
 import types.Types.{DataType, SyntheticDataType}
 
-case class Point(id: Int, values: DataType, assignedToCluster: Option[Int] = None)(implicit val types: TypesT) {
+case class Point(id: Int, override val data: DataType, assignedToCluster: Option[Int] = None)(implicit val types: TypesT) extends Types.Type {
 
   override def equals(obj: scala.Any): Boolean = obj match {
     case p: Point => this.id == p.id
@@ -19,10 +19,11 @@ case class Point(id: Int, values: DataType, assignedToCluster: Option[Int] = Non
 
   def isAssignedToCluster: Boolean = this.assignedToCluster.isDefined
 
-  def setValues(values: DataType): Point = this.copy(values = values)
+  def setValues(data: DataType): Point = this.copy(data = data)
 
-  def syntheticValue: SyntheticDataType = types.synthesizeValues(this.values)
+  def syntheticValue: SyntheticDataType = types.synthesizeValues(this.data)
 
+  override def centroid: SyntheticDataType =  syntheticValue / types.Rows
 }
 
 object Point {

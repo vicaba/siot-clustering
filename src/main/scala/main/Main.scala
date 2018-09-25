@@ -169,10 +169,10 @@ object Main {
         case (steps, idx) =>
           Json.obj(
             "k"         -> steps._1.settings.numberOfClusters,
-            "s1. peak"  -> max(steps._1.clusters.maxBy(c => max(c.syntheticCenter)).syntheticCenter),
+            "s1. peak"  -> max(steps._1.clusters.maxBy(c => max(c.syntheticValue)).syntheticValue),
             "s1. agg m" -> steps._1.aggregatedMetric,
             "s1. max m" -> steps._1.clusters.map(steps._2.settings.metric(_)).max,
-            "s2. peak"  -> max(steps._2.clusters.maxBy(c => max(c.syntheticCenter)).syntheticCenter),
+            "s2. peak"  -> max(steps._2.clusters.maxBy(c => max(c.syntheticValue)).syntheticValue),
             "s2. agg m" -> steps._2.aggregatedMetric,
             "s2. max m" -> steps._2.clusters.map(steps._2.settings.metric(_)).max,
             "total m" -> Point

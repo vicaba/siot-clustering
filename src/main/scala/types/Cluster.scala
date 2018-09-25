@@ -1,12 +1,15 @@
 package types
 
-import breeze.linalg.DenseVector
+import breeze.linalg._
+import breeze.math._
+import breeze.numerics._
 import metrics.DenseVectorReprOps
-import types.Types.SyntheticDataType
+import spire.algebra.{InnerProductSpace, VectorSpace}
+import types.Types.{DataType, SyntheticDataType}
 
 import scala.annotation.tailrec
 
-case class Cluster(id: Int, name: String, points: Set[Point])(implicit val types: TypesT) {
+case class Cluster(id: Int, name: String, points: Set[Point])(implicit val types: TypesT) extends Types.Type {
 
   def isEmpty: Boolean = points.isEmpty
 
@@ -31,17 +34,19 @@ case class Cluster(id: Int, name: String, points: Set[Point])(implicit val types
     *
     * @return
     */
-  def syntheticCenter: SyntheticDataType = {
-
-    @tailrec
-    def sumVectors(remaining: List[SyntheticDataType], accum: SyntheticDataType): SyntheticDataType = remaining match {
-      case e :: tail => sumVectors(tail, accum + e)
-      case Nil       => accum
-    }
+  def syntheticValue: SyntheticDataType = {
 
     val syntheticValues = this.points.toList.map(_.syntheticValue)
 
     sumVectors(syntheticValues, types.EmptySyntheticData())
+  }
+
+  override def data: DataType = {
+
+    val values = this.points.toList.map(_.data)
+
+    sumPoints(values, types.EmptyData())
+
   }
 
 }
@@ -52,7 +57,7 @@ object Cluster {
 
   def Empty(implicit types: TypesT): Cluster = Cluster(-1, "empty", Set.empty)(types)
 
-  implicit def clusterToVector(c: Cluster): SyntheticDataType = c.syntheticCenter
+  implicit def clusterToVector(c: Cluster): SyntheticDataType = c.syntheticValue
 
   implicit val toVector: DenseVectorReprOps[Cluster] = new DenseVectorReprOps[Cluster] {
 

@@ -2,7 +2,7 @@ package algorithm2
 
 import breeze.linalg.{DenseMatrix, DenseVector}
 import org.scalatest.{FeatureSpec, GivenWhenThen}
-import types.{Point, Types2, TypesT}
+import types.{Cluster, Point, Types2, TypesT}
 import algorithm2.Ops._
 import org.scalatest.Matchers._
 

@@ -22,6 +22,8 @@ import scala.util.Random
 
 object Ops {
 
+  type Heuristic = (Cluster, SyntheticDataType, IndexedSeq[Cluster]) => Option[Cluster]
+
   /**
     * Given two points A and B, finds C as the mirror image of point A reflected into the plane perpendicular to line AB
     * and situated at distance norm(AB, 2) from A
@@ -40,9 +42,9 @@ object Ops {
     * @param points the set of points to find the closest to the image of point A
     * @return the closest mirror image
     */
-  def findClosestMirrors(origin: Point,
+  def findClosestMirrors(origin: Cluster,
                          center: SyntheticDataType,
-                         points: IndexedSeq[Point]): IndexedSeq[(Double, Point)] = {
+                         points: IndexedSeq[Cluster]): IndexedSeq[(Double, Cluster)] = {
 
     val idealMirror = findMirror(origin, center)
 
@@ -81,6 +83,9 @@ object Ops {
                         points: IndexedSeq[SyntheticDataType]): Option[SyntheticDataType] =
     findClosestMirrors(origin, center, points).headOption.map(_._2)
 
+  def findClosestMirror(origin: Cluster, center: SyntheticDataType, points: IndexedSeq[Cluster]): Option[Cluster] =
+    findClosestMirrors(origin, center, points).headOption.map(_._2)
+
   def centroidOf(points: Seq[Point]): types.Types.SyntheticDataType =
     points.foldLeft(points.head.types.EmptySyntheticData()) {
       case (accum, p) =>
@@ -90,26 +95,30 @@ object Ops {
   @tailrec
   def clustersToClusters(centroid: SyntheticDataType,
                          freeClusters: IndexedSeq[Cluster],
+                         heuristic: Heuristic,
                          clusters: LinearSeq[Cluster] = LinearSeq()): LinearSeq[Cluster] = {
     freeClusters match {
       case c +: tail =>
-        val closestMirror = findClosestMirror(c.centroid, centroid, tail.map(_.centroid))
+        val closestMirror = heuristic(c, centroid, tail)
         if (closestMirror.isEmpty) c +: clusters
         else {
           val mirrorIndex =
-            tail.indexWhere(_.centroid == closestMirror.get)
+            tail.indexWhere(_.centroid == closestMirror.get.centroid)
           val mirror             = tail(mirrorIndex)
           val remainingClusters  = tail.patch(mirrorIndex, IndexedSeq(), 1)
           val lastCreatedCluster = clusters.headOption.map(_.id).getOrElse(1)
           val cluster =
             Cluster(lastCreatedCluster + 1, s"${lastCreatedCluster + 1}", c.points ++ mirror.points)(c.types)
-          clustersToClusters(centroid, remainingClusters, cluster +: clusters)
+          clustersToClusters(centroid, remainingClusters, heuristic, cluster +: clusters)
         }
       case IndexedSeq() => clusters
     }
   }
 
-  def cluster(stopAtKClusters: Int, stopAtIterationCount: Int, clusters: LinearSeq[Cluster]): LinearSeq[Cluster] = {
+  def cluster(stopAtKClusters: Int,
+              stopAtIterationCount: Int,
+              clusters: LinearSeq[Cluster],
+              heuristic: Heuristic = findClosestMirror): LinearSeq[Cluster] = {
 
     val points   = clusters.flatMap(_.points)
     val centroid = centroidOf(points)
@@ -125,7 +134,7 @@ object Ops {
 
     while (iterations < stopAtIterationCount && kClusters > stopAtKClusters) {
 
-      _clusters = clustersToClusters(centroid, _clusters.toVector, Nil)
+      _clusters = clustersToClusters(centroid, _clusters.toVector, heuristic, Nil)
       iterations = iterations + 1
       kClusters = _clusters.size
 
@@ -143,11 +152,10 @@ object Ops {
 
     for (_ <- 1 to numberOfPoints) yield {
       // Random from [0, 1]
-      val random = () => Random.nextDouble()
-      val angle  = 2 * Pi * random()
-      val r      = radius * sqrt(random())
-      val x      = r * cos(angle) + center(0)
-      val y      = r * sin(angle) + center(1)
+      val angle = 2 * Pi * Random.nextDouble()
+      val r     = radius * sqrt(Random.nextDouble())
+      val x     = r * cos(angle) + center(0)
+      val y     = r * sin(angle) + center(1)
       Vector[Double](x, y)
     }
 
@@ -155,7 +163,7 @@ object Ops {
 
   def main(args: Array[String]): Unit = {
 
-    val genPoints = generateRandom2DPoints(Vector(0.0, 0.0), 5, 10, 5).zipWithIndex.map {
+    val genPoints = generateRandom2DPoints(Vector(0.0, 0.0), 5, 50, 5).zipWithIndex.map {
       case (m, idx) =>
         Cluster(idx, idx.toString, Set(Point(idx, m.toDenseVector.asDenseMatrix, None)(Types2)))(Types2)
     }.toList
@@ -165,11 +173,11 @@ object Ops {
       .subscribe("clusters",
                  (topic: String, event: Object) => clustersBuffer = event.asInstanceOf[List[Cluster]] :: clustersBuffer)
 
-/*    readEgaugeData("files/input/egauge.json").map { p =>
+    /*    readEgaugeData("files/input/egauge.json").map { p =>
       Cluster(p.id, p.id.toString, Set(p))(p.types)
     }.toList.take(10)*/
 
-    val clusters = cluster(2, 1, genPoints)
+    val clusters = cluster(4, Int.MaxValue, genPoints)
     println(clusters.flatMap(_.points).size)
 
     Some(new PrintWriter("files/output/cluster.json")).foreach { p =>

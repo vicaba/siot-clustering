@@ -18,7 +18,7 @@ object ClusterJsonSerializer {
     override def writes(o: Cluster): JsValue = Json.obj(
       ClusterIdKey              -> o.id,
       ClusterNameKey            -> o.name,
-      ClusterSyntheticCenterKey -> o.syntheticCenter,
+      ClusterSyntheticCenterKey -> o.syntheticValue,
       ClusterCentriodKey        -> o.centroid,
       pointsKey                 -> o.points.map(_.syntheticValue),
       metricKey                 -> Metric.par(o)

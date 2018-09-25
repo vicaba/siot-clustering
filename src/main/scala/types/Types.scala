@@ -2,6 +2,8 @@ package types
 
 import breeze.linalg._
 
+import scala.annotation.tailrec
+
 trait TypesT {
 
   /**
@@ -23,6 +25,30 @@ trait TypesT {
 }
 
 object Types {
+
+  trait Type {
+
+    def data: DataType
+
+    def syntheticValue: SyntheticDataType
+
+    def centroid: SyntheticDataType
+
+    @tailrec
+    final def sumPoints(remaining: List[DataType], accum: DataType): DataType = remaining match {
+      case e :: tail => sumPoints(tail, accum + e)
+      case Nil       => accum
+    }
+
+    @tailrec
+    final def sumVectors(remaining: List[SyntheticDataType], accum: SyntheticDataType): SyntheticDataType =
+      remaining match {
+        case e :: tail => sumVectors(tail, accum + e)
+        case Nil       => accum
+      }
+
+
+  }
 
   /**
     * Rows correspond to each appliance, columns correspond to each time interval
