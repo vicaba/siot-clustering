@@ -28,11 +28,15 @@ object Types {
 
   trait Type {
 
+    def id: Int
+
     def data: DataType
 
     def syntheticValue: SyntheticDataType
 
     def centroid: SyntheticDataType
+
+    def types: TypesT
 
     @tailrec
     final def sumPoints(remaining: List[DataType], accum: DataType): DataType = remaining match {

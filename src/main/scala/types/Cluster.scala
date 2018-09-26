@@ -9,7 +9,7 @@ import types.Types.{DataType, SyntheticDataType}
 
 import scala.annotation.tailrec
 
-case class Cluster(id: Int, name: String, points: Set[Point])(implicit val types: TypesT) extends Types.Type {
+case class Cluster(override val id: Int, name: String, points: Set[Point])(implicit override val types: TypesT) extends Types.Type {
 
   def isEmpty: Boolean = points.isEmpty
 

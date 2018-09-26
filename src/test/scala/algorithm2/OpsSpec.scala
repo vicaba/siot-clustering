@@ -5,6 +5,7 @@ import org.scalatest.{FeatureSpec, GivenWhenThen}
 import types.{Cluster, Point, Types2, TypesT}
 import algorithm2.Ops._
 import org.scalatest.Matchers._
+import algorithm2.MirrorImage._
 
 class OpsSpec extends FeatureSpec with GivenWhenThen {
 
@@ -48,7 +49,7 @@ class OpsSpec extends FeatureSpec with GivenWhenThen {
       val c = pointsWithoutExactMirror(1)
 
       When("finding the closest mirror image")
-      val result = findClosestMirror(p, c, pointsWithoutExactMirror.map(_.syntheticValue))
+      val result = findClosestMirror(p, c, pointsWithoutExactMirror)
 
       Then("the result is the expected")
       result.get shouldBe pointsWithoutExactMirror(2)
