@@ -18,7 +18,16 @@ import scala.collection.immutable.LinearSeq
 
 object Ops {
 
-  type Heuristic = (Cluster, SyntheticDataType, IndexedSeq[Cluster]) => Option[Cluster]
+  type Heuristic = (Cluster, SyntheticDataType, IndexedSeq[Cluster]) => IndexedSeq[(Double, Cluster)]
+
+  case class HeuristicDecorator(heuristic: Heuristic) extends Heuristic {
+    override def apply(v1: Cluster, v2: SyntheticDataType, v3: IndexedSeq[Cluster]): IndexedSeq[(Double, Cluster)] = {
+      val clusters              = heuristic.apply(v1, v2, v3)
+      val aprioriElementsToDrop = clusters.length / 2
+      val elementsToDrop        = if (aprioriElementsToDrop < 1) aprioriElementsToDrop + 1 else aprioriElementsToDrop
+      clusters.dropRight(aprioriElementsToDrop)
+    }
+  }
 
   def centroidOf[T <: Types.Type](points: Seq[T]): types.Types.SyntheticDataType =
     points.foldLeft(points.head.types.EmptySyntheticData()) {
@@ -29,15 +38,18 @@ object Ops {
   @tailrec
   def clustersToClusters(centroid: SyntheticDataType,
                          freeClusters: IndexedSeq[Cluster],
-                         heuristic: Heuristic,
+                         heuristic: List[Heuristic],
                          clusters: LinearSeq[Cluster] = LinearSeq()): LinearSeq[Cluster] = {
     freeClusters match {
       case c +: tail =>
-        val closestMirror = heuristic(c, centroid, tail)
+        val closestMirror = heuristic.foldLeft(tail) {
+          case (_clusters, _heuristic) =>
+            _heuristic(c, centroid, _clusters).map(_._2)
+        }
         if (closestMirror.isEmpty) c +: clusters
         else {
           val mirrorIndex =
-            tail.indexWhere(_.centroid == closestMirror.get.centroid)
+            tail.indexWhere(_.id == closestMirror.head.id)
           val mirror             = tail(mirrorIndex)
           val remainingClusters  = tail.patch(mirrorIndex, IndexedSeq(), 1)
           val lastCreatedCluster = clusters.headOption.map(_.id).getOrElse(1)
@@ -52,7 +64,7 @@ object Ops {
   def cluster(stopAtKClusters: Int,
               stopAtIterationCount: Int,
               clusters: LinearSeq[Cluster],
-              heuristic: Heuristic = MirrorImage.findClosestMirror(_, _, _)(MirrorImage.MirroredCluster)): LinearSeq[Cluster] = {
+              heuristic: List[Heuristic]): LinearSeq[Cluster] = {
 
     val points   = clusters.flatMap(_.points)
     val centroid = centroidOf(points)
@@ -79,13 +91,21 @@ object Ops {
 
   }
 
+  val chain: List[Heuristic] = List(
+    HeuristicDecorator(MirrorImage.findClosestMirrors(_, _, _)(MirrorImage.MirroredCluster))) ::: Nil
+
+  //chain.foldLeft()
 
   def main(args: Array[String]): Unit = {
 
-    val genPoints = Generator.generateRandom2DPoints(Vector(0.0, 0.0), 5, 50, 5).zipWithIndex.map {
-      case (m, idx) =>
-        Cluster(idx, idx.toString, Set(Point(idx, m.toDenseVector.asDenseMatrix, None)(Types2)))(Types2)
-    }.toList
+    val genPoints = Generator
+      .generateRandom2DPoints(Vector(0.0, 0.0), 5, 50, 5)
+      .zipWithIndex
+      .map {
+        case (m, idx) =>
+          Cluster(idx, idx.toString, Set(Point(idx, m.toDenseVector.asDenseMatrix, None)(Types2)))(Types2)
+      }
+      .toList
 
     var clustersBuffer: List[List[Cluster]] = Nil
     EventManager.singleton
@@ -96,7 +116,7 @@ object Ops {
       Cluster(p.id, p.id.toString, Set(p))(p.types)
     }.toList.take(10)*/
 
-    val clusters = cluster(4, Int.MaxValue, genPoints)
+    val clusters = cluster(4, Int.MaxValue, genPoints, chain)
     println(clusters.flatMap(_.points).size)
 
     Some(new PrintWriter("files/output/cluster.json")).foreach { p =>
@@ -104,14 +124,14 @@ object Ops {
         case (clusteringIteration, idx) =>
           Json.obj(
             "iteration" -> idx,
-            "clusters"  -> Json.toJson(clusteringIteration.toList)
+            "clusters"  -> Json.toJson(clusteringIteration)
           )
       }
       p.write(Json.prettyPrint(Json.toJson(json)).toString)
       p.close()
     }
 
-    FileUtils.copyFile("files/output/cluster.json", "/Users/vicaba/Projects/jupyter/shared/siot-eclustering-viz/files")
+    FileUtils.copyFile("files/output/cluster.json", "/Users/vcaballero/Projects/jupyter-notebook/siot-eclustering-viz/files")
 
   }
 
