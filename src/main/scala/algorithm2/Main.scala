@@ -13,8 +13,9 @@ import main.Main.{batchRun, readEgaugeData}
 import util.FileUtils
 import algorithm2.serialization.AlgorithmJsonSerializer._
 import algorithm2.serialization.ClustererSettingsJsonSerializer._
-
-
+import types.serialization.ClusterJsonSerializer._
+import types.serialization.TypesJsonSerializer._
+import types.serialization.PointJsonSerializer._
 
 object Main {
 
@@ -24,13 +25,14 @@ object Main {
       .zipWithIndex
       .map {
         case (m, idx) =>
-          Point(idx, m.toDenseVector.asDenseMatrix, None)(Types2)      }
+          Point(idx, m.toDenseVector.asDenseMatrix, None)(Types2)
+      }
       .toVector
 
     var clustersBuffer: List[List[Cluster]] = Nil
     EventManager.singleton
       .subscribe("clusters",
-        (topic: String, event: Object) => clustersBuffer = event.asInstanceOf[List[Cluster]] :: clustersBuffer)
+                 (topic: String, event: Object) => clustersBuffer = event.asInstanceOf[List[Cluster]] :: clustersBuffer)
 
     /*    readEgaugeData("files/input/egauge.json").map { p =>
       Cluster(p.id, p.id.toString, Set(p))(p.types)
@@ -51,19 +53,21 @@ object Main {
     }
 
     FileUtils.copyFile("files/output/cluster.json",
-      "/Users/vcaballero/Projects/jupyter-notebook/siot-eclustering-viz/files")
+                       "/Users/vcaballero/Projects/jupyter-notebook/siot-eclustering-viz/files")
 
-    FileUtils.copyFile(Configuration.summaryBatchRunFile, "/Users/vcaballero/Projects/jupyter-notebook/siot-eclustering-viz/files")
-    FileUtils.copyFile(Configuration.batchRunFile, "/Users/vcaballero/Projects/jupyter-notebook/siot-eclustering-viz/files")
+    FileUtils.copyFile(Configuration.summaryBatchRunFile,
+                       "/Users/vcaballero/Projects/jupyter-notebook/siot-eclustering-viz/files")
+    FileUtils.copyFile(Configuration.batchRunFile,
+                       "/Users/vcaballero/Projects/jupyter-notebook/siot-eclustering-viz/files")
 
   }
 
   def batchRun(points: scala.Vector[Point]) = {
 
     val batchRunnerSettingsBuilder = new BatchRunSettingsBuilder(points,
-      (1 to 6).toList,
-      List(Par.withAverageAggregate),
-      (points, k) => points.size * k)
+                                                                 (1 to 6).toList,
+                                                                 List(Par.withAverageAggregate),
+                                                                 (points, k) => points.size * k)
 
     val stepsList = BatchRun(batchRunnerSettingsBuilder).zipWithIndex
 
@@ -101,7 +105,6 @@ object Main {
       p.write(Json.prettyPrint(Json.toJson(jsonList)).toString())
       p.close()
     }
-
 
   }
 

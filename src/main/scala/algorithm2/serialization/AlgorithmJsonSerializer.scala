@@ -2,6 +2,9 @@ package algorithm2.serialization
 
 import algorithm2.Algorithm.{Step1, Step2, Steps}
 import play.api.libs.json._
+import algorithm2.serialization.ClustererSettingsJsonSerializer._
+import algorithm.serialization.ReschedulerSettingsJsonSerializer._
+import types.serialization.ClusterJsonSerializer._
 
 object AlgorithmJsonSerializer {
 
