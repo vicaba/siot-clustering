@@ -7,29 +7,22 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{FileIO, Keep, Sink, Source}
 import akka.util.ByteString
-import algorithm.Algorithm
 import breeze.linalg.{DenseMatrix, DenseVector, max}
 import algorithm.clusterer.Clusterer
 import algorithm.serialization.AlgorithmJsonSerializer._
-import algorithm.scheduler.ClusterRescheduler
 import batch.BatchRun
 import batch.BatchRun.BatchRunSettingsBuilder
 import types._
-import types.Types._
 import config.Configuration
 import eventmanager.{EventManager, Subscriber}
-import metrics.{Metric, Par}
-import org.apache.commons.csv.CSVFormat
-import play.api.libs.json.{JsArray, JsObject, JsValue, Json}
-import reader.Reader
+import metrics.Par
+import play.api.libs.json.{JsObject, JsValue, Json}
 import types.Point
 import types.serialization.ClusterJsonSerializer._
-import algorithm.serialization.ClustererJsonSerializer._
+import algorithm.serialization.ClustererSettingsJsonSerializer._
 import com.typesafe.scalalogging.Logger
 import util.FileUtils
 
-import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
 import scala.util.Try
 
 object Main {

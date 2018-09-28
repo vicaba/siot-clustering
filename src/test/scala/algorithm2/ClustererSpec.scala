@@ -3,11 +3,11 @@ package algorithm2
 import breeze.linalg.{DenseMatrix, DenseVector}
 import org.scalatest.{FeatureSpec, GivenWhenThen}
 import types.{Cluster, Point, Types2, TypesT}
-import algorithm2.Ops._
+import algorithm2.clusterer.Clusterer._
 import org.scalatest.Matchers._
 import algorithm2.MirrorImage._
 
-class OpsSpec extends FeatureSpec with GivenWhenThen {
+class ClustererSpec extends FeatureSpec with GivenWhenThen {
 
   implicit val types: TypesT = Types2
 

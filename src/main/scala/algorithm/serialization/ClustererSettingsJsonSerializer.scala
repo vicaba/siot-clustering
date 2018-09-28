@@ -6,7 +6,7 @@ import types.serialization.TypesJsonSerializer._
 import metrics.serialization.MetricJsonSerializer._
 import types.serialization.PointJsonSerializer
 
-object ClustererJsonSerializer {
+object ClustererSettingsJsonSerializer {
 
   implicit val SettingsWrites: OWrites[Clusterer.Settings] = {
     implicit val pointSerializer = PointJsonSerializer.syntheticPointWrites

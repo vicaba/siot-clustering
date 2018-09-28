@@ -6,7 +6,7 @@ import play.api.libs.json._
 import types.serialization.TypesJsonSerializer._
 import metrics.serialization.MetricJsonSerializer._
 
-object ReschedulerJsonSerializer {
+object ReschedulerSettingsJsonSerializer {
 
   implicit val SchedulerSettingsWrites: OWrites[ClusterRescheduler.Settings] = Json.writes[ClusterRescheduler.Settings]
 
