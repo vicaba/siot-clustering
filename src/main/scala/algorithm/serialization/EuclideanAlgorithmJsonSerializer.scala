@@ -1,24 +1,39 @@
 package algorithm.serialization
 
-import algorithm.algorithms.EuclideanAlgorithm.{Step1, Step2, Steps}
+import algorithm.algorithms.EuclideanAlgorithm
+import algorithm.algorithms.EuclideanAlgorithm.{StepT, Steps}
+import algorithm.clusterer.EuclideanClusterer
 import algorithm.serialization.EuclideanClustererSettingsJsonSerializer._
 import algorithm.serialization.ReschedulerSettingsJsonSerializer._
 import types.serialization.ClusterJsonSerializer._
-import play.api.libs.json.{JsValue, Json, Writes}
+import play.api.libs.json._
 
-object EuclideanAlgorithmJsonSerializer {
+object AlgorithmJsonSerializer {
 
-  implicit val Step1Writes = Json.writes[Step1]
+  val SettingsKey = "settings"
 
-  implicit val Step2Writes = Json.writes[Step2]
+  val ClustersKey = "clusters"
 
-  val Step1Key = "1"
-  val Step2Key = "2"
+  implicit val stepTWrites: OWrites[EuclideanAlgorithm.StepT[EuclideanAlgorithm.ClustererSettings]] =
+    new OWrites[EuclideanAlgorithm.StepT[EuclideanAlgorithm.ClustererSettings]] {
+      override def writes(o: EuclideanAlgorithm.StepT[EuclideanAlgorithm.ClustererSettings]): JsObject = {
+        Json.obj(SettingsKey -> o.settings, ClustersKey -> o.clusters)
+      }
 
-  implicit val stepsWrites: Writes[Steps] = new Writes[Steps] {
-    override def writes(o: Steps): JsValue = Json.arr(
-      o._1,
-      o._2
-    )
+    }
+
+  implicit val stepT2Writes: OWrites[EuclideanAlgorithm.StepT[EuclideanAlgorithm.ReschedulerSettings]] =
+    new OWrites[EuclideanAlgorithm.StepT[EuclideanAlgorithm.ReschedulerSettings]] {
+      override def writes(o: EuclideanAlgorithm.StepT[EuclideanAlgorithm.ReschedulerSettings]): JsObject =
+        Json.obj(SettingsKey -> o.settings, ClustersKey -> o.clusters)
+    }
+
+  implicit val stepsWrites: OWrites[EuclideanAlgorithm.Steps] = new OWrites[EuclideanAlgorithm.Steps] {
+    override def writes(o: EuclideanAlgorithm.Steps): JsObject =
+      Json.obj(
+        "1" -> o._1,
+        "2" -> o._2
+      )
   }
+
 }
