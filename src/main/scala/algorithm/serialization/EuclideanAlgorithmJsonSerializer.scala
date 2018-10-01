@@ -1,12 +1,12 @@
-package algorithm2.serialization
+package algorithm.serialization
 
-import algorithm2.Algorithm.{Step1, Step2, Steps}
-import play.api.libs.json._
-import algorithm2.serialization.ClustererSettingsJsonSerializer._
+import algorithm.algorithms.EuclideanAlgorithm.{Step1, Step2, Steps}
+import algorithm.serialization.EuclideanClustererSettingsJsonSerializer._
 import algorithm.serialization.ReschedulerSettingsJsonSerializer._
 import types.serialization.ClusterJsonSerializer._
+import play.api.libs.json.{JsValue, Json, Writes}
 
-object AlgorithmJsonSerializer {
+object EuclideanAlgorithmJsonSerializer {
 
   implicit val Step1Writes = Json.writes[Step1]
 

@@ -1,11 +1,10 @@
-package algorithm
-
-import algorithm.clusterer.Clusterer
+package algorithm.algorithms
+import algorithm.clusterer.BruteClusterer
 import algorithm.scheduler.ClusterRescheduler
 import com.typesafe.scalalogging.Logger
 import types.Cluster
 
-object Algorithm {
+object BruteAlgorithm {
 
   val logger = Logger("algorithm")
 
@@ -16,8 +15,8 @@ object Algorithm {
     val aggregatedMetric: Double
   }
 
-  case class Step1(settings: Clusterer.Settings,
-                   override val clusters: List[Cluster],
+  case class Step1(settings: BruteClusterer.Settings,
+                   override val clusters:  List[Cluster],
                    override val aggregatedMetric: Double)
       extends StepT
 
@@ -29,11 +28,11 @@ object Algorithm {
 
   case class Steps(_1: Step1, _2: Step2)
 
-  def apply(clustererSettings: Clusterer.Settings, reschedulerSettings: ClusterRescheduler.Settings): Steps = {
+  def apply(clustererSettings: BruteClusterer.Settings, reschedulerSettings: ClusterRescheduler.Settings): Steps = {
 
     logger.info("clusterer")
 
-    val clustererResult = Clusterer(clustererSettings)
+    val clustererResult = BruteClusterer(clustererSettings)
 
     logger.info("rescheduler")
 

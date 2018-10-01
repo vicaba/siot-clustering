@@ -7,12 +7,12 @@ import metrics.Par
 import play.api.libs.json.{JsObject, JsValue, Json}
 import types.{Cluster, Point, Types2}
 import algorithm2.BatchRun.BatchRunSettingsBuilder
-import algorithm2.clusterer.Clusterer.{chain, cluster}
+import algorithm.clusterer.EuclideanClusterer.{chain, cluster}
 import eventmanager.EventManager
 import main.Main.{batchRun, readEgaugeData}
 import util.FileUtils
-import algorithm2.serialization.AlgorithmJsonSerializer._
-import algorithm2.serialization.ClustererSettingsJsonSerializer._
+import algorithm.serialization.EuclideanAlgorithmJsonSerializer._
+import algorithm.serialization.EuclideanClustererSettingsJsonSerializer._
 import types.serialization.ClusterJsonSerializer._
 import types.serialization.TypesJsonSerializer._
 import types.serialization.PointJsonSerializer._
@@ -20,23 +20,21 @@ import types.serialization.PointJsonSerializer._
 object Main {
 
   def main(args: Array[String]): Unit = {
-    val points = Generator
+/*    val points = Generator
       .generateRandom2DPoints(Vector(0.0, 0.0), 5, 50, 5)
       .zipWithIndex
       .map {
         case (m, idx) =>
           Point(idx, m.toDenseVector.asDenseMatrix, None)(Types2)
       }
-      .toVector
+      .toVector*/
 
     var clustersBuffer: List[List[Cluster]] = Nil
     EventManager.singleton
       .subscribe("clusters",
                  (topic: String, event: Object) => clustersBuffer = event.asInstanceOf[List[Cluster]] :: clustersBuffer)
 
-    /*    readEgaugeData("files/input/egauge.json").map { p =>
-      Cluster(p.id, p.id.toString, Set(p))(p.types)
-    }.toList.take(10)*/
+     val points =   readEgaugeData("files/input/egauge.json").toVector
 
     batchRun(points)
 
@@ -52,21 +50,31 @@ object Main {
       p.close()
     }
 
-    FileUtils.copyFile("files/output/cluster.json",
+    // Windows
+/*    FileUtils.copyFile("files/output/cluster.json",
                        "/Users/vcaballero/Projects/jupyter-notebook/siot-eclustering-viz/files")
 
     FileUtils.copyFile(Configuration.summaryBatchRunFile,
                        "/Users/vcaballero/Projects/jupyter-notebook/siot-eclustering-viz/files")
     FileUtils.copyFile(Configuration.batchRunFile,
-                       "/Users/vcaballero/Projects/jupyter-notebook/siot-eclustering-viz/files")
+                       "/Users/vcaballero/Projects/jupyter-notebook/siot-eclustering-viz/files")*/
+
+    // Mac
+    FileUtils.copyFile("files/output/cluster.json",
+      "/Users/vicaba/Projects/jupyter/shared/siot-eclustering-viz/files")
+
+    FileUtils.copyFile(Configuration.summaryBatchRunFile,
+      "/Users/vicaba/Projects/jupyter/shared/siot-eclustering-viz/files")
+    FileUtils.copyFile(Configuration.batchRunFile,
+      "/Users/vicaba/Projects/jupyter/shared/siot-eclustering-viz/files")
 
   }
 
   def batchRun(points: scala.Vector[Point]) = {
 
     val batchRunnerSettingsBuilder = new BatchRunSettingsBuilder(points,
-                                                                 (1 to 6).toList,
-                                                                 List(Par.withAverageAggregate),
+                                                                 (1 to 3).toList,
+                                                                 List(Par.withParAggregate),
                                                                  (points, k) => points.size * k)
 
     val stepsList = BatchRun(batchRunnerSettingsBuilder).zipWithIndex

@@ -1,4 +1,4 @@
-package algorithm2
+package util
 import breeze.linalg.Vector
 
 import scala.math._

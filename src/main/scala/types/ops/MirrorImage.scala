@@ -1,8 +1,7 @@
-package algorithm2
-import algorithm2.MirrorImage.DistanceFunc
+package types.ops
 import breeze.linalg.norm
-import types._
 import types.Types.SyntheticDataType
+import types.{Cluster, Point}
 
 object MirrorImage {
 

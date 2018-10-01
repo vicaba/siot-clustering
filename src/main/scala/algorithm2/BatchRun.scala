@@ -2,9 +2,10 @@ package algorithm2
 
 import java.io.PrintWriter
 
-import algorithm2.Algorithm.Steps
+import algorithm.algorithms.EuclideanAlgorithm
+import algorithm.clusterer.EuclideanClusterer
+import algorithm.algorithms.EuclideanAlgorithm.Steps
 import algorithm2._
-import algorithm2.clusterer.Clusterer
 import algorithm.scheduler.ClusterRescheduler
 import com.typesafe.scalalogging.Logger
 import metrics.Metric
@@ -19,17 +20,17 @@ object BatchRun {
                                 metrics: List[Metric],
                                 timesToIterate: (Vector[Point], Int) => Int) {
 
-    def build: List[Clusterer.Settings] =
+    def build: List[EuclideanClusterer.Settings] =
       numbersOfClusters.flatMap { numberOfClusters =>
         metrics.map { metric =>
-          Clusterer.Settings(numberOfClusters, points, metric, timesToIterate(points, numberOfClusters))
+          EuclideanClusterer.Settings(numberOfClusters, points, metric, timesToIterate(points, numberOfClusters))
         }
       }
 
   }
 
   def apply(clustererSettingsBuilder: BatchRunSettingsBuilder,
-            run: Clusterer.Settings => List[Cluster]): List[List[Cluster]] =
+            run: EuclideanClusterer.Settings => List[Cluster]): List[List[Cluster]] =
     clustererSettingsBuilder.build.map(run)
 
   def apply(clustererSettingsBuilder: BatchRunSettingsBuilder): List[Steps] = {
@@ -39,7 +40,7 @@ object BatchRun {
 
       val reschedulerSettings = ClusterRescheduler.Settings(clustererSettings.metric, 0.5, memory = 3)
 
-      val steps = Algorithm(clustererSettings, reschedulerSettings)
+      val steps = EuclideanAlgorithm(clustererSettings, reschedulerSettings)
 
       steps
     }

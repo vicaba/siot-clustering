@@ -16,6 +16,11 @@ object ClusterRescheduler {
 
   class PointChanged(val point: Point, val change: MatrixResult[Double])
 
+  def apply(clusters: List[Cluster], settings: Settings): List[(Cluster, List[PointChanged])] = {
+    val newClusterConfiguration = clusters.map(rescheduleCluster(_, settings.metric, settings.improvement, settings.memory))
+    newClusterConfiguration
+  }
+
   def apply(cluster: Cluster, settings: Settings): (Cluster, List[PointChanged]) =
     rescheduleCluster(cluster, settings.metric, settings.improvement, settings.memory)
 

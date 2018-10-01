@@ -8,8 +8,8 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{FileIO, Keep, Sink, Source}
 import akka.util.ByteString
 import breeze.linalg.{DenseMatrix, DenseVector, max}
-import algorithm.clusterer.Clusterer
-import algorithm.serialization.AlgorithmJsonSerializer._
+import algorithm.clusterer.BruteClusterer
+import algorithm.serialization.BruteAlgorithmJsonSerializer._
 import batch.BatchRun
 import batch.BatchRun.BatchRunSettingsBuilder
 import types._
@@ -19,7 +19,7 @@ import metrics.Par
 import play.api.libs.json.{JsObject, JsValue, Json}
 import types.Point
 import types.serialization.ClusterJsonSerializer._
-import algorithm.serialization.ClustererSettingsJsonSerializer._
+import algorithm.serialization.BruteClustererSettingsJsonSerializer._
 import com.typesafe.scalalogging.Logger
 import util.FileUtils
 
@@ -75,7 +75,7 @@ object Main {
     implicit val materializer = ActorMaterializer()(actorSystem)
 
     val queue = Source
-      .queue[(Clusterer.Settings, List[Cluster])](bufferSize, overflowStrategy)
+      .queue[(BruteClusterer.Settings, List[Cluster])](bufferSize, overflowStrategy)
       .map(tupleToJson)
       .map(Json.prettyPrint)
       .map(json => ByteString(json + ", "))
@@ -84,12 +84,12 @@ object Main {
 
     override def onEvent(topic: String, event: Object): Unit = topic match {
       case "iteration" =>
-        val iteration = event.asInstanceOf[(Clusterer.Settings, List[Cluster])]
+        val iteration = event.asInstanceOf[(BruteClusterer.Settings, List[Cluster])]
         queue offer iteration
       case _ =>
     }
 
-    private def tupleToJson(iteration: (Clusterer.Settings, List[Cluster])): JsObject = {
+    private def tupleToJson(iteration: (BruteClusterer.Settings, List[Cluster])): JsObject = {
       val oppositeMetric =
         if (iteration._1.metric == Par.withAverageAggregate) Par.withParAggregate
         else Par.withAverageAggregate
@@ -201,7 +201,7 @@ object Main {
     BatchRun(
       batchRunnerSettingsBuilder, { clustererSettings =>
         logger.info("clusterer settings: {}", clustererSettings)
-        val r = Clusterer(clustererSettings)
+        val r = BruteClusterer(clustererSettings)
         logger.info("done")
         r
       }

@@ -1,20 +1,14 @@
-package algorithm2.clusterer
-import java.io.PrintWriter
-
-import algorithm2.{Generator, MirrorImage}
-import breeze.linalg.Vector
+package algorithm.clusterer
 import eventmanager.EventManager
 import metrics.Metric
-import play.api.libs.json.Json
 import types.Types.SyntheticDataType
-import types.{Cluster, Point, Types, Types2}
-import util.FileUtils
-import types.serialization.ClusterJsonSerializer._
+import types.ops.MirrorImage
+import types.{Cluster, Point, Types}
 
 import scala.annotation.tailrec
 import scala.collection.immutable.LinearSeq
 
-object Clusterer {
+object EuclideanClusterer {
 
   case class Settings(numberOfClusters: Int, points: scala.Vector[Point], metric: Metric, times: Int = 1)
 

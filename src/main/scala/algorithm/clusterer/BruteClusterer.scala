@@ -7,7 +7,7 @@ import types._
 import scala.annotation.tailrec
 import scala.util.Random
 
-object Clusterer {
+object BruteClusterer {
 
   case class Settings(numberOfClusters: Int, points: scala.Vector[Point], metric: Metric, times: Int = 1)
 

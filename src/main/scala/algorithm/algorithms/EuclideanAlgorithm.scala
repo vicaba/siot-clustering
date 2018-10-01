@@ -1,17 +1,10 @@
-package algorithm2
-
-import algorithm2.clusterer.Clusterer
+package algorithm.algorithms
+import algorithm.clusterer.EuclideanClusterer
 import algorithm.scheduler.ClusterRescheduler
 import com.typesafe.scalalogging.Logger
-import play.api.libs.json.{JsValue, Json, Writes}
 import types.Cluster
-import play.api.libs.json._
-import algorithm.serialization.ClustererSettingsJsonSerializer._
-import algorithm.serialization.ReschedulerSettingsJsonSerializer._
-import types.serialization.ClusterJsonSerializer._
 
-
-object Algorithm {
+object EuclideanAlgorithm {
 
   val logger = Logger("algorithm")
 
@@ -22,7 +15,7 @@ object Algorithm {
     val aggregatedMetric: Double
   }
 
-  case class Step1(settings: Clusterer.Settings,
+  case class Step1(settings: EuclideanClusterer.Settings,
                    override val clusters: List[Cluster],
                    override val aggregatedMetric: Double)
     extends StepT
@@ -35,11 +28,11 @@ object Algorithm {
 
   case class Steps(_1: Step1, _2: Step2)
 
-  def apply(clustererSettings: Clusterer.Settings, reschedulerSettings: ClusterRescheduler.Settings): Steps = {
+  def apply(clustererSettings: EuclideanClusterer.Settings, reschedulerSettings: ClusterRescheduler.Settings): Steps = {
 
     logger.info("clusterer")
 
-    val clustererResult = Clusterer(clustererSettings)
+    val clustererResult = EuclideanClusterer(clustererSettings)
 
     logger.info("rescheduler")
 
@@ -55,4 +48,3 @@ object Algorithm {
   }
 
 }
-

@@ -2,9 +2,10 @@ package batch
 
 import java.io.PrintWriter
 
-import algorithm.Algorithm.Steps
+import algorithm.algorithms.BruteAlgorithm.Steps
 import algorithm._
-import algorithm.clusterer.Clusterer
+import algorithm.algorithms.BruteAlgorithm
+import algorithm.clusterer.BruteClusterer
 import algorithm.scheduler.ClusterRescheduler
 import com.typesafe.scalalogging.Logger
 import metrics.Metric
@@ -19,17 +20,17 @@ object BatchRun {
                                 metrics: List[Metric],
                                 timesToIterate: (Vector[Point], Int) => Int) {
 
-    def build: List[Clusterer.Settings] =
+    def build: List[BruteClusterer.Settings] =
       numbersOfClusters.flatMap { numberOfClusters =>
         metrics.map { metric =>
-          Clusterer.Settings(numberOfClusters, points, metric, timesToIterate(points, numberOfClusters))
+          BruteClusterer.Settings(numberOfClusters, points, metric, timesToIterate(points, numberOfClusters))
         }
       }
 
   }
 
   def apply(clustererSettingsBuilder: BatchRunSettingsBuilder,
-            run: Clusterer.Settings => List[Cluster]): List[List[Cluster]] =
+            run: BruteClusterer.Settings => List[Cluster]): List[List[Cluster]] =
     clustererSettingsBuilder.build.map(run)
 
   def apply(clustererSettingsBuilder: BatchRunSettingsBuilder): List[Steps] = {
@@ -39,7 +40,7 @@ object BatchRun {
 
       val reschedulerSettings = ClusterRescheduler.Settings(clustererSettings.metric, 0.5, memory = 3)
 
-      val steps = Algorithm(clustererSettings, reschedulerSettings)
+      val steps = BruteAlgorithm(clustererSettings, reschedulerSettings)
 
       steps
     }

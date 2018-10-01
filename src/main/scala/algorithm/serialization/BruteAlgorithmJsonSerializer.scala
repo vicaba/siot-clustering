@@ -1,12 +1,12 @@
 package algorithm.serialization
 
-import algorithm.Algorithm.{Step1, Step2, Steps}
+import algorithm.algorithms.BruteAlgorithm.{Step1, Step2, Steps}
 import play.api.libs.json._
-import algorithm.serialization.ClustererSettingsJsonSerializer._
+import algorithm.serialization.BruteClustererSettingsJsonSerializer._
 import algorithm.serialization.ReschedulerSettingsJsonSerializer._
 import types.serialization.ClusterJsonSerializer._
 
-object AlgorithmJsonSerializer {
+object BruteAlgorithmJsonSerializer {
 
   implicit val Step1Writes = Json.writes[Step1]
 
