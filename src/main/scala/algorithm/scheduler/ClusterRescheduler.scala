@@ -10,7 +10,7 @@ import scala.annotation.tailrec
 
 object ClusterRescheduler {
 
-  case class Settings(metric: Metric, improvement: Double, memory: Int = 2)
+  case class Settings(override val metric: Metric, improvement: Double, memory: Int = 2, override val numberOfClusters: Int = 1) extends algorithm.algorithms.Settings
 
   class PointChange(val cluster: Cluster, val point: Point, val change: MatrixResult[Double])
 

@@ -1,4 +1,4 @@
-package util
+package utils
 import breeze.linalg.Vector
 
 import scala.math._

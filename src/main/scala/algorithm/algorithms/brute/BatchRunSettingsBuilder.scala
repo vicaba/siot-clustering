@@ -1,4 +1,4 @@
-package batch
+package algorithm.algorithms.brute
 
 import algorithm.clusterer.BruteClusterer
 import algorithm.scheduler.ClusterRescheduler

@@ -1,15 +1,9 @@
-package algorithm2
+package algorithm.algorithms.euclidean
 
-import java.io.PrintWriter
-
-import algorithm.algorithms.EuclideanAlgorithm
 import algorithm.clusterer.EuclideanClusterer
-import algorithm.algorithms.EuclideanAlgorithm.Steps
-import algorithm2._
 import algorithm.scheduler.ClusterRescheduler
-import com.typesafe.scalalogging.Logger
 import metrics.Metric
-import types.{Cluster, Point}
+import types.Point
 
 class BatchRunSettingsBuilder(points: Vector[Point],
                               numbersOfClusters: List[Int],

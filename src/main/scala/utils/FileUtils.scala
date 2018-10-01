@@ -1,4 +1,4 @@
-package util
+package utils
 import java.io.{File, FileInputStream, FileOutputStream}
 
 object FileUtils {

@@ -1,4 +1,4 @@
-import util.Slicer
+import utils.Slicer
 val l = List(1.6, 1.3, 1.25, 1.2).map(BigDecimal(_)).sorted
 
 val lMax = l.max

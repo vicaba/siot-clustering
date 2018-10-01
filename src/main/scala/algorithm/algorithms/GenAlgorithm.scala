@@ -1,63 +1,40 @@
 package algorithm.algorithms
-import algorithm.algorithms.BruteAlgorithm.{Step1, Step2, Steps, logger}
-import algorithm.clusterer.BruteClusterer
-import algorithm.scheduler.ClusterRescheduler
+
 import algorithm.scheduler.ClusterRescheduler.PointChanged
+import com.typesafe.scalalogging.Logger
 import types.Cluster
 
 trait GenAlgorithm {
 
-  type Step1
+  type ClustererSettings <: Settings
 
-  type Step2
-
-  type ClustererSettings
-
-  type ReschedulerSettings
+  type ReschedulerSettings <: Settings
 
   case class StepT[Settings](settings: Settings, clusters: List[Cluster])
 
   case class Steps(_1: StepT[ClustererSettings], _2: StepT[ReschedulerSettings])
 
-/*  def apply(clustererSettings: BruteClusterer.Settings, reschedulerSettings: ClusterRescheduler.Settings): Steps = {
+  val logger = Logger("Algorithm")
 
-    logger.info("clusterer")
+  def clusterer(settings: ClustererSettings): List[Cluster]
 
-    val clustererResult = BruteClusterer(clustererSettings)
+  def rescheduler(clusters: List[Cluster], settings: ReschedulerSettings): List[(Cluster, List[PointChanged])]
 
-    logger.info("rescheduler")
+  def apply(clustererSettings: ClustererSettings, reschedulerSettings: ReschedulerSettings): Steps = {
+    logger.info("Clusterer")
 
-    val reschedulerResult = clustererResult.map(ClusterRescheduler(_, reschedulerSettings)._1).toList
+    val clustererResult = clusterer(clustererSettings)
 
-    logger.info("end")
+    logger.info("Rescheduler")
 
-    Steps(
-      _1 = Step1(clustererSettings, clustererResult, clustererSettings.metric.aggregateOf(clustererResult)),
-      _2 = Step2(reschedulerSettings, reschedulerResult, reschedulerSettings.metric.aggregateOf(reschedulerResult))
-    )
+    val reschedulerResult = rescheduler(clustererResult, reschedulerSettings)
 
-  }*/
-
-  def apply(
-      clusterer: () => (ClustererSettings, List[Cluster]),
-      rescheduler: List[Cluster] => (ReschedulerSettings, List[(Cluster, List[PointChanged])]))
-    : Steps = {
-
-    logger.info("clusterer")
-
-    val clustererResult = clusterer()
-
-    logger.info("rescheduler")
-
-    val reschedulerResult = rescheduler(clustererResult._2)
-
-    logger.info("end")
+    logger.info("End")
 
     Steps(
-      _1 = StepT(clustererResult._1, clustererResult._2),
-      _2 = StepT(reschedulerResult._1, reschedulerResult._2.map(_._1))
+      _1 = StepT(clustererSettings, clustererResult),
+      _2 = StepT(reschedulerSettings, reschedulerResult.map(_._1))
     )
-
   }
 
 }

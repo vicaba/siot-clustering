@@ -10,7 +10,11 @@ import scala.collection.immutable.LinearSeq
 
 object EuclideanClusterer {
 
-  case class Settings(numberOfClusters: Int, points: scala.Vector[Point], metric: Metric, times: Int = 1)
+  case class Settings(override val numberOfClusters: Int,
+                      points: scala.Vector[Point],
+                      override val metric: Metric,
+                      times: Int = 1)
+      extends algorithm.algorithms.Settings
 
   type Heuristic = (Cluster, SyntheticDataType, IndexedSeq[Cluster]) => IndexedSeq[(Double, Cluster)]
 
@@ -98,10 +102,6 @@ object EuclideanClusterer {
       Cluster(point.id, point.id.toString, Set(point))(point.types)
     }.toList, chain).toList
 
-  def main(args: Array[String]): Unit = {
-
-
-
-  }
+  def main(args: Array[String]): Unit = {}
 
 }

@@ -3,7 +3,7 @@ package metrics
 import breeze.stats._
 import metrics.Metric.Progression
 import breeze.linalg._
-import util.Slicer
+import utils.Slicer
 
 trait DenseVectorReprOps[T] {
 

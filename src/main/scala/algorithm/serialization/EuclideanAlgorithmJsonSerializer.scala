@@ -1,14 +1,12 @@
 package algorithm.serialization
 
-import algorithm.algorithms.EuclideanAlgorithm
-import algorithm.algorithms.EuclideanAlgorithm.{StepT, Steps}
-import algorithm.clusterer.EuclideanClusterer
+import algorithm.algorithms.euclidean.EuclideanAlgorithm
 import algorithm.serialization.EuclideanClustererSettingsJsonSerializer._
 import algorithm.serialization.ReschedulerSettingsJsonSerializer._
 import types.serialization.ClusterJsonSerializer._
 import play.api.libs.json._
 
-object AlgorithmJsonSerializer {
+object EuclideanAlgorithmJsonSerializer {
 
   val SettingsKey = "settings"
 

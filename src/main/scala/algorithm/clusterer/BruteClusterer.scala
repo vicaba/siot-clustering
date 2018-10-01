@@ -9,7 +9,11 @@ import scala.util.Random
 
 object BruteClusterer {
 
-  case class Settings(numberOfClusters: Int, points: scala.Vector[Point], metric: Metric, times: Int = 1)
+  case class Settings(override val numberOfClusters: Int,
+                      points: scala.Vector[Point],
+                      override val metric: Metric,
+                      times: Int = 1)
+      extends algorithm.algorithms.Settings
 
   def apply(settings: Settings): List[Cluster] = {
 
@@ -53,8 +57,7 @@ object BruteClusterer {
         case p +: tail =>
           val bestClusterToAssignLocally = clusters.values.minBy { cluster =>
             p.assignedToCluster
-              .map { cId =>
-                if (cId == cluster.id) distanceF(cluster) else distanceF(cluster + p)
+              .map { cId => if (cId == cluster.id) distanceF(cluster) else distanceF(cluster + p)
               }
               .getOrElse(distanceF(cluster + p))
           }

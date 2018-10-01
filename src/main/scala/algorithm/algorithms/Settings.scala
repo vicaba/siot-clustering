@@ -1,3 +1,10 @@
-package algorithm.algorithms trait Settings {
+package algorithm.algorithms
+import metrics.Metric
+
+trait Settings {
+
+  val numberOfClusters: Int
+
+  val metric: Metric
 
 }
