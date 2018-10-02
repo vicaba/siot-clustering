@@ -1,6 +1,6 @@
 package algorithm.serialization
+
 import algorithm.algorithms.GenAlgorithm
-import algorithm.algorithms.brute.BruteAlgorithm
 import play.api.libs.json._
 import types.serialization.ClusterJsonSerializer._
 

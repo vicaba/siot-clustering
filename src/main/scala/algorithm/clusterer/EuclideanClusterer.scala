@@ -1,12 +1,16 @@
 package algorithm.clusterer
+import breeze.linalg.DenseVector
 import eventmanager.EventManager
 import metrics.Metric
+import scalafx.application.Platform
 import types.Types.SyntheticDataType
 import types.ops.MirrorImage
-import types.{Cluster, Point, Types}
+import types.{Cluster, Point, Types, Types2}
+import utils.Generator
 
 import scala.annotation.tailrec
 import scala.collection.immutable.LinearSeq
+import scala.util.Random
 
 object EuclideanClusterer {
 
@@ -56,8 +60,9 @@ object EuclideanClusterer {
           val mirror             = tail(mirrorIndex)
           val remainingClusters  = tail.patch(mirrorIndex, IndexedSeq(), 1)
           val lastCreatedCluster = clusters.headOption.map(_.id).getOrElse(1)
+          val clusterPoints      = c.points ++ mirror.points
           val cluster =
-            Cluster(lastCreatedCluster + 1, s"${lastCreatedCluster + 1}", c.points ++ mirror.points)(c.types)
+            Cluster(lastCreatedCluster + 1, s"${lastCreatedCluster + 1}", clusterPoints)(c.types)
           clustersToClusters(centroid, remainingClusters, heuristic, cluster +: clusters)
         }
       case IndexedSeq() => clusters
@@ -94,6 +99,25 @@ object EuclideanClusterer {
 
   }
 
+  def metricReductionCluster(clusters: LinearSeq[Cluster],
+                             metricToOptimize: Metric,
+                             clusterer: LinearSeq[Cluster] => LinearSeq[Cluster],
+                             maxIterations: Int): LinearSeq[Cluster] = {
+    var best: LinearSeq[Cluster] = null
+
+    for (i <- 0 to maxIterations) {
+      val result          = clusterer(Random.shuffle(clusters))
+      val aggregateMetric = metricToOptimize.aggregateOf(result)
+      val maxMetric       = metricToOptimize(result.maxBy(metricToOptimize(_)))
+      if (i == 0) best = result
+      else {
+        if (aggregateMetric <= metricToOptimize.aggregateOf(best) && maxMetric <= metricToOptimize(
+              best.maxBy(metricToOptimize(_)))) best = result
+      }
+    }
+    best
+  }
+
   val chain: HeuristicChain = List(
     HeuristicDecorator(MirrorImage.findClosestMirrors(_, _, _)(MirrorImage.MirroredCluster))) ::: Nil
 
@@ -101,7 +125,5 @@ object EuclideanClusterer {
     cluster(settings.numberOfClusters, Int.MaxValue, settings.points.map { point =>
       Cluster(point.id, point.id.toString, Set(point))(point.types)
     }.toList, chain).toList
-
-  def main(args: Array[String]): Unit = {}
 
 }

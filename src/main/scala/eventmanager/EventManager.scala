@@ -1,4 +1,9 @@
 package eventmanager
+import types.Cluster
+
+object Events {
+  case class NewClusters(clusters: List[Cluster])
+}
 
 object EventManager {
 
@@ -19,6 +24,7 @@ class EventManager {
     val subscribers = topicToSubscribers.applyOrElse(topic, { t: String =>
       List.empty[Subscriber]
     })
+    println("subscribed to topic")
     topicToSubscribers.+=(topic -> (subscriber +: subscribers))
   }
 

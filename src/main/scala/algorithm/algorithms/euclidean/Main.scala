@@ -2,7 +2,6 @@ package algorithm.algorithms.euclidean
 import java.io.PrintWriter
 
 import batch.GenBatchRun
-import breeze.linalg.max
 import config.Configuration
 import eventmanager.EventManager
 import algorithm.algorithms.brute.Main.readEgaugeData
@@ -10,7 +9,6 @@ import metrics.Par
 import play.api.libs.json.Json
 import types.{Cluster, Point}
 import utils.FileUtils
-import algorithm.serialization.EuclideanClustererSettingsJsonSerializer._
 import algorithm.serialization.EuclideanAlgorithmJsonSerializer._
 import algorithm.serialization.ResultsJsonSerializer
 import types.serialization.ClusterJsonSerializer._
