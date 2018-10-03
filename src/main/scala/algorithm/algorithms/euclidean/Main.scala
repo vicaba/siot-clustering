@@ -47,23 +47,16 @@ object Main {
       p.close()
     }
 
-    // Windows
-/*    FileUtils.copyFile("files/output/cluster.json",
-                       "/Users/vcaballero/Projects/jupyter-notebook/siot-eclustering-viz/files")
+    val filePath = "w" match {
+      case "w" => "/Users/vcaballero/Projects/jupyter-notebook/siot-eclustering-viz/files"
+      case "m" => "/Users/vicaba/Projects/jupyter/shared/siot-eclustering-viz/files"
+    }
 
-    FileUtils.copyFile(Configuration.summaryBatchRunFile,
-                       "/Users/vcaballero/Projects/jupyter-notebook/siot-eclustering-viz/files")
-    FileUtils.copyFile(Configuration.batchRunFile,
-                       "/Users/vcaballero/Projects/jupyter-notebook/siot-eclustering-viz/files")*/
+    FileUtils.copyFile("files/output/cluster.json", filePath)
 
-    // Mac
-    FileUtils.copyFile("files/output/cluster.json",
-      "/Users/vicaba/Projects/jupyter/shared/siot-eclustering-viz/files")
+    FileUtils.copyFile(Configuration.summaryBatchRunFile, filePath)
 
-    FileUtils.copyFile(Configuration.summaryBatchRunFile,
-      "/Users/vicaba/Projects/jupyter/shared/siot-eclustering-viz/files")
-    FileUtils.copyFile(Configuration.batchRunFile,
-      "/Users/vicaba/Projects/jupyter/shared/siot-eclustering-viz/files")
+    FileUtils.copyFile(Configuration.batchRunFile, filePath)
 
   }
 

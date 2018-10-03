@@ -121,9 +121,10 @@ object EuclideanClusterer {
   val chain: HeuristicChain = List(
     HeuristicDecorator(MirrorImage.findClosestMirrors(_, _, _)(MirrorImage.MirroredCluster))) ::: Nil
 
-  def apply(settings: Settings): List[Cluster] =
-    cluster(settings.numberOfClusters, Int.MaxValue, settings.points.map { point =>
+  def apply(settings: Settings): List[Cluster] = {
+    metricReductionCluster(settings.points.map { point =>
       Cluster(point.id, point.id.toString, Set(point))(point.types)
-    }.toList, chain).toList
+    }.toList, Metric.par, cluster(settings.numberOfClusters, Int.MaxValue, _, chain), 50).toList
+  }
 
 }
