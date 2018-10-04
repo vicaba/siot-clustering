@@ -20,19 +20,29 @@ trait GenAlgorithm {
 
   def rescheduler(clusters: List[Cluster], settings: ReschedulerSettings): List[(Cluster, List[PointChanged])]
 
-  def apply(clustererSettings: ClustererSettings, reschedulerSettings: ReschedulerSettings): Steps = {
+  def apply(clustererSettings: ClustererSettings): StepT[ClustererSettings] = {
+
     logger.info("Clusterer")
 
     val clustererResult = clusterer(clustererSettings)
 
+    StepT(clustererSettings, clustererResult)
+
+  }
+
+  def apply(clustererSettings: ClustererSettings, reschedulerSettings: ReschedulerSettings): Steps = {
+    logger.info("Clusterer")
+
+    val step1 = apply(clustererSettings)
+
     logger.info("Rescheduler")
 
-    val reschedulerResult = rescheduler(clustererResult, reschedulerSettings)
+    val reschedulerResult = rescheduler(step1.clusters, reschedulerSettings)
 
     logger.info("End")
 
     Steps(
-      _1 = StepT(clustererSettings, clustererResult),
+      _1 = step1,
       _2 = StepT(reschedulerSettings, reschedulerResult.map(_._1))
     )
   }

@@ -2,11 +2,9 @@ package algorithm.clusterer
 import breeze.linalg.DenseVector
 import eventmanager.EventManager
 import metrics.Metric
-import scalafx.application.Platform
 import types.Types.SyntheticDataType
 import types.ops.MirrorImage
 import types.{Cluster, Point, Types, Types2}
-import utils.Generator
 
 import scala.annotation.tailrec
 import scala.collection.immutable.LinearSeq

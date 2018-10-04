@@ -9,4 +9,10 @@ object GenBatchRun {
     }
   }
 
+  def cluster(algorithm: GenAlgorithm)(settings: List[algorithm.type#ClustererSettings]): List[algorithm.type#StepT[algorithm.type#ClustererSettings]] = {
+    settings.map { clustererSettings =>
+      algorithm.apply(clustererSettings)
+    }
+  }
+
 }

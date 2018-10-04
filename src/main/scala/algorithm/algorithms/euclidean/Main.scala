@@ -5,47 +5,34 @@ import batch.GenBatchRun
 import config.Configuration
 import eventmanager.EventManager
 import algorithm.algorithms.brute.Main.readEgaugeData
+import algorithm.clusterer.EuclideanClusterer
 import metrics.Par
 import play.api.libs.json.Json
-import types.{Cluster, Point}
-import utils.FileUtils
+import types.{Cluster, Point, Types2}
+import utils.{FileUtils, Generator}
 import algorithm.serialization.EuclideanAlgorithmJsonSerializer._
-import algorithm.serialization.ResultsJsonSerializer
+import algorithm.serialization.{EuclideanAlgorithmJsonSerializer, ResultsJsonSerializer}
+import breeze.linalg.DenseVector
 import types.serialization.ClusterJsonSerializer._
-
 
 object Main {
 
   def main(args: Array[String]): Unit = {
-/*    val points = Generator
-      .generateRandom2DPoints(Vector(0.0, 0.0), 5, 50, 5)
+    val points = Generator
+      .generateRandom2DPoints(DenseVector(0.0, 0.0), 5, 16, 5)
       .zipWithIndex
       .map {
         case (m, idx) =>
           Point(idx, m.toDenseVector.asDenseMatrix, None)(Types2)
       }
-      .toVector*/
+      .toVector
 
-    var clustersBuffer: List[List[Cluster]] = Nil
-    EventManager.singleton
-      .subscribe("clusters",
-                 (topic: String, event: Object) => clustersBuffer = event.asInstanceOf[List[Cluster]] :: clustersBuffer)
+    //val points = readEgaugeData("files/input/egauge.json")
 
-     val points =   readEgaugeData("files/input/egauge.json").toVector
+    val batchRunSettingsBuilder =
+      new BatchRunSettingsBuilder(points, (1 to 16).toList, List(Par.withParAggregate), (points, k) => points.size * k)
 
-    batchRun(points)
-
-    Some(new PrintWriter("files/output/cluster.json")).foreach { p =>
-      val json = clustersBuffer.zipWithIndex.map {
-        case (clusteringIteration, idx) =>
-          Json.obj(
-            "iteration" -> idx,
-            "clusters"  -> Json.toJson(clusteringIteration)
-          )
-      }
-      p.write(Json.prettyPrint(Json.toJson(json)).toString)
-      p.close()
-    }
+    batchRunCluster(batchRunSettingsBuilder)
 
     val filePath = "w" match {
       case "w" => "/Users/vcaballero/Projects/jupyter-notebook/siot-eclustering-viz/files"
@@ -60,14 +47,9 @@ object Main {
 
   }
 
-  def batchRun(points: scala.Vector[Point]) = {
+  def batchRun(batchRunSettingsBuilder: BatchRunSettingsBuilder): Unit = {
 
-    val batchRunnerSettingsBuilder = new BatchRunSettingsBuilder(points,
-                                                                 (1 to 3).toList,
-                                                                 List(Par.withParAggregate),
-                                                                 (points, k) => points.size * k)
-
-    val stepsList = GenBatchRun(EuclideanAlgorithm)(batchRunnerSettingsBuilder.build)
+    val stepsList = GenBatchRun(EuclideanAlgorithm)(batchRunSettingsBuilder.build)
 
     Some(new PrintWriter(Configuration.batchRunFile)).foreach { p =>
       val jsonList = ResultsJsonSerializer.batchRunAsJson(stepsList)
@@ -83,5 +65,27 @@ object Main {
     }
 
   }
+
+
+  def batchRunCluster(batchRunSettingsBuilder: BatchRunSettingsBuilder): Unit = {
+
+    val stepsList = GenBatchRun.cluster(EuclideanAlgorithm)(batchRunSettingsBuilder.build.map(_._1))
+
+    Some(new PrintWriter(Configuration.batchRunFile)).foreach { p =>
+      val jsonList = ResultsJsonSerializer.clustererBatchRunAsJson(stepsList)
+
+      p.write(Json.prettyPrint(Json.toJson(jsonList)).toString())
+      p.close()
+    }
+
+    Some(new PrintWriter(Configuration.summaryBatchRunFile)).foreach { p =>
+      val jsonList = ResultsJsonSerializer.summaryClustererBatchRunAsJson(stepsList)
+      p.write(Json.prettyPrint(Json.toJson(jsonList)).toString())
+      p.close()
+    }
+
+  }
+
+
 
 }
