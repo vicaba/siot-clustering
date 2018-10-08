@@ -13,12 +13,13 @@ object MathUtils {
     _factorize(x)
   }
 
+/*
   def clusteringOrder(points: Int, k: Int): List[Int] = {
     val pointsFactors = factorize(points)
     val kFactors = factorize(k)
     val groupedPointsFactors = pointsFactors.groupBy(_)
     val groupedKFactors = kFactors.groupBy(_)
-
   }
+*/
 
 }

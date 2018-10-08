@@ -5,6 +5,7 @@ import metrics.Metric
 import types.Types.SyntheticDataType
 import types.ops.MirrorImage
 import types.{Cluster, Point, Types, Types2}
+import utils.MathUtils
 
 import scala.annotation.tailrec
 import scala.collection.immutable.LinearSeq
@@ -47,7 +48,9 @@ object EuclideanClusterer {
   def clustersToClusters(centroid: SyntheticDataType,
                          freeClusters: IndexedSeq[Cluster],
                          heuristic: Heuristic,
+                         membersPerCluster: Int,
                          clusters: LinearSeq[Cluster] = LinearSeq()): LinearSeq[Cluster] = {
+
     freeClusters match {
       case c +: tail =>
         val closestMirror = heuristic(c, centroid, tail)
@@ -56,12 +59,13 @@ object EuclideanClusterer {
           val mirrorIndex =
             tail.indexWhere(_.id == closestMirror.head._2.id)
           val mirror             = tail(mirrorIndex)
+          //Update for next iteration
           val remainingClusters  = tail.patch(mirrorIndex, IndexedSeq(), 1)
           val lastCreatedCluster = clusters.headOption.map(_.id).getOrElse(1)
           val clusterPoints      = c.points ++ mirror.points
           val cluster =
             Cluster(lastCreatedCluster + 1, s"${lastCreatedCluster + 1}", clusterPoints)(c.types)
-          clustersToClusters(centroid, remainingClusters, heuristic, cluster +: clusters)
+          clustersToClusters(centroid, remainingClusters, heuristic, membersPerCluster,  cluster +: clusters)
         }
       case IndexedSeq() => clusters
     }
@@ -70,7 +74,8 @@ object EuclideanClusterer {
   def cluster(stopAtKClusters: Int,
               stopAtIterationCount: Int,
               clusters: LinearSeq[Cluster],
-              heuristic: Heuristic): LinearSeq[Cluster] = {
+              heuristic: Heuristic,
+              clusteringOrder: List[Int]): LinearSeq[Cluster] = {
 
     val points   = clusters.flatMap(_.points)
     val centroid = centroidOf(points)
@@ -120,9 +125,12 @@ object EuclideanClusterer {
     HeuristicDecorator(MirrorImage.findClosestMirrors(_, _, _)(MirrorImage.MirroredCluster))) ::: Nil
 
   def apply(settings: Settings): List[Cluster] = {
+
+    val clusteringOrder = MathUtils.factorize(settings.numberOfClusters)
+
     metricReductionCluster(settings.points.map { point =>
       Cluster(point.id, point.id.toString, Set(point))(point.types)
-    }.toList, Metric.par, cluster(settings.numberOfClusters, Int.MaxValue, _, chain), 50).toList
+    }.toList, Metric.par, cluster(settings.numberOfClusters, Int.MaxValue, _, chain, clusteringOrder), 50).toList
   }
 
 }
