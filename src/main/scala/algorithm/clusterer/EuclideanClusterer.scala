@@ -44,7 +44,7 @@ object EuclideanClusterer {
         accum + p.syntheticValue
     } / points.length.toDouble
 
-  @tailrec
+/*  @tailrec
   def clustersToClusters(centroid: SyntheticDataType,
                          freeClusters: IndexedSeq[Cluster],
                          heuristic: Heuristic,
@@ -69,6 +69,52 @@ object EuclideanClusterer {
         }
       case IndexedSeq() => clusters
     }
+  }*/
+
+  @tailrec
+  def clustersToClusters(centroid: SyntheticDataType,
+                         freeClusters: IndexedSeq[Cluster],
+                         heuristic: Heuristic,
+                         membersPerCluster: Int,
+                         clusters: LinearSeq[Cluster] = LinearSeq()): LinearSeq[Cluster] = {
+
+    freeClusters match {
+      case c +: tail =>
+        val (cluster, remainingClusters) = clustersToClusterXTimes(c, centroid, tail, heuristic, 1)
+        if (remainingClusters.isEmpty) cluster +: clusters
+        clustersToClusters(centroid, remainingClusters, heuristic, membersPerCluster, cluster +: clusters)
+      case IndexedSeq() => clusters
+    }
+  }
+
+  @tailrec
+  def clustersToClusterXTimes(c: Cluster,
+                              centroid: SyntheticDataType,
+                              freeClusters: IndexedSeq[Cluster],
+                              heuristic: Heuristic,
+                              times: Int = 1): (Cluster, IndexedSeq[Cluster]) = {
+    times match {
+      case 0 => (c, freeClusters)
+      case _ =>
+        val (cluster, remainingClusters) = clustersToCluster(c, centroid, freeClusters, heuristic)
+        clustersToClusterXTimes(cluster, centroid, remainingClusters, heuristic, times - 1)
+    }
+  }
+
+  def clustersToCluster(c: Cluster,
+                        centroid: SyntheticDataType,
+                        freeClusters: IndexedSeq[Cluster],
+                        heuristic: Heuristic): (Cluster, IndexedSeq[Cluster]) = {
+    val closestMirror = heuristic(c, centroid, freeClusters)
+    if (closestMirror.isEmpty) (c, freeClusters)
+    else {
+      val mirrorIndex =
+        freeClusters.indexWhere(_.id == closestMirror.head._2.id)
+      val mirror             = freeClusters(mirrorIndex)
+      val remainingClusters  = freeClusters.patch(mirrorIndex, IndexedSeq(), 1)
+      val clusterPoints      = c.points ++ mirror.points
+      (c.copy(points = clusterPoints)(c.types), remainingClusters)
+    }
   }
 
   def cluster(stopAtKClusters: Int,
@@ -91,7 +137,7 @@ object EuclideanClusterer {
 
     while (iterations < stopAtIterationCount && kClusters > stopAtKClusters) {
 
-      _clusters = clustersToClusters(centroid, _clusters.toVector, heuristic, Nil)
+      _clusters = clustersToClusters(centroid, _clusters.toVector, heuristic, 1)
       iterations = iterations + 1
       kClusters = _clusters.size
 
@@ -128,9 +174,13 @@ object EuclideanClusterer {
 
     val clusteringOrder = MathUtils.factorize(settings.numberOfClusters)
 
-    metricReductionCluster(settings.points.map { point =>
-      Cluster(point.id, point.id.toString, Set(point))(point.types)
-    }.toList, Metric.par, cluster(settings.numberOfClusters, Int.MaxValue, _, chain, clusteringOrder), 50).toList
+    metricReductionCluster(
+      settings.points.map { point => Cluster(point.id, point.id.toString, Set(point))(point.types)
+      }.toList,
+      Metric.par,
+      cluster(settings.numberOfClusters, Int.MaxValue, _, chain, clusteringOrder),
+      50
+    ).toList
   }
 
 }
