@@ -18,19 +18,19 @@ import types.serialization.ClusterJsonSerializer._
 object Main {
 
   def main(args: Array[String]): Unit = {
-    val points = Generator
-      .generateRandom2DPoints(DenseVector(0.0, 0.0), 5, 54, 5)
+    /*val points = Generator
+      .generateRandom2DPoints(DenseVector(0.0, 0.0), 5, 18, 5)
       .zipWithIndex
       .map {
         case (m, idx) =>
           Point(idx, m.toDenseVector.asDenseMatrix, None)(Types2)
       }
-      .toVector
+      .toVector*/
 
-    //val points = readEgaugeData("files/input/egauge.json")
+    val points = readEgaugeData("files/input/egauge.json")
 
     val batchRunSettingsBuilder =
-      new BatchRunSettingsBuilder(points, (6 to 6).toList, List(Par.withParAggregate), (points, k) => points.size * k)
+      new BatchRunSettingsBuilder(points, (1 to 6).toList, List(Par.withParAggregate), (points, k) => points.size * k)
 
     batchRunCluster(batchRunSettingsBuilder)
 

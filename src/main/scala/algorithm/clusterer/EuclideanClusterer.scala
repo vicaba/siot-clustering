@@ -1,4 +1,5 @@
 package algorithm.clusterer
+
 import eventmanager.EventManager
 import metrics.Metric
 import types.Types.SyntheticDataType
@@ -9,6 +10,7 @@ import utils.MathUtils
 import scala.annotation.tailrec
 import scala.collection.immutable.LinearSeq
 import scala.util.Random
+import scala.math._
 
 object EuclideanClusterer {
 
@@ -176,13 +178,22 @@ object EuclideanClusterer {
 
     val clusteringOrder = ClusteringOrder(settings.points.size, settings.numberOfClusters)
 
-    metricReductionCluster(
+    val result = metricReductionCluster(
       settings.points.map { point => Cluster(point.id, point.id.toString, Set(point))(point.types)
       }.toList,
       Metric.par,
       cluster(settings.numberOfClusters, Int.MaxValue, _, chain, clusteringOrder),
-      50
+      500
     ).toList
+
+    val res = result.find(_.points.size == clusteringOrder.outliers).map { outliers =>
+      (result.toSet - outliers)
+    }.getOrElse(result)
+
+
+    result
+
+
   }
 
 }
