@@ -23,12 +23,17 @@ case class Point(override val id: Int, override val data: DataType, assignedToCl
 
   def syntheticValue: SyntheticDataType = types.synthesizeValues(this.data)
 
+  def toCluster: Cluster = Point.toCluster(this)
+
   override def centroid: SyntheticDataType =  syntheticValue / types.Rows.toDouble
+
 }
 
 object Point {
 
   import scala.language.implicitConversions
+
+  def toCluster(point: Point): Cluster = Cluster(point.id, point.id.toString, Set(point))(point.types)
 
   implicit def pointListToVector(list: List[Point]): Option[SyntheticDataType] = list.map(_.syntheticValue) match {
     case Nil   => None

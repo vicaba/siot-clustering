@@ -11,6 +11,13 @@ import scala.annotation.tailrec
 
 case class Cluster(override val id: Int, name: String, points: Set[Point])(implicit override val types: TypesT) extends Types.Type {
 
+  override def equals(obj: scala.Any): Boolean = obj match {
+    case c: Cluster => this.id == c.id
+    case _        => false
+  }
+
+  override def hashCode(): Int = this.id
+
   def isEmpty: Boolean = points.isEmpty
 
   def nonEmpty: Boolean = !isEmpty

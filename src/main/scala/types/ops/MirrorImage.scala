@@ -47,8 +47,8 @@ object MirrorImage {
     }
 
     override implicit def distance: DistanceFunc[Point] = new DistanceFunc[Point] {
-      override def apply(e1: Point, e2: Point): Double           = norm(e2.syntheticValue - e1.syntheticValue, 2)
-      override def apply(e1: Point, e2: SyntheticDataType): Double = norm(e2 - e1.syntheticValue, 2)
+      override def apply(e1: Point, e2: Point): Double           = norm(e2.centroid - e1.centroid, 2)
+      override def apply(e1: Point, e2: SyntheticDataType): Double = norm(e2 - e1.centroid, 2)
     }
 
   }

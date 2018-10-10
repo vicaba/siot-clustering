@@ -19,7 +19,7 @@ object Main {
 
   def main(args: Array[String]): Unit = {
     /*val points = Generator
-      .generateRandom2DPoints(DenseVector(0.0, 0.0), 5, 18, 5)
+      .generateRandom2DPoints(DenseVector(0.0, 0.0), 5, 20, 5)
       .zipWithIndex
       .map {
         case (m, idx) =>

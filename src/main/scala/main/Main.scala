@@ -58,7 +58,7 @@ case class AlgorithmActor(gui: ActorRef) extends Actor {
     )
 
     val points = Generator
-      .generateRandom2DPoints(DenseVector(500, 500), 500, 50, 5)
+      .generateRandom2DPoints(DenseVector(500, 500), 500, 20, 5)
       .zipWithIndex
       .map {
         case (m, idx) =>
@@ -68,7 +68,7 @@ case class AlgorithmActor(gui: ActorRef) extends Actor {
 
     println(points)
 
-    EuclideanClusterer.apply(EuclideanClusterer.Settings(2, points, Metric.par))
+    EuclideanClusterer.apply(EuclideanClusterer.Settings(4, points, Metric.par))
 
   }
 

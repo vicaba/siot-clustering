@@ -11,6 +11,7 @@ import scala.annotation.tailrec
 import scala.collection.immutable.LinearSeq
 import scala.util.Random
 import scala.math._
+import types.ops.SetOps._
 
 object EuclideanClusterer {
 
@@ -64,19 +65,33 @@ object EuclideanClusterer {
     } / points.length.toDouble
 
   @tailrec
-  def clustersToClusters(centroid: SyntheticDataType,
+  def clustersToClusters(iterations: Int,
+                         centroid: SyntheticDataType,
                          freeClusters: IndexedSeq[Cluster],
                          heuristic: Heuristic,
                          membersPerCluster: Int,
-                         clusters: LinearSeq[Cluster] = LinearSeq()): LinearSeq[Cluster] = {
+                         clusters: IndexedSeq[Cluster] = IndexedSeq()): IndexedSeq[Cluster] = {
 
-    freeClusters match {
-      case c +: tail =>
+    if (iterations > 0 && freeClusters.nonEmpty) {
+      val c                            = freeClusters.head
+      val tail                         = freeClusters.tail
+      val (cluster, remainingClusters) = clustersToClusterXTimes(c, centroid, tail, heuristic, membersPerCluster)
+      if (remainingClusters.isEmpty) cluster +: clusters
+      clustersToClusters(iterations - 1, centroid, remainingClusters, heuristic, membersPerCluster, cluster +: clusters)
+    } else {
+      clusters
+    }
+
+    /*    iterations match {
+      case _ if () => clusters
+      case _ =>
+        val c = freeClusters.head
+        val tail = freeClusters.tail
         val (cluster, remainingClusters) = clustersToClusterXTimes(c, centroid, tail, heuristic, membersPerCluster)
         if (remainingClusters.isEmpty) cluster +: clusters
-        clustersToClusters(centroid, remainingClusters, heuristic, membersPerCluster, cluster +: clusters)
-      case IndexedSeq() => clusters
-    }
+        clustersToClusters(iterations - 1, centroid, remainingClusters, heuristic, membersPerCluster, cluster +: clusters)
+
+    }*/
   }
 
   def clustersToClusterXTimes(c: Cluster,
@@ -119,16 +134,16 @@ object EuclideanClusterer {
 
   def cluster(stopAtKClusters: Int,
               stopAtIterationCount: Int,
-              clusters: LinearSeq[Cluster],
+              clusters: Seq[Cluster],
               heuristic: Heuristic,
               clusteringOrder: ClusteringOrder): LinearSeq[Cluster] = {
 
     val points   = clusters.flatMap(_.points)
     val centroid = centroidOf(points)
 
-    var iterations              = 0
-    var kClusters               = clusters.size
-    var _clusters: Seq[Cluster] = clusters
+    var iterations                     = 0
+    var kClusters                      = clusters.size
+    var _clusters: IndexedSeq[Cluster] = clusters.toIndexedSeq
 
     if (clusters.isEmpty) return Nil
     if (stopAtKClusters == 1) return List(Cluster(1, "1", points.toSet)(clusters.head.types))
@@ -141,14 +156,43 @@ object EuclideanClusterer {
 
     while (!maxIterations && !clusteringOrderEnd && !minClustersReached) {
 
-      _clusters = clustersToClusters(centroid, _clusters.toVector, heuristic, clusteringOrder.order(iterations))
+      val membersPerCluster = clusteringOrder.order(iterations)
+
+      _clusters = clustersToClusters(iterations = _clusters.size / membersPerCluster,
+                                     centroid,
+                                     _clusters,
+                                     heuristic,
+                                     membersPerCluster)
       iterations = iterations + 1
       kClusters = _clusters.size
 
       EventManager.singleton.publish("clusters", _clusters.toList)
 
     }
-    _clusters.toList
+
+    val outliers = clusters.flatMap(_.points).toSet -- _clusters.flatMap(_.points).toSet
+    val finalClusters =
+      clustersToFixedClusters(centroid, _clusters, outliers.map(Point.toCluster).toIndexedSeq, heuristic)
+
+    finalClusters.toList
+
+  }
+
+  def clustersToFixedClusters(centroid: SyntheticDataType,
+                              fixedClusters: IndexedSeq[Cluster],
+                              freeClusters: IndexedSeq[Cluster],
+                              heuristic: Heuristic): IndexedSeq[Cluster] = {
+    if (freeClusters.nonEmpty) {
+      var closestMirror: Cluster = null
+      val bestClusterToAssign = fixedClusters.minBy { fixedCluster =>
+        closestMirror = heuristic(fixedCluster, centroid, freeClusters).head._2
+      }
+      val newFixedCluster = bestClusterToAssign.copy(points = bestClusterToAssign.points ++ closestMirror.points)(bestClusterToAssign.types)
+      clustersToFixedClusters(centroid,
+                              (fixedClusters.toSet += newFixedCluster).toIndexedSeq,
+                              (freeClusters.toSet - closestMirror).toIndexedSeq,
+                              heuristic)
+    } else fixedClusters
 
   }
 
@@ -158,7 +202,7 @@ object EuclideanClusterer {
                              maxIterations: Int): LinearSeq[Cluster] = {
     var best: LinearSeq[Cluster] = null
 
-    for (i <- 0 to maxIterations) {
+    for (i <- 0 until maxIterations) {
       val result          = clusterer(Random.shuffle(clusters))
       val aggregateMetric = metricToOptimize.aggregateOf(result)
       val maxMetric       = metricToOptimize(result.maxBy(metricToOptimize(_)))
@@ -179,20 +223,19 @@ object EuclideanClusterer {
     val clusteringOrder = ClusteringOrder(settings.points.size, settings.numberOfClusters)
 
     val result = metricReductionCluster(
-      settings.points.map { point => Cluster(point.id, point.id.toString, Set(point))(point.types)
-      }.toList,
+      settings.points.map(Point.toCluster).toList,
       Metric.par,
       cluster(settings.numberOfClusters, Int.MaxValue, _, chain, clusteringOrder),
-      500
+      100
     ).toList
 
-    val res = result.find(_.points.size == clusteringOrder.outliers).map { outliers =>
-      (result.toSet - outliers)
-    }.getOrElse(result)
-
+    val res = result
+      .find(_.points.size == clusteringOrder.outliers)
+      .map { outliers => (result.toSet - outliers)
+      }
+      .getOrElse(result)
 
     result
-
 
   }
 
