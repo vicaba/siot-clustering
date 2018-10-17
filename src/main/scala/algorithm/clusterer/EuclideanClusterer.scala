@@ -171,8 +171,12 @@ object EuclideanClusterer {
     }
 
     val outliers = clusters.flatMap(_.points).toSet -- _clusters.flatMap(_.points).toSet
+
     val finalClusters =
       clustersToFixedClusters(centroid, _clusters, outliers.map(Point.toCluster).toIndexedSeq, heuristic)
+
+    if (outliers.nonEmpty)  EventManager.singleton.publish("clusters", finalClusters.toList)
+
 
     finalClusters.toList
 
@@ -229,14 +233,14 @@ object EuclideanClusterer {
       100
     ).toList
 
-    val res = result
-      .find(_.points.size == clusteringOrder.outliers)
-      .map { outliers => (result.toSet - outliers)
-      }
-      .getOrElse(result)
-
     result
 
+  }
+
+  def applyOnce(settings: Settings): List[Cluster] = {
+    val clusteringOrder = ClusteringOrder(settings.points.size, settings.numberOfClusters)
+    val result = cluster(settings.numberOfClusters, Int.MaxValue, settings.points.map(Point.toCluster).toList, chain, clusteringOrder)
+    result.toList
   }
 
 }

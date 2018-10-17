@@ -4,9 +4,6 @@ import eventmanager.Events.NewClusters
 
 class GridGuiActor extends Actor {
   override def receive: Receive = {
-    case NewClusters(clusters) => {
-      println("new")
-      GridGui.drawClusters(clusters)
-    }
+    case NewClusters(clusters) => GridGui.drawClusters(clusters)
   }
 }

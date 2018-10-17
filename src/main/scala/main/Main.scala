@@ -13,33 +13,30 @@ import utils.Generator
 
 case class AlgorithmActor(gui: ActorRef) extends Actor {
 
-  var eventStack: List[List[Cluster]] = List()
+  var events: Vector[List[Cluster]] = Vector()
 
-  var forwardStack: List[List[Cluster]] = List()
+  var counter: Int = 0
 
   override def preStart(): Unit = {
     super.preStart()
     GridGui.forwardButton.onAction = (event: ActionEvent) => {
-      if (forwardStack.nonEmpty) {
-        println(eventStack.size)
-        val current = forwardStack.head
-        forwardStack = forwardStack.drop(1)
-        eventStack = current :: eventStack
-        gui ! NewClusters(current)
+      if (counter > 0) {
+        counter = counter - 1
+        println(s"Counter: $counter")
+        val res = events(counter)
+        gui ! NewClusters(events(counter))
       }
-
     }
 
     GridGui.backwardButton.onAction = (event: ActionEvent) => {
-      if (eventStack.nonEmpty) {
-        println(eventStack.size)
-        val current = eventStack.head
-        eventStack = eventStack.drop(1)
-        forwardStack = current :: forwardStack
-        gui ! NewClusters(current)
+      if (counter < events.size - 1) {
+        counter = counter + 1
+        println(s"Counter: $counter")
+        val res = events(counter)
+        gui ! NewClusters(events(counter))
       }
-
     }
+
   }
 
   override def receive: Receive = {
@@ -52,13 +49,14 @@ case class AlgorithmActor(gui: ActorRef) extends Actor {
       "clusters",
       (topic: String, event: Object) => {
         val newClusters = event.asInstanceOf[List[Cluster]]
-        eventStack = newClusters :: eventStack
+        events = newClusters +: events
+        println(s"Events Size:${events.size}")
         gui ! NewClusters(newClusters)
       }
     )
 
     val points = Generator
-      .generateRandom2DPoints(DenseVector(500, 500), 500, 20, 5)
+      .generateRandom2DPoints(DenseVector(500, 500), 500, 43, 5)
       .zipWithIndex
       .map {
         case (m, idx) =>
@@ -68,7 +66,7 @@ case class AlgorithmActor(gui: ActorRef) extends Actor {
 
     println(points)
 
-    EuclideanClusterer.apply(EuclideanClusterer.Settings(4, points, Metric.par))
+    EuclideanClusterer.applyOnce(EuclideanClusterer.Settings(4, points, Metric.par))
 
   }
 
