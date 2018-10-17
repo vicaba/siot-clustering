@@ -175,8 +175,7 @@ object EuclideanClusterer {
     val finalClusters =
       clustersToFixedClusters(centroid, _clusters, outliers.map(Point.toCluster).toIndexedSeq, heuristic)
 
-    if (outliers.nonEmpty)  EventManager.singleton.publish("clusters", finalClusters.toList)
-
+    if (outliers.nonEmpty) EventManager.singleton.publish("clusters", finalClusters.toList)
 
     finalClusters.toList
 
@@ -191,7 +190,8 @@ object EuclideanClusterer {
       val bestClusterToAssign = fixedClusters.minBy { fixedCluster =>
         closestMirror = heuristic(fixedCluster, centroid, freeClusters).head._2
       }
-      val newFixedCluster = bestClusterToAssign.copy(points = bestClusterToAssign.points ++ closestMirror.points)(bestClusterToAssign.types)
+      val newFixedCluster =
+        bestClusterToAssign.copy(points = bestClusterToAssign.points ++ closestMirror.points)(bestClusterToAssign.types)
       clustersToFixedClusters(centroid,
                               (fixedClusters.toSet += newFixedCluster).toIndexedSeq,
                               (freeClusters.toSet - closestMirror).toIndexedSeq,
@@ -239,7 +239,11 @@ object EuclideanClusterer {
 
   def applyOnce(settings: Settings): List[Cluster] = {
     val clusteringOrder = ClusteringOrder(settings.points.size, settings.numberOfClusters)
-    val result = cluster(settings.numberOfClusters, Int.MaxValue, settings.points.map(Point.toCluster).toList, chain, clusteringOrder)
+    val result = cluster(settings.numberOfClusters,
+                         Int.MaxValue,
+                         settings.points.map(Point.toCluster).toList,
+                         chain,
+                         clusteringOrder)
     result.toList
   }
 
