@@ -1,7 +1,7 @@
 package types.ops
 import breeze.linalg.norm
 import types.Types.SyntheticDataType
-import types.{Cluster, Point}
+import types.{Cluster, Point, Types, mutable}
 
 object MirrorImage {
 
@@ -24,6 +24,32 @@ object MirrorImage {
     implicit def findMirror: FindMirror[T]
 
     implicit def distance: DistanceFunc[T]
+
+  }
+
+  implicit object MirroredType extends Mirrored[Types.Type] {
+    override def findMirror: FindMirror[Types.Type] = new FindMirror[Types.Type] {
+      override def apply(origin: Types.Type, center: SyntheticDataType): SyntheticDataType =
+        (2.0 * center) - origin.syntheticValue
+    }
+
+    override implicit def distance: DistanceFunc[Types.Type] = new DistanceFunc[Types.Type] {
+      override def apply(e1: Types.Type, e2: Types.Type): Double           = norm(e2.syntheticValue - e1.syntheticValue, 2)
+      override def apply(e1: Types.Type, e2: SyntheticDataType): Double = norm(e2 - e1.syntheticValue, 2)
+    }
+
+  }
+
+  implicit object MirroredMutableCluster extends Mirrored[mutable.Cluster] {
+    override def findMirror: FindMirror[mutable.Cluster] = new FindMirror[mutable.Cluster] {
+      override def apply(origin: mutable.Cluster, center: SyntheticDataType): SyntheticDataType =
+        (2.0 * center) - origin.syntheticValue
+    }
+
+    override implicit def distance: DistanceFunc[mutable.Cluster] = new DistanceFunc[mutable.Cluster] {
+      override def apply(e1: mutable.Cluster, e2: mutable.Cluster): Double           = norm(e2.syntheticValue - e1.syntheticValue, 2)
+      override def apply(e1: mutable.Cluster, e2: SyntheticDataType): Double = norm(e2 - e1.syntheticValue, 2)
+    }
 
   }
 

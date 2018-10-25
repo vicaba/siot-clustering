@@ -1,25 +1,17 @@
-package algorithm.clusterer
-
+package algorithm.clusterer.mutable
+import algorithm.clusterer.EuclideanClusterer.{ClusteringOrder, Heuristic, HeuristicChain, HeuristicDecorator, Settings, centroidOf}
 import eventmanager.EventManager
 import metrics.Metric
+import types.Point
+import types.mutable.Cluster
 import types.Types.SyntheticDataType
 import types.ops.MirrorImage
-import types.{Cluster, Point, Types, Types2}
-import utils.MathUtils
 
 import scala.annotation.tailrec
 import scala.collection.immutable.LinearSeq
 import scala.util.Random
-import scala.math._
-import types.ops.SetOps._
 
 object EuclideanClusterer {
-
-  case class Settings(override val numberOfClusters: Int,
-                      points: scala.Vector[Point],
-                      override val metric: Metric,
-                      times: Int = 1)
-      extends algorithm.algorithms.Settings
 
   type Heuristic = (Cluster, SyntheticDataType, IndexedSeq[Cluster]) => IndexedSeq[(Double, Cluster)]
 
@@ -39,30 +31,6 @@ object EuclideanClusterer {
           _heuristic(v1, v2, _clusters.map(_._2))
       }
   }
-
-  /**
-    * This type represents the number of points that belong to each cluster per iteration in order to match
-    * the generation of K clusters.
-    *
-    * @param order A list containing the number of points that belong to each cluster per iteration
-    * @param outliers The points that do not fit in the clustering order to match K clusters
-    */
-  case class ClusteringOrder(order: List[Int], outliers: Int)
-
-  object ClusteringOrder {
-    def apply(numberOfPoints: Int, kClusters: Int): ClusteringOrder = {
-      val clusteringOrder             = MathUtils.factorize(numberOfPoints / kClusters)
-      val outliersFromClusteringOrder = numberOfPoints % kClusters
-
-      ClusteringOrder(clusteringOrder, outliersFromClusteringOrder)
-    }
-  }
-
-  def centroidOf[T <: Types.Type](points: Seq[T]): types.Types.SyntheticDataType =
-    points.foldLeft(points.head.types.EmptySyntheticData()) {
-      case (accum, p) =>
-        accum + p.syntheticValue
-    } / points.length.toDouble
 
   @tailrec
   def clustersToClusters(iterations: Int,
@@ -150,10 +118,10 @@ object EuclideanClusterer {
       val membersPerCluster = clusteringOrder.order(iterations)
 
       _clusters = clustersToClusters(iterations = _clusters.size / membersPerCluster,
-                                     centroid,
-                                     _clusters,
-                                     heuristic,
-                                     membersPerCluster)
+        centroid,
+        _clusters,
+        heuristic,
+        membersPerCluster)
       iterations = iterations + 1
       kClusters = _clusters.size
 
@@ -184,9 +152,9 @@ object EuclideanClusterer {
       val newFixedCluster =
         bestClusterToAssign.copy(points = bestClusterToAssign.points ++ closestMirror.points)(bestClusterToAssign.types)
       clustersToFixedClusters(centroid,
-                              (fixedClusters.toSet += newFixedCluster).toIndexedSeq,
-                              (freeClusters.toSet - closestMirror).toIndexedSeq,
-                              heuristic)
+        (fixedClusters.toSet += newFixedCluster).toIndexedSeq,
+        (freeClusters.toSet - closestMirror).toIndexedSeq,
+        heuristic)
     } else fixedClusters
 
   }
@@ -204,14 +172,14 @@ object EuclideanClusterer {
       if (i == 0) best = result
       else {
         if (aggregateMetric <= metricToOptimize.aggregateOf(best) && maxMetric <= metricToOptimize(
-              best.maxBy(metricToOptimize(_)))) best = result
+          best.maxBy(metricToOptimize(_)))) best = result
       }
     }
     best
   }
 
   val chain: HeuristicChain = List(
-    HeuristicDecorator(MirrorImage.findClosestMirrors(_, _, _)(MirrorImage.MirroredCluster))) ::: Nil
+    HeuristicDecorator(MirrorImage.findClosestMirrors(_, _, _)(MirrorImage.MirroredMutableCluster))) ::: Nil
 
   def apply(settings: Settings): List[Cluster] = {
 
@@ -231,11 +199,14 @@ object EuclideanClusterer {
   def applyOnce(settings: Settings): List[Cluster] = {
     val clusteringOrder = ClusteringOrder(settings.points.size, settings.numberOfClusters)
     val result = cluster(settings.numberOfClusters,
-                         Int.MaxValue,
-                         settings.points.map(Point.toCluster).toList,
-                         chain,
-                         clusteringOrder)
+      Int.MaxValue,
+      settings.points.map(Point.toCluster).toList,
+      chain,
+      clusteringOrder)
     result.toList
   }
+
+
+
 
 }
