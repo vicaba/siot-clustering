@@ -1,6 +1,7 @@
 package types
 
 import breeze.linalg._
+import metrics.DenseVectorReprOps
 
 import scala.annotation.tailrec
 
@@ -51,6 +52,26 @@ object Types {
         case Nil       => accum
       }
 
+  }
+
+  trait Cluster extends Type {
+
+    type ContainedElement
+
+    def points: scala.collection.Set[ContainedElement]
+
+  }
+
+  object Cluster {
+
+    implicit def clusterToVector(c: Cluster): SyntheticDataType = c.syntheticValue
+
+    implicit val toVector: DenseVectorReprOps[Cluster] = new DenseVectorReprOps[Cluster] {
+
+      override def apply(t: Cluster): DenseVector[Double] = clusterToVector(t)
+
+      override def zero(t: Cluster): DenseVector[Double] = t.types.EmptySyntheticData()
+    }
 
   }
 

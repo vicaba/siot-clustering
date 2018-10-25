@@ -1,10 +1,12 @@
 package algorithm.algorithms.euclidean
 import algorithm.algorithms.GenAlgorithm
-import algorithm.clusterer.EuclideanClusterer
+import algorithm.clusterer._
 import algorithm.scheduler.ClusterRescheduler
 import types.Cluster
 
 object EuclideanAlgorithm extends GenAlgorithm {
+
+  override type Cluster = types.Cluster
 
   override type ClustererSettings = EuclideanClusterer.Settings
 

@@ -4,7 +4,9 @@ import breeze.linalg.{DenseVector, sum}
 import metrics.DenseVectorReprOps
 import types.Types.{DataType, SyntheticDataType}
 
-case class Point(override val id: Int, override val data: DataType, assignedToCluster: Option[Int] = None)(implicit override val types: TypesT) extends Types.Type {
+case class Point(override val id: Int, override val data: DataType, assignedToCluster: Option[Int] = None)(
+    implicit override val types: TypesT)
+    extends Types.Type {
 
   override def equals(obj: scala.Any): Boolean = obj match {
     case p: Point => this.id == p.id
@@ -25,7 +27,7 @@ case class Point(override val id: Int, override val data: DataType, assignedToCl
 
   def toCluster: Cluster = Point.toCluster(this)
 
-  override def centroid: SyntheticDataType =  syntheticValue / types.Rows.toDouble
+  override def centroid: SyntheticDataType = syntheticValue / types.Rows.toDouble
 
 }
 
@@ -34,6 +36,15 @@ object Point {
   import scala.language.implicitConversions
 
   def toCluster(point: Point): Cluster = Cluster(point.id, point.id.toString, Set(point))(point.types)
+
+  def toMutableCluster(point: Point): mutable.Cluster = {
+    val points = scala.collection.mutable.Set.empty[mutable.Cluster]
+    new mutable.Cluster(point.id, point.id.toString, points, hierarchyLevel = 0)(point.types) {
+      override def data: DataType = point.data
+      override def syntheticValue: SyntheticDataType = point.syntheticValue
+      override def centroid: SyntheticDataType = point.centroid
+    }
+  }
 
   implicit def pointListToVector(list: List[Point]): Option[SyntheticDataType] = list.map(_.syntheticValue) match {
     case Nil   => None

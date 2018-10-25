@@ -2,9 +2,11 @@ package algorithm.algorithms
 
 import algorithm.scheduler.ClusterRescheduler.PointChanged
 import com.typesafe.scalalogging.Logger
-import types.Cluster
+import types.Types
 
 trait GenAlgorithm {
+
+  type Cluster <: Types.Cluster
 
   type ClustererSettings <: Settings
 

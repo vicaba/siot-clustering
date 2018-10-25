@@ -9,11 +9,14 @@ import types.Types.{DataType, SyntheticDataType}
 
 import scala.annotation.tailrec
 
-case class Cluster(override val id: Int, name: String, points: Set[Point])(implicit override val types: TypesT) extends Types.Type {
+case class Cluster(override val id: Int, name: String, points: Set[Point])(implicit override val types: TypesT)
+    extends Types.Cluster {
+
+  override type ContainedElement = Point
 
   override def equals(obj: scala.Any): Boolean = obj match {
     case c: Cluster => this.id == c.id
-    case _        => false
+    case _          => false
   }
 
   override def hashCode(): Int = this.id

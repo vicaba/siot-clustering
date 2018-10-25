@@ -184,7 +184,7 @@ object EuclideanClusterer {
       val newFixedCluster =
         bestClusterToAssign.copy(points = bestClusterToAssign.points ++ closestMirror.points)(bestClusterToAssign.types)
       clustersToFixedClusters(centroid,
-                              (fixedClusters.toSet += newFixedCluster).toIndexedSeq,
+                              (fixedClusters.toSet -/+ newFixedCluster).toIndexedSeq,
                               (freeClusters.toSet - closestMirror).toIndexedSeq,
                               heuristic)
     } else fixedClusters

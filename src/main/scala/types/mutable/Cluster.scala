@@ -11,12 +11,14 @@ class Cluster(val id: Int,
               val name: String,
               val points: mutable.Set[Cluster],
               private var hierarchyLevel: Int = 0,
-              private var topLevel: Option[Cluster])(implicit override val types: TypesT)
-    extends Types.Type {
+              private var topLevel: Option[Cluster] = None)(implicit override val types: TypesT)
+    extends Types.Cluster {
+
+  override type ContainedElement = Cluster
 
   override def equals(obj: scala.Any): Boolean = obj match {
     case c: Cluster => this.id == c.id
-    case _        => false
+    case _          => false
   }
 
   override def hashCode(): Int = this.id
@@ -25,23 +27,28 @@ class Cluster(val id: Int,
 
   def nonEmpty: Boolean = !isEmpty
 
-  def hierarchyLevel_=(_hierarchyLevel: Int): Cluster = {
+  def setHierarchyLevel(_hierarchyLevel: Int): Cluster = {
     this.hierarchyLevel = _hierarchyLevel
     this
   }
 
-  def topLevel_=(_topLevel: Option[Cluster]): Cluster = {
+  def setTopLevel(_topLevel: Option[Cluster]): Cluster = {
     this.topLevel = _topLevel
     this
   }
 
   def +=(point: Cluster): Cluster = {
-    this.points += point.topLevel(Some(this))
+    this.points += point.setTopLevel(Some(this))
     this
   }
 
   def ++=(points: Seq[Cluster]): Cluster = {
     points.foreach(this.+=)
+    this
+  }
+
+  def ++=(points: mutable.Set[Cluster]): Cluster = {
+    points.toSeq.foreach(this.+=)
     this
   }
 
@@ -55,6 +62,11 @@ class Cluster(val id: Int,
     this.points ++= points
     this
   }
+
+  def setPoints(points: mutable.Set[Cluster]): Cluster =
+    this.setPoints(points.toSeq)
+
+  def copy: Cluster = new Cluster(this.id, this.name, this.points, this.hierarchyLevel, this.topLevel)(this.types)
 
   override def data: DataType = {
 
@@ -76,11 +88,11 @@ class Cluster(val id: Int,
     sumVectors(syntheticValues, types.EmptySyntheticData())
   }
 
-  override def centroid: SyntheticDataType       =
+  override def centroid: SyntheticDataType =
     points.foldLeft(types.EmptySyntheticData()) {
-    case (accum, p) =>
-      accum + p.syntheticValue
-  } / points.size.toDouble
+      case (accum, p) =>
+        accum + p.syntheticValue
+    } / points.size.toDouble
 
 }
 
@@ -88,7 +100,7 @@ object Cluster {
 
   import scala.language.implicitConversions
 
-  def Empty(implicit types: TypesT): Cluster = Cluster(-1, "empty", Set.empty)(types)
+  def Empty(implicit types: TypesT): Cluster = new Cluster(-1, "empty", mutable.Set.empty)(types)
 
   implicit def clusterToVector(c: Cluster): SyntheticDataType = c.syntheticValue
 

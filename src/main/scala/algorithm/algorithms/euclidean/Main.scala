@@ -15,6 +15,8 @@ import algorithm.serialization.{EuclideanAlgorithmJsonSerializer, ResultsJsonSer
 import breeze.linalg.DenseVector
 import types.serialization.ClusterJsonSerializer._
 
+import scala.collection.mutable
+
 object Main {
 
   def main(args: Array[String]): Unit = {
@@ -69,9 +71,9 @@ object Main {
 
   def batchRunCluster(batchRunSettingsBuilder: BatchRunSettingsBuilder): Unit = {
 
-    val stepsList = GenBatchRun.cluster(EuclideanAlgorithm)(batchRunSettingsBuilder.build.map(_._1))
+    val stepsList = GenBatchRun.cluster(MutableEuclideanAlgorithm)(batchRunSettingsBuilder.build.map(_._1))
 
-    Some(new PrintWriter(Configuration.batchRunFile)).foreach { p =>
+/*    Some(new PrintWriter(Configuration.batchRunFile)).foreach { p =>
       val jsonList = ResultsJsonSerializer.clustererBatchRunAsJson(stepsList)
 
       p.write(Json.prettyPrint(Json.toJson(jsonList)).toString())
@@ -82,7 +84,7 @@ object Main {
       val jsonList = ResultsJsonSerializer.summaryClustererBatchRunAsJson(stepsList)
       p.write(Json.prettyPrint(Json.toJson(jsonList)).toString())
       p.close()
-    }
+    }*/
 
   }
 
