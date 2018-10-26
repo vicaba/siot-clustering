@@ -37,15 +37,6 @@ object Point {
 
   def toCluster(point: Point): Cluster = Cluster(point.id, point.id.toString, Set(point))(point.types)
 
-  def toMutableCluster(point: Point): mutable.Cluster = {
-    val points = scala.collection.mutable.Set.empty[mutable.Cluster]
-    new mutable.Cluster(point.id, point.id.toString, points, hierarchyLevel = 0)(point.types) {
-      override def data: DataType = point.data
-      override def syntheticValue: SyntheticDataType = point.syntheticValue
-      override def centroid: SyntheticDataType = point.centroid
-    }
-  }
-
   implicit def pointListToVector(list: List[Point]): Option[SyntheticDataType] = list.map(_.syntheticValue) match {
     case Nil   => None
     case _list => Some(_list.tail.foldLeft(_list.head) { case (accum, vector) => accum + vector })

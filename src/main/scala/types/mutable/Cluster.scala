@@ -7,6 +7,8 @@ import types.ops._
 
 import scala.collection.mutable
 
+/*
+
 class Cluster(val id: Int,
               val name: String,
               val points: mutable.Set[Cluster],
@@ -112,3 +114,4 @@ object Cluster {
   }
 
 }
+*/

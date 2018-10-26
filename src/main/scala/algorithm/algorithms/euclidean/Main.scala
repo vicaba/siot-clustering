@@ -71,7 +71,7 @@ object Main {
 
   def batchRunCluster(batchRunSettingsBuilder: BatchRunSettingsBuilder): Unit = {
 
-    val stepsList = GenBatchRun.cluster(MutableEuclideanAlgorithm)(batchRunSettingsBuilder.build.map(_._1))
+    val stepsList = GenBatchRun.cluster(EuclideanAlgorithm)(batchRunSettingsBuilder.build.map(_._1))
 
 /*    Some(new PrintWriter(Configuration.batchRunFile)).foreach { p =>
       val jsonList = ResultsJsonSerializer.clustererBatchRunAsJson(stepsList)

@@ -4,6 +4,7 @@ import eventmanager.EventManager
 import metrics.Metric
 import types._
 
+import scala.None
 import scala.annotation.tailrec
 import scala.util.Random
 
@@ -39,7 +40,7 @@ object BruteClusterer {
         .foldLeft(clusters.head.points) {
           case (accum, cluster) => accum ++ cluster.points
         }
-        .toVector
+        .toVector.asInstanceOf[Vector[Point]]
 
     case class BestConfiguration(clusters: Iterable[Cluster], aggregatedMetric: Double)
 
@@ -127,7 +128,7 @@ object BruteClusterer {
 
       val _clusters = randomSamplePoints.zipWithIndex.map {
         case (point, idx) =>
-          idx -> Cluster(idx, idx.toString, Set(point.setCluster(idx)))
+          idx -> Cluster(idx, idx.toString, Set(point.setCluster(idx)), 0, None)
       }.toMap
 
       // First round without the points assigned to each cluster

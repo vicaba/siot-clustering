@@ -6,8 +6,6 @@ import types.Cluster
 
 object EuclideanAlgorithm extends GenAlgorithm {
 
-  override type Cluster = types.Cluster
-
   override type ClustererSettings = EuclideanClusterer.Settings
 
   override type ReschedulerSettings = ClusterRescheduler.Settings

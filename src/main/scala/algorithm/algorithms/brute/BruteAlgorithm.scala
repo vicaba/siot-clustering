@@ -6,8 +6,6 @@ import types.Cluster
 
 object BruteAlgorithm extends GenAlgorithm {
 
-  override type Cluster = types.Cluster
-
   override type ClustererSettings   = BruteClusterer.Settings
 
   override type ReschedulerSettings = ClusterRescheduler.Settings

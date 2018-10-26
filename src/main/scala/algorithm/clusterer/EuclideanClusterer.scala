@@ -119,7 +119,7 @@ object EuclideanClusterer {
       val mirror            = freeClusters(mirrorIndex)
       val remainingClusters = freeClusters.patch(mirrorIndex, IndexedSeq(), 1)
       val clusterPoints     = c.points ++ mirror.points
-      (c.copy(points = clusterPoints)(c.types), remainingClusters)
+      (c.copy(points = new scala.collection.mutable.HashSet[Types.Type]() ++= clusterPoints)(c.types), remainingClusters)
     }
   }
 

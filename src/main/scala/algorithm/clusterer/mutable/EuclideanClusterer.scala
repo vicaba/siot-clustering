@@ -3,7 +3,7 @@ import algorithm.clusterer.EuclideanClusterer.{ClusteringOrder, Heuristic, Heuri
 import eventmanager.EventManager
 import metrics.Metric
 import types.Point
-import types.mutable.Cluster
+import types.Cluster
 import types.Types.SyntheticDataType
 import types.ops.MirrorImage
 

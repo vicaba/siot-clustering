@@ -6,13 +6,26 @@ import breeze.numerics._
 import metrics.DenseVectorReprOps
 import spire.algebra.{InnerProductSpace, VectorSpace}
 import types.Types.{DataType, SyntheticDataType}
+import types.ops.SetOps._
 
 import scala.annotation.tailrec
 
-case class Cluster(override val id: Int, name: String, points: Set[Point])(implicit override val types: TypesT)
+case class Cluster private (override val id: Int,
+                            name: String,
+                            private val points: scala.collection.mutable.Set[Types.Type],
+                            private var hierarchyLevel: Int = 0,
+                            private var topLevel: Option[Cluster] = None)(implicit override val types: TypesT)
     extends Types.Cluster {
 
-  override type ContainedElement = Point
+  override type ContainedElement = Types.Type
+
+  def copy(id: Int = this.id,
+           name: String = this.name,
+           points: scala.collection.mutable.Set[Types.Type] = this.points,
+           hierarchylevel: Int = this.hierarchyLevel,
+           topLevel: Option[Cluster] = this.topLevel): Cluster = {
+    new Cluster(id, name, points, hierarchyLevel, topLevel)
+  }
 
   override def equals(obj: scala.Any): Boolean = obj match {
     case c: Cluster => this.id == c.id
@@ -25,13 +38,60 @@ case class Cluster(override val id: Int, name: String, points: Set[Point])(impli
 
   def nonEmpty: Boolean = !isEmpty
 
-  def +(point: Point): Cluster = this.copy(points = (this.points - point) + point.setCluster(id))
+  def setHierarchyLevel(_hierarchyLevel: Int): Cluster = {
+    this.hierarchyLevel = _hierarchyLevel
+    this
+  }
 
-  def ++(points: Seq[Point]): Cluster = this.copy(points = (this.points -- points) ++ points.map(_.setCluster(id)))
+  def setTopLevel(_topLevel: Option[Cluster]): Cluster = {
+    this.topLevel = _topLevel
+    this
+  }
 
-  def setPoints(points: Seq[Point]): Cluster = this.copy(points = points.map(_.setCluster(id)).toSet)
+  def +=(point: Types.Type): Cluster = {
+    this.points += typeTransform(point)
+    this
+  }
 
-  def -(point: Point): Cluster = this.copy(points = points - point)
+  def -=(point: Point): Cluster = {
+    this.points -= typeTransform(point)
+    this
+  }
+
+  def ++=(points: TraversableOnce[Types.Type]): Cluster = {
+    this.points ++= points.map(typeTransform)
+    this
+  }
+
+  def --=(points: TraversableOnce[Types.Type]): Cluster = {
+    this.points --= points.map(typeTransform)
+    this
+  }
+
+  def setPoints(points: TraversableOnce[Types.Type]): Cluster = {
+    (this --= points) ++= points.map(typeTransform)
+    this
+  }
+
+  def +(point: Types.Type): Cluster = {
+    val newPoints = this.points.toSet -/+ typeTransform(point)
+    this.copy(points = mutableSetOf(newPoints))
+  }
+
+  def -(point: Types.Type): Cluster = {
+    val newPoints = this.points.toSet - typeTransform(point)
+    this.copy(points = mutableSetOf(newPoints))
+  }
+
+  def ++(points: TraversableOnce[Cluster]): Cluster = {
+    val newPoints = this.points.toSet --/++ points.map(typeTransform)
+    this.copy(points = mutableSetOf(newPoints))
+  }
+
+  def --(points: TraversableOnce[Cluster]): Cluster = {
+    val newPoints = this.points.toSet -- points.map(typeTransform)
+    this.copy(points = mutableSetOf(newPoints))
+  }
 
   def centroid: SyntheticDataType =
     points.foldLeft(types.EmptySyntheticData()) {
@@ -59,11 +119,27 @@ case class Cluster(override val id: Int, name: String, points: Set[Point])(impli
 
   }
 
+  private def typeTransform(_type: Types.Type): Types.Type = _type match {
+    case p: Point   => p.setCluster(id)
+    case c: Cluster => c.setTopLevel(Some(this)).setHierarchyLevel(this.hierarchyLevel - 1)
+  }
+
+  def mutableSetOf[A](s: TraversableOnce[A]): scala.collection.mutable.Set[A] =
+    Cluster.mutableSetOf(s)
+
 }
 
 object Cluster {
 
+  def mutableSetOf[A](s: TraversableOnce[A]): scala.collection.mutable.Set[A] =
+    new scala.collection.mutable.HashSet[A]() ++= s
+
   import scala.language.implicitConversions
+
+  def apply(id: Int, name: String, points: TraversableOnce[Types.Type], hierarchyLevel: Int, topLevel: Option[Cluster])(
+      implicit types: TypesT): Cluster = {
+    new Cluster(id, name, mutableSetOf(points), hierarchyLevel, topLevel)(types)
+  }
 
   def Empty(implicit types: TypesT): Cluster = Cluster(-1, "empty", Set.empty)(types)
 
