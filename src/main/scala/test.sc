@@ -1,9 +1,4 @@
 import scala.collection.mutable
+import scala.collection.Set
 
-val s = new mutable.HashSet[Int]
-s += 1
-s += (2, 3)
-
-s --= s
-
-s
+case class ClusterTest(id: Int, private var _list: Set[Int])

@@ -25,5 +25,4 @@ object AlgorithmJsonSerializer {
         Json.obj(SettingsKey -> o.settings, ClustersKey -> o.clusters)
       }
     }
-
 }
