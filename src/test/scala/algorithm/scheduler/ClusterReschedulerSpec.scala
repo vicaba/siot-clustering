@@ -43,7 +43,7 @@ class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
       Point(idx, m, Some(0))
   }.toSet
 
-  val globalCluster = Cluster(0, "0", globalPoints)
+  val globalCluster = Cluster(0, "0", globalPoints, 0, None)
 
   feature("Vector cluster.scheduler.ClusterRescheduler") {
 

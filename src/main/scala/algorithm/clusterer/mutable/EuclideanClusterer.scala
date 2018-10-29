@@ -2,8 +2,7 @@ package algorithm.clusterer.mutable
 import algorithm.clusterer.EuclideanClusterer.{ClusteringOrder, Heuristic, HeuristicChain, HeuristicDecorator, Settings, centroidOf}
 import eventmanager.EventManager
 import metrics.Metric
-import types.Point
-import types.Cluster
+import types.{Cluster, Point, Types}
 import types.Types.SyntheticDataType
 import types.ops.MirrorImage
 
@@ -13,6 +12,7 @@ import scala.util.Random
 import types.ops.SetOps._
 
 import scala.collection.mutable
+import scala.reflect.api.Types
 
 object EuclideanClusterer {
 
@@ -106,7 +106,7 @@ object EuclideanClusterer {
     var _clusters: IndexedSeq[Cluster] = clusters.toIndexedSeq
 
     if (clusters.isEmpty) return Nil
-    if (stopAtKClusters == 1) return List(new Cluster(1, "1",new mutable.HashSet[Cluster]().++=(clusters))(clusters.head.types))
+    if (stopAtKClusters == 1) return List(Cluster(1, "1", new mutable.HashSet[Cluster]() ++= clusters, 0, None)(clusters.head.types))
 
     EventManager.singleton.publish("clusters", _clusters.toList)
 
@@ -133,7 +133,7 @@ object EuclideanClusterer {
     val outliers = clusters.flatMap(_.points).toSet -- _clusters.flatMap(_.points).toSet
 
     val finalClusters =
-      clustersToFixedClusters(centroid, _clusters, outliers.toIndexedSeq, heuristic)
+      clustersToFixedClusters(centroid, _clusters, outliers.map(Types.Type.toCluster).toIndexedSeq, heuristic)
 
     if (outliers.nonEmpty) EventManager.singleton.publish("clusters", finalClusters.toList)
 
@@ -182,14 +182,14 @@ object EuclideanClusterer {
   }
 
   val chain: HeuristicChain = List(
-    HeuristicDecorator(MirrorImage.findClosestMirrors(_, _, _)(MirrorImage.MirroredMutableCluster))) ::: Nil
+    HeuristicDecorator(MirrorImage.findClosestMirrors(_, _, _)(MirrorImage.MirroredCluster))) ::: Nil
 
   def apply(settings: Settings): List[Cluster] = {
 
     val clusteringOrder = ClusteringOrder(settings.points.size, settings.numberOfClusters)
 
     val result = metricReductionCluster(
-      settings.points.map(Point.toMutableCluster).toList,
+      settings.points.map(Point.toCluster).toList,
       Metric.par,
       cluster(settings.numberOfClusters, Int.MaxValue, _, chain, clusteringOrder),
       100
@@ -203,7 +203,7 @@ object EuclideanClusterer {
     val clusteringOrder = ClusteringOrder(settings.points.size, settings.numberOfClusters)
     val result = cluster(settings.numberOfClusters,
                          Int.MaxValue,
-                         settings.points.map(Point.toMutableCluster).toList,
+                         settings.points.map(Point.toCluster).toList,
                          chain,
                          clusteringOrder)
     result.toList

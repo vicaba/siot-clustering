@@ -35,7 +35,7 @@ object Point {
 
   import scala.language.implicitConversions
 
-  def toCluster(point: Point): Cluster = Cluster(point.id, point.id.toString, Set(point))(point.types)
+  def toCluster(point: Point): types.Cluster = Types.Type.toCluster(point)
 
   implicit def pointListToVector(list: List[Point]): Option[SyntheticDataType] = list.map(_.syntheticValue) match {
     case Nil   => None

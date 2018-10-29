@@ -18,9 +18,7 @@ object ResultsJsonSerializer {
           "s2. peak"  -> max(steps._2.clusters.maxBy(c => max(c.syntheticValue)).syntheticValue),
           "s2. agg m" -> steps._2.settings.metric.aggregateOf(steps._2.clusters),
           "s2. max m" -> steps._2.clusters.map(steps._2.settings.metric(_)).max,
-          "total m" -> Point
-            .pointListToVector(steps._2.clusters.flatMap(_.points))
-            .map(vec => steps._2.settings.metric(vec)),
+          "total m" -> steps._2.settings.metric(steps._2.clusters),
           "clusters" -> steps._1.clusters.map(_.points.size)
         )
     }
@@ -35,9 +33,7 @@ object ResultsJsonSerializer {
           "s1. peak"  -> max(step.clusters.maxBy(c => max(c.syntheticValue)).syntheticValue),
           "s1. agg m" -> step.settings.metric.aggregateOf(step.clusters), //steps._1.aggregatedMetric,
           "s1. max m" -> step.clusters.map(step.settings.metric(_)).max,
-          "total m" -> Point
-            .pointListToVector(step.clusters.flatMap(_.points))
-            .map(vec => step.settings.metric(vec)),
+          "total m" ->step.settings.metric(step.clusters),
           "clusters" -> step.clusters.map(_.points.size)
         )
     }

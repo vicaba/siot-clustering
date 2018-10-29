@@ -82,10 +82,9 @@ class BruteClustererSpec extends FeatureSpec with GivenWhenThen {
       val result      = BruteClusterer(runSettings)
 
       Then("the two clusters have a PAR of 1")
-      val metricBefore = metric(Cluster.Empty ++ points)
+      val metricBefore = metric(Cluster.Empty ++ points.map(Point.toCluster))
 
-      result.foreach { cluster =>
-        info(cluster.toString)
+      result.foreach { cluster => info(cluster.toString)
       }
 
       result.foreach { cluster =>

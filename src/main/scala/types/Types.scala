@@ -27,6 +27,15 @@ trait TypesT {
 
 object Types {
 
+  object Type {
+
+    def toCluster(_type: Type): types.Cluster = _type match {
+      case c: types.Cluster => c
+      case p: Point => types.Cluster(p.id, p.id.toString, Set(p), 0, None)(p.types)
+    }
+
+  }
+
   trait Type {
 
     def id: Int

@@ -38,7 +38,7 @@ object ClusterRescheduler {
                         improvement: Double,
                         memory: Int = 2): (Cluster, List[PointChanged]) = {
 
-    val initialMetric = metric(cluster)
+/*    val initialMetric = metric(cluster)
 
     def improvementPercentage(improvement: Double): Double = 1 - improvement / initialMetric
 
@@ -67,13 +67,15 @@ object ClusterRescheduler {
       }
     }
 
-    reschedule(initialMetric, Memory(cluster.points.size), cluster, List.empty)
+    reschedule(initialMetric, Memory(cluster.points.size), cluster, List.empty)*/
+
+    (cluster, Nil)
 
   }
 
   def rescheduleOnePoint(cluster: Cluster, metric: Metric): Option[PointChange] = {
 
-    val pointToReschedule = cluster.points.maxBy { point =>
+/*    val pointToReschedule = cluster.points.maxBy { point =>
       metric(cluster) - metric(cluster - point)
     }
 
@@ -84,7 +86,8 @@ object ClusterRescheduler {
       val rescheduledCluster = cluster + rescheduledPoint
 
       new PointChange(rescheduledCluster, rescheduledPoint, result)
-    }
+    }*/
+    None
   }
 
 }

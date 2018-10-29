@@ -118,8 +118,8 @@ object EuclideanClusterer {
         freeClusters.indexWhere(_.id == closestMirror.head._2.id)
       val mirror            = freeClusters(mirrorIndex)
       val remainingClusters = freeClusters.patch(mirrorIndex, IndexedSeq(), 1)
-      val clusterPoints     = c.points ++ mirror.points
-      (c.copy(points = new scala.collection.mutable.HashSet[Types.Type]() ++= clusterPoints)(c.types), remainingClusters)
+      val clusterPoints     = new scala.collection.mutable.HashSet[Types.Type]() ++= (c.points ++ mirror.points)
+      (c.copy(points = clusterPoints), remainingClusters)
     }
   }
 
@@ -137,7 +137,7 @@ object EuclideanClusterer {
     var _clusters: IndexedSeq[Cluster] = clusters.toIndexedSeq
 
     if (clusters.isEmpty) return Nil
-    if (stopAtKClusters == 1) return List(Cluster(1, "1", points.toSet)(clusters.head.types))
+    if (stopAtKClusters == 1) return List(Cluster(1, "1", points.toSet, 0, None)(clusters.head.types))
 
     EventManager.singleton.publish("clusters", _clusters.toList)
 
@@ -164,7 +164,7 @@ object EuclideanClusterer {
     val outliers = clusters.flatMap(_.points).toSet -- _clusters.flatMap(_.points).toSet
 
     val finalClusters =
-      clustersToFixedClusters(centroid, _clusters, outliers.map(Point.toCluster).toIndexedSeq, heuristic)
+      clustersToFixedClusters(centroid, _clusters, outliers.map(Types.Type.toCluster).toIndexedSeq, heuristic)
 
     if (outliers.nonEmpty) EventManager.singleton.publish("clusters", finalClusters.toList)
 
@@ -182,7 +182,7 @@ object EuclideanClusterer {
         closestMirror = heuristic(fixedCluster, centroid, freeClusters).head._2
       }
       val newFixedCluster =
-        bestClusterToAssign.copy(points = bestClusterToAssign.points ++ closestMirror.points)(bestClusterToAssign.types)
+        bestClusterToAssign.copy(points = bestClusterToAssign.points ++ closestMirror.points)
       clustersToFixedClusters(centroid,
                               (fixedClusters.toSet -/+ newFixedCluster).toIndexedSeq,
                               (freeClusters.toSet - closestMirror).toIndexedSeq,
