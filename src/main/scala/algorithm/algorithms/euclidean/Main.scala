@@ -73,7 +73,7 @@ object Main {
 
     val stepsList = GenBatchRun.cluster(EuclideanAlgorithm)(batchRunSettingsBuilder.build.map(_._1))
 
-/*    Some(new PrintWriter(Configuration.batchRunFile)).foreach { p =>
+    Some(new PrintWriter(Configuration.batchRunFile)).foreach { p =>
       val jsonList = ResultsJsonSerializer.clustererBatchRunAsJson(stepsList)
 
       p.write(Json.prettyPrint(Json.toJson(jsonList)).toString())
@@ -84,7 +84,7 @@ object Main {
       val jsonList = ResultsJsonSerializer.summaryClustererBatchRunAsJson(stepsList)
       p.write(Json.prettyPrint(Json.toJson(jsonList)).toString())
       p.close()
-    }*/
+    }
 
   }
 
