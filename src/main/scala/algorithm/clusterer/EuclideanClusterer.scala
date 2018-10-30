@@ -3,7 +3,7 @@ import java.util.UUID
 
 import algorithm.clusterer.FlattenedEuclideanClusterer.{ClusteringOrder, Settings, centroidOf}
 import eventmanager.EventManager
-import metrics.Metric
+import metrics.{Metric, Par}
 import types.Types.SyntheticDataType
 import types.ops.MirrorImage
 import types.{Cluster, Point}
@@ -98,17 +98,21 @@ object EuclideanClusterer {
                               freeClusters: IndexedSeq[Cluster],
                               heuristic: Heuristic): IndexedSeq[Cluster] = {
 
+    if (freeClusters.nonEmpty) {
+
+      // This seems to work better as it traverses the tree to look for the best position to add the points, but it is slower
+
+      val fixedClustersCopy = fixedClusters.map(_.copy())
+
       val (_, _bestClusterToAssign) = Cluster
-        .traverseAndFindFittest(fixedClusters.toList, c => { heuristic(c, centroid, IndexedSeq(freeClusters.head)).head._1 })
+        .traverseAndFindFittest(fixedClustersCopy.toList, c => {
+          heuristic(c, centroid, IndexedSeq(freeClusters.head)).head._1
+        })
         .get
 
-    var top: Cluster = _bestClusterToAssign
-    while (top.topLevel.nonEmpty) {
-      top = _bestClusterToAssign.topLevel.get
-    }
+      _bestClusterToAssign += freeClusters.head
 
-
-    if (freeClusters.nonEmpty) {
+      //clustersToFixedClusters(centroid, fixedClustersCopy, freeClusters.tail, heuristic)
 
       var closestMirror: Cluster = null
 
@@ -119,6 +123,10 @@ object EuclideanClusterer {
       }
 
       bestClusterToAssign += closestMirror
+
+      val traverseMetric = Par.withParAggregate.aggregateOf(fixedClustersCopy)
+
+      val metric = Par.withParAggregate.aggregateOf(fixedClusters)
 
       clustersToFixedClusters(centroid, fixedClusters, (freeClusters.toSet - closestMirror).toIndexedSeq, heuristic)
 
@@ -190,8 +198,9 @@ object EuclideanClusterer {
       val maxMetric       = metricToOptimize(result.maxBy(metricToOptimize(_)))
       if (i == 0) best = result
       else {
-        if (aggregateMetric <= metricToOptimize.aggregateOf(best) && maxMetric <= metricToOptimize(
-              best.maxBy(metricToOptimize(_)))) best = result
+        val currentAggregateMetricLowerThanBest = aggregateMetric <= metricToOptimize.aggregateOf(best)
+        val currentMaxMetricLowerThanBest       = maxMetric <= metricToOptimize(best.maxBy(metricToOptimize(_)))
+        if (currentAggregateMetricLowerThanBest && currentMaxMetricLowerThanBest) best = result
       }
     }
     best
@@ -208,7 +217,7 @@ object EuclideanClusterer {
       settings.points.map(Point.toCluster).toList,
       Metric.par,
       cluster(settings.numberOfClusters, Int.MaxValue, _, chain, clusteringOrder),
-      1
+      100
     ).toList
 
     val flattened = Cluster.flatten(result)

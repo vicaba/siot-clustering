@@ -31,6 +31,8 @@ case class Point(override val id: Int, override val data: DataType, assignedToCl
 
   override def centroid: SyntheticDataType = syntheticValue / types.Rows.toDouble
 
+  override def deepCopy(): Types.Type = this.copy()
+
 }
 
 object Point {

@@ -21,18 +21,18 @@ object Main {
 
   def main(args: Array[String]): Unit = {
     /*val points = Generator
-      .generateRandom2DPoints(DenseVector(0.0, 0.0), 5, 20, 5)
+      .generateRandom2DPoints(DenseVector(0.0, 0.0), 5, 189, 5)
       .zipWithIndex
       .map {
         case (m, idx) =>
           Point(idx, m.toDenseVector.asDenseMatrix, None)(Types2)
       }
-      .toVector.take(5)*/
+      .toVector*/
 
     val points = readEgaugeData("files/input/egauge.json")
 
     val batchRunSettingsBuilder =
-      new BatchRunSettingsBuilder(points, (5 to 5).toList, List(Par.withParAggregate), (points, k) => points.size * k)
+      new BatchRunSettingsBuilder(points, (2 to 2).toList, List(Par.withParAggregate), (points, k) => points.size * k)
 
     batchRunCluster(batchRunSettingsBuilder)
 

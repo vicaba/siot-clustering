@@ -65,6 +65,8 @@ object Types {
 
     override def toString: String = s"Type($id, $data)"
 
+    def deepCopy(): Type
+
   }
 
   trait Cluster extends Type {

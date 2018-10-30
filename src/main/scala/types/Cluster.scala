@@ -20,12 +20,14 @@ case class Cluster private (override val id: Int,
 
   override type ContainedElement = Types.Type
 
+  override def deepCopy(): Types.Type = this.copy()
+
   def copy(id: Int = this.id,
            name: String = this.name,
            points: TraversableOnce[Types.Type] = this._points,
            hierarchylevel: Int = this._hierarchyLevel,
            topLevel: Option[Cluster] = this._topLevel): Cluster = {
-    new Cluster(id, name, mutableSetOf(points), _hierarchyLevel, topLevel)(types)
+    new Cluster(id, name, mutableSetOf(points.map(_.deepCopy())), _hierarchyLevel, topLevel)(types)
   }
 
   override def equals(obj: scala.Any): Boolean = obj match {
@@ -199,7 +201,7 @@ object Cluster {
         h match {
           case c: Cluster =>
             val fitValue = p(c)
-            if (fitValue < best._1) {
+            if (fitValue > best._1) {
               _traverseAndFindFittest(c.points.toList ::: tail, (fitValue, c))
             } else _traverseAndFindFittest(c.points.toList ::: tail, best)
           case _ => _traverseAndFindFittest(tail, best)
