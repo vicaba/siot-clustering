@@ -106,7 +106,6 @@ case class Cluster private (override val id: Int,
         accum + p.syntheticValue
     } / _points.size.toDouble
 
-
   /**
     * Calling this method without any point in the cluster is unsafe
     *
@@ -164,11 +163,12 @@ object Cluster {
 
   implicit val listToVector: DenseVectorReprOps[List[Cluster]] = new DenseVectorReprOps[List[Cluster]] {
 
-    private def lift(t: List[Cluster]): Cluster = Cluster(-1, "lifted", t, t.headOption.map(_.id).getOrElse(-1), None)(t.head.types)
+    private def lift(t: List[Cluster]): Cluster =
+      Cluster(-1, "lifted", t, t.headOption.map(_.id).getOrElse(-1), None)(t.head.types)
 
     override def apply(t: List[Cluster]): DenseVector[Double] = toVector.apply(lift(t))
 
-    override def zero(t: List[Cluster]): DenseVector[Double]  = toVector.zero(t.head)
+    override def zero(t: List[Cluster]): DenseVector[Double] = toVector.zero(t.head)
 
   }
 
@@ -177,10 +177,11 @@ object Cluster {
     @tailrec
     def _flatten(types: List[Types.Type], accum: List[Point]): List[Point] = types match {
       case Nil => accum
-      case h :: tail => h match {
-        case p: Point => _flatten(tail, p :: accum)
-        case c: Cluster => _flatten(c.points.toList ::: tail, accum)
-      }
+      case h :: tail =>
+        h match {
+          case p: Point   => _flatten(tail, p :: accum)
+          case c: Cluster => _flatten(c.points.toList ::: tail, accum)
+        }
     }
 
     _flatten(cl.toList, Nil).toSet
@@ -188,5 +189,25 @@ object Cluster {
   }
 
   def flatten(c: Cluster): Set[Point] = flatten(List(c))
+
+  def traverseAndFindFittest(cl: List[Cluster], p: Cluster => Double): Option[(Double, Cluster)] = {
+
+    @tailrec
+    def _traverseAndFindFittest(types: List[Types.Type], best: (Double, Cluster)): (Double, Cluster) = types match {
+      case Nil => best
+      case h :: tail =>
+        h match {
+          case c: Cluster =>
+            val fitValue = p(c)
+            if (fitValue < best._1) {
+              _traverseAndFindFittest(c.points.toList ::: tail, (fitValue, c))
+            } else _traverseAndFindFittest(c.points.toList ::: tail, best)
+          case _ => _traverseAndFindFittest(tail, best)
+        }
+    }
+
+    cl.headOption.map(c => _traverseAndFindFittest(cl, (p(c), c)))
+
+  }
 
 }

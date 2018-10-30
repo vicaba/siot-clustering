@@ -1,7 +1,9 @@
 package algorithm.algorithms.euclidean
 import algorithm.algorithms.GenAlgorithm
-import algorithm.clusterer.mutable._
-import algorithm.clusterer.EuclideanClusterer.Settings
+import algorithm.clusterer.EuclideanClusterer
+import algorithm.clusterer.FlattenedEuclideanClusterer.Settings
+import algorithm.clusterer.FlattenedEuclideanClusterer
+
 import algorithm.scheduler.ClusterRescheduler
 import types.Cluster
 

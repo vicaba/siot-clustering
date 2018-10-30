@@ -5,7 +5,7 @@ import batch.GenBatchRun
 import config.Configuration
 import eventmanager.EventManager
 import algorithm.algorithms.brute.Main.readEgaugeData
-import algorithm.clusterer.EuclideanClusterer
+import algorithm.clusterer.FlattenedEuclideanClusterer
 import metrics.Par
 import play.api.libs.json.Json
 import types.{Cluster, Point, Types2}
@@ -27,12 +27,12 @@ object Main {
         case (m, idx) =>
           Point(idx, m.toDenseVector.asDenseMatrix, None)(Types2)
       }
-      .toVector.take(8)*/
+      .toVector.take(5)*/
 
     val points = readEgaugeData("files/input/egauge.json")
 
     val batchRunSettingsBuilder =
-      new BatchRunSettingsBuilder(points, (1 to 5).toList, List(Par.withParAggregate), (points, k) => points.size * k)
+      new BatchRunSettingsBuilder(points, (5 to 5).toList, List(Par.withParAggregate), (points, k) => points.size * k)
 
     batchRunCluster(batchRunSettingsBuilder)
 
