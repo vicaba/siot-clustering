@@ -48,6 +48,8 @@ object Types {
 
     def types: TypesT
 
+    def size: Int
+
     @tailrec
     final def sumPoints(remaining: List[DataType], accum: DataType): DataType = remaining match {
       case e :: tail => sumPoints(tail, accum + e)
@@ -61,6 +63,8 @@ object Types {
         case Nil       => accum
       }
 
+    override def toString: String = s"Type($id, $data)"
+
   }
 
   trait Cluster extends Type {
@@ -68,6 +72,8 @@ object Types {
     type ContainedElement
 
     def points: scala.collection.Set[ContainedElement]
+
+    override def toString: String = s"Cluster($id, $size, $points)"
 
   }
 

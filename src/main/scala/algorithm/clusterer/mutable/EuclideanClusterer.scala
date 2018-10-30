@@ -1,4 +1,6 @@
 package algorithm.clusterer.mutable
+import java.util.UUID
+
 import algorithm.clusterer.EuclideanClusterer.{ClusteringOrder, Heuristic, HeuristicChain, HeuristicDecorator, Settings, centroidOf}
 import eventmanager.EventManager
 import metrics.Metric
@@ -44,10 +46,10 @@ object EuclideanClusterer {
                          clusters: IndexedSeq[Cluster] = IndexedSeq()): IndexedSeq[Cluster] = {
 
     if (iterations > 0 && freeClusters.nonEmpty) {
-      val c                            = freeClusters.head
+      val head                         = freeClusters.head
+      val c                            = Cluster(head.id + 1, UUID.randomUUID().toString, Set(head), head.hierarchyLevel + 1, None)(head.types)
       val tail                         = freeClusters.tail
       val (cluster, remainingClusters) = clustersToClusterXTimes(c, centroid, tail, heuristic, membersPerCluster)
-      if (remainingClusters.isEmpty) cluster +: clusters
       clustersToClusters(iterations - 1, centroid, remainingClusters, heuristic, membersPerCluster, cluster +: clusters)
     } else {
       clusters
@@ -88,8 +90,29 @@ object EuclideanClusterer {
         freeClusters.indexWhere(_.id == closestMirror.head._2.id)
       val mirror            = freeClusters(mirrorIndex)
       val remainingClusters = freeClusters.patch(mirrorIndex, IndexedSeq(), 1)
-      (c ++= mirror.points, remainingClusters)
+      (c += mirror, remainingClusters)
     }
+  }
+
+  @tailrec
+  def clustersToFixedClusters(centroid: SyntheticDataType,
+                              fixedClusters: IndexedSeq[Cluster],
+                              freeClusters: IndexedSeq[Cluster],
+                              heuristic: Heuristic): IndexedSeq[Cluster] = {
+    if (freeClusters.nonEmpty) {
+      var closestMirror: Cluster = null
+      val bestClusterToAssign = fixedClusters.minBy { fixedCluster =>
+        closestMirror = heuristic(fixedCluster, centroid, freeClusters).head._2
+      }
+
+      bestClusterToAssign += closestMirror
+
+      clustersToFixedClusters(centroid,
+                              (fixedClusters.toSet -/+ bestClusterToAssign).toIndexedSeq,
+                              (freeClusters.toSet - closestMirror).toIndexedSeq,
+                              heuristic)
+    } else fixedClusters
+
   }
 
   def cluster(stopAtKClusters: Int,
@@ -106,7 +129,8 @@ object EuclideanClusterer {
     var _clusters: IndexedSeq[Cluster] = clusters.toIndexedSeq
 
     if (clusters.isEmpty) return Nil
-    if (stopAtKClusters == 1) return List(Cluster(1, "1", new mutable.HashSet[Cluster]() ++= clusters, 0, None)(clusters.head.types))
+    if (stopAtKClusters == 1)
+      return List(Cluster(1, "1", new mutable.HashSet[Cluster]() ++= clusters, 0, None)(clusters.head.types))
 
     EventManager.singleton.publish("clusters", _clusters.toList)
 
@@ -130,35 +154,16 @@ object EuclideanClusterer {
 
     }
 
-    val outliers = clusters.flatMap(_.points).toSet -- _clusters.flatMap(_.points).toSet
+    //TODO: Outliers are not well calculated
+
+    val outliers = (Cluster.flatten(clusters) -- Cluster.flatten(_clusters)).map(Point.toCluster)
 
     val finalClusters =
-      clustersToFixedClusters(centroid, _clusters, outliers.map(Types.Type.toCluster).toIndexedSeq, heuristic)
+      clustersToFixedClusters(centroid, _clusters, outliers.toIndexedSeq, heuristic)
 
     if (outliers.nonEmpty) EventManager.singleton.publish("clusters", finalClusters.toList)
 
     finalClusters.toList
-
-  }
-
-  @tailrec
-  def clustersToFixedClusters(centroid: SyntheticDataType,
-                              fixedClusters: IndexedSeq[Cluster],
-                              freeClusters: IndexedSeq[Cluster],
-                              heuristic: Heuristic): IndexedSeq[Cluster] = {
-    if (freeClusters.nonEmpty) {
-      var closestMirror: Cluster = null
-      val bestClusterToAssign = fixedClusters.minBy { fixedCluster =>
-        closestMirror = heuristic(fixedCluster, centroid, freeClusters).head._2
-      }
-
-      bestClusterToAssign += closestMirror
-
-      clustersToFixedClusters(centroid,
-                              (fixedClusters.toSet -/+ bestClusterToAssign).toIndexedSeq,
-                              (freeClusters.toSet - closestMirror).toIndexedSeq,
-                              heuristic)
-    } else fixedClusters
 
   }
 
@@ -194,6 +199,8 @@ object EuclideanClusterer {
       cluster(settings.numberOfClusters, Int.MaxValue, _, chain, clusteringOrder),
       100
     ).toList
+
+    val flattened = Cluster.flatten(result)
 
     result
 

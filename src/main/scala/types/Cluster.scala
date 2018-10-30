@@ -14,8 +14,8 @@ import scala.collection
 case class Cluster private (override val id: Int,
                             name: String,
                             private val _points: scala.collection.mutable.Set[Types.Type],
-                            private var hierarchyLevel: Int = 0,
-                            private var topLevel: Option[Cluster] = None)(implicit override val types: TypesT)
+                            private var _hierarchyLevel: Int = 0,
+                            private var _topLevel: Option[Cluster] = None)(implicit override val types: TypesT)
     extends Types.Cluster {
 
   override type ContainedElement = Types.Type
@@ -23,13 +23,13 @@ case class Cluster private (override val id: Int,
   def copy(id: Int = this.id,
            name: String = this.name,
            points: TraversableOnce[Types.Type] = this._points,
-           hierarchylevel: Int = this.hierarchyLevel,
-           topLevel: Option[Cluster] = this.topLevel): Cluster = {
-    new Cluster(id, name, mutableSetOf(points), hierarchyLevel, topLevel)(types)
+           hierarchylevel: Int = this._hierarchyLevel,
+           topLevel: Option[Cluster] = this._topLevel): Cluster = {
+    new Cluster(id, name, mutableSetOf(points), _hierarchyLevel, topLevel)(types)
   }
 
   override def equals(obj: scala.Any): Boolean = obj match {
-    case c: Cluster => this.id == c.id
+    case c: Cluster => this.name == c.name
     case _          => false
   }
 
@@ -46,15 +46,19 @@ case class Cluster private (override val id: Int,
 
   override def points: collection.Set[Types.Type] = _points.toSet
 
-  def setHierarchyLevel(_hierarchyLevel: Int): Cluster = {
-    this.hierarchyLevel = _hierarchyLevel
+  def hierarchyLevel_=(_hierarchyLevel: Int): Cluster = {
+    this._hierarchyLevel = _hierarchyLevel
     this
   }
 
-  def setTopLevel(_topLevel: Option[Cluster]): Cluster = {
-    this.topLevel = _topLevel
+  def hierarchyLevel: Int = _hierarchyLevel
+
+  def topLevel_=(_topLevel: Option[Cluster]): Cluster = {
+    this._topLevel = _topLevel
     this
   }
+
+  def topLevel: Option[Cluster] = _topLevel
 
   def +=(point: Types.Type): Cluster = {
     this._points += typeTransform(point)
@@ -102,6 +106,7 @@ case class Cluster private (override val id: Int,
         accum + p.syntheticValue
     } / _points.size.toDouble
 
+
   /**
     * Calling this method without any point in the cluster is unsafe
     *
@@ -122,9 +127,11 @@ case class Cluster private (override val id: Int,
 
   }
 
+  override def size: Int = _points.foldLeft(0)(_ + _.size)
+
   private def typeTransform(_type: Types.Type): Types.Type = _type match {
     case p: Point   => p.setCluster(id)
-    case c: Cluster => c.setTopLevel(Some(this)).setHierarchyLevel(this.hierarchyLevel - 1)
+    case c: Cluster => c.topLevel_=(Some(this)).hierarchyLevel_=(this._hierarchyLevel - 1)
   }
 
   def mutableSetOf[A](s: TraversableOnce[A]): scala.collection.mutable.Set[A] =
@@ -164,5 +171,22 @@ object Cluster {
     override def zero(t: List[Cluster]): DenseVector[Double]  = toVector.zero(t.head)
 
   }
+
+  def flatten(cl: TraversableOnce[Cluster]): Set[Point] = {
+
+    @tailrec
+    def _flatten(types: List[Types.Type], accum: List[Point]): List[Point] = types match {
+      case Nil => accum
+      case h :: tail => h match {
+        case p: Point => _flatten(tail, p :: accum)
+        case c: Cluster => _flatten(c.points.toList ::: tail, accum)
+      }
+    }
+
+    _flatten(cl.toList, Nil).toSet
+
+  }
+
+  def flatten(c: Cluster): Set[Point] = flatten(List(c))
 
 }

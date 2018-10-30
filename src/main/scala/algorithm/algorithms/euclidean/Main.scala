@@ -27,12 +27,12 @@ object Main {
         case (m, idx) =>
           Point(idx, m.toDenseVector.asDenseMatrix, None)(Types2)
       }
-      .toVector*/
+      .toVector.take(8)*/
 
     val points = readEgaugeData("files/input/egauge.json")
 
     val batchRunSettingsBuilder =
-      new BatchRunSettingsBuilder(points, (1 to 6).toList, List(Par.withParAggregate), (points, k) => points.size * k)
+      new BatchRunSettingsBuilder(points, (1 to 5).toList, List(Par.withParAggregate), (points, k) => points.size * k)
 
     batchRunCluster(batchRunSettingsBuilder)
 
@@ -87,7 +87,5 @@ object Main {
     }
 
   }
-
-
 
 }

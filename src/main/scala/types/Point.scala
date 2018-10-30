@@ -13,6 +13,8 @@ case class Point(override val id: Int, override val data: DataType, assignedToCl
     case _        => false
   }
 
+  override def size: Int = 1
+
   override def hashCode(): Int = this.id
 
   override def toString: String = s"Point($id, $syntheticValue, $assignedToCluster)"
