@@ -122,7 +122,13 @@ object EuclideanClusterer {
         result._1
       }
 
-      bestClusterToAssign += closestMirror
+      //bestClusterToAssign += closestMirror
+
+      val (_, __bestClusterToAssign) = Cluster
+        .traverseAndFindFittest(bestClusterToAssign, c => {
+          heuristic(c, centroid, IndexedSeq(freeClusters.head)).head._1
+        })
+        .get
 
       val traverseMetric = Par.withParAggregate.aggregateOf(fixedClustersCopy)
 
