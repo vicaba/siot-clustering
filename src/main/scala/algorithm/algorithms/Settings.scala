@@ -7,4 +7,6 @@ trait Settings {
 
   val metric: Metric
 
+  val improveIterations: Int = 1
+
 }

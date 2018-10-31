@@ -13,14 +13,14 @@ object BruteClusterer {
   case class Settings(override val numberOfClusters: Int,
                       points: scala.Vector[Point],
                       override val metric: Metric,
-                      times: Int = 1)
+                      override val improveIterations: Int = 1)
       extends algorithm.algorithms.Settings
 
   def apply(settings: Settings): List[Cluster] = {
 
     def aggregateErrorOf(clusters: List[Cluster]): Double = settings.metric.aggregateOf(clusters)
 
-    (for (i <- 0 until settings.times)
+    (for (i <- 0 until settings.improveIterations)
       yield {
         val result = runOnce(settings.numberOfClusters, settings.points, settings.metric)
         EventManager.singleton.publish("iteration", (settings, result))

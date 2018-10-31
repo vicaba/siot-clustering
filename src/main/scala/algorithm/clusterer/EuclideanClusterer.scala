@@ -102,7 +102,7 @@ object EuclideanClusterer {
 
       // This seems to work better as it traverses the tree to look for the best position to add the points, but it is slower
 
-      val fixedClustersCopy = fixedClusters.map(_.copy())
+/*      val fixedClustersCopy = fixedClusters.map(_.copy())
 
       val (_, _bestClusterToAssign) = Cluster
         .traverseAndFindFittest(fixedClustersCopy.toList, c => {
@@ -110,7 +110,7 @@ object EuclideanClusterer {
         })
         .get
 
-      _bestClusterToAssign += freeClusters.head
+      _bestClusterToAssign += freeClusters.head*/
 
       //clustersToFixedClusters(centroid, fixedClustersCopy, freeClusters.tail, heuristic)
 
@@ -130,9 +130,11 @@ object EuclideanClusterer {
         })
         .get
 
-      val traverseMetric = Par.withParAggregate.aggregateOf(fixedClustersCopy)
+      bestClusterToAssign += closestMirror
 
-      val metric = Par.withParAggregate.aggregateOf(fixedClusters)
+      //val traverseMetric = Par.withParAggregate.aggregateOf(fixedClustersCopy)
+
+      //val metric = Par.withParAggregate.aggregateOf(fixedClusters)
 
       clustersToFixedClusters(centroid, fixedClusters, (freeClusters.toSet - closestMirror).toIndexedSeq, heuristic)
 
@@ -223,7 +225,7 @@ object EuclideanClusterer {
       settings.points.map(Point.toCluster).toList,
       Metric.par,
       cluster(settings.numberOfClusters, Int.MaxValue, _, chain, clusteringOrder),
-      100
+      189*5
     ).toList
 
     val flattened = Cluster.flatten(result)

@@ -18,7 +18,7 @@ object FlattenedEuclideanClusterer {
   case class Settings(override val numberOfClusters: Int,
                       points: scala.Vector[Point],
                       override val metric: Metric,
-                      times: Int = 1)
+                      override val improveIterations: Int = 1)
       extends algorithm.algorithms.Settings
 
   type Heuristic = (Cluster, SyntheticDataType, IndexedSeq[Cluster]) => IndexedSeq[(Double, Cluster)]
@@ -222,7 +222,7 @@ object FlattenedEuclideanClusterer {
       settings.points.map(Point.toCluster).toList,
       Metric.par,
       cluster(settings.numberOfClusters, Int.MaxValue, _, chain, clusteringOrder),
-      100
+      1
     ).toList
 
     result
