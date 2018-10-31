@@ -222,7 +222,7 @@ object FlattenedEuclideanClusterer {
       settings.points.map(Point.toCluster).toList,
       Metric.par,
       cluster(settings.numberOfClusters, Int.MaxValue, _, chain, clusteringOrder),
-      1
+      settings.improveIterations
     ).toList
 
     result

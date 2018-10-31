@@ -225,7 +225,7 @@ object EuclideanClusterer {
       settings.points.map(Point.toCluster).toList,
       Metric.par,
       cluster(settings.numberOfClusters, Int.MaxValue, _, chain, clusteringOrder),
-      189*5
+      settings.improveIterations
     ).toList
 
     val flattened = Cluster.flatten(result)

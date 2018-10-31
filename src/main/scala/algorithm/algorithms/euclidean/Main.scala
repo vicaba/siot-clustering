@@ -32,7 +32,7 @@ object Main {
     val points = readEgaugeData("files/input/egauge.json")
 
     val batchRunSettingsBuilder =
-      new BatchRunSettingsBuilder(points, (1 to 6).toList, List(Par.withParAggregate), (points, k) => points.size * k)
+      new BatchRunSettingsBuilder(points, (1 to 6).toList, List(Par.withParAggregate), (points, k) => 150)
 
     batchRunCluster(batchRunSettingsBuilder)
 
