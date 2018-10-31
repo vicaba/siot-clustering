@@ -78,7 +78,7 @@ class BruteClustererSpec extends FeatureSpec with GivenWhenThen {
       }.toVector
 
       When("asked to assign each point to a cluster, given 2 clusters")
-      val runSettings = Settings(1, points, Par.withAverageAggregate, times = 100)
+      val runSettings = Settings(1, points, Par.withAverageAggregate, improveIterations = 100)
       val result      = BruteClusterer(runSettings)
 
       Then("the two clusters have a PAR of 1")
