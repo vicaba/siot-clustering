@@ -14,7 +14,7 @@ import algorithm.serialization.EuclideanAlgorithmJsonSerializer._
 import algorithm.serialization.{EuclideanAlgorithmJsonSerializer, ResultsJsonSerializer}
 import breeze.linalg.DenseVector
 import crossfold.CrossFoldValidation
-import crossfold.CrossFoldValidation.Percentage
+import crossfold.CrossFoldValidation.{MonteCarlo, Percentage}
 import types.serialization.ClusterJsonSerializer._
 
 import scala.collection.mutable
@@ -34,7 +34,7 @@ object Main {
     val points = readEgaugeData("files/input/egauge.json")
 
     val batchRunSettingsBuilder =
-      new BatchRunSettingsBuilder(points, (1 to 6).toList, List(Par.withParAggregate), (points, k) => 200)
+      new BatchRunSettingsBuilder(points, (1 to 2).toList, List(Par.withParAggregate), (points, k) => 200)
 
     crossFoldValidation(batchRunSettingsBuilder)
 
@@ -70,7 +70,6 @@ object Main {
 
   }
 
-
   def batchRunCluster(batchRunSettingsBuilder: BatchRunSettingsBuilder): Unit = {
 
     val stepsList = GenBatchRun.cluster(EuclideanAlgorithm)(batchRunSettingsBuilder.build.map(_._1))
@@ -92,7 +91,9 @@ object Main {
 
   def crossFoldValidation(batchRunSettingsBuilder: BatchRunSettingsBuilder): Unit = {
 
-    val stepsList = CrossFoldValidation.batchRun(EuclideanAlgorithm)(List(CrossFoldValidation.MonteCarlo(5, Percentage.of(0.8))), batchRunSettingsBuilder)
+    val Max         = 10
+    val monteCarlos = for (i <- 9 to Max) yield { MonteCarlo(1, Percentage.of(i / Max)) }
+    val stepsList   = CrossFoldValidation.batchRun(EuclideanAlgorithm)(monteCarlos.toList, batchRunSettingsBuilder)
 
     Some(new PrintWriter(Configuration.summaryBatchRunFile)).foreach { p =>
       val jsonList = ResultsJsonSerializer.summaryCrossfoldBatchRunAsJson(stepsList)

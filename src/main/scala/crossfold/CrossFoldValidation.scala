@@ -27,7 +27,7 @@ object CrossFoldValidation {
 
   case class KFold(k: Int) extends CrossFoldTypeSettings
 
-  case class MonteCarlo(splits: Int, subSAmpleSize: Percentage) extends CrossFoldTypeSettings
+  case class MonteCarlo(splits: Int, subsampleSize: Percentage) extends CrossFoldTypeSettings
 
   def run(algorithm: GenAlgorithm)(settings: CrossFoldTypeSettings,
                                    batchRunSettings: algorithm.BatchRunSettingsBuilderT)
@@ -35,7 +35,7 @@ object CrossFoldValidation {
     case s: MonteCarlo =>
       val points = batchRunSettings.points
       val splits = for (i <- 0 until s.splits) yield {
-        Random.shuffle(points).take(Math.floor(points.size * s.subSAmpleSize.v).toInt)
+        Random.shuffle(points).take(Math.floor(points.size * s.subsampleSize.v).toInt)
       }
       val bulkBatchRunSettings = splits.map(p => batchRunSettings.copy(points = p))
       bulkBatchRunSettings.flatMap { builder => GenBatchRun.cluster(algorithm)(builder.build.map(_._1))

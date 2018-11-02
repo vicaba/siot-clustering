@@ -2,7 +2,7 @@ package algorithm.serialization
 
 import algorithm.algorithms.GenAlgorithm
 import breeze.linalg.max
-import crossfold.CrossFoldValidation.CrossFoldTypeSettings
+import crossfold.CrossFoldValidation.{CrossFoldTypeSettings, MonteCarlo}
 import play.api.libs.json._
 import types.Point
 
@@ -19,8 +19,8 @@ object ResultsJsonSerializer {
           "s2. peak"  -> max(steps._2.clusters.maxBy(c => max(c.syntheticValue)).syntheticValue),
           "s2. agg m" -> steps._2.settings.metric.aggregateOf(steps._2.clusters),
           "s2. max m" -> steps._2.clusters.map(steps._2.settings.metric(_)).max,
-          "total m" -> steps._2.settings.metric(steps._2.clusters),
-          "clusters" -> steps._1.clusters.map(_.size)
+          "total m"   -> steps._2.settings.metric(steps._2.clusters),
+          "clusters"  -> steps._1.clusters.map(_.size)
         )
     }
   }
@@ -34,20 +34,31 @@ object ResultsJsonSerializer {
           "s1. peak"  -> max(step.clusters.maxBy(c => max(c.syntheticValue)).syntheticValue),
           "s1. agg m" -> step.settings.metric.aggregateOf(step.clusters), //steps._1.aggregatedMetric,
           "s1. max m" -> step.clusters.map(step.settings.metric(_)).max,
-          "total m" ->step.settings.metric(step.clusters),
-          "clusters" -> step.clusters.map(_.size)
+          "total m"   -> step.settings.metric(step.clusters),
+          "clusters"  -> step.clusters.map(_.size)
+        )
+    }
+  }
+
+  val crossfoldTypeSettingsWriter = new OWrites[CrossFoldTypeSettings] {
+    override def writes(o: CrossFoldTypeSettings): JsObject = o match {
+      case m: MonteCarlo =>
+        Json.obj(
+          "splits"     -> m.splits,
+          "sampleSize" -> m.subsampleSize.v
         )
     }
   }
 
   //TODO: Test
   def summaryCrossfoldBatchRunAsJson[Algo <: GenAlgorithm](
-                                                     stepsList: List[(CrossFoldTypeSettings, List[Algo#StepT[Algo#ClustererSettingsT]])]): List[JsObject] = {
-    stepsList.map { case (crossFoldSettings, steps) =>
-      Json.obj(
-        "crossfold" -> "1",
-      "step" -> summaryClustererBatchRunAsJson(steps)
-      )
+      stepsList: List[(CrossFoldTypeSettings, List[Algo#StepT[Algo#ClustererSettingsT]])]): List[JsObject] = {
+    stepsList.map {
+      case (crossFoldSettings, steps) =>
+        Json.obj(
+          "crossfold" -> crossfoldTypeSettingsWriter.writes(crossFoldSettings),
+          "step" -> summaryClustererBatchRunAsJson(steps)
+        )
 
     }
   }
