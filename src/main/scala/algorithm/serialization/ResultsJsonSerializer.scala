@@ -2,6 +2,7 @@ package algorithm.serialization
 
 import algorithm.algorithms.GenAlgorithm
 import breeze.linalg.max
+import crossfold.CrossFoldValidation.CrossFoldTypeSettings
 import play.api.libs.json._
 import types.Point
 
@@ -36,6 +37,18 @@ object ResultsJsonSerializer {
           "total m" ->step.settings.metric(step.clusters),
           "clusters" -> step.clusters.map(_.size)
         )
+    }
+  }
+
+  //TODO: Test
+  def summaryCrossfoldBatchRunAsJson[Algo <: GenAlgorithm](
+                                                     stepsList: List[(CrossFoldTypeSettings, List[Algo#StepT[Algo#ClustererSettingsT]])]): List[JsObject] = {
+    stepsList.map { case (crossFoldSettings, steps) =>
+      Json.obj(
+        "crossfold" -> "1",
+      "step" -> summaryClustererBatchRunAsJson(steps)
+      )
+
     }
   }
 

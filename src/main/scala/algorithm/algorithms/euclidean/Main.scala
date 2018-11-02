@@ -13,6 +13,8 @@ import utils.{FileUtils, Generator}
 import algorithm.serialization.EuclideanAlgorithmJsonSerializer._
 import algorithm.serialization.{EuclideanAlgorithmJsonSerializer, ResultsJsonSerializer}
 import breeze.linalg.DenseVector
+import crossfold.CrossFoldValidation
+import crossfold.CrossFoldValidation.Percentage
 import types.serialization.ClusterJsonSerializer._
 
 import scala.collection.mutable
@@ -32,9 +34,9 @@ object Main {
     val points = readEgaugeData("files/input/egauge.json")
 
     val batchRunSettingsBuilder =
-      new BatchRunSettingsBuilder(points, (1 to 6).toList, List(Par.withParAggregate), (points, k) => 150)
+      new BatchRunSettingsBuilder(points, (1 to 6).toList, List(Par.withParAggregate), (points, k) => 200)
 
-    batchRunCluster(batchRunSettingsBuilder)
+    crossFoldValidation(batchRunSettingsBuilder)
 
     val filePath = "w" match {
       case "w" => "/Users/vcaballero/Projects/jupyter-notebook/siot-eclustering-viz/files"
@@ -82,6 +84,18 @@ object Main {
 
     Some(new PrintWriter(Configuration.summaryBatchRunFile)).foreach { p =>
       val jsonList = ResultsJsonSerializer.summaryClustererBatchRunAsJson(stepsList)
+      p.write(Json.prettyPrint(Json.toJson(jsonList)).toString())
+      p.close()
+    }
+
+  }
+
+  def crossFoldValidation(batchRunSettingsBuilder: BatchRunSettingsBuilder): Unit = {
+
+    val stepsList = CrossFoldValidation.batchRun(EuclideanAlgorithm)(List(CrossFoldValidation.MonteCarlo(5, Percentage.of(0.8))), batchRunSettingsBuilder)
+
+    Some(new PrintWriter(Configuration.summaryBatchRunFile)).foreach { p =>
+      val jsonList = ResultsJsonSerializer.summaryCrossfoldBatchRunAsJson(stepsList)
       p.write(Json.prettyPrint(Json.toJson(jsonList)).toString())
       p.close()
     }
