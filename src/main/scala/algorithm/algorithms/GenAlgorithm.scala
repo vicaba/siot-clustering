@@ -6,21 +6,23 @@ import types._
 
 trait GenAlgorithm {
 
-  type ClustererSettings <: Settings
+  type ClustererSettingsT <: Settings
 
-  type ReschedulerSettings <: Settings
+  type ReschedulerSettingsT <: Settings
+
+  type BatchRunSettingsBuilderT <: BatchRunSettingsBuilder[this.type]
 
   case class StepT[Settings](settings: Settings, clusters: List[Cluster])
 
-  case class Steps(_1: StepT[ClustererSettings], _2: StepT[ReschedulerSettings])
+  case class Steps(_1: StepT[ClustererSettingsT], _2: StepT[ReschedulerSettingsT])
 
   val logger = Logger("Algorithm")
 
-  def clusterer(settings: ClustererSettings): List[Cluster]
+  def clusterer(settings: ClustererSettingsT): List[Cluster]
 
-  def rescheduler(clusters: List[Cluster], settings: ReschedulerSettings): List[(Cluster, List[PointChanged])]
+  def rescheduler(clusters: List[Cluster], settings: ReschedulerSettingsT): List[(Cluster, List[PointChanged])]
 
-  def apply(clustererSettings: ClustererSettings): StepT[ClustererSettings] = {
+  def apply(clustererSettings: ClustererSettingsT): StepT[ClustererSettingsT] = {
 
     logger.info("Clusterer")
 
@@ -30,7 +32,7 @@ trait GenAlgorithm {
 
   }
 
-  def apply(clustererSettings: ClustererSettings, reschedulerSettings: ReschedulerSettings): Steps = {
+  def apply(clustererSettings: ClustererSettingsT, reschedulerSettings: ReschedulerSettingsT): Steps = {
     logger.info("Clusterer")
 
     val step1 = apply(clustererSettings)

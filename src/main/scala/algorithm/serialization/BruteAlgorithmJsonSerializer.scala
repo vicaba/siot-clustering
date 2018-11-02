@@ -14,17 +14,17 @@ object BruteAlgorithmJsonSerializer {
 
   val ClustersKey = "clusters"
 
-  implicit val stepTWrites: OWrites[BruteAlgorithm.StepT[BruteAlgorithm.ClustererSettings]] =
-    new OWrites[BruteAlgorithm.StepT[BruteAlgorithm.ClustererSettings]] {
-      override def writes(o: BruteAlgorithm.StepT[BruteAlgorithm.ClustererSettings]): JsObject = {
+  implicit val stepTWrites: OWrites[BruteAlgorithm.StepT[BruteAlgorithm.ClustererSettingsT]] =
+    new OWrites[BruteAlgorithm.StepT[BruteAlgorithm.ClustererSettingsT]] {
+      override def writes(o: BruteAlgorithm.StepT[BruteAlgorithm.ClustererSettingsT]): JsObject = {
         Json.obj(SettingsKey -> o.settings, ClustersKey -> o.clusters)
       }
 
     }
 
-  implicit val stepT2Writes: OWrites[BruteAlgorithm.StepT[BruteAlgorithm.ReschedulerSettings]] =
-    new OWrites[BruteAlgorithm.StepT[BruteAlgorithm.ReschedulerSettings]] {
-      override def writes(o: BruteAlgorithm.StepT[BruteAlgorithm.ReschedulerSettings]): JsObject =
+  implicit val stepT2Writes: OWrites[BruteAlgorithm.StepT[BruteAlgorithm.ReschedulerSettingsT]] =
+    new OWrites[BruteAlgorithm.StepT[BruteAlgorithm.ReschedulerSettingsT]] {
+      override def writes(o: BruteAlgorithm.StepT[BruteAlgorithm.ReschedulerSettingsT]): JsObject =
         Json.obj(SettingsKey -> o.settings, ClustersKey -> o.clusters)
     }
 

@@ -25,7 +25,7 @@ object ResultsJsonSerializer {
   }
 
   def summaryClustererBatchRunAsJson[Algo <: GenAlgorithm](
-      stepsList: List[Algo#StepT[Algo#ClustererSettings]]): List[JsObject] = {
+      stepsList: List[Algo#StepT[Algo#ClustererSettingsT]]): List[JsObject] = {
     stepsList.zipWithIndex.map {
       case (step, idx) =>
         Json.obj(
@@ -50,8 +50,8 @@ object ResultsJsonSerializer {
     }
   }
 
-  def clustererBatchRunAsJson[Algo <: GenAlgorithm](stepsList: List[Algo#StepT[Algo#ClustererSettings]])(
-      implicit stepsWrites: OWrites[Algo#StepT[Algo#ClustererSettings]]): List[JsObject] = {
+  def clustererBatchRunAsJson[Algo <: GenAlgorithm](stepsList: List[Algo#StepT[Algo#ClustererSettingsT]])(
+      implicit stepsWrites: OWrites[Algo#StepT[Algo#ClustererSettingsT]]): List[JsObject] = {
     stepsList.zipWithIndex.map {
       case (steps, idx) =>
         Json.obj(

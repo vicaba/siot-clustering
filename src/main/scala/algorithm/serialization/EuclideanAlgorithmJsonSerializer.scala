@@ -12,17 +12,17 @@ object EuclideanAlgorithmJsonSerializer {
 
   val ClustersKey = "clusters"
 
-  implicit val stepTWrites: OWrites[EuclideanAlgorithm.StepT[EuclideanAlgorithm.ClustererSettings]] =
-    new OWrites[EuclideanAlgorithm.StepT[EuclideanAlgorithm.ClustererSettings]] {
-      override def writes(o: EuclideanAlgorithm.StepT[EuclideanAlgorithm.ClustererSettings]): JsObject = {
+  implicit val stepTWrites: OWrites[EuclideanAlgorithm.StepT[EuclideanAlgorithm.ClustererSettingsT]] =
+    new OWrites[EuclideanAlgorithm.StepT[EuclideanAlgorithm.ClustererSettingsT]] {
+      override def writes(o: EuclideanAlgorithm.StepT[EuclideanAlgorithm.ClustererSettingsT]): JsObject = {
         Json.obj(SettingsKey -> o.settings, ClustersKey -> o.clusters)
       }
 
     }
 
-  implicit val stepT2Writes: OWrites[EuclideanAlgorithm.StepT[EuclideanAlgorithm.ReschedulerSettings]] =
-    new OWrites[EuclideanAlgorithm.StepT[EuclideanAlgorithm.ReschedulerSettings]] {
-      override def writes(o: EuclideanAlgorithm.StepT[EuclideanAlgorithm.ReschedulerSettings]): JsObject =
+  implicit val stepT2Writes: OWrites[EuclideanAlgorithm.StepT[EuclideanAlgorithm.ReschedulerSettingsT]] =
+    new OWrites[EuclideanAlgorithm.StepT[EuclideanAlgorithm.ReschedulerSettingsT]] {
+      override def writes(o: EuclideanAlgorithm.StepT[EuclideanAlgorithm.ReschedulerSettingsT]): JsObject =
         Json.obj(SettingsKey -> o.settings, ClustersKey -> o.clusters)
     }
 

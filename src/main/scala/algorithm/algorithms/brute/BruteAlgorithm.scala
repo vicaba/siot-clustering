@@ -6,14 +6,16 @@ import types.Cluster
 
 object BruteAlgorithm extends GenAlgorithm {
 
-  override type ClustererSettings   = BruteClusterer.Settings
+  override type ClustererSettingsT   = BruteClusterer.Settings
 
-  override type ReschedulerSettings = ClusterRescheduler.Settings
+  override type ReschedulerSettingsT = ClusterRescheduler.Settings
 
-  override def clusterer(settings: ClustererSettings): List[Cluster] = BruteClusterer.apply(settings)
+  override type BatchRunSettingsBuilderT = algorithm.algorithms.brute.BatchRunSettingsBuilder
+
+  override def clusterer(settings: ClustererSettingsT): List[Cluster] = BruteClusterer.apply(settings)
 
   override def rescheduler(clusters: List[Cluster],
-    settings: ReschedulerSettings): List[(Cluster, List[ClusterRescheduler.PointChanged])] =
+    settings: ReschedulerSettingsT): List[(Cluster, List[ClusterRescheduler.PointChanged])] =
     ClusterRescheduler.apply(clusters, settings)
 
 }

@@ -9,14 +9,16 @@ import types.Cluster
 
 object EuclideanAlgorithm extends GenAlgorithm {
 
-  override type ClustererSettings = Settings
+  override type ClustererSettingsT = Settings
 
-  override type ReschedulerSettings = ClusterRescheduler.Settings
+  override type ReschedulerSettingsT = ClusterRescheduler.Settings
 
-  override def clusterer(settings: ClustererSettings): List[Cluster] = EuclideanClusterer.apply(settings)
+  override type BatchRunSettingsBuilderT = BatchRunSettingsBuilder
+
+  override def clusterer(settings: ClustererSettingsT): List[Cluster] = EuclideanClusterer.apply(settings)
 
   override def rescheduler(clusters: List[Cluster],
-                           settings: ReschedulerSettings): List[(Cluster, List[ClusterRescheduler.PointChanged])] =
+                           settings: ReschedulerSettingsT): List[(Cluster, List[ClusterRescheduler.PointChanged])] =
     ClusterRescheduler.apply(clusters, settings)
 
 }
