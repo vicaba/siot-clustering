@@ -15,7 +15,7 @@ object CrossFoldValidation {
     */
   object Percentage {
     def of(v: Double): Percentage = {
-      if (v < 1) Percentage(1)
+      if (v > 1) Percentage(1)
       else if (v < 0) Percentage(0)
       else Percentage(v)
     }
