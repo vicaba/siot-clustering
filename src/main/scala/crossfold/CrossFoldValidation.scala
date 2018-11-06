@@ -8,13 +8,13 @@ import scala.util.Random
 
 object CrossFoldValidation {
 
-  case class Percentage private (v: Double)
+  case class Percentage private (v: BigDecimal)
 
   /**
     *  Range [0, 1]
     */
   object Percentage {
-    def of(v: Double): Percentage = {
+    def of(v: BigDecimal): Percentage = {
       if (v > 1) Percentage(1)
       else if (v < 0) Percentage(0)
       else Percentage(v)
@@ -35,7 +35,7 @@ object CrossFoldValidation {
     case s: MonteCarlo =>
       val points = batchRunSettings.points
       val splits = for (i <- 0 until s.splits) yield {
-        Random.shuffle(points).take(Math.floor(points.size * s.subsampleSize.v).toInt)
+        Random.shuffle(points).take(Math.floor((points.size * s.subsampleSize.v).toDouble).toInt)
       }
       val bulkBatchRunSettings = splits.map(p => batchRunSettings.copy(points = p))
       bulkBatchRunSettings.flatMap { builder => GenBatchRun.cluster(algorithm)(builder.build.map(_._1))

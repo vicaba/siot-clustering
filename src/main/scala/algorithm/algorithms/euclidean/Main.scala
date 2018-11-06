@@ -34,7 +34,7 @@ object Main {
     val points = readEgaugeData("files/input/egauge.json")
 
     val batchRunSettingsBuilder =
-      new BatchRunSettingsBuilder(points, (1 to 2).toList, List(Par.withParAggregate), (points, k) => 200)
+      new BatchRunSettingsBuilder(points, (1 to 6).toList, List(Par.withParAggregate), (points, k) => 200)
 
     crossFoldValidation(batchRunSettingsBuilder)
 
@@ -91,8 +91,8 @@ object Main {
 
   def crossFoldValidation(batchRunSettingsBuilder: BatchRunSettingsBuilder): Unit = {
 
-    val Max         = 10
-    val monteCarlos = for (i <- 9 to Max) yield { MonteCarlo(1, Percentage.of(i / Max)) }
+    val Max         = BigDecimal(1)
+    val monteCarlos = for (i <- BigDecimal(0.6) to(Max, step = BigDecimal(0.1))) yield { MonteCarlo(batchRunSettingsBuilder.points.size, Percentage.of(i / Max)) }
     val stepsList   = CrossFoldValidation.batchRun(EuclideanAlgorithm)(monteCarlos.toList, batchRunSettingsBuilder)
 
     Some(new PrintWriter(Configuration.summaryBatchRunFile)).foreach { p =>
