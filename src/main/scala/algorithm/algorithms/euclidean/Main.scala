@@ -37,7 +37,7 @@ object Main {
       new BatchRunSettingsBuilder(points,
                                   (Configuration.BatchRun.KRange.from to Configuration.BatchRun.KRange.to).toList,
                                   List(Par.withParAggregate),
-                                  (points, k) => points.size)
+                                  (points, k) => points.size + points.size/3)
 
     crossFoldValidation(batchRunSettingsBuilder)
 

@@ -1,3 +1,5 @@
+import sbt.Keys.packageBin
+
 name := "siot-clustering"
 
 version := "0.1"
@@ -5,6 +7,22 @@ version := "0.1"
 scalaVersion := "2.12.6"
 
 enablePlugins(JavaAppPackaging)
+
+lazy val deployTask = TaskKey[Unit]("deploy", "Copies assembly jar to remote location")
+
+deployTask := (Universal / packageBin map { _packageBin =>
+  val account = "vcaballero@172.16.2.172" // FIXME!
+val local   = _packageBin.getPath
+  val remote  = account + ":" + "/" + _packageBin.getName
+  println(s"Copying: $local -> $account:$remote")
+  Seq("scp", local, remote)
+}).value
+
+val helloTask = TaskKey[Unit]("hello", "Print hello")
+
+helloTask := println("hello world")
+
+libraryDependencies += "org.apache.commons" % "commons-vfs2" % "2.2"
 
 libraryDependencies += "org.apache.commons" % "commons-csv" % "1.4"
 libraryDependencies += "com.typesafe.akka" %% "akka-stream" % "2.5.13"
@@ -21,3 +39,5 @@ libraryDependencies ++= Seq(
 
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.5"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
+
+
