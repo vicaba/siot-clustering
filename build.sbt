@@ -1,3 +1,4 @@
+import deployssh.DeploySSH.ServerConfig
 import sbt.Keys.packageBin
 
 name := "siot-clustering"
@@ -7,6 +8,25 @@ version := "0.1"
 scalaVersion := "2.12.6"
 
 enablePlugins(JavaAppPackaging)
+
+lazy val myProject = project.enablePlugins(DeploySSH).settings(
+  //load build.conf from external path
+  deployExternalConfigFiles ++= Seq("/home/myUser/Documents/build.conf"),
+  //load build2.conf from `myProjectDir` and load build3.conf from `myProjectDir/project`
+  deployResourceConfigFiles ++= Seq("build2.conf", "project/build3.conf"),
+  //load build4.conf from user home directory (in example `/home/myUser/build4.conf`)
+  deployHomeConfigFiles ++= Seq("build4.conf"),
+  //configuration in project setttings
+  deployConfigs ++= mySettings,
+  deployConfigs ++= Seq(
+    ServerConfig("server_6", "169.254.0.3"),
+    ServerConfig("server_7", "169.254.0.4")
+  )
+  )
+
+lazy val mySettings = Seq(
+  ServerConfig("server_5", "169.254.0.2")
+)
 
 lazy val deployTask = TaskKey[Unit]("deploy", "Copies assembly jar to remote location")
 
@@ -21,8 +41,6 @@ val local   = _packageBin.getPath
 val helloTask = TaskKey[Unit]("hello", "Print hello")
 
 helloTask := println("hello world")
-
-libraryDependencies += "org.apache.commons" % "commons-vfs2" % "2.2"
 
 libraryDependencies += "org.apache.commons" % "commons-csv" % "1.4"
 libraryDependencies += "com.typesafe.akka" %% "akka-stream" % "2.5.13"
