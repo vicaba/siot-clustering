@@ -11,10 +11,10 @@ import scala.util.Random
 object BruteClusterer {
 
   case class Settings(override val numberOfClusters: Int,
-                      points: scala.Vector[Point],
+                      override val points: scala.Vector[Point],
                       override val metric: Metric,
                       override val improveIterations: Int = 1)
-      extends algorithm.algorithms.Settings
+      extends algorithm.algorithms.ClustererSettings
 
   def apply(settings: Settings): List[Cluster] = {
 

@@ -6,7 +6,7 @@ import types._
 
 trait GenAlgorithm {
 
-  type ClustererSettingsT <: Settings
+  type ClustererSettingsT <: ClustererSettings
 
   type ReschedulerSettingsT <: Settings
 
@@ -24,7 +24,7 @@ trait GenAlgorithm {
 
   def apply(clustererSettings: ClustererSettingsT): StepT[ClustererSettingsT] = {
 
-    logger.info("Clusterer. Settings")
+    logger.info(s"Clusterer. NumberOfClusters: ${clustererSettings.numberOfClusters}. Points: ${clustererSettings.points.size}")
 
     val clustererResult = clusterer(clustererSettings)
 

@@ -16,10 +16,10 @@ import types.ops.SetOps._
 object FlattenedEuclideanClusterer {
 
   case class Settings(override val numberOfClusters: Int,
-                      points: scala.Vector[Point],
+                      override val points: scala.Vector[Point],
                       override val metric: Metric,
                       override val improveIterations: Int = 1)
-      extends algorithm.algorithms.Settings
+      extends algorithm.algorithms.ClustererSettings
 
   type Heuristic = (Cluster, SyntheticDataType, IndexedSeq[Cluster]) => IndexedSeq[(Double, Cluster)]
 

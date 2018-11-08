@@ -1,23 +1,13 @@
 package algorithm.algorithms.brute
 
 import java.io._
-import java.nio.file.Paths
-
-import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{FileIO, Keep, Sink, Source}
-import akka.util.ByteString
-import algorithm.algorithms.GenAlgorithm
-import algorithm.algorithms.brute.{BatchRunSettingsBuilder, BruteAlgorithm}
-import breeze.linalg.{DenseMatrix, DenseVector, max}
-import algorithm.clusterer.BruteClusterer
+import breeze.linalg.{DenseMatrix, DenseVector}
 import algorithm.serialization.BruteAlgorithmJsonSerializer._
 import batch.GenBatchRun
 import types._
 import config.Configuration
-import eventmanager.Subscriber
 import metrics.Par
-import play.api.libs.json.{JsObject, JsValue, Json, OWrites}
+import play.api.libs.json.{JsValue, Json}
 import types.Point
 import types.serialization.ClusterJsonSerializer._
 import algorithm.serialization.BruteClustererSettingsJsonSerializer._
@@ -99,10 +89,11 @@ object Main {
 
   def batchRun(points: scala.Vector[Point]) = {
 
-    val batchRunnerSettingsBuilder = new BatchRunSettingsBuilder(points,
-                                                                 (1 to 6).toList,
-                                                                 List(Par.withAverageAggregate),
-                                                                 (points, k) => points.size * k)
+    val batchRunnerSettingsBuilder = new BatchRunSettingsBuilder(
+      points,
+      (Configuration.BatchRun.KRange.from to Configuration.BatchRun.KRange.to).toList,
+      List(Par.withAverageAggregate),
+      (points, k) => points.size * k)
 
     val stepsList = GenBatchRun(BruteAlgorithm)(batchRunnerSettingsBuilder.build)
 
@@ -112,7 +103,6 @@ object Main {
       p.write(Json.prettyPrint(Json.toJson(jsonList)).toString())
       p.close()
     }
-
 
     Some(new PrintWriter(Configuration.summaryBatchRunFile)).foreach { p =>
       val jsonList = ResultsJsonSerializer.summaryBatchRunAsJson(stepsList)

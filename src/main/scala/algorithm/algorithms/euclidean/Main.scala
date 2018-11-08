@@ -46,11 +46,11 @@ object Main {
       case "m" => "/Users/vicaba/Projects/jupyter/shared/siot-eclustering-viz/files"
     }
 
-    FileUtils.copyFile("files/output/cluster.json", filePath)
+/*    FileUtils.copyFile("files/output/cluster.json", filePath)
 
     FileUtils.copyFile(Configuration.summaryBatchRunFile, filePath)
 
-    FileUtils.copyFile(Configuration.batchRunFile, filePath)
+    FileUtils.copyFile(Configuration.batchRunFile, filePath)*/
 
   }
 
