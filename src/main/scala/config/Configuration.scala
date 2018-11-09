@@ -51,9 +51,9 @@ object Configuration extends Configuration {
 
     object SubsampleSize {
 
-      val from: Double = conf.getDouble("batch-run.k-range.from")
+      val from: Double = conf.getDouble("cross-fold.subsample-size.from")
 
-      val to: Double = conf.getDouble("batch-run.k-range.to")
+      val to: Double = conf.getDouble("cross-fold.subsample-size.to")
 
     }
   }

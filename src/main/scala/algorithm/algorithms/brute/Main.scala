@@ -81,7 +81,7 @@ object Main {
       Point(idx, m, None)(Types4)
     }.toVector*/
 
-    val points = readEgaugeData("files/input/egauge.json")
+    val points = readEgaugeData(Configuration.userProfilesFile)
 
     batchRun(points)
 

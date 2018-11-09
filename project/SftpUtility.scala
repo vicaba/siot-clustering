@@ -73,6 +73,7 @@ object SftpUtility {
         throw new RuntimeException(e)
     } finally manager.close()
   }
+
   def move(hostName: String,
            username: String,
            password: String,
@@ -125,14 +126,28 @@ object SftpUtility {
     val manager = new StandardFileSystemManager
     try {
       manager.init()
-      // Append _downlaod_from_sftp to the given file name.
-      //String downloadFilePath = localFilePath.substring(0, localFilePath.lastIndexOf(".")) + "_downlaod_from_sftp" + localFilePath.substring(localFilePath.lastIndexOf("."), localFilePath.length());
-      // Create local file object. Change location if necessary for new downloadFilePath
       val localFile = manager.resolveFile(localFilePath)
       val remoteFile =
         manager.resolveFile(createConnectionString(hostName, username, password, remoteFilePath), createDefaultOptions)
       localFile.copyFrom(remoteFile, Selectors.SELECT_SELF)
       System.out.println("File download success")
+    } catch {
+      case e: Exception =>
+        throw new RuntimeException(e)
+    } finally manager.close()
+  }
+
+  def createFolder(hostName: String, username: String, password: String, remoteFilePath: String): Unit = {
+    val manager = new StandardFileSystemManager
+    try {
+      manager.init()
+      // Append _downlaod_from_sftp to the given file name.
+      //String downloadFilePath = localFilePath.substring(0, localFilePath.lastIndexOf(".")) + "_downlaod_from_sftp" + localFilePath.substring(localFilePath.lastIndexOf("."), localFilePath.length());
+      // Create local file object. Change location if necessary for new downloadFilePath
+      val remoteFile =
+        manager.resolveFile(createConnectionString(hostName, username, password, remoteFilePath), createDefaultOptions)
+      remoteFile.createFolder()
+      System.out.println("Folder creation success")
     } catch {
       case e: Exception =>
         throw new RuntimeException(e)
