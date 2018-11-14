@@ -8,7 +8,7 @@ import types.Point
 class BatchRunSettingsBuilder(override val points: Vector[Point],
                               override val numbersOfClusters: List[Int],
                               override val metrics: List[Metric],
-                              override val timesToIterate: (Vector[Point], Int) => Int)
+                              override val improveIterations: (Vector[Point], Int) => Int)
     extends algorithm.algorithms.BatchRunSettingsBuilder[BruteAlgorithm.type] {
 
   override def copy(points: Vector[Point],
@@ -20,7 +20,7 @@ class BatchRunSettingsBuilder(override val points: Vector[Point],
   def build: List[(BruteClusterer.Settings, ClusterRescheduler.Settings)] =
     numbersOfClusters.flatMap { numberOfClusters =>
       metrics.map { metric =>
-        (BruteClusterer.Settings(numberOfClusters, points, metric, timesToIterate(points, numberOfClusters)),
+        (BruteClusterer.Settings(numberOfClusters, points, metric, improveIterations(points, numberOfClusters)),
          ClusterRescheduler.Settings(metric, 0.5, memory = 3))
       }
     }

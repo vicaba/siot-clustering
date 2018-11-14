@@ -96,7 +96,11 @@ object Main {
 
     val Max = BigDecimal(1.0)
     val monteCarlos = for (i <- BigDecimal(Configuration.CrossFold.SubsampleSize.from) to (Max, step = BigDecimal(0.1)))
-      yield { MonteCarlo(batchRunSettingsBuilder.points.size, Percentage.of(i / Max)) }
+      yield {
+        val subsampleSize = Percentage.of(i / Max)
+        val splits = Math.floor((batchRunSettingsBuilder.points.size * subsampleSize.v).toDouble).toInt
+        MonteCarlo(splits, subsampleSize)
+      }
     val stepsList = CrossFoldValidation.batchRun(EuclideanAlgorithm)(monteCarlos.toList, batchRunSettingsBuilder)
 
     Some(new PrintWriter(Configuration.summaryBatchRunFile)).foreach { p =>

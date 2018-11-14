@@ -40,6 +40,12 @@ object ResultsJsonSerializer {
     }
   }
 
+  def summaryClustererCrossfoldRunAsJson[Algo <: GenAlgorithm](
+                                                            stepsList: List[List[Algo#StepT[Algo#ClustererSettingsT]]]): List[List[JsObject]] = {
+    stepsList.map(summaryClustererBatchRunAsJson)
+  }
+
+
   val crossfoldTypeSettingsWriter = new OWrites[CrossFoldTypeSettings] {
     override def writes(o: CrossFoldTypeSettings): JsObject = o match {
       case m: MonteCarlo =>
@@ -52,12 +58,12 @@ object ResultsJsonSerializer {
 
   //TODO: Test
   def summaryCrossfoldBatchRunAsJson[Algo <: GenAlgorithm](
-      stepsList: List[(CrossFoldTypeSettings, List[Algo#StepT[Algo#ClustererSettingsT]])]): List[JsObject] = {
+      stepsList: List[(CrossFoldTypeSettings, List[List[Algo#StepT[Algo#ClustererSettingsT]]])]): List[JsObject] = {
     stepsList.map {
       case (crossFoldSettings, steps) =>
         Json.obj(
           "crossfold" -> crossfoldTypeSettingsWriter.writes(crossFoldSettings),
-          "step" -> summaryClustererBatchRunAsJson(steps)
+          "step" -> summaryClustererCrossfoldRunAsJson(steps)
         )
 
     }

@@ -8,7 +8,7 @@ import types.Point
 class BatchRunSettingsBuilder(override val points: Vector[Point],
                               override val numbersOfClusters: List[Int],
                               override val metrics: List[Metric],
-                              override val timesToIterate: (Vector[Point], Int) => Int)
+                              override val improveIterations: (Vector[Point], Int) => Int)
     extends algorithm.algorithms.BatchRunSettingsBuilder[EuclideanAlgorithm.type] {
 
   override def copy(points: Vector[Point],
@@ -23,7 +23,7 @@ class BatchRunSettingsBuilder(override val points: Vector[Point],
         (FlattenedEuclideanClusterer.Settings(numberOfClusters,
                                               points,
                                               metric,
-                                              timesToIterate(points, numberOfClusters)),
+                                              improveIterations(points, numberOfClusters)),
          ClusterRescheduler.Settings(metric, 0.5, memory = 3))
       }
     }
