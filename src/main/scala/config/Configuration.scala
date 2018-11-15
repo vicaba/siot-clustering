@@ -19,7 +19,7 @@ trait Configuration {
 
 object Configuration extends Configuration {
 
-  private lazy val conf: Config = ConfigFactory.load("Application.conf")
+  private lazy val conf: Config = ConfigFactory.load("application.conf")
 
   override val userProfilesFile: String = conf.getString("user-energy-profiles.in-file")
 
