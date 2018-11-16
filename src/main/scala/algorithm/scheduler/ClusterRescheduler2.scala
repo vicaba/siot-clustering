@@ -16,16 +16,20 @@ object ClusterRescheduler2 {
     // TODO: make tail recursive. Use trampoline?
     def retrieveLeafClusters(clusters: List[Types.Type]): List[Cluster] = {
       clusters.flatMap {
-        case cluster: Cluster if cluster.hierarchyLevel != 1 => retrieveLeafClusters(cluster.points.toList)
-        case cluster: Cluster if cluster.hierarchyLevel == 1 => List(cluster)
+        case cluster: Cluster if cluster.hierarchyLevel > 2  => retrieveLeafClusters(cluster.points.toList)
+        case cluster: Cluster if cluster.hierarchyLevel == 2 => List(cluster)
         case _                                               => Nil
       }
     }
 
     val leafClusters: List[Cluster] = retrieveLeafClusters(clusters)
 
+    println("hola")
+
     val newClusterConfiguration =
-      leafClusters.map(rescheduleCluster(_, settings.metric, settings.improvement, settings.memory))
+      if (leafClusters.nonEmpty)
+        leafClusters.map(rescheduleCluster(_, settings.metric, settings.improvement, settings.memory))
+      else clusters.map((_, Nil))
     newClusterConfiguration
   }
 
@@ -88,15 +92,20 @@ object ClusterRescheduler2 {
 
     cluster.points
       .asInstanceOf[Set[Cluster]]
-      .flatMap { c=>
-        c.points.foreach { p=>
-          if (p.isInstanceOf[Cluster]) println("Cluster") else println("Point")
+      .flatMap { c =>
+        c.points.foreach { p => if (p.isInstanceOf[Cluster]) println("Cluster") else println("Point")
         }
         c.points
       }
+      .asInstanceOf[Set[Cluster]]
+      .flatMap { c => c.points
+      }
+      .asInstanceOf[Set[Point]]
 
     val pointToReschedule =
       cluster.points
+        .asInstanceOf[Set[Cluster]]
+        .flatMap(_.points)
         .asInstanceOf[Set[Cluster]]
         .flatMap(_.points)
         .asInstanceOf[Set[Point]]
@@ -107,7 +116,7 @@ object ClusterRescheduler2 {
 
     rescheduleResult.map { result =>
       val rescheduledPoint   = pointToReschedule.copy(data = result.matrix)(pointToReschedule.types)
-      val rescheduledCluster = cluster += rescheduledPoint // Look here
+      val rescheduledCluster = cluster += rescheduledPoint.toCluster // Look here
 
       new PointChange(rescheduledCluster, rescheduledPoint, result)
     }

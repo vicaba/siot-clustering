@@ -188,7 +188,7 @@ object EuclideanClusterer {
 
     if (outliers.nonEmpty) EventManager.singleton.publish("clusters", finalClusters.toList)
 
-    finalClusters.toList
+    _clusters.toList
 
   }
 
