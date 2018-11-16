@@ -31,7 +31,7 @@ object Main {
       }
       .toVector*/
 
-    val points = readEgaugeData(Configuration.userProfilesFile)
+    val points = readEgaugeData(Configuration.userProfilesFile).take(4)
 
     val batchRunSettingsBuilder =
       new BatchRunSettingsBuilder(points,

@@ -226,8 +226,6 @@ object EuclideanClusterer {
       settings.improveIterations
     ).toList
 
-    val flattened = Cluster.flatten(result)
-
     result
 
   }

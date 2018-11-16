@@ -25,7 +25,7 @@ object ClusterRescheduler2 {
     val leafClusters: List[Cluster] = retrieveLeafClusters(clusters)
 
     val newClusterConfiguration =
-      clusters.map(rescheduleCluster(_, settings.metric, settings.improvement, settings.memory))
+      leafClusters.map(rescheduleCluster(_, settings.metric, settings.improvement, settings.memory))
     newClusterConfiguration
   }
 
@@ -86,24 +86,19 @@ object ClusterRescheduler2 {
 
     println("hola")
 
+    cluster.points
+      .asInstanceOf[Set[Cluster]]
+      .flatMap { c=>
+        c.points.foreach { p=>
+          if (p.isInstanceOf[Cluster]) println("Cluster") else println("Point")
+        }
+        c.points
+      }
+
     val pointToReschedule =
       cluster.points
         .asInstanceOf[Set[Cluster]]
-        .map { c =>
-            if (c.isInstanceOf[Point]) {
-              c.points
-            } else {
-              c.points
-            }
-        }
-        .asInstanceOf[Set[Cluster]]
-        .map{ c =>
-          if (c.isInstanceOf[Point]) {
-            c.points
-          } else {
-            c.points
-          }
-        }
+        .flatMap(_.points)
         .asInstanceOf[Set[Point]]
         .maxBy { point => metric(cluster) - metric(cluster - point)
         }
