@@ -181,8 +181,6 @@ object EuclideanClusterer {
 
     }
 
-    //TODO: Outliers are not well calculated
-
     val outliers = (Cluster.flatten(clusters) -- Cluster.flatten(_clusters)).map(Point.toCluster)
 
     val finalClusters =

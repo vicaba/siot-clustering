@@ -8,10 +8,8 @@ import collection._
 import types.{Cluster, Point}
 
 import scala.annotation.tailrec
-import scala.collection.mutable
 
 object ClusterRescheduler2 {
-
 
   def apply(clusters: List[Cluster], settings: Settings): List[(Cluster, List[PointChanged])] = {
 
@@ -20,6 +18,7 @@ object ClusterRescheduler2 {
       clusters.flatMap {
         case cluster: Cluster if cluster.hierarchyLevel != 1 => retrieveLeafClusters(cluster.points.toList)
         case cluster: Cluster if cluster.hierarchyLevel == 1 => List(cluster)
+        case _                                               => Nil
       }
     }
 
@@ -85,15 +84,35 @@ object ClusterRescheduler2 {
   // TODO: Make sure that the change is mutable
   def rescheduleOnePoint(cluster: Cluster, metric: Metric): Option[PointChange] = {
 
+    println("hola")
+
     val pointToReschedule =
-      cluster.points.asInstanceOf[mutable.Set[Point]].maxBy { point => metric(cluster) - metric(cluster - point)
-      }
+      cluster.points
+        .asInstanceOf[Set[Cluster]]
+        .map { c =>
+            if (c.isInstanceOf[Point]) {
+              c.points
+            } else {
+              c.points
+            }
+        }
+        .asInstanceOf[Set[Cluster]]
+        .map{ c =>
+          if (c.isInstanceOf[Point]) {
+            c.points
+          } else {
+            c.points
+          }
+        }
+        .asInstanceOf[Set[Point]]
+        .maxBy { point => metric(cluster) - metric(cluster - point)
+        }
 
     val rescheduleResult = Rescheduler.reschedule(pointToReschedule.data, cluster - pointToReschedule, metric)
 
     rescheduleResult.map { result =>
       val rescheduledPoint   = pointToReschedule.copy(data = result.matrix)(pointToReschedule.types)
-      val rescheduledCluster = cluster += rescheduledPoint  // Look here
+      val rescheduledCluster = cluster += rescheduledPoint // Look here
 
       new PointChange(rescheduledCluster, rescheduledPoint, result)
     }
