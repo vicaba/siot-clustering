@@ -1,5 +1,6 @@
 package algorithm.scheduler
 
+import algorithm.scheduler.ClusterRescheduler.{PointChange, PointChanged, Settings}
 import types._
 import algorithm.scheduler.Rescheduler.MatrixResult
 import metrics.Metric
@@ -7,17 +8,25 @@ import collection._
 import types.{Cluster, Point}
 
 import scala.annotation.tailrec
+import scala.collection.mutable
 
 object ClusterRescheduler2 {
 
-  case class Settings(override val metric: Metric, improvement: Double, memory: Int = 2, override val numberOfClusters: Int = 1) extends algorithm.algorithms.Settings
-
-  class PointChange(val cluster: Cluster, val point: Point, val change: MatrixResult[Double])
-
-  class PointChanged(val point: Point, val change: MatrixResult[Double])
 
   def apply(clusters: List[Cluster], settings: Settings): List[(Cluster, List[PointChanged])] = {
-    val newClusterConfiguration = clusters.map(rescheduleCluster(_, settings.metric, settings.improvement, settings.memory))
+
+    // TODO: make tail recursive. Use trampoline?
+    def retrieveLeafClusters(clusters: List[Types.Type]): List[Cluster] = {
+      clusters.flatMap {
+        case cluster: Cluster if cluster.hierarchyLevel != 1 => retrieveLeafClusters(cluster.points.toList)
+        case cluster: Cluster if cluster.hierarchyLevel == 1 => List(cluster)
+      }
+    }
+
+    val leafClusters: List[Cluster] = retrieveLeafClusters(clusters)
+
+    val newClusterConfiguration =
+      clusters.map(rescheduleCluster(_, settings.metric, settings.improvement, settings.memory))
     newClusterConfiguration
   }
 
@@ -38,71 +47,57 @@ object ClusterRescheduler2 {
                         improvement: Double,
                         memory: Int = 2): (Cluster, List[PointChanged]) = {
 
-    /*    val initialMetric = metric(cluster)
+    val initialMetric = metric(cluster)
 
-        def improvementPercentage(improvement: Double): Double = 1 - improvement / initialMetric
+    def improvementPercentage(improvement: Double): Double = 1 - improvement / initialMetric
 
-        @tailrec
-        def reschedule(currentClusterMetric: Double,
-                       memory: Memory[Double],
-                       cluster: Cluster,
-                       changes: List[PointChanged]): (Cluster, List[PointChanged]) = {
+    @tailrec
+    def reschedule(currentClusterMetric: Double,
+                   memory: Memory[Double],
+                   cluster: Cluster,
+                   changes: List[PointChanged]): (Cluster, List[PointChanged]) = {
 
-          val improvedEnough = improvementPercentage(currentClusterMetric) > improvement
+      val improvedEnough = improvementPercentage(currentClusterMetric) > improvement
 
-          if (improvedEnough || memory.areAllElementsEqual())
-            if (improvedEnough)
-              (cluster, changes)
-            else
-              (cluster, changes)
-          else {
-            val pointChange = rescheduleOnePoint(cluster, metric)
-            if (pointChange.isDefined) {
-              val pointChanged   = new PointChanged(pointChange.get.point, pointChange.get.change)
-              val _currentMetric = metric(pointChange.get.cluster)
-              reschedule(_currentMetric, _currentMetric +: memory, pointChange.get.cluster, pointChanged +: changes)
-            } else {
-              reschedule(currentClusterMetric, 0 +: memory, cluster, changes)
-            }
-          }
+      if (improvedEnough || memory.areAllElementsEqual())
+        if (improvedEnough)
+          (cluster, changes)
+        else
+          (cluster, changes)
+      else {
+        val pointChange = rescheduleOnePoint(cluster, metric)
+        if (pointChange.isDefined) {
+          val pointChanged   = new PointChanged(pointChange.get.point, pointChange.get.change)
+          val _currentMetric = metric(pointChange.get.cluster)
+          reschedule(_currentMetric, _currentMetric +: memory, pointChange.get.cluster, pointChanged +: changes)
+        } else {
+          reschedule(currentClusterMetric, 0 +: memory, cluster, changes)
         }
+      }
+    }
 
-        reschedule(initialMetric, Memory(cluster.points.size), cluster, List.empty)*/
+    reschedule(initialMetric, Memory(cluster.points.size), cluster, List.empty)
 
     (cluster, Nil)
 
   }
 
+  // TODO: Make sure that the change is mutable
   def rescheduleOnePoint(cluster: Cluster, metric: Metric): Option[PointChange] = {
 
-    def retrieveLeafClusters(clusters: List[Types.Type]): List[Cluster] = {
-      clusters.flatMap {
-        case cluster: Cluster if cluster.hierarchyLevel == 1 => List(cluster)
-        case cluster: Cluster if cluster.hierarchyLevel != 1 => retrieveLeafClusters(cluster.points.toList)
+    val pointToReschedule =
+      cluster.points.asInstanceOf[mutable.Set[Point]].maxBy { point => metric(cluster) - metric(cluster - point)
       }
+
+    val rescheduleResult = Rescheduler.reschedule(pointToReschedule.data, cluster - pointToReschedule, metric)
+
+    rescheduleResult.map { result =>
+      val rescheduledPoint   = pointToReschedule.copy(data = result.matrix)(pointToReschedule.types)
+      val rescheduledCluster = cluster += rescheduledPoint  // Look here
+
+      new PointChange(rescheduledCluster, rescheduledPoint, result)
     }
 
-
-    val leafClusters: List[Cluster] = _
-
-    cluster.hierarchyLevel match {
-      case 0 => //TODO: Perform reschedule
-      case _ => //TODO: Keep searching for cluster with hierarchy level 0
-    }
-
-    /*    val pointToReschedule = cluster.points.maxBy { point =>
-          metric(cluster) - metric(cluster - point)
-        }
-
-        val rescheduleResult = Rescheduler.reschedule(pointToReschedule.data, cluster - pointToReschedule, metric)
-
-        rescheduleResult.map { result =>
-          val rescheduledPoint   = pointToReschedule.copy(data = result.matrix)(pointToReschedule.types)
-          val rescheduledCluster = cluster + rescheduledPoint
-
-          new PointChange(rescheduledCluster, rescheduledPoint, result)
-        }*/
-    None
   }
 
 }

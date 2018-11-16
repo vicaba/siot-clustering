@@ -29,7 +29,7 @@ object CrossFoldValidation {
 
   case class MonteCarlo(splits: Int, subsampleSize: Percentage) extends CrossFoldTypeSettings
 
-  def run(algorithm: GenAlgorithm)(settings: CrossFoldTypeSettings,
+  def runClusterer(algorithm: GenAlgorithm)(settings: CrossFoldTypeSettings,
                                    batchRunSettings: algorithm.BatchRunSettingsBuilderT)
     : List[List[algorithm.type#StepT[algorithm.type#ClustererSettingsT]]] = settings match {
     case s: MonteCarlo =>
@@ -43,9 +43,30 @@ object CrossFoldValidation {
 
   }
 
+  def batchRunClusterer(algorithm: GenAlgorithm)(settings: List[CrossFoldTypeSettings],
+                                        batchRunSettings: algorithm.BatchRunSettingsBuilderT)
+    : List[(CrossFoldValidation.CrossFoldTypeSettings, List[List
+
+    [algorithm.StepT[algorithm.ClustererSettingsT]]])] =
+    settings.map(s => (s, runClusterer(algorithm)(s, batchRunSettings)))
+
+  def run(algorithm: GenAlgorithm)(settings: CrossFoldTypeSettings,
+                                   batchRunSettings: algorithm.BatchRunSettingsBuilderT)
+  : List[List[algorithm.type#Steps]] = settings match {
+    case s: MonteCarlo =>
+      val points = batchRunSettings.points
+      val splits = for (i <- 0 until s.splits) yield {
+        Random.shuffle(points).take(Math.floor((points.size * s.subsampleSize.v).toDouble).toInt)
+      }
+      val bulkBatchRunSettings = splits.map(p => batchRunSettings.copy(points = p))
+      bulkBatchRunSettings.map { builder => GenBatchRun.apply(algorithm)(builder.build)
+      }.toList
+
+  }
+
   def batchRun(algorithm: GenAlgorithm)(settings: List[CrossFoldTypeSettings],
                                         batchRunSettings: algorithm.BatchRunSettingsBuilderT)
-    : List[(CrossFoldValidation.CrossFoldTypeSettings, List[List[algorithm.StepT[algorithm.ClustererSettingsT]]])] =
+  : List[(CrossFoldValidation.CrossFoldTypeSettings, List[List[algorithm.type#Steps]])] =
     settings.map(s => (s, run(algorithm)(s, batchRunSettings)))
 
 }

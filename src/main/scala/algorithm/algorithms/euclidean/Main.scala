@@ -85,7 +85,7 @@ object Main {
     }
 
     Some(new PrintWriter(Configuration.summaryBatchRunFile)).foreach { p =>
-      val jsonList = ResultsJsonSerializer.summaryClustererBatchRunAsJson(stepsList)
+      val jsonList = ResultsJsonSerializer.summaryStep1ListAsJson(stepsList)
       p.write(Json.prettyPrint(Json.toJson(jsonList)).toString())
       p.close()
     }

@@ -31,6 +31,7 @@ object Rescheduler {
 
   /**
     * No side effects
+    *
     * @param vectorToReschedule
     * @param fixedVector
     * @return
@@ -54,11 +55,7 @@ object Rescheduler {
         val vector      = swap(i, j, vectorToReschedule)
         val distance    = metric(vector + fixedVector)
         val progression = metric.progression(vectorToReschedule + fixedVector, vector + fixedVector)
-        if (distance < smallest) {
-          smallest = distance
-          bestSolution = vector
-          changedComponent = new ChangedComponent(i, j)
-        } else if (progression.isPositive) {
+        if ((distance < smallest) || progression.isPositive) {
           smallest = distance
           bestSolution = vector
           changedComponent = new ChangedComponent(i, j)
@@ -74,6 +71,7 @@ object Rescheduler {
 
   /**
     * No side effects
+    *
     * @param matrixToReschedule
     * @param fixedVector
     * @return

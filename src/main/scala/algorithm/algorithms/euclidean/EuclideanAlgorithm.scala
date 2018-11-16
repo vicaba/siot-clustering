@@ -3,8 +3,7 @@ import algorithm.algorithms.GenAlgorithm
 import algorithm.clusterer.EuclideanClusterer
 import algorithm.clusterer.FlattenedEuclideanClusterer.Settings
 import algorithm.clusterer.FlattenedEuclideanClusterer
-
-import algorithm.scheduler.ClusterRescheduler
+import algorithm.scheduler.{ClusterRescheduler, ClusterRescheduler2}
 import types.Cluster
 
 object EuclideanAlgorithm extends GenAlgorithm {
@@ -19,6 +18,6 @@ object EuclideanAlgorithm extends GenAlgorithm {
 
   override def rescheduler(clusters: List[Cluster],
                            settings: ReschedulerSettingsT): List[(Cluster, List[ClusterRescheduler.PointChanged])] =
-    ClusterRescheduler.apply(clusters, settings)
+    ClusterRescheduler2.apply(clusters, settings)
 
 }
