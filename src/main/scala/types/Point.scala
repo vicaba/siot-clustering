@@ -4,7 +4,7 @@ import breeze.linalg.{DenseVector, sum}
 import metrics.DenseVectorReprOps
 import types.Types.{DataType, SyntheticDataType}
 
-case class Point(override val id: Int, override val data: DataType, assignedToCluster: Option[Int] = None)(
+case class Point(override val id: Int, override val data: DataType, assignedToCluster: Option[Cluster] = None)(
     implicit override val types: TypesT)
     extends Types.Type {
 
@@ -19,7 +19,7 @@ case class Point(override val id: Int, override val data: DataType, assignedToCl
 
   override def toString: String = s"Point($id, $syntheticValue, $assignedToCluster)"
 
-  def setCluster(clusterId: Int): Point = this.copy(assignedToCluster = Some(clusterId))
+  def setCluster(clusterId: Cluster): Point = this.copy(assignedToCluster = Some(clusterId))
 
   def isAssignedToCluster: Boolean = this.assignedToCluster.isDefined
 

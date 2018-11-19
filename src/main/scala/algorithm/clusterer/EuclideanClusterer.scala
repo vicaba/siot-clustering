@@ -191,14 +191,14 @@ object EuclideanClusterer {
 
 
 
-/*    val outliers = (Cluster.flatten(clusters) -- Cluster.flatten(_clusters)).map(Point.toCluster)
+    val outliers = (Cluster.flatten(clusters) -- Cluster.flatten(_clusters)).map(Point.toCluster)
 
     val finalClusters =
       clustersToFixedClusters(centroid, _clusters, outliers.toIndexedSeq, heuristic)
 
-    if (outliers.nonEmpty) EventManager.singleton.publish("clusters", finalClusters.toList)*/
+    if (outliers.nonEmpty) EventManager.singleton.publish("clusters", finalClusters.toList)
 
-    _clusters.toList
+    finalClusters.toList
 
   }
 

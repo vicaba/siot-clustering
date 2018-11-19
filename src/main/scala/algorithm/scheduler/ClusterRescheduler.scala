@@ -1,12 +1,9 @@
 package algorithm.scheduler
 
-import types._
 import algorithm.scheduler.Rescheduler.MatrixResult
 import metrics.Metric
-import collection._
 import types.{Cluster, Point}
 
-import scala.annotation.tailrec
 
 object ClusterRescheduler {
 

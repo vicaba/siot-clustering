@@ -16,13 +16,13 @@ object ClusterRescheduler2 {
     // TODO: make tail recursive. Use trampoline?
     def retrieveLeafClusters(clusters: List[Types.Type]): List[Cluster] = {
       clusters.flatMap {
-        case cluster: Cluster if cluster.hierarchyLevel > 2  => retrieveLeafClusters(cluster.points.toList)
-        case cluster: Cluster if cluster.hierarchyLevel == 2 => List(cluster)
-        case _                                               => Nil
+        case point: Point =>
+          point.assignedToCluster.toList.flatMap(_.topLevel)
+        case cluster: Cluster => retrieveLeafClusters(cluster.points.toList)
       }
     }
 
-    val leafClusters: List[Cluster] = retrieveLeafClusters(clusters)
+    val leafClusters: List[Cluster] = retrieveLeafClusters(clusters).distinct
 
     println("hola")
 
@@ -90,26 +90,9 @@ object ClusterRescheduler2 {
 
     println("hola")
 
-    cluster.points
-      .asInstanceOf[Set[Cluster]]
-      .flatMap { c =>
-        c.points.foreach { p =>
-          if (p.isInstanceOf[Cluster])
-            println("Cluster")
-          else
-            println("Point")
-        }
-        c.points
-      }
-      .asInstanceOf[Set[Cluster]]
-      .flatMap { c => c.points
-      }
-      .asInstanceOf[Set[Point]]
 
     val pointToReschedule =
       cluster.points
-        .asInstanceOf[Set[Cluster]]
-        .flatMap(_.points)
         .asInstanceOf[Set[Cluster]]
         .flatMap(_.points)
         .asInstanceOf[Set[Point]]

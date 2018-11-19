@@ -35,15 +35,17 @@ class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
   }
 
+  val globalCluster = Cluster(0, "0", Set.empty, 0, None)
+
   val globalPoints = List(
     DenseMatrix((0.0, 3.0, 3.0, 0.0), (0.0, 4.0, 4.0, 0.0)),
     DenseMatrix((0.0, 3.0, 3.0, 0.0), (0.0, 4.0, 4.0, 0.0))
   ).zipWithIndex.map {
     case (m, idx) =>
-      Point(idx, m, Some(0))
+      Point(idx, m, Some(globalCluster))
   }.toSet
 
-  val globalCluster = Cluster(0, "0", globalPoints, 0, None)
+  globalCluster ++= globalPoints
 
   feature("Vector cluster.scheduler.ClusterRescheduler") {
 

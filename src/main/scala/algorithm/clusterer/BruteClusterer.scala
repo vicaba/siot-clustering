@@ -58,7 +58,7 @@ object BruteClusterer {
         case p +: tail =>
           val bestClusterToAssignLocally = clusters.values.minBy { cluster =>
             p.assignedToCluster
-              .map { cId => if (cId == cluster.id) distanceF(cluster) else distanceF(cluster + p)
+              .map { cId => if (cId == cluster) distanceF(cluster) else distanceF(cluster + p)
               }
               .getOrElse(distanceF(cluster + p))
           }
@@ -66,7 +66,7 @@ object BruteClusterer {
           val bestClusterToAssignGlobally = clusters.values.minBy { cluster =>
             p.assignedToCluster
               .map { cId =>
-                if (cId == cluster.id) metric.aggregateOf(clusters.values)
+                if (cId == cluster) metric.aggregateOf(clusters.values)
                 else metric.aggregateOf((clusters + (cluster + p)).values)
               }
               .getOrElse(metric.aggregateOf((clusters + (cluster + p)).values))
@@ -76,10 +76,10 @@ object BruteClusterer {
 
           val newClusters =
             if (p.assignedToCluster.isDefined)
-              if (p.assignedToCluster.get == bestClusterToAssign.id)
+              if (p.assignedToCluster.get == bestClusterToAssign)
                 clusters
               else
-                clusters ++ Map(bestClusterToAssign + p, clusters(p.assignedToCluster.get) - p)
+                clusters ++ Map(bestClusterToAssign + p, clusters(p.assignedToCluster.get.id) - p)
             else
               clusters + (bestClusterToAssign + p)
 
@@ -128,7 +128,7 @@ object BruteClusterer {
 
       val _clusters = randomSamplePoints.zipWithIndex.map {
         case (point, idx) =>
-          idx -> Cluster(idx, idx.toString, Set(point.setCluster(idx)), 0, None)
+          idx -> Cluster(idx, idx.toString, Set(point), 0, None)
       }.toMap
 
       // First round without the points assigned to each cluster
