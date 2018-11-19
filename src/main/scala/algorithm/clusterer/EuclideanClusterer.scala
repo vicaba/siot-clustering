@@ -92,6 +92,14 @@ object EuclideanClusterer {
     }
   }
 
+  /**
+    * This mutates fixedClusters and freeClusters !
+    * @param centroid
+    * @param fixedClusters mutable
+    * @param freeClusters mutable
+    * @param heuristic
+    * @return
+    */
   @tailrec
   def clustersToFixedClusters(centroid: SyntheticDataType,
                               fixedClusters: IndexedSeq[Cluster],
@@ -181,12 +189,14 @@ object EuclideanClusterer {
 
     }
 
-    val outliers = (Cluster.flatten(clusters) -- Cluster.flatten(_clusters)).map(Point.toCluster)
+
+
+/*    val outliers = (Cluster.flatten(clusters) -- Cluster.flatten(_clusters)).map(Point.toCluster)
 
     val finalClusters =
       clustersToFixedClusters(centroid, _clusters, outliers.toIndexedSeq, heuristic)
 
-    if (outliers.nonEmpty) EventManager.singleton.publish("clusters", finalClusters.toList)
+    if (outliers.nonEmpty) EventManager.singleton.publish("clusters", finalClusters.toList)*/
 
     _clusters.toList
 
@@ -199,7 +209,7 @@ object EuclideanClusterer {
     var best: LinearSeq[Cluster] = null
 
     for (i <- 0 until maxIterations) {
-      val result          = clusterer(Random.shuffle(clusters))
+      val result          = clusterer(clusters/*Random.shuffle(clusters)*/)
       val aggregateMetric = metricToOptimize.aggregateOf(result)
       val maxMetric       = metricToOptimize(result.maxBy(metricToOptimize(_)))
       if (i == 0) best = result

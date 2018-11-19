@@ -149,7 +149,8 @@ object Cluster {
 
   def apply(id: Int, name: String, points: TraversableOnce[Types.Type], hierarchyLevel: Int, topLevel: Option[Cluster])(
       implicit types: TypesT): Cluster = {
-    new Cluster(id, name, mutableSetOf(points), hierarchyLevel, topLevel)(types)
+    val c = new Cluster(id, name, mutableSetOf(Set.empty), hierarchyLevel, topLevel)(types)
+    c ++= points
   }
 
   def Empty(implicit types: TypesT): Cluster = Cluster(-1, "empty", Set.empty, 0, None)(types)

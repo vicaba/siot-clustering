@@ -93,7 +93,11 @@ object ClusterRescheduler2 {
     cluster.points
       .asInstanceOf[Set[Cluster]]
       .flatMap { c =>
-        c.points.foreach { p => if (p.isInstanceOf[Cluster]) println("Cluster") else println("Point")
+        c.points.foreach { p =>
+          if (p.isInstanceOf[Cluster])
+            println("Cluster")
+          else
+            println("Point")
         }
         c.points
       }
