@@ -17,7 +17,9 @@ object ClusterRescheduler2 {
     def retrieveLeafClusters(clusters: List[Types.Type]): List[Cluster] = {
       clusters.flatMap {
         case point: Point =>
-          point.assignedToCluster.toList.flatMap(_.topLevel)
+          point.assignedToCluster.toList.flatMap { c =>
+            if (c.hierarchyLevel == 0) c.topLevel else Nil
+          }
         case cluster: Cluster => retrieveLeafClusters(cluster.points.toList)
       }
     }
@@ -88,13 +90,16 @@ object ClusterRescheduler2 {
   // TODO: Make sure that the change is mutable
   def rescheduleOnePoint(cluster: Cluster, metric: Metric): Option[PointChange] = {
 
-    println("hola")
-
-
     val pointToReschedule =
       cluster.points
         .asInstanceOf[Set[Cluster]]
-        .flatMap(_.points)
+        .flatMap { c =>
+          c.points.foreach { p =>
+            if (p.isInstanceOf[Cluster])
+              println("Cluster")
+          }
+          c.points
+        }
         .asInstanceOf[Set[Point]]
         .maxBy { point => metric(cluster) - metric(cluster - point)
         }
