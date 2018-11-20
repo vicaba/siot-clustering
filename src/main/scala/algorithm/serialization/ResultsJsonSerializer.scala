@@ -108,7 +108,18 @@ object ResultsJsonSerializer {
         Json.obj(
           "crossfold" -> crossfoldTypeSettingsWriter.writes(crossFoldSettings),
           "step"      -> steps.map(summaryBatchRunAsJson)
-          //summaryStep1CrossfoldRunAsJson(steps)
+        )
+
+    }
+  }
+
+  def summaryCrossfoldBatchRunClustererAsJson[Algo <: GenAlgorithm](
+                                                            stepsList: List[(CrossFoldTypeSettings, List[List[Algo#StepT[Algo#ClustererSettingsT]]])]): List[JsObject] = {
+    stepsList.map {
+      case (crossFoldSettings, steps) =>
+        Json.obj(
+          "crossfold" -> crossfoldTypeSettingsWriter.writes(crossFoldSettings),
+          "step"      -> summaryStep1CrossfoldRunAsJson(steps)
         )
 
     }

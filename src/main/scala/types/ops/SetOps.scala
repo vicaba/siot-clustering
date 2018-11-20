@@ -8,8 +8,25 @@ object SetOps {
     def -/+(elem: T): Set[T] =
       (s - elem) + elem
 
-    def --/++(elem: TraversableOnce[T]): Set[T] =
+    def --/++(elem: Traversable[T]): Set[T] =
       (s -- elem) ++ elem
+
+  }
+
+  implicit class MutableSetOps[T](s: mutable.Set[T]) {
+
+    def -/+=(e: T): mutable.Set[T] = {
+      (s -= e) += e
+    }
+
+    def --/++=(es: Traversable[T]): mutable.Set[T] = {
+      (s --= es) ++= es
+    }
+
+    def ei() = {
+      println("hola")
+      1
+    }
 
   }
 

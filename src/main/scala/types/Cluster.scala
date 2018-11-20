@@ -41,7 +41,7 @@ case class Cluster private (override val id: Int,
 
   def nonEmpty: Boolean = !isEmpty
 
-  def setPoints(points: TraversableOnce[Types.Type]): Cluster = {
+  def setPoints(points: Traversable[Types.Type]): Cluster = {
     (this --= points) ++= points.map(typeTransform)
     this
   }
@@ -63,7 +63,7 @@ case class Cluster private (override val id: Int,
   def topLevel: Option[Cluster] = _topLevel
 
   def +=(point: Types.Type): Cluster = {
-    this._points += typeTransform(point)
+    (this._points -= typeTransform(point)) += typeTransform(point)
     this
   }
 
@@ -72,12 +72,12 @@ case class Cluster private (override val id: Int,
     this
   }
 
-  def ++=(points: TraversableOnce[Types.Type]): Cluster = {
-    this._points ++= points.map(typeTransform)
+  def ++=(points: Traversable[Types.Type]): Cluster = {
+    this._points --/++= points.map(typeTransform)
     this
   }
 
-  def --=(points: TraversableOnce[Types.Type]): Cluster = {
+  def --=(points: Traversable[Types.Type]): Cluster = {
     this._points --= points.map(typeTransform)
     this
   }
@@ -92,12 +92,12 @@ case class Cluster private (override val id: Int,
     this.copy(points = mutableSetOf(newPoints))
   }
 
-  def ++(points: TraversableOnce[Cluster]): Cluster = {
+  def ++(points: Traversable[Cluster]): Cluster = {
     val newPoints = this._points.toSet --/++ points.map(typeTransform)
     this.copy(points = mutableSetOf(newPoints))
   }
 
-  def --(points: TraversableOnce[Cluster]): Cluster = {
+  def --(points: Traversable[Cluster]): Cluster = {
     val newPoints = this._points.toSet -- points.map(typeTransform)
     this.copy(points = mutableSetOf(newPoints))
   }
@@ -147,7 +147,7 @@ object Cluster {
 
   import scala.language.implicitConversions
 
-  def apply(id: Int, name: String, points: TraversableOnce[Types.Type], hierarchyLevel: Int, topLevel: Option[Cluster])(
+  def apply(id: Int, name: String, points: Traversable[Types.Type], hierarchyLevel: Int, topLevel: Option[Cluster])(
       implicit types: TypesT): Cluster = {
     val c = new Cluster(id, name, mutableSetOf(Set.empty), hierarchyLevel, topLevel)(types)
     c ++= points

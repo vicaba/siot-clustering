@@ -1,7 +1,7 @@
 package algorithm.scheduler
 
 import breeze.linalg.{DenseMatrix, DenseVector}
-import algorithm.scheduler.ClusterRescheduler.PointChange
+import algorithm.scheduler.ClusterReschedulerOld.PointChange
 import types._
 import metrics._
 import org.scalatest.Matchers._
@@ -22,7 +22,7 @@ class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
       times match {
         case 0 => accum
         case t =>
-          val result = ClusterRescheduler.rescheduleOnePoint(clusterToReschedule, metric)
+          val result = ClusterReschedulerOld.rescheduleOnePoint(clusterToReschedule, metric)
           if (result.isDefined) {
             _rescheduleTimes(t - 1, result.get.cluster, result.get +: accum)
           } else {
@@ -86,7 +86,7 @@ class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
       When("asked to reschedule the cluster")
 
-      val (betterCluster, scheduleResult) = ClusterRescheduler.rescheduleCluster(cluster, metric, 1)
+      val (betterCluster, scheduleResult) = ClusterReschedulerOld.rescheduleCluster(cluster, metric, 1)
 
       Then("the cluster improves distanceFunction")
       val originalCompatibility = metric(cluster)

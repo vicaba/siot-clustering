@@ -1,7 +1,7 @@
 package algorithm.algorithms.euclidean
 
 import algorithm.clusterer.FlattenedEuclideanClusterer
-import algorithm.scheduler.ClusterRescheduler
+import algorithm.scheduler.ClusterReschedulerOld
 import metrics.Metric
 import types.Point
 
@@ -17,14 +17,14 @@ class BatchRunSettingsBuilder(override val points: Vector[Point],
                     timesToIterate: (Vector[Point], Int) => Int): BatchRunSettingsBuilder =
     new BatchRunSettingsBuilder(points, numbersOfClusters, metrics, timesToIterate)
 
-  override def build: List[(FlattenedEuclideanClusterer.Settings, ClusterRescheduler.Settings)] = {
+  override def build: List[(FlattenedEuclideanClusterer.Settings, ClusterReschedulerOld.Settings)] = {
     numbersOfClusters.flatMap { numberOfClusters =>
       metrics.map { metric =>
         (FlattenedEuclideanClusterer.Settings(numberOfClusters,
                                               points,
                                               metric,
                                               improveIterations(points, numberOfClusters)),
-         ClusterRescheduler.Settings(metric, 0.5, memory = 3))
+         ClusterReschedulerOld.Settings(numberOfClusters, metric, 0.5, memory = 3))
       }
     }
   }

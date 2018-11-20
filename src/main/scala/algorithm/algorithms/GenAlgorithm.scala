@@ -1,6 +1,6 @@
 package algorithm.algorithms
 
-import algorithm.scheduler.ClusterRescheduler.PointChanged
+import algorithm.scheduler.ClusterReschedulerOld.PointChanged
 import com.typesafe.scalalogging.Logger
 import types._
 
@@ -46,7 +46,7 @@ trait GenAlgorithm {
 
     Steps(
       _1 = step1,
-      _2 = StepT(reschedulerSettings, reschedulerResult.map(_._1))
+      _2 = StepT(reschedulerSettings, step1.clusters)
     )
   }
 
