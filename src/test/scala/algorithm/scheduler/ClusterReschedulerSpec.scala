@@ -22,7 +22,7 @@ class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
       times match {
         case 0 => accum
         case t =>
-          val result = ClusterReschedulerOld.rescheduleOnePoint(clusterToReschedule, metric)
+          val result = ClusterRescheduler.rescheduleOnePoint(clusterToReschedule, metric)
           if (result.isDefined) {
             _rescheduleTimes(t - 1, result.get.cluster, result.get +: accum)
           } else {
@@ -42,7 +42,7 @@ class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
     DenseMatrix((0.0, 3.0, 3.0, 0.0), (0.0, 4.0, 4.0, 0.0))
   ).zipWithIndex.map {
     case (m, idx) =>
-      Point(idx, m, Some(globalCluster))
+      Point.toCluster(Point(idx, m, Some(globalCluster)))
   }.toSet
 
   globalCluster ++= globalPoints
@@ -86,7 +86,7 @@ class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
       When("asked to reschedule the cluster")
 
-      val (betterCluster, scheduleResult) = ClusterReschedulerOld.rescheduleCluster(cluster, metric, 1)
+      val (betterCluster, scheduleResult) = ClusterRescheduler.rescheduleCluster(cluster, metric, 1)
 
       Then("the cluster improves distanceFunction")
       val originalCompatibility = metric(cluster)

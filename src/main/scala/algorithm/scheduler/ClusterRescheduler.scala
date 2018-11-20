@@ -89,6 +89,8 @@ object ClusterRescheduler {
   // TODO: Make sure that the change is mutable
   def rescheduleOnePoint(cluster: Cluster, metric: Metric): Option[PointChange] = {
 
+   val oldMetric = metric(cluster)
+
     val pointToReschedule =
       cluster.points
         .asInstanceOf[Set[Cluster]]
@@ -106,10 +108,11 @@ object ClusterRescheduler {
     val rescheduleResult = Rescheduler.reschedule(pointToReschedule.data, cluster - pointToReschedule, metric)
 
     rescheduleResult.map { result =>
-      val rescheduledPoint   = pointToReschedule.copy(data = result.matrix)(pointToReschedule.types)
-      val rescheduledCluster = cluster += rescheduledPoint.toCluster // Look here
+      pointToReschedule.setValues(result.matrix)
 
-      new PointChange(rescheduledCluster, rescheduledPoint, result)
+      val newMetric = metric(cluster)
+
+      new PointChange(cluster, pointToReschedule, result)
     }
 
   }
