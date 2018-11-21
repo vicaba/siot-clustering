@@ -99,14 +99,14 @@ object Rescheduler {
         if (!vector.data.forall(_ == 0)) {
 
           val fixedValue = fixedVector + sum(matrixToReschedule, Axis._0).inner - vector
-          val distance   = reschedule(vector, fixedValue, metric)
+          val rescheduledVector   = reschedule(vector, fixedValue, metric)
 
-          if ((first || distance.distanceAfterReschedule < smallest) && vector != distance.vector) {
+          if ((first || rescheduledVector.distanceAfterReschedule < smallest) && vector != rescheduledVector.vector) {
             first = false
 
             bestSolutionRow = rowNumber
-            smallest = distance.distanceAfterReschedule
-            bestSolution = distance
+            smallest = rescheduledVector.distanceAfterReschedule
+            bestSolution = rescheduledVector
           }
 
         }

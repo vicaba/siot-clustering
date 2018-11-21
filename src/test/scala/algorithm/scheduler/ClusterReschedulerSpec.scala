@@ -57,14 +57,16 @@ class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
       And("a cluster with those points")
 
-      val cluster = globalCluster
+      val cluster = globalCluster.deepCopy()
 
       When("asked to reschedule one point")
+
+      val oldCluster = cluster.deepCopy()
 
       val scheduleResult = rescheduleTimes(11, cluster, metric)
 
       Then("the cluster improves distanceFunction")
-      val originalCompatibility = metric(cluster)
+      val originalCompatibility = metric(oldCluster)
       val betterCompatibility   = metric(scheduleResult.head.cluster)
 
       betterCompatibility should be < originalCompatibility
@@ -79,17 +81,19 @@ class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
       And("a cluster with those points")
 
-      val cluster = globalCluster
+      val cluster = globalCluster.deepCopy()
 
       And("a vector solution")
       val vector = DenseVector(7.0, 7.0, 7.0, 7.0)
 
       When("asked to reschedule the cluster")
 
+      val oldCluster = cluster.deepCopy()
+
       val (betterCluster, scheduleResult) = ClusterRescheduler.rescheduleCluster(cluster, metric, 1)
 
       Then("the cluster improves distanceFunction")
-      val originalCompatibility = metric(cluster)
+      val originalCompatibility = metric(oldCluster)
       val betterCompatibility   = metric(betterCluster)
 
       betterCompatibility should be < originalCompatibility

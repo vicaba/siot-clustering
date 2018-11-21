@@ -18,9 +18,11 @@ case class Cluster private (override val id: Int,
                             private var _topLevel: Option[Cluster] = None)(implicit override val types: TypesT)
     extends Types.Cluster {
 
+  override type ThisType = Cluster
+
   override type ContainedElement = Types.Type
 
-  override def deepCopy(): Types.Type = this.copy()
+  override def deepCopy(): ThisType = this.copy()
 
   def copy(id: Int = this.id,
            name: String = this.name,

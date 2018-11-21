@@ -40,7 +40,7 @@ trait GenAlgorithm {
 
     logger.info("Rescheduler")
 
-    val reschedulerResult = rescheduler(step1.clusters, reschedulerSettings)
+    val reschedulerResult = rescheduler(step1.clusters.map(_.deepCopy()), reschedulerSettings)
 
     logger.info("End")
 

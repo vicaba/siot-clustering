@@ -38,6 +38,8 @@ object Types {
 
   trait Type {
 
+    type ThisType <: Type
+
     def id: Int
 
     def data: DataType
@@ -65,7 +67,7 @@ object Types {
 
     override def toString: String = s"Type($id, $data)"
 
-    def deepCopy(): Type
+    def deepCopy(): ThisType
 
   }
 

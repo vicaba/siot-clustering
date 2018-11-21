@@ -8,6 +8,8 @@ case class Point(override val id: Int, override val data: DataType, assignedToCl
     implicit override val types: TypesT)
     extends Types.Type {
 
+  override type ThisType = Point
+
   override def equals(obj: scala.Any): Boolean = obj match {
     case p: Point => this.id == p.id
     case _        => false
@@ -31,7 +33,7 @@ case class Point(override val id: Int, override val data: DataType, assignedToCl
 
   override def centroid: SyntheticDataType = syntheticValue / types.Rows.toDouble
 
-  override def deepCopy(): Types.Type = this.copy()
+  override def deepCopy(): ThisType = this.copy()
 
 }
 
