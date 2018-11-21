@@ -1,40 +1,50 @@
 package algorithm.util
 
-case class RelativeImprovement private (baseValue: Double,
+case class RelativeImprovement[T] private (baseValue: Double,
                                         relativeImprovement: Double,
                                         goodInRange: Int,
-                                        private val history: List[Double]) {
+                                        private val history: List[(Double, T)],
+                                        private val lowestGlobalHistory: List[(Double, T)]) {
 
-  def feed(value: Double): RelativeImprovement = {
+  def feed(value: Double, e: T): RelativeImprovement[T] = {
 
-    if (hasReachedMaxHistory) RelativeImprovement(average, relativeImprovement, goodInRange, Nil)
-    else this.copy(baseValue, relativeImprovement, goodInRange, value :: history)
+    if (hasReachedMaxHistory) {
+      val historyMin = history.minBy(_._1)
+      val _lowestGlobalHistory = if (truncate(historyMin._1) <= truncate(lowestGlobalHistory.minBy(_._1)._1)) {
+        historyMin :: lowestGlobalHistory
+      } else lowestGlobalHistory
+      RelativeImprovement[T](average, relativeImprovement, goodInRange, Nil, _lowestGlobalHistory)
+    }
+    else this.copy(baseValue, relativeImprovement, goodInRange, (value, e) :: history, lowestGlobalHistory)
   }
 
   def average: Double =
     if (history.isEmpty) 0.0
     else
-      history.foldLeft(0.0) { case (accum, item) => accum + item } / history.size
+      history.foldLeft(0.0) { case (accum, item) => accum + item._1 } / history.size
 
   def hasDecreased: Boolean = baseValue > average
 
   def hasImprovedEnough: Boolean =
     if (history.isEmpty) false
-    else hasReachedMaxHistory && (baseValue - average) < relativeImprovement && (history.last - history.head) > 0
+    else hasReachedMaxHistory && (baseValue - average) < relativeImprovement && (history.last._1 - history.head._1) > 0
 
-  def isNotImprovingEnough: Boolean =
+  def isStuck: Boolean =
     if (history.isEmpty || !hasReachedMaxHistory) false
     else {
-      def truncate(n: Double): Double = BigDecimal(n).setScale(3, BigDecimal.RoundingMode.FLOOR).toDouble
       val truncatedAverage            = truncate(average)
-      history.forall(truncate(_) == truncatedAverage)
+      history.forall { e => truncate(e._1) == truncatedAverage }
     }
 
+  def getBest: (Double, T) = lowestGlobalHistory.minBy(_._1)
+
   def hasReachedMaxHistory: Boolean = history.size == goodInRange
+
+  private def truncate(n: Double): Double = BigDecimal(n).setScale(3, BigDecimal.RoundingMode.FLOOR).toDouble
 
 }
 
 object RelativeImprovement {
-  def apply(baseValue: Double, relativeImprovement: Double, goodInRange: Int): RelativeImprovement =
-    new RelativeImprovement(baseValue, relativeImprovement, goodInRange, Nil)
+  def apply[T](baseValue: (Double, T), relativeImprovement: Double, goodInRange: Int): RelativeImprovement[T] =
+    new RelativeImprovement(baseValue._1, relativeImprovement, goodInRange, Nil, baseValue :: Nil)
 }

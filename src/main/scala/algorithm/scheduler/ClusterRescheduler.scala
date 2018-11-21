@@ -55,29 +55,28 @@ object ClusterRescheduler {
 
     @tailrec
     def reschedule(currentClusterMetric: Double,
-                   relativeImprovement: RelativeImprovement,
+                   relativeImprovement: RelativeImprovement[Cluster],
                    cluster: Cluster,
                    changes: List[PointChanged]): (Cluster, List[PointChanged]) = {
 
-      println(relativeImprovement.average)
-
-      if (relativeImprovement.hasImprovedEnough || relativeImprovement.isNotImprovingEnough)
-        (cluster, changes)
+      if (relativeImprovement.hasImprovedEnough || relativeImprovement.isStuck)
+        (relativeImprovement.getBest._2, changes)
       else {
         val pointChange = rescheduleOnePoint(cluster, metric)
         if (pointChange.isDefined) {
           val pointChanged   = new PointChanged(pointChange.get.point, pointChange.get.change)
           val _currentMetric = metric(pointChange.get.cluster)
-          reschedule(_currentMetric, relativeImprovement.feed(_currentMetric), pointChange.get.cluster, pointChanged +: changes)
+          reschedule(_currentMetric, relativeImprovement.feed(_currentMetric, cluster.deepCopy()), pointChange.get.cluster, pointChanged +: changes)
         } else {
           reschedule(currentClusterMetric, relativeImprovement, cluster, changes)
         }
       }
     }
 
-    reschedule(initialMetric, RelativeImprovement(initialMetric, 0.01, cluster.size * (cluster.size / 2)), cluster, List.empty)
+    // TODO: Replace oldCluster with the rescheduledOne
+    val newCluster = reschedule(initialMetric, RelativeImprovement((initialMetric, cluster.deepCopy()), 0.01, cluster.size * (cluster.size / 2)), cluster, List.empty)
 
-    (cluster, Nil)
+    (cluster.topLevel.map(c => c += newCluster._1).get, Nil)
 
   }
 
