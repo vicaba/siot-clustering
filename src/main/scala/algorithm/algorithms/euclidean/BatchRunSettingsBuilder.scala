@@ -24,7 +24,7 @@ class BatchRunSettingsBuilder(override val points: Vector[Point],
                                               points,
                                               metric,
                                               improveIterations(points, numberOfClusters)),
-         ClusterReschedulerOld.Settings(numberOfClusters, metric, 0.5, memory = 3))
+         ClusterReschedulerOld.Settings(numberOfClusters, metric, 0.1, memory = 3))
       }
     }
   }

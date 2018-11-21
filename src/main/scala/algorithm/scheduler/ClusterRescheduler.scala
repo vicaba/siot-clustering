@@ -3,6 +3,7 @@ package algorithm.scheduler
 import algorithm.scheduler.ClusterReschedulerOld.{PointChange, PointChanged, Settings}
 import types._
 import algorithm.scheduler.Rescheduler.MatrixResult
+import algorithm.util.RelativeImprovement
 import metrics.Metric
 import collection._
 import types.{Cluster, Point}
@@ -52,34 +53,29 @@ object ClusterRescheduler {
 
     val initialMetric = metric(cluster)
 
-    def improvementPercentage(improvement: Double): Double = 1 - improvement / initialMetric
-
     @tailrec
     def reschedule(currentClusterMetric: Double,
-                   memory: Memory[Double],
+                   relativeImprovement: RelativeImprovement,
                    cluster: Cluster,
                    changes: List[PointChanged]): (Cluster, List[PointChanged]) = {
 
-      val improvedEnough = improvementPercentage(currentClusterMetric) > improvement
+      println(relativeImprovement.average)
 
-      if (improvedEnough || memory.areAllElementsEqual())
-        if (improvedEnough)
-          (cluster, changes)
-        else
-          (cluster, changes)
+      if (relativeImprovement.hasImprovedEnough || relativeImprovement.isNotImprovingEnough)
+        (cluster, changes)
       else {
         val pointChange = rescheduleOnePoint(cluster, metric)
         if (pointChange.isDefined) {
           val pointChanged   = new PointChanged(pointChange.get.point, pointChange.get.change)
           val _currentMetric = metric(pointChange.get.cluster)
-          reschedule(_currentMetric, _currentMetric +: memory, pointChange.get.cluster, pointChanged +: changes)
+          reschedule(_currentMetric, relativeImprovement.feed(_currentMetric), pointChange.get.cluster, pointChanged +: changes)
         } else {
-          reschedule(currentClusterMetric, 0 +: memory, cluster, changes)
+          reschedule(currentClusterMetric, relativeImprovement, cluster, changes)
         }
       }
     }
 
-    reschedule(initialMetric, Memory(cluster.points.size), cluster, List.empty)
+    reschedule(initialMetric, RelativeImprovement(initialMetric, 0.01, cluster.size * (cluster.size / 2)), cluster, List.empty)
 
     (cluster, Nil)
 
@@ -99,7 +95,12 @@ object ClusterRescheduler {
           c.points
         }
         .asInstanceOf[Set[Point]]
-        .maxBy { point => metric(cluster) - metric(cluster - point)
+        .maxBy { point =>
+
+        val m1 = metric(cluster)
+          val m2 = metric(cluster - point.toCluster)
+
+          metric(cluster) - metric(cluster - point.toCluster)
         }
 
     val rescheduleResult = Rescheduler.reschedule(pointToReschedule.data, cluster - pointToReschedule, metric)
