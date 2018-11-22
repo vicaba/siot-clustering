@@ -11,7 +11,7 @@ import types.ops.SetOps._
 import scala.annotation.tailrec
 import scala.collection
 
-case class Cluster private (override val id: Int,
+case class Cluster private[types] (override val id: Int,
                             name: String,
                             private val _points: scala.collection.mutable.Set[Types.Type],
                             private var _hierarchyLevel: Int = 0,
@@ -29,6 +29,7 @@ case class Cluster private (override val id: Int,
            points: TraversableOnce[Types.Type] = this._points,
            hierarchylevel: Int = this._hierarchyLevel,
            topLevel: Option[Cluster] = this._topLevel): Cluster = {
+    // TODO: Problem with top level, it is shared between copies. BAD!
     new Cluster(id, name, mutableSetOf(points.map(_.deepCopy())), _hierarchyLevel, topLevel)(types)
   }
 

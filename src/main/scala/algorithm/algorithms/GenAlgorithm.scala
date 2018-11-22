@@ -40,13 +40,15 @@ trait GenAlgorithm {
 
     logger.info("Rescheduler")
 
-    val reschedulerResult = rescheduler(step1.clusters.map(_.deepCopy()), reschedulerSettings)
+    val clustersCopy = Types.Type.deepCopy(step1.clusters).asInstanceOf[List[Cluster]]
+
+    val reschedulerResult = rescheduler(clustersCopy, reschedulerSettings)
 
     logger.info("End")
 
     Steps(
       _1 = step1,
-      _2 = StepT(reschedulerSettings, step1.clusters)
+      _2 = StepT(reschedulerSettings, reschedulerResult.map(_._1))
     )
   }
 

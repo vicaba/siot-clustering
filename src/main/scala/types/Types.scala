@@ -34,6 +34,32 @@ object Types {
       case p: Point => types.Cluster(p.id, p.id.toString, Set(p), 0, None)(p.types)
     }
 
+    def deepCopy(types: List[Type]): List[Type] = types.map(deepCopy)
+
+    def deepCopy(_type: Type): Type = {
+
+      def deepCopy(_type: Type, parent: Option[types.Cluster]): Type = _type match {
+        case c: types.Cluster =>
+          if (parent.isDefined) {
+            c.topLevel = parent
+            c.points.foreach(deepCopy(_, Some(c)))
+          } else {
+            c.points.foreach(deepCopy(_, Some(c)))
+          }
+          c
+        case p: Point => parent.get += p.setCluster(parent.get)
+      }
+
+      _type match {
+        case c: types.Cluster =>
+          val clusterCopy = c.deepCopy()
+          clusterCopy.points.foreach(t => deepCopy(t, Some(clusterCopy)))
+          clusterCopy
+        case p: Point => p.deepCopy()
+      }
+
+    }
+
   }
 
   trait Type {

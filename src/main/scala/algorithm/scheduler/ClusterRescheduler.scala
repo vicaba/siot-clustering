@@ -76,7 +76,7 @@ object ClusterRescheduler {
     // TODO: Replace oldCluster with the rescheduledOne
     val newCluster = reschedule(initialMetric, RelativeImprovement((initialMetric, cluster.deepCopy()), 0.01, cluster.size * (cluster.size / 2)), cluster, List.empty)
 
-    (cluster.topLevel.map(c => c += newCluster._1).get, Nil)
+    (cluster.setPoints(newCluster._1.points), Nil)
 
   }
 
