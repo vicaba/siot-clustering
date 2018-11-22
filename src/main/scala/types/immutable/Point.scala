@@ -1,12 +1,14 @@
-package types
+package types.immutable
 
-import breeze.linalg.{DenseVector, sum}
+import breeze.linalg.DenseVector
 import metrics.DenseVectorReprOps
 import types.Types.{DataType, SyntheticDataType}
+import types.mutable.Cluster
+import types.{DataTypeMetadata, PointLike, Type}
 
-case class Point(override val id: Int, override val data: DataType, assignedToCluster: Option[Cluster] = None)(
-    implicit override val types: TypesT)
-    extends Types.Type {
+case class Point(override val id: Int, override val data: DataType, override val assignedToCluster: Option[Cluster] = None)(
+    implicit override val dataTypeMetadata: DataTypeMetadata)
+    extends PointLike {
 
   override type ThisType = Point
 
@@ -27,11 +29,11 @@ case class Point(override val id: Int, override val data: DataType, assignedToCl
 
   def setValues(data: DataType): Point = this.copy(data = data)
 
-  def syntheticValue: SyntheticDataType = types.synthesizeValues(this.data)
+  def syntheticValue: SyntheticDataType = dataTypeMetadata.synthesizeValues(this.data)
 
   def toCluster: Cluster = Point.toCluster(this)
 
-  override def centroid: SyntheticDataType = syntheticValue / types.Rows.toDouble
+  override def centroid: SyntheticDataType = syntheticValue / dataTypeMetadata.Rows.toDouble
 
   override def deepCopy(): ThisType = this.copy()
 
@@ -41,7 +43,7 @@ object Point {
 
   import scala.language.implicitConversions
 
-  def toCluster(point: Point): types.Cluster = Types.Type.toCluster(point)
+  def toCluster(point: Point): Cluster = Type.toCluster(point)
 
   implicit def pointListToVector(list: List[Point]): Option[SyntheticDataType] = list.map(_.syntheticValue) match {
     case Nil   => None
@@ -54,7 +56,7 @@ object Point {
 
     override def apply(t: Point): DenseVector[Double] = t.syntheticValue
 
-    override def zero(t: Point): DenseVector[Double] = t.types.EmptySyntheticData()
+    override def zero(t: Point): DenseVector[Double] = t.dataTypeMetadata.EmptySyntheticData()
   }
 
 }

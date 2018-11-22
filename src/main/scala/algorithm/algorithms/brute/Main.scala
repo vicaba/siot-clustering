@@ -1,6 +1,7 @@
 package algorithm.algorithms.brute
 
 import java.io._
+
 import breeze.linalg.{DenseMatrix, DenseVector}
 import algorithm.serialization.BruteAlgorithmJsonSerializer._
 import batch.GenBatchRun
@@ -8,10 +9,10 @@ import types._
 import config.Configuration
 import metrics.Par
 import play.api.libs.json.{JsValue, Json}
-import types.Point
 import types.serialization.ClusterJsonSerializer._
 import algorithm.serialization.BruteClustererSettingsJsonSerializer._
 import algorithm.serialization.ResultsJsonSerializer
+import types.immutable.Point
 import utils.FileUtils
 
 import scala.util.Try

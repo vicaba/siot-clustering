@@ -5,13 +5,13 @@ import algorithm.scheduler.Rescheduler.{MatrixResult, VectorResult}
 import metrics._
 import org.scalatest.Matchers._
 import org.scalatest._
-import types.{Types, Types4}
+import types.{Types, DataTypeMetadata4Columns}
 
 import scala.annotation.tailrec
 
 class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
-  implicit val types = Types4
+  implicit val types = DataTypeMetadata4Columns
 
   val metric = Metric.par
 

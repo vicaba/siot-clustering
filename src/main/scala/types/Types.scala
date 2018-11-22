@@ -2,10 +2,11 @@ package types
 
 import breeze.linalg._
 import metrics.DenseVectorReprOps
+import types.immutable.Point
 
 import scala.annotation.tailrec
 
-trait TypesT {
+trait DataTypeMetadata {
 
   /**
     * Rows correspond to each appliance, columns correspond to each time interval
@@ -27,76 +28,6 @@ trait TypesT {
 
 object Types {
 
-  object Type {
-
-    def toCluster(_type: Type): types.Cluster = _type match {
-      case c: types.Cluster => c
-      case p: Point => types.Cluster(p.id, p.id.toString, Set(p), 0, None)(p.types)
-    }
-
-    def deepCopy(types: List[Type]): List[Type] = types.map(deepCopy)
-
-    def deepCopy(_type: Type): Type = {
-
-      def deepCopy(_type: Type, parent: Option[types.Cluster]): Type = _type match {
-        case c: types.Cluster =>
-          if (parent.isDefined) {
-            c.topLevel = parent
-            c.points.foreach(deepCopy(_, Some(c)))
-          } else {
-            c.points.foreach(deepCopy(_, Some(c)))
-          }
-          c
-        case p: Point => parent.get += p.setCluster(parent.get)
-      }
-
-      _type match {
-        case c: types.Cluster =>
-          val clusterCopy = c.deepCopy()
-          clusterCopy.points.foreach(t => deepCopy(t, Some(clusterCopy)))
-          clusterCopy
-        case p: Point => p.deepCopy()
-      }
-
-    }
-
-  }
-
-  trait Type {
-
-    type ThisType <: Type
-
-    def id: Int
-
-    def data: DataType
-
-    def syntheticValue: SyntheticDataType
-
-    def centroid: SyntheticDataType
-
-    def types: TypesT
-
-    def size: Int
-
-    @tailrec
-    final def sumPoints(remaining: List[DataType], accum: DataType): DataType = remaining match {
-      case e :: tail => sumPoints(tail, accum + e)
-      case Nil       => accum
-    }
-
-    @tailrec
-    final def sumVectors(remaining: List[SyntheticDataType], accum: SyntheticDataType): SyntheticDataType =
-      remaining match {
-        case e :: tail => sumVectors(tail, accum + e)
-        case Nil       => accum
-      }
-
-    override def toString: String = s"Type($id, $data)"
-
-    def deepCopy(): ThisType
-
-  }
-
   trait Cluster extends Type {
 
     type ContainedElement
@@ -115,7 +46,7 @@ object Types {
 
       override def apply(t: Cluster): DenseVector[Double] = clusterToVector(t)
 
-      override def zero(t: Cluster): DenseVector[Double] = t.types.EmptySyntheticData()
+      override def zero(t: Cluster): DenseVector[Double] = t.dataTypeMetadata.EmptySyntheticData()
     }
 
   }
@@ -127,26 +58,26 @@ object Types {
 
   type SyntheticDataType = DenseVector[Double]
 
-  def EmptyData()(implicit types: TypesT): DataType = DenseMatrix.zeros[Double](types.Rows, types.Columns)
+  def EmptyData()(implicit types: DataTypeMetadata): DataType = DenseMatrix.zeros[Double](types.Rows, types.Columns)
 
-  def EmptySyntheticData()(implicit types: TypesT): SyntheticDataType = sum(EmptyData(), Axis._0).inner
+  def EmptySyntheticData()(implicit types: DataTypeMetadata): SyntheticDataType = sum(EmptyData(), Axis._0).inner
 
   def synthesizeValues(values: DataType): SyntheticDataType = sum(values, Axis._0).inner
 
 }
 
-object Types2 extends TypesT {
+object DataTypeMetadata2Columns extends DataTypeMetadata {
   override val Columns: Int = 2
 }
 
-object Types4 extends TypesT {
+object DataTypeMetadata4Columns extends DataTypeMetadata {
   override val Columns: Int = 4
 }
 
-object Types24 extends TypesT {
+object DataTypeMetadata24Columns extends DataTypeMetadata {
   override val Columns: Int = 24
 }
 
-object Types67_24 extends TypesT {
+object Types67_24 extends DataTypeMetadata {
   override val Columns: Int = 24
 }

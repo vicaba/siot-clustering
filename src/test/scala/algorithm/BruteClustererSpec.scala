@@ -7,10 +7,12 @@ import metrics.{Metric, Par}
 import org.scalatest.Matchers._
 import org.scalatest.{FeatureSpec, GivenWhenThen}
 import types._
+import types.mutable.Cluster
+import types.immutable.Point
 
 class BruteClustererSpec extends FeatureSpec with GivenWhenThen {
 
-  implicit val types: TypesT = Types4
+  implicit val types: DataTypeMetadata = DataTypeMetadata4Columns
 
   val metric = Par.withParAggregate
 

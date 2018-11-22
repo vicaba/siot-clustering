@@ -5,8 +5,9 @@ import algorithm.clusterer.FlattenedEuclideanClusterer.{ClusteringOrder, Setting
 import eventmanager.EventManager
 import metrics.{Metric, Par}
 import types.Types.SyntheticDataType
+import types.immutable.Point
 import types.ops.MirrorImage
-import types.{Cluster, Point}
+import types.mutable.Cluster
 
 import scala.annotation.tailrec
 import scala.collection.immutable.LinearSeq
@@ -45,7 +46,7 @@ object EuclideanClusterer {
 
     if (iterations > 0 && freeClusters.nonEmpty) {
       val head                         = freeClusters.head
-      val c                            = Cluster(head.id + 1, UUID.randomUUID().toString, Set(head), head.hierarchyLevel + 1, None)(head.types)
+      val c                            = Cluster(head.id + 1, UUID.randomUUID().toString, Set(head), head.hierarchyLevel + 1, None)(head.dataTypeMetadata)
       val tail                         = freeClusters.tail
       val (cluster, remainingClusters) = clustersToClusterXTimes(c, centroid, tail, heuristic, membersPerCluster)
       clustersToClusters(iterations - 1, centroid, remainingClusters, heuristic, membersPerCluster, cluster +: clusters)
@@ -165,7 +166,7 @@ object EuclideanClusterer {
 
     if (clusters.isEmpty) return Nil
     if (stopAtKClusters == 1)
-      return List(Cluster(1, "1", new mutable.HashSet[Cluster]() ++= clusters, 0, None)(clusters.head.types))
+      return List(Cluster(1, "1", new mutable.HashSet[Cluster]() ++= clusters, 0, None)(clusters.head.dataTypeMetadata))
 
     EventManager.singleton.publish("clusters", _clusters.toList)
 

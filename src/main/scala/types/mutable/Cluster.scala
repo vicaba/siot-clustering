@@ -1,36 +1,36 @@
-package types
+package types.mutable
 
 import breeze.linalg._
-import breeze.math._
-import breeze.numerics._
 import metrics.DenseVectorReprOps
-import spire.algebra.{InnerProductSpace, VectorSpace}
 import types.Types.{DataType, SyntheticDataType}
+import types.immutable.Point
 import types.ops.SetOps._
+import types.{Types, DataTypeMetadata}
+import types.Type
 
 import scala.annotation.tailrec
 import scala.collection
 
 case class Cluster private[types] (override val id: Int,
                             name: String,
-                            private val _points: scala.collection.mutable.Set[Types.Type],
+                            private val _points: scala.collection.mutable.Set[Type],
                             private var _hierarchyLevel: Int = 0,
-                            private var _topLevel: Option[Cluster] = None)(implicit override val types: TypesT)
+                            private var _topLevel: Option[Cluster] = None)(implicit override val dataTypeMetadata: DataTypeMetadata)
     extends Types.Cluster {
 
   override type ThisType = Cluster
 
-  override type ContainedElement = Types.Type
+  override type ContainedElement = Type
 
   override def deepCopy(): ThisType = this.copy()
 
   def copy(id: Int = this.id,
            name: String = this.name,
-           points: TraversableOnce[Types.Type] = this._points,
+           points: TraversableOnce[Type] = this._points,
            hierarchylevel: Int = this._hierarchyLevel,
            topLevel: Option[Cluster] = this._topLevel): Cluster = {
     // TODO: Problem with top level, it is shared between copies. BAD!
-    new Cluster(id, name, mutableSetOf(points.map(_.deepCopy())), _hierarchyLevel, topLevel)(types)
+    new Cluster(id, name, mutableSetOf(points.map(_.deepCopy())), _hierarchyLevel, topLevel)(dataTypeMetadata)
   }
 
   override def equals(obj: scala.Any): Boolean = obj match {
@@ -44,12 +44,12 @@ case class Cluster private[types] (override val id: Int,
 
   def nonEmpty: Boolean = !isEmpty
 
-  def setPoints(points: Traversable[Types.Type]): Cluster = {
+  def setPoints(points: Traversable[Type]): Cluster = {
     (this --= points) ++= points.map(typeTransform)
     this
   }
 
-  override def points: collection.Set[Types.Type] = _points.toSet
+  override def points: collection.Set[Type] = _points.toSet
 
   def hierarchyLevel_=(_hierarchyLevel: Int): Cluster = {
     this._hierarchyLevel = _hierarchyLevel
@@ -65,7 +65,7 @@ case class Cluster private[types] (override val id: Int,
 
   def topLevel: Option[Cluster] = _topLevel
 
-  def +=(point: Types.Type): Cluster = {
+  def +=(point: Type): Cluster = {
     (this._points -= typeTransform(point)) += typeTransform(point)
     this
   }
@@ -75,22 +75,22 @@ case class Cluster private[types] (override val id: Int,
     this
   }
 
-  def ++=(points: Traversable[Types.Type]): Cluster = {
+  def ++=(points: Traversable[Type]): Cluster = {
     this._points --/++= points.map(typeTransform)
     this
   }
 
-  def --=(points: Traversable[Types.Type]): Cluster = {
+  def --=(points: Traversable[Type]): Cluster = {
     this._points --= points.map(typeTransform)
     this
   }
 
-  def +(point: Types.Type): Cluster = {
+  def +(point: Type): Cluster = {
     val newPoints = this._points.toSet -/+ typeTransform(point)
     this.copy(points = mutableSetOf(newPoints))
   }
 
-  def -(point: Types.Type): Cluster = {
+  def -(point: Type): Cluster = {
     val newPoints = this._points.toSet - typeTransform(point)
     this.copy(points = mutableSetOf(newPoints))
   }
@@ -106,7 +106,7 @@ case class Cluster private[types] (override val id: Int,
   }
 
   def centroid: SyntheticDataType =
-    _points.foldLeft(types.EmptySyntheticData()) {
+    _points.foldLeft(dataTypeMetadata.EmptySyntheticData()) {
       case (accum, p) =>
         accum + p.syntheticValue
     } / _points.size.toDouble
@@ -120,20 +120,20 @@ case class Cluster private[types] (override val id: Int,
 
     val syntheticValues = this._points.toList.map(_.syntheticValue)
 
-    sumVectors(syntheticValues, types.EmptySyntheticData())
+    sumVectors(syntheticValues, dataTypeMetadata.EmptySyntheticData())
   }
 
   override def data: DataType = {
 
     val values = this._points.toList.map(_.data)
 
-    sumPoints(values, types.EmptyData())
+    sumPoints(values, dataTypeMetadata.EmptyData())
 
   }
 
   override def size: Int = _points.foldLeft(0)(_ + _.size)
 
-  private def typeTransform(_type: Types.Type): Types.Type = _type match {
+  private def typeTransform(_type: Type): Type = _type match {
     case p: Point   => p.setCluster(this)
     case c: Cluster => c.topLevel_=(Some(this)).hierarchyLevel_=(this._hierarchyLevel - 1)
   }
@@ -150,13 +150,13 @@ object Cluster {
 
   import scala.language.implicitConversions
 
-  def apply(id: Int, name: String, points: Traversable[Types.Type], hierarchyLevel: Int, topLevel: Option[Cluster])(
-      implicit types: TypesT): Cluster = {
+  def apply(id: Int, name: String, points: Traversable[Type], hierarchyLevel: Int, topLevel: Option[Cluster])(
+      implicit types: DataTypeMetadata): Cluster = {
     val c = new Cluster(id, name, mutableSetOf(Set.empty), hierarchyLevel, topLevel)(types)
     c ++= points
   }
 
-  def Empty(implicit types: TypesT): Cluster = Cluster(-1, "empty", Set.empty, 0, None)(types)
+  def Empty(implicit types: DataTypeMetadata): Cluster = Cluster(-1, "empty", Set.empty, 0, None)(types)
 
   implicit def clusterToVector(c: Cluster): SyntheticDataType = c.syntheticValue
 
@@ -164,13 +164,13 @@ object Cluster {
 
     override def apply(t: Cluster): DenseVector[Double] = clusterToVector(t)
 
-    override def zero(t: Cluster): DenseVector[Double] = t.types.EmptySyntheticData()
+    override def zero(t: Cluster): DenseVector[Double] = t.dataTypeMetadata.EmptySyntheticData()
   }
 
   implicit val listToVector: DenseVectorReprOps[List[Cluster]] = new DenseVectorReprOps[List[Cluster]] {
 
     private def lift(t: List[Cluster]): Cluster =
-      Cluster(-1, "lifted", t, t.headOption.map(_.id).getOrElse(-1), None)(t.head.types)
+      Cluster(-1, "lifted", t, t.headOption.map(_.id).getOrElse(-1), None)(t.head.dataTypeMetadata)
 
     override def apply(t: List[Cluster]): DenseVector[Double] = toVector.apply(lift(t))
 
@@ -181,7 +181,7 @@ object Cluster {
   def flatten(cl: TraversableOnce[Cluster]): Set[Point] = {
 
     @tailrec
-    def _flatten(types: List[Types.Type], accum: List[Point]): List[Point] = types match {
+    def _flatten(types: List[Type], accum: List[Point]): List[Point] = types match {
       case Nil => accum
       case h :: tail =>
         h match {
@@ -199,7 +199,7 @@ object Cluster {
   def traverseAndFindFittest(cl: List[Cluster], p: Cluster => Double): Option[(Double, Cluster)] = {
 
     @tailrec
-    def _traverseAndFindFittest(types: List[Types.Type], best: (Double, Cluster)): (Double, Cluster) = types match {
+    def _traverseAndFindFittest(types: List[Type], best: (Double, Cluster)): (Double, Cluster) = types match {
       case Nil => best
       case h :: tail =>
         h match {

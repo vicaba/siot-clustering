@@ -3,9 +3,8 @@ import algorithm.algorithms.GenAlgorithm
 import algorithm.clusterer.EuclideanClusterer
 import algorithm.clusterer.FlattenedEuclideanClusterer.Settings
 import algorithm.clusterer.FlattenedEuclideanClusterer
-import algorithm.scheduler.{ClusterReschedulerOld, ClusterRescheduler}
-import types.Cluster
-
+import algorithm.scheduler.{ClusterRescheduler, ClusterReschedulerOld}
+import types.mutable.Cluster
 object EuclideanAlgorithm extends GenAlgorithm {
 
   override type ClustererSettingsT = Settings

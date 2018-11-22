@@ -1,7 +1,9 @@
 package types.ops
 import breeze.linalg.norm
+import types.mutable.Cluster
+import types.Type
 import types.Types.SyntheticDataType
-import types.{Cluster, Point, Types}
+import types.immutable.Point
 
 object MirrorImage {
 
@@ -27,15 +29,15 @@ object MirrorImage {
 
   }
 
-  implicit object MirroredType extends Mirrored[Types.Type] {
-    override def findMirror: FindMirror[Types.Type] = new FindMirror[Types.Type] {
-      override def apply(origin: Types.Type, center: SyntheticDataType): SyntheticDataType =
+  implicit object MirroredType extends Mirrored[Type] {
+    override def findMirror: FindMirror[Type] = new FindMirror[Type] {
+      override def apply(origin: Type, center: SyntheticDataType): SyntheticDataType =
         (2.0 * center) - origin.syntheticValue
     }
 
-    override implicit def distance: DistanceFunc[Types.Type] = new DistanceFunc[Types.Type] {
-      override def apply(e1: Types.Type, e2: Types.Type): Double           = norm(e2.syntheticValue - e1.syntheticValue, 2)
-      override def apply(e1: Types.Type, e2: SyntheticDataType): Double = norm(e2 - e1.syntheticValue, 2)
+    override implicit def distance: DistanceFunc[Type] = new DistanceFunc[Type] {
+      override def apply(e1: Type, e2: Type): Double           = norm(e2.syntheticValue - e1.syntheticValue, 2)
+      override def apply(e1: Type, e2: SyntheticDataType): Double = norm(e2 - e1.syntheticValue, 2)
     }
 
   }

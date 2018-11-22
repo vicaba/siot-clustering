@@ -2,8 +2,7 @@ package algorithm.algorithms.brute
 import algorithm.algorithms.GenAlgorithm
 import algorithm.clusterer.BruteClusterer
 import algorithm.scheduler.ClusterReschedulerOld
-import types.Cluster
-
+import types.mutable.Cluster
 object BruteAlgorithm extends GenAlgorithm {
 
   override type ClustererSettingsT   = BruteClusterer.Settings

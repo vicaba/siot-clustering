@@ -6,7 +6,8 @@ import algorithm.scheduler.Rescheduler.MatrixResult
 import algorithm.util.RelativeImprovement
 import metrics.Metric
 import collection._
-import types.{Cluster, Point}
+import types.immutable.Point
+import types.mutable.Cluster
 import types.ops.SetOps._
 
 import scala.annotation.tailrec
@@ -16,7 +17,7 @@ object ClusterRescheduler {
   def apply(clusters: List[Cluster], settings: Settings): List[(Cluster, List[PointChanged])] = {
 
     // TODO: make tail recursive. Use trampoline?
-    def retrieveLeafClusters(clusters: List[Types.Type]): List[Cluster] = {
+    def retrieveLeafClusters(clusters: List[Type]): List[Cluster] = {
       clusters.flatMap {
         case point: Point =>
           point.assignedToCluster.toList.flatMap { c => if (c.hierarchyLevel == 0) c.topLevel else Nil

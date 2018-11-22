@@ -3,8 +3,10 @@ package algorithm.clusterer
 import eventmanager.EventManager
 import metrics.Metric
 import types.Types.SyntheticDataType
+import types.immutable.Point
+import types.mutable.Cluster
 import types.ops.MirrorImage
-import types.{Cluster, Point, Types, Types2}
+import types.{Types, DataTypeMetadata2Columns}
 import utils.MathUtils
 
 import scala.annotation.tailrec
@@ -12,6 +14,7 @@ import scala.collection.immutable.LinearSeq
 import scala.util.Random
 import scala.math._
 import types.ops.SetOps._
+import types.Type
 
 object FlattenedEuclideanClusterer {
 
@@ -58,8 +61,8 @@ object FlattenedEuclideanClusterer {
     }
   }
 
-  def centroidOf[T <: Types.Type](points: Seq[T]): types.Types.SyntheticDataType =
-    points.foldLeft(points.head.types.EmptySyntheticData()) {
+  def centroidOf[T <: Type](points: Seq[T]): types.Types.SyntheticDataType =
+    points.foldLeft(points.head.dataTypeMetadata.EmptySyntheticData()) {
       case (accum, p) =>
         accum + p.syntheticValue
     } / points.length.toDouble
@@ -117,7 +120,7 @@ object FlattenedEuclideanClusterer {
         freeClusters.indexWhere(_.id == closestMirror.head._2.id)
       val mirror            = freeClusters(mirrorIndex)
       val remainingClusters = freeClusters.patch(mirrorIndex, IndexedSeq(), 1)
-      val clusterPoints     = new scala.collection.mutable.HashSet[Types.Type]() ++= (c.points ++ mirror.points)
+      val clusterPoints     = new scala.collection.mutable.HashSet[Type]() ++= (c.points ++ mirror.points)
       (c.copy(points = clusterPoints), remainingClusters)
     }
   }
@@ -157,7 +160,7 @@ object FlattenedEuclideanClusterer {
     var _clusters: IndexedSeq[Cluster] = clusters.toIndexedSeq
 
     if (clusters.isEmpty) return Nil
-    if (stopAtKClusters == 1) return List(Cluster(1, "1", points.toSet, 0, None)(clusters.head.types))
+    if (stopAtKClusters == 1) return List(Cluster(1, "1", points.toSet, 0, None)(clusters.head.dataTypeMetadata))
 
     EventManager.singleton.publish("clusters", _clusters.toList)
 
@@ -184,7 +187,7 @@ object FlattenedEuclideanClusterer {
     val outliers = clusters.flatMap(_.points).toSet -- _clusters.flatMap(_.points).toSet
 
     val finalClusters =
-      clustersToFixedClusters(centroid, _clusters, outliers.map(Types.Type.toCluster).toIndexedSeq, heuristic)
+      clustersToFixedClusters(centroid, _clusters, outliers.map(Type.toCluster).toIndexedSeq, heuristic)
 
     if (outliers.nonEmpty) EventManager.singleton.publish("clusters", finalClusters.toList)
 

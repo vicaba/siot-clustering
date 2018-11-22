@@ -1,9 +1,9 @@
 package types.serialization
 
 import play.api.libs.json._
-import types.Cluster
 import TypesJsonSerializer._
 import metrics.Metric
+import types.mutable.Cluster
 
 object ClusterJsonSerializer {
 
