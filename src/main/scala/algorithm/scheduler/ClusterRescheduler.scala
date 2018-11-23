@@ -59,6 +59,7 @@ object ClusterRescheduler {
                    cluster: Cluster,
                    changes: List[PointChanged]): (Cluster, List[PointChanged]) = {
 
+
       if (relativeImprovement.hasImprovedEnough || relativeImprovement.isStuck)
         (relativeImprovement.getBest._2, changes)
       else {
@@ -74,7 +75,7 @@ object ClusterRescheduler {
     }
 
     // TODO: Replace oldCluster with the rescheduledOne
-    val newCluster = reschedule(initialMetric, RelativeImprovement((initialMetric, cluster.deepCopy()), 0.01, cluster.size * (cluster.size / 2)), cluster, List.empty)
+    val newCluster = reschedule(initialMetric, RelativeImprovement((initialMetric, cluster.deepCopy()), 0.01, cluster.size + (cluster.size / 2)), cluster, List.empty)
 
     (cluster.setPoints(newCluster._1.points), Nil)
 
