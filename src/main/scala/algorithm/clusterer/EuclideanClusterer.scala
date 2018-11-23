@@ -166,7 +166,7 @@ object EuclideanClusterer {
 
     if (clusters.isEmpty) return Nil
     if (stopAtKClusters == 1)
-      return List(Cluster(1, "1", new mutable.HashSet[Cluster]() ++= clusters, 0, None)(clusters.head.dataTypeMetadata))
+      return List(Cluster(1, "1", new mutable.HashSet[Cluster]() ++= clusters, 1, None)(clusters.head.dataTypeMetadata))
 
     EventManager.singleton.publish("clusters", _clusters.toList)
 

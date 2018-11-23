@@ -1,10 +1,10 @@
 package algorithm.util
 
 case class RelativeImprovement[T] private (baseValue: Double,
-                                        relativeImprovement: Double,
-                                        goodInRange: Int,
-                                        private val history: List[(Double, T)],
-                                        private val lowestGlobalHistory: List[(Double, T)]) {
+                                           relativeImprovement: Double,
+                                           goodInRange: Int,
+                                           private val history: List[(Double, T)],
+                                           private val lowestGlobalHistory: List[(Double, T)]) {
 
   def feed(value: Double, e: T): RelativeImprovement[T] = {
 
@@ -27,20 +27,20 @@ case class RelativeImprovement[T] private (baseValue: Double,
 
   def hasImprovedEnough: Boolean =
     if (history.isEmpty) false
-    else hasReachedMaxHistory && (baseValue - average) < relativeImprovement && (history.last._1 - history.head._1) > 0
+    else hasReachedMaxHistory && (baseValue - average) < relativeImprovement
 
   def isStuck: Boolean =
     if (history.isEmpty || !hasReachedMaxHistory) false
     else {
       val truncatedAverage            = truncate(average)
-      history.forall { e => truncate(e._1) == truncatedAverage }
+      history.count { e => truncate(e._1) == truncatedAverage } >= Math.floor(0.6 * goodInRange)
     }
 
   def getBest: (Double, T) = lowestGlobalHistory.minBy(_._1)
 
   def hasReachedMaxHistory: Boolean = history.size == goodInRange
 
-  private def truncate(n: Double): Double = BigDecimal(n).setScale(3, BigDecimal.RoundingMode.FLOOR).toDouble
+  def truncate(n: Double): Double = BigDecimal(n).setScale(3, BigDecimal.RoundingMode.FLOOR).toDouble
 
 }
 
