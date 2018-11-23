@@ -31,7 +31,7 @@ object Main {
       }
       .toVector*/
 
-    val points = readEgaugeData(Configuration.userProfilesFile).take(5)
+    val points = readEgaugeData(Configuration.userProfilesFile)
 
     val batchRunSettingsBuilder =
       new BatchRunSettingsBuilder(points,
@@ -99,7 +99,7 @@ object Main {
       yield {
         val subsampleSize = Percentage.of(i / Max)
         val splits = Math.floor((batchRunSettingsBuilder.points.size * subsampleSize.v).toDouble).toInt
-        MonteCarlo(1, subsampleSize)
+        MonteCarlo(splits, subsampleSize)
       }
     val stepsList = CrossFoldValidation.batchRun(EuclideanAlgorithm)(monteCarlos.toList, batchRunSettingsBuilder)
 
