@@ -71,8 +71,8 @@ object ClusterRescheduler {
           val _currentMetric = metric(pointChange.get.cluster)
           reschedule(_currentMetric, relativeImprovement.feed(_currentMetric, cluster.deepCopy()), pointChange.get.cluster, pointChanged +: changes)
         } else {
-          // TODO: If the point is not defined and you have tried X times, then... what happens now is infinite loop
-          reschedule(currentClusterMetric, relativeImprovement, cluster, changes)
+          // TODO: If the point is not defined and you have tried X times, then... what happens now is infinite loop, ClusterRescheduler or RelativeImprovement?
+          (relativeImprovement.getBest._2, changes)
         }
       }
     }
