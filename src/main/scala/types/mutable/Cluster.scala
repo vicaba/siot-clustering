@@ -5,8 +5,7 @@ import metrics.DenseVectorReprOps
 import types.Types.{DataType, SyntheticDataType}
 import types.immutable.Point
 import types.ops.SetOps._
-import types.{Types, DataTypeMetadata}
-import types.Type
+import types.{ClusterLike, DataTypeMetadata, Type, Types}
 
 import scala.annotation.tailrec
 import scala.collection
@@ -16,7 +15,7 @@ case class Cluster private[types] (override val id: Int,
                             private val _points: scala.collection.mutable.Set[Type],
                             private var _hierarchyLevel: Int = 0,
                             private var _topLevel: Option[Cluster] = None)(implicit override val dataTypeMetadata: DataTypeMetadata)
-    extends Types.Cluster {
+    extends ClusterLike {
 
   override type ThisType = Cluster
 

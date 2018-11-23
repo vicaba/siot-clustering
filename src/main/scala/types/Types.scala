@@ -28,28 +28,6 @@ trait DataTypeMetadata {
 
 object Types {
 
-  trait Cluster extends Type {
-
-    type ContainedElement
-
-    def points: scala.collection.Set[ContainedElement]
-
-    override def toString: String = s"Cluster($id, $size, $points)"
-
-  }
-
-  object Cluster {
-
-    implicit def clusterToVector(c: Cluster): SyntheticDataType = c.syntheticValue
-
-    implicit val toVector: DenseVectorReprOps[Cluster] = new DenseVectorReprOps[Cluster] {
-
-      override def apply(t: Cluster): DenseVector[Double] = clusterToVector(t)
-
-      override def zero(t: Cluster): DenseVector[Double] = t.dataTypeMetadata.EmptySyntheticData()
-    }
-
-  }
 
   /**
     * Rows correspond to each appliance, columns correspond to each time interval

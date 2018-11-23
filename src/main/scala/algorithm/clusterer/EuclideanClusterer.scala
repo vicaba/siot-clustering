@@ -210,7 +210,7 @@ object EuclideanClusterer {
     var best: LinearSeq[Cluster] = null
 
     for (i <- 0 until maxIterations) {
-      val result          = clusterer(clusters/*Random.shuffle(clusters)*/)
+      val result          = clusterer(Random.shuffle(clusters))
       val aggregateMetric = metricToOptimize.aggregateOf(result)
       val maxMetric       = metricToOptimize(result.maxBy(metricToOptimize(_)))
       if (i == 0) best = result

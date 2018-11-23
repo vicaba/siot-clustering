@@ -8,6 +8,8 @@ case class RelativeImprovement[T] private (baseValue: Double,
 
   def feed(value: Double, e: T): RelativeImprovement[T] = {
 
+    println("historySize: " + history.size)
+
     if (hasReachedMaxHistory) {
       val historyMin = history.minBy(_._1)
       val _lowestGlobalHistory = if (truncate(historyMin._1) <= truncate(lowestGlobalHistory.minBy(_._1)._1)) {
