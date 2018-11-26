@@ -11,6 +11,7 @@ import breeze.linalg._
 import scalafx.scene.control.Button
 import scalafx.scene.layout.{BorderPane, HBox, Pane}
 import types._
+import types.mutable.Cluster
 import utils.Generator
 
 import scala.util.Random

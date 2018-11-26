@@ -1,7 +1,6 @@
 package algorithm.algorithms
 import metrics.Metric
-import types.Point
-
+import types.immutable.Point
 trait BatchRunSettingsBuilder[Algorithm <: GenAlgorithm] {
 
   type ThisType = BatchRunSettingsBuilder[Algorithm]

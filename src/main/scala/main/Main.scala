@@ -8,7 +8,9 @@ import gui.{GridGui, GridGuiActor}
 import javafx.embed.swing.JFXPanel
 import javafx.event.{ActionEvent, EventHandler}
 import metrics.Metric
-import types.{Cluster, Point, Types2}
+import types.mutable.Cluster
+import types.DataTypeMetadata2Columns
+import types.immutable.Point
 import utils.Generator
 
 case class AlgorithmActor(gui: ActorRef) extends Actor {
@@ -60,7 +62,7 @@ case class AlgorithmActor(gui: ActorRef) extends Actor {
       .zipWithIndex
       .map {
         case (m, idx) =>
-          Point(idx, m.toDenseVector.asDenseMatrix, None)(Types2)
+          Point(idx, m.toDenseVector.asDenseMatrix, None)(DataTypeMetadata2Columns)
       }
       .toVector
 

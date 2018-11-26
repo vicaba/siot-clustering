@@ -2,7 +2,8 @@ package algorithm.scheduler
 
 import algorithm.scheduler.Rescheduler.MatrixResult
 import metrics.Metric
-import types.{Cluster, Point}
+import types.immutable.Point
+import types.mutable.Cluster
 
 
 object ClusterReschedulerOld {

@@ -1,5 +1,6 @@
 package eventmanager
-import types.Cluster
+import types.mutable.Cluster
+
 
 object Events {
   case class NewClusters(clusters: List[Cluster])

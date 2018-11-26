@@ -2,14 +2,15 @@ package algorithm2
 
 import breeze.linalg.{DenseMatrix, DenseVector}
 import org.scalatest.{FeatureSpec, GivenWhenThen}
-import types.{Cluster, Point, Types2, TypesT}
+import types.{DataTypeMetadata2Columns, DataTypeMetadata}
 import algorithm.clusterer.FlattenedEuclideanClusterer._
 import org.scalatest.Matchers._
+import types.immutable.Point
 import types.ops.MirrorImage._
 
 class FlattenedEuclideanClustererSpec extends FeatureSpec with GivenWhenThen {
 
-  implicit val types: TypesT = Types2
+  implicit val types: DataTypeMetadata = DataTypeMetadata2Columns
 
   def createPoint(v: Vector[Double]): Point = {
     Point(0, DenseMatrix(v), None)
@@ -39,7 +40,7 @@ class FlattenedEuclideanClustererSpec extends FeatureSpec with GivenWhenThen {
         DenseMatrix((10.0, 13.0)),
       ).zipWithIndex.map {
         case (m, idx) =>
-          Point(idx, m, None)(Types2)
+          Point(idx, m, None)(DataTypeMetadata2Columns)
       }.toVector
 
       Given("A point")

@@ -6,12 +6,14 @@ import types._
 import metrics._
 import org.scalatest.Matchers._
 import org.scalatest.{FeatureSpec, GivenWhenThen}
+import types.immutable.Point
+import types.mutable.Cluster
 
 import scala.annotation.tailrec
 
 class ClusterReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
-  implicit val types = Types4
+  implicit val types = DataTypeMetadata4Columns
 
   val metric = Metric.par
 

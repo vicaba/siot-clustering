@@ -3,6 +3,7 @@ package algorithm.algorithms
 import algorithm.scheduler.ClusterReschedulerOld.PointChanged
 import com.typesafe.scalalogging.Logger
 import types._
+import types.mutable.Cluster
 
 trait GenAlgorithm {
 
@@ -40,7 +41,7 @@ trait GenAlgorithm {
 
     logger.info("Rescheduler")
 
-    val clustersCopy = Types.Type.deepCopy(step1.clusters).asInstanceOf[List[Cluster]]
+    val clustersCopy = Type.deepCopy(step1.clusters).asInstanceOf[List[Cluster]]
 
     val reschedulerResult = rescheduler(clustersCopy, reschedulerSettings)
 

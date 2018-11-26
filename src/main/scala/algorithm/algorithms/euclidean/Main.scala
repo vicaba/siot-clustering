@@ -8,7 +8,7 @@ import algorithm.algorithms.brute.Main.readEgaugeData
 import algorithm.clusterer.FlattenedEuclideanClusterer
 import metrics.Par
 import play.api.libs.json.Json
-import types.{Cluster, Point, Types2}
+import types.DataTypeMetadata2Columns
 import utils.{FileUtils, Generator}
 import algorithm.serialization.EuclideanAlgorithmJsonSerializer._
 import algorithm.serialization.{EuclideanAlgorithmJsonSerializer, ResultsJsonSerializer}

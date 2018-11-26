@@ -3,6 +3,8 @@ package algorithm.clusterer
 import eventmanager.EventManager
 import metrics.Metric
 import types._
+import types.immutable.Point
+import types.mutable.Cluster
 
 import scala.None
 import scala.annotation.tailrec
@@ -118,7 +120,7 @@ object BruteClusterer {
 
     if (points.nonEmpty) {
 
-      implicit val types: TypesT = points.head.types
+      implicit val types: DataTypeMetadata = points.head.dataTypeMetadata
 
       val averagePointsPerCluster = points.length / numberOfClusters
 

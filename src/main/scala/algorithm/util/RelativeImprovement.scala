@@ -1,12 +1,14 @@
 package algorithm.util
 
 case class RelativeImprovement[T] private (baseValue: Double,
-                                        relativeImprovement: Double,
-                                        goodInRange: Int,
-                                        private val history: List[(Double, T)],
-                                        private val lowestGlobalHistory: List[(Double, T)]) {
+                                           relativeImprovement: Double,
+                                           goodInRange: Int,
+                                           private val history: List[(Double, T)],
+                                           private val lowestGlobalHistory: List[(Double, T)]) {
 
   def feed(value: Double, e: T): RelativeImprovement[T] = {
+
+    println("historySize: " + history.size)
 
     if (hasReachedMaxHistory) {
       val historyMin = history.minBy(_._1)
@@ -14,8 +16,12 @@ case class RelativeImprovement[T] private (baseValue: Double,
         historyMin :: lowestGlobalHistory
       } else lowestGlobalHistory
       RelativeImprovement[T](average, relativeImprovement, goodInRange, Nil, _lowestGlobalHistory)
-    }
-    else this.copy(baseValue, relativeImprovement, goodInRange, (value, e) :: history, lowestGlobalHistory)
+    } else
+      this.copy(baseValue,
+                relativeImprovement,
+                goodInRange,
+                (value, e) :: history,
+                lowestGlobalHistory)
   }
 
   def average: Double =
@@ -32,15 +38,26 @@ case class RelativeImprovement[T] private (baseValue: Double,
   def isStuck: Boolean =
     if (history.isEmpty || !hasReachedMaxHistory) false
     else {
-      val truncatedAverage            = truncate(average)
-      history.count { e => truncate(e._1) == truncatedAverage } >= Math.floor(0.6 * goodInRange)
+
+      val truncatedAverage = truncate(average)
+      history.count { e =>
+        truncate(e._1) == truncatedAverage
+      } >= Math.floor(0.6 * goodInRange) || allElementsOfHistoryAreEqualToAverage
     }
+
+  def allElementsOfHistoryAreEqualToAverage: Boolean =  {
+    val equal = history.forall(_._1 == average)
+    println("all elements of history are equal to average: " + equal)
+    equal
+  }
 
   def getBest: (Double, T) = lowestGlobalHistory.minBy(_._1)
 
   def hasReachedMaxHistory: Boolean = history.size == goodInRange
 
-  def truncate(n: Double): Double = BigDecimal(n).setScale(3, BigDecimal.RoundingMode.FLOOR).toDouble
+  def truncate(n: Double, pos: Int): Double = BigDecimal(n).setScale(pos, BigDecimal.RoundingMode.FLOOR).toDouble
+
+  def truncate(n: Double): Double = truncate(n, 3)
 
 }
 

@@ -4,8 +4,7 @@ import algorithm.algorithms.GenAlgorithm
 import breeze.linalg.max
 import crossfold.CrossFoldValidation.{CrossFoldTypeSettings, MonteCarlo}
 import play.api.libs.json._
-import types.Point
-
+import types.immutable.Point
 object ResultsJsonSerializer {
 
   object Keys {

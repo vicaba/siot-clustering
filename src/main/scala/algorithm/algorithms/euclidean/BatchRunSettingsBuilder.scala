@@ -3,8 +3,7 @@ package algorithm.algorithms.euclidean
 import algorithm.clusterer.FlattenedEuclideanClusterer
 import algorithm.scheduler.ClusterReschedulerOld
 import metrics.Metric
-import types.Point
-
+import types.immutable.Point
 class BatchRunSettingsBuilder(override val points: Vector[Point],
                               override val numbersOfClusters: List[Int],
                               override val metrics: List[Metric],
