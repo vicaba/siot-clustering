@@ -42,6 +42,7 @@ case class RelativeImprovement[T] private (baseValue: Double,
       val truncatedAverage = truncate(average)
       history.count { e =>
         truncate(e._1) == truncatedAverage
+        // TODO: Why defaulting to 0.6?
       } >= Math.floor(0.6 * goodInRange) || allElementsOfHistoryAreEqualToAverage
     }
 
@@ -57,6 +58,7 @@ case class RelativeImprovement[T] private (baseValue: Double,
 
   def truncate(n: Double, pos: Int): Double = BigDecimal(n).setScale(pos, BigDecimal.RoundingMode.FLOOR).toDouble
 
+  // TODO: Why defaulting to 3?
   def truncate(n: Double): Double = truncate(n, 3)
 
 }
