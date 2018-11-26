@@ -1,4 +1,5 @@
 package types
+
 import types.Types.{DataType, SyntheticDataType}
 import types.immutable.Point
 import types.mutable.Cluster
@@ -9,7 +10,7 @@ object Type {
 
   def toCluster(_type: Type): mutable.Cluster = _type match {
     case c: mutable.Cluster => c
-    case p: PointLike => mutable.Cluster(p.id, p.id.toString, Set(p), 0, None)(p.dataTypeMetadata)
+    case p: Point => mutable.Cluster(p.id, p.id.toString, Set(p), 0, None)(p.dataTypeMetadata)
   }
 
   private def deepCopy(_type: Type, parent: Option[mutable.Cluster]): Type = _type match {
