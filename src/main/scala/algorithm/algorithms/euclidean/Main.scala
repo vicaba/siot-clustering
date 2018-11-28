@@ -3,16 +3,13 @@ import java.io.PrintWriter
 
 import batch.GenBatchRun
 import config.Configuration
-import eventmanager.EventManager
-import algorithm.algorithms.brute.Main.readEgaugeData
-import algorithm.clusterer.FlattenedEuclideanClusterer
+
 import metrics.Par
 import play.api.libs.json.Json
+import reader.Reader._
 import types.DataTypeMetadata2Columns
-import utils.{FileUtils, Generator}
 import algorithm.serialization.EuclideanAlgorithmJsonSerializer._
-import algorithm.serialization.{EuclideanAlgorithmJsonSerializer, ResultsJsonSerializer}
-import breeze.linalg.DenseVector
+import algorithm.serialization.ResultsJsonSerializer
 import crossfold.CrossFoldValidation
 import crossfold.CrossFoldValidation.{MonteCarlo, Percentage}
 import types.serialization.ClusterJsonSerializer._
@@ -31,7 +28,7 @@ object Main {
       }
       .toVector*/
 
-    val points = readEgaugeData(Configuration.userProfilesFile)
+    val points = readEgaugeData(Configuration.userProfilesFile).take(6)
 
     //TODO: Why defaulting to points.size + points.size/3?
     val batchRunSettingsBuilder =
@@ -100,7 +97,7 @@ object Main {
       yield {
         val subsampleSize = Percentage.of(i / Max)
         val splits = Math.floor((batchRunSettingsBuilder.points.size * subsampleSize.v).toDouble).toInt
-        MonteCarlo(splits, subsampleSize)
+        MonteCarlo(1, subsampleSize)
       }
     val stepsList = CrossFoldValidation.batchRun(EuclideanAlgorithm)(monteCarlos.toList, batchRunSettingsBuilder)
 

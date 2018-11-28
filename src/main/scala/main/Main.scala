@@ -1,6 +1,6 @@
 package main
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
-import algorithm.clusterer.FlattenedEuclideanClusterer
+import algorithm.clusterer.EuclideanClusterer
 import breeze.linalg.DenseVector
 import eventmanager.Events.NewClusters
 import eventmanager.{EventManager, Subscriber}
@@ -68,7 +68,7 @@ case class AlgorithmActor(gui: ActorRef) extends Actor {
 
     println(points)
 
-    FlattenedEuclideanClusterer.applyOnce(FlattenedEuclideanClusterer.Settings(4, points, Metric.par))
+    EuclideanClusterer.applyOnce(EuclideanClusterer.Settings(4, points, Metric.par))
 
   }
 

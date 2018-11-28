@@ -1,6 +1,6 @@
 package algorithm.algorithms
 
-import algorithm.scheduler.ClusterReschedulerOld.PointChanged
+import algorithm.scheduler.PointChanged
 import com.typesafe.scalalogging.Logger
 import types._
 import types.mutable.Cluster
