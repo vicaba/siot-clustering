@@ -116,30 +116,17 @@ object EuclideanClusterer {
 
     if (freeClusters.nonEmpty) {
 
-      // This seems to work better as it traverses the tree to look for the best position to add the points, but it is slower
-
-/*      val fixedClustersCopy = fixedClusters.map(_.copy())
-
-      val (_, _bestClusterToAssign) = Cluster
-        .traverseAndFindFittest(fixedClustersCopy.toList, c => {
-          heuristic(c, centroid, IndexedSeq(freeClusters.head)).head._1
-        })
-        .get
-
-      _bestClusterToAssign += freeClusters.head*/
-
-      //clustersToFixedClusters(centroid, fixedClustersCopy, freeClusters.tail, heuristic)
-
       var closestMirror: Cluster = null
 
+      // From the top level clusters, choose in which one the point fits best
       val bestClusterToAssign = fixedClusters.minBy { fixedCluster =>
         val result = heuristic(fixedCluster, centroid, freeClusters).head
         closestMirror = result._2
         result._1
       }
 
-      //bestClusterToAssign += closestMirror
-
+      // TODO: This is not used, why?
+      // Given the best top level cluster, find in which cluster, down to the hierarchy, the point fits best
       val (_, __bestClusterToAssign) = Cluster
         .traverseAndFindFittest(bestClusterToAssign, c => {
           heuristic(c, centroid, IndexedSeq(freeClusters.head)).head._1
@@ -147,10 +134,6 @@ object EuclideanClusterer {
         .get
 
       bestClusterToAssign += closestMirror
-
-      //val traverseMetric = Par.withParAggregate.aggregateOf(fixedClustersCopy)
-
-      //val metric = Par.withParAggregate.aggregateOf(fixedClusters)
 
       clustersToFixedClusters(centroid, fixedClusters, (freeClusters.toSet - closestMirror).toIndexedSeq, heuristic)
 
