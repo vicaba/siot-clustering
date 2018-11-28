@@ -17,6 +17,13 @@ import types.ops.SetOps._
 
 object EuclideanClusterer {
 
+
+  case class Settings(override val numberOfClusters: Int,
+                      override val points: scala.Vector[Point],
+                      override val metric: Metric,
+                      override val improveIterations: Int = 1)
+    extends algorithm.algorithms.ClustererSettings
+
   type Heuristic = (Cluster, SyntheticDataType, IndexedSeq[Cluster]) => IndexedSeq[(Double, Cluster)]
 
   case class HeuristicDecorator(heuristic: Heuristic) extends Heuristic {
