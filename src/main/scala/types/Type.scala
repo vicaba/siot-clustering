@@ -1,6 +1,6 @@
 package types
 
-import types.Types.{DataType, SyntheticDataType}
+import types.DataTypeMetadata.{DataType, SyntheticDataType}
 import types.immutable.Point
 import types.mutable.Cluster
 

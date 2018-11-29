@@ -2,11 +2,11 @@ package algorithm.clusterer
 
 import eventmanager.EventManager
 import metrics.Metric
-import types.Types.SyntheticDataType
+import types.DataTypeMetadata.SyntheticDataType
 import types.immutable.Point
 import types.mutable.Cluster
 import types.ops.MirrorImage
-import types.{Types, DataTypeMetadata2Columns}
+import types.{DataTypeMetadata, DataTypeMetadata2Columns}
 import utils.MathUtils
 
 import scala.annotation.tailrec
@@ -61,7 +61,7 @@ object FlattenedEuclideanClusterer {
     }
   }
 
-  def centroidOf[T <: Type](points: Seq[T]): types.Types.SyntheticDataType =
+  def centroidOf[T <: Type](points: Seq[T]): types.DataTypeMetadata.SyntheticDataType =
     points.foldLeft(points.head.dataTypeMetadata.EmptySyntheticData()) {
       case (accum, p) =>
         accum + p.syntheticValue

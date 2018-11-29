@@ -4,7 +4,7 @@ import java.util.UUID
 import algorithm.clusterer.FlattenedEuclideanClusterer.{ClusteringOrder, Settings, centroidOf}
 import eventmanager.EventManager
 import metrics.{Metric, Par}
-import types.Types.SyntheticDataType
+import types.DataTypeMetadata.SyntheticDataType
 import types.immutable.Point
 import types.ops.MirrorImage
 import types.mutable.Cluster

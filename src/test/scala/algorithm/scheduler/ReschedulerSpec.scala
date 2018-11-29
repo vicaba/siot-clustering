@@ -5,7 +5,7 @@ import algorithm.scheduler.Rescheduler.{MatrixResult, VectorResult}
 import metrics._
 import org.scalatest.Matchers._
 import org.scalatest._
-import types.{Types, DataTypeMetadata4Columns}
+import types.{DataTypeMetadata, DataTypeMetadata4Columns}
 
 import scala.annotation.tailrec
 
@@ -134,8 +134,8 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
       val result = rescheduleTimes(times = 4, m, u, metric).head
 
       Then("the new matrix contributes in minimizing overall distance function")
-      val originalCompatibility = metric(Types.synthesizeValues(m) + u)
-      val betterCompatibility   = metric(Types.synthesizeValues(result.matrix) + u)
+      val originalCompatibility = metric(DataTypeMetadata.synthesizeValues(m) + u)
+      val betterCompatibility   = metric(DataTypeMetadata.synthesizeValues(result.matrix) + u)
 
       betterCompatibility should be < originalCompatibility
 
@@ -153,7 +153,7 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
       val result = rescheduleTimes(times = 4, m, u, metric).head
 
       Then("the new matrix contributes in minimizing overall distance function")
-      val betterCompatibility = metric(Types.synthesizeValues(result.matrix) + u)
+      val betterCompatibility = metric(DataTypeMetadata.synthesizeValues(result.matrix) + u)
 
       betterCompatibility should equal(metric.Lowest)
 

@@ -2,7 +2,7 @@ package types
 
 import breeze.linalg.DenseVector
 import metrics.DenseVectorReprOps
-import types.Types.SyntheticDataType
+import types.DataTypeMetadata.SyntheticDataType
 
 trait PointLikeCompanion[P <: PointLike, C <: ClusterLike] {
 

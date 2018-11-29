@@ -1,7 +1,7 @@
 package types
 import breeze.linalg.DenseVector
 import metrics.DenseVectorReprOps
-import types.Types.SyntheticDataType
+import types.DataTypeMetadata.SyntheticDataType
 
 trait ClusterLike extends Type {
 

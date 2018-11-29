@@ -2,7 +2,7 @@ package types.ops
 import breeze.linalg.norm
 import types.mutable.Cluster
 import types.Type
-import types.Types.SyntheticDataType
+import types.DataTypeMetadata.SyntheticDataType
 import types.immutable.Point
 
 object MirrorImage {

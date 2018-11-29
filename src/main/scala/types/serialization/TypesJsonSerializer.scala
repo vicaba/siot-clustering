@@ -1,7 +1,7 @@
 package types.serialization
 
 import play.api.libs.json._
-import types.Types._
+import types.DataTypeMetadata._
 
 object TypesJsonSerializer {
 

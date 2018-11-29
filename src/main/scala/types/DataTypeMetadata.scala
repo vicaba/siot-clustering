@@ -1,19 +1,15 @@
 package types
 
 import breeze.linalg._
-import metrics.DenseVectorReprOps
-import types.immutable.Point
-
-import scala.annotation.tailrec
 
 trait DataTypeMetadata {
 
   /**
     * Rows correspond to each appliance, columns correspond to each time interval
     */
-  type DataType = DenseMatrix[Double]
+  type DataType = DataTypeMetadata.DataType
 
-  type SyntheticDataType = DenseVector[Double]
+  type SyntheticDataType = DataTypeMetadata.SyntheticDataType
 
   val Rows = 1
 
@@ -26,8 +22,7 @@ trait DataTypeMetadata {
   def synthesizeValues(values: DataType): SyntheticDataType = sum(values, Axis._0).inner
 }
 
-object Types {
-
+object DataTypeMetadata {
 
   /**
     * Rows correspond to each appliance, columns correspond to each time interval

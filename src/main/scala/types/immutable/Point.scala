@@ -2,7 +2,7 @@ package types.immutable
 
 import breeze.linalg.DenseVector
 import metrics.DenseVectorReprOps
-import types.Types.{DataType, SyntheticDataType}
+import types.DataTypeMetadata.{DataType, SyntheticDataType}
 import types.mutable.Cluster
 import types.{DataTypeMetadata, PointLike, PointLikeCompanion, Type}
 
