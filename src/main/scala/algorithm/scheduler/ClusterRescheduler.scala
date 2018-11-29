@@ -69,7 +69,6 @@ object ClusterRescheduler {
         if (pointChange.isDefined) {
           val pointChanged   = new PointChanged(pointChange.get.point, pointChange.get.change)
           val _currentMetric = metric(pointChange.get.cluster)
-          //TODO: Cluster.deepCopy()?
           reschedule(_currentMetric, relativeImprovement.feed(_currentMetric, cluster), pointChange.get.cluster, pointChanged +: changes)
         } else {
           (relativeImprovement.getBest._2, changes)
@@ -77,7 +76,6 @@ object ClusterRescheduler {
       }
     }
 
-    // TODO: Replace oldCluster with the rescheduledOne
     val newCluster = reschedule(initialMetric, RelativeImprovement((initialMetric, Type.deepCopy(cluster)), 0.01, cluster.size + (cluster.size / 2)), cluster, List.empty)
 
     (cluster.setPoints(newCluster._1.points), Nil)
@@ -91,18 +89,10 @@ object ClusterRescheduler {
       cluster.points
         .asInstanceOf[Set[Cluster]]
         .flatMap { c =>
-          c.points.foreach { p =>
-            if (p.isInstanceOf[Cluster])
-              println("Cluster")
-          }
           c.points
         }
         .asInstanceOf[Set[Point]]
         .maxBy { point =>
-
-        val m1 = metric(cluster)
-          val m2 = metric(cluster - point.toCluster)
-
           metric(cluster) - metric(cluster - point.toCluster)
         }
 
