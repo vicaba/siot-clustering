@@ -77,7 +77,7 @@ trait Type {
       case Nil       => accum
     }
 
-  override def toString: String = s"Type($id, $data)"
+  override def toString: String = s"Type($id, $size)"
 
   def deepCopy(): ThisType
 

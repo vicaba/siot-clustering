@@ -28,7 +28,7 @@ object Main {
       }
       .toVector*/
 
-    val points = readEgaugeData(Configuration.userProfilesFile).take(6)
+    val points = readEgaugeData(Configuration.userProfilesFile).take(15)
 
     //TODO: Why defaulting to points.size + points.size/3?
     val batchRunSettingsBuilder =

@@ -51,7 +51,7 @@ object EuclideanClusterer {
                          membersPerCluster: Int,
                          clusters: IndexedSeq[Cluster] = IndexedSeq()): IndexedSeq[Cluster] = {
 
-    if (freeClusters.nonEmpty) {
+    if (iterations > 0 && freeClusters.nonEmpty) {
       val head                         = freeClusters.head
       val c                            = Cluster(head.id + 1, UUID.randomUUID().toString, Set(head), head.hierarchyLevel + 1, None)(head.dataTypeMetadata)
       val tail                         = freeClusters.tail
@@ -116,26 +116,25 @@ object EuclideanClusterer {
 
     if (freeClusters.nonEmpty) {
 
-      var closestMirror: Cluster = null
+      val thisFreeCluster = freeClusters.head
 
       // From the top level clusters, choose in which one the point fits best
       val bestClusterToAssign = fixedClusters.minBy { fixedCluster =>
-        val result = heuristic(fixedCluster, centroid, freeClusters).head
-        closestMirror = result._2
-        result._1
+        heuristic(fixedCluster, centroid, IndexedSeq(thisFreeCluster)).head._1
       }
+
+      def fittest(c: Cluster): Double = heuristic(c, centroid, IndexedSeq(thisFreeCluster)).head._1
 
       // TODO: This is not used, why?
       // Given the best top level cluster, find in which cluster, down to the hierarchy, the point fits best
       val (_, __bestClusterToAssign) = Cluster
-        .traverseAndFindFittest(bestClusterToAssign, c => {
-          heuristic(c, centroid, IndexedSeq(freeClusters.head)).head._1
-        })
-        .get
+        .traverseAndFindFittest(bestClusterToAssign, fittest _)
 
-      bestClusterToAssign += closestMirror
+      println("hola")
 
-      clustersToFixedClusters(centroid, fixedClusters, (freeClusters.toSet - closestMirror).toIndexedSeq, heuristic)
+      __bestClusterToAssign += thisFreeCluster
+
+      clustersToFixedClusters(centroid, fixedClusters, (freeClusters.toSet - thisFreeCluster).toIndexedSeq, heuristic)
 
     } else fixedClusters
 
@@ -183,6 +182,8 @@ object EuclideanClusterer {
 
 
     val outliers = (Cluster.flatten(clusters) -- Cluster.flatten(_clusters)).map(Point.toCluster)
+
+    println("hola")
 
     val finalClusters =
       clustersToFixedClusters(centroid, _clusters, outliers.toIndexedSeq, heuristic)

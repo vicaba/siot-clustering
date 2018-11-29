@@ -215,7 +215,7 @@ object Cluster {
 
   }
 
-  def traverseAndFindFittest(c: Cluster, p: Cluster => Double): Option[(Double, Cluster)] = traverseAndFindFittest(List(c), p)
+  def traverseAndFindFittest(c: Cluster, p: Cluster => Double): (Double, Cluster) = traverseAndFindFittest(List(c), p).get
 
 
 }
