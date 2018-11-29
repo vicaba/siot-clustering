@@ -51,13 +51,14 @@ object EuclideanClusterer {
                          membersPerCluster: Int,
                          clusters: IndexedSeq[Cluster] = IndexedSeq()): IndexedSeq[Cluster] = {
 
-    if (iterations > 0 && freeClusters.nonEmpty) {
+    if (freeClusters.nonEmpty) {
       val head                         = freeClusters.head
       val c                            = Cluster(head.id + 1, UUID.randomUUID().toString, Set(head), head.hierarchyLevel + 1, None)(head.dataTypeMetadata)
       val tail                         = freeClusters.tail
       val (cluster, remainingClusters) = clustersToClusterXTimes(c, centroid, tail, heuristic, membersPerCluster)
       clustersToClusters(iterations - 1, centroid, remainingClusters, heuristic, membersPerCluster, cluster +: clusters)
     } else {
+      println(iterations)
       clusters
     }
 

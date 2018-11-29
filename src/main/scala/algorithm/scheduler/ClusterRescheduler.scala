@@ -19,6 +19,7 @@ object ClusterRescheduler {
     def retrieveLeafClusters(clusters: List[Type]): List[Cluster] = {
       clusters.flatMap {
         case point: Point =>
+          // By forcing hierarchyLevel == 0 we are forcing bottom and leaf points only
           point.assignedToCluster.toList.flatMap { c => if (c.hierarchyLevel == 0) c.topLevel else Nil
           }
         case cluster: Cluster => retrieveLeafClusters(cluster.points.toList)
