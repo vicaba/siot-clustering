@@ -58,7 +58,6 @@ object EuclideanClusterer {
       val (cluster, remainingClusters) = clustersToClusterXTimes(c, centroid, tail, heuristic, membersPerCluster)
       clustersToClusters(iterations - 1, centroid, remainingClusters, heuristic, membersPerCluster, cluster +: clusters)
     } else {
-      println(iterations)
       clusters
     }
 
