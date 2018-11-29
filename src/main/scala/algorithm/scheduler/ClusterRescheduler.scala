@@ -60,8 +60,6 @@ object ClusterRescheduler {
                    cluster: Cluster,
                    changes: List[PointChanged]): (Cluster, List[PointChanged]) = {
 
-      println(relativeImprovement.average)
-
       if (relativeImprovement.hasImprovedEnough || relativeImprovement.isStuck)
         (relativeImprovement.getBest._2, changes)
       else {
