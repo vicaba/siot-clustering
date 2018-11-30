@@ -5,6 +5,7 @@ import algorithm.clusterer.FlattenedEuclideanClusterer.{ClusteringOrder, Setting
 import eventmanager.EventManager
 import metrics.{Metric, Par}
 import types.DataTypeMetadata.SyntheticDataType
+import types.Type
 import types.immutable.Point
 import types.ops.MirrorImage
 import types.mutable.Cluster
@@ -134,7 +135,7 @@ object EuclideanClusterer {
 
       __bestClusterToAssign += thisFreeCluster
 
-      clustersToFixedClusters(centroid, fixedClusters, (freeClusters.toSet - thisFreeCluster).toIndexedSeq, heuristic)
+      clustersToFixedClusters(fixedClusters, (freeClusters.toSet - thisFreeCluster).toIndexedSeq, centroid, heuristic)
 
     } else fixedClusters
 
@@ -186,7 +187,7 @@ object EuclideanClusterer {
     println("hola")
 
     val finalClusters =
-      clustersToFixedClusters(_clusters, outliers.toIndexedSeq, centroid, heuristic)
+      clustersToFixedClusters(Type.deepCopy(_clusters).asInstanceOf[Traversable[Cluster]].toIndexedSeq, outliers.toIndexedSeq, centroid, heuristic)
 
     if (outliers.nonEmpty) EventManager.singleton.publish("clusters", finalClusters.toList)
 
