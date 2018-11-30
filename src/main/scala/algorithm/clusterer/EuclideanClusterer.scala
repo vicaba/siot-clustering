@@ -109,9 +109,9 @@ object EuclideanClusterer {
     * @return
     */
   @tailrec
-  def clustersToFixedClusters(centroid: SyntheticDataType,
-                              fixedClusters: IndexedSeq[Cluster],
+  def clustersToFixedClusters(fixedClusters: IndexedSeq[Cluster],
                               freeClusters: IndexedSeq[Cluster],
+                              centroid: SyntheticDataType,
                               heuristic: Heuristic): IndexedSeq[Cluster] = {
 
     if (freeClusters.nonEmpty) {
@@ -167,7 +167,7 @@ object EuclideanClusterer {
 
       val membersPerCluster = clusteringOrder.order(iterations)
 
-      _clusters = clustersToClusters(iterations = _clusters.size / membersPerCluster,
+      _clusters = clustersToClusters(iterations = (_clusters.size - clusteringOrder.outliers) / membersPerCluster,
                                      centroid,
                                      _clusters,
                                      heuristic,
@@ -186,7 +186,7 @@ object EuclideanClusterer {
     println("hola")
 
     val finalClusters =
-      clustersToFixedClusters(centroid, _clusters, outliers.toIndexedSeq, heuristic)
+      clustersToFixedClusters(_clusters, outliers.toIndexedSeq, centroid, heuristic)
 
     if (outliers.nonEmpty) EventManager.singleton.publish("clusters", finalClusters.toList)
 
