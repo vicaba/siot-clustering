@@ -29,6 +29,17 @@ object MirrorImage {
 
   }
 
+  implicit object MirroredSyntheticDataType extends Mirrored[SyntheticDataType] {
+    override implicit def findMirror: FindMirror[SyntheticDataType] = new FindMirror[SyntheticDataType] {
+      override implicit def apply(origin: SyntheticDataType, center: SyntheticDataType): SyntheticDataType =
+        (2.0 * center) - origin
+    }
+
+    override implicit def distance: DistanceFunc[SyntheticDataType] = new DistanceFunc[SyntheticDataType] {
+      override implicit def apply(e1: SyntheticDataType, e2: SyntheticDataType): Double = norm(e2 - e1, 2)
+    }
+  }
+
   implicit object MirroredType extends Mirrored[Type] {
     override def findMirror: FindMirror[Type] = new FindMirror[Type] {
       override def apply(origin: Type, center: SyntheticDataType): SyntheticDataType =
@@ -36,7 +47,7 @@ object MirrorImage {
     }
 
     override implicit def distance: DistanceFunc[Type] = new DistanceFunc[Type] {
-      override def apply(e1: Type, e2: Type): Double           = norm(e2.syntheticValue - e1.syntheticValue, 2)
+      override def apply(e1: Type, e2: Type): Double              = norm(e2.syntheticValue - e1.syntheticValue, 2)
       override def apply(e1: Type, e2: SyntheticDataType): Double = norm(e2 - e1.syntheticValue, 2)
     }
 
@@ -62,7 +73,7 @@ object MirrorImage {
     }
 
     override implicit def distance: DistanceFunc[Point] = new DistanceFunc[Point] {
-      override def apply(e1: Point, e2: Point): Double           = norm(e2.centroid - e1.centroid, 2)
+      override def apply(e1: Point, e2: Point): Double             = norm(e2.centroid - e1.centroid, 2)
       override def apply(e1: Point, e2: SyntheticDataType): Double = norm(e2 - e1.centroid, 2)
     }
 

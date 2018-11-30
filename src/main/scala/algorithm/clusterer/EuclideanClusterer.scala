@@ -124,12 +124,24 @@ object EuclideanClusterer {
         heuristic(fixedCluster, centroid, IndexedSeq(thisFreeCluster)).head._1
       }
 
+      // From the top level clusters, choose in which one the point fits best
+      val bestClusterToAssign2 = fixedClusters.minBy { fixedCluster =>
+       Metric.par(fixedCluster + thisFreeCluster)
+      }
+
       def fittest(c: Cluster): Double = heuristic(c, centroid, IndexedSeq(thisFreeCluster)).head._1
 
       // TODO: This is not used, why?
       // Given the best top level cluster, find in which cluster, down to the hierarchy, the point fits best
       val (_, __bestClusterToAssign) = Cluster
         .traverseAndFindFittest(bestClusterToAssign, fittest _)
+
+      def fittest2(c: Cluster): Double = Metric.par(c + thisFreeCluster)
+
+      // TODO: This is not used, why?
+      // Given the best top level cluster, find in which cluster, down to the hierarchy, the point fits best
+      val (_, __bestClusterToAssign2) = Cluster
+        .traverseAndFindFittest(bestClusterToAssign2, fittest2 _)
 
       println("hola")
 
