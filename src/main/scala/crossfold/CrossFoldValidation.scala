@@ -2,11 +2,15 @@ package crossfold
 import algorithm.algorithms.GenAlgorithm
 import algorithm.algorithms.euclidean.BatchRunSettingsBuilder
 import batch.GenBatchRun
+import com.typesafe.scalalogging.Logger
 
 import scala.collection.immutable
 import scala.util.Random
 
 object CrossFoldValidation {
+
+  val logger = Logger("CrossfoldValidation")
+
 
   case class Percentage private (v: BigDecimal)
 
@@ -59,7 +63,9 @@ object CrossFoldValidation {
         Random.shuffle(points).take(Math.floor((points.size * s.subsampleSize.v).toDouble).toInt)
       }
       val bulkBatchRunSettings = splits.map(p => batchRunSettings.copy(points = p))
-      bulkBatchRunSettings.map { builder => GenBatchRun.apply(algorithm)(builder.build)
+      bulkBatchRunSettings.zipWithIndex.map { case (builder, idx) =>
+        logger.info("Split: {}", idx)
+        GenBatchRun.apply(algorithm)(builder.build)
       }.toList
 
   }

@@ -17,7 +17,7 @@ class MetricAndMirrorSpec extends FeatureSpec with GivenWhenThen {
 
   val vecB = vec(0.0, 5.0)
 
-  val vecC = vec(5.0, 5.0)
+  val vecC = vec(0.0, 0.0)
 
   import MirrorImage._
 
@@ -25,18 +25,18 @@ class MetricAndMirrorSpec extends FeatureSpec with GivenWhenThen {
 
   val idealMirror = MirrorImage.findClosestMirror(vecA, centroid, IndexedSeq(vecB, vecC)).get
 
-  val mA1 = MirrorImage.findClosestMirrors(vecA, (vecA + vecB) / 2.0, IndexedSeq(vecB)).head._1
+  val mA1 = MirrorImage.findClosestMirrors(vecA, centroid, IndexedSeq(vecB)).head._1
+
+  val mB1 = MirrorImage.findClosestMirrors(vecA, centroid, IndexedSeq(vecC)).head._1
 
   val mA2 = Metric.par(vecA + vecB)
-
-  val mB1 = MirrorImage.findClosestMirrors(vecA, (vecA + vecC) / 2.0, IndexedSeq(vecC)).head._1
 
   val mB2 = Metric.par(vecA + vecC)
 
   info(s"mA1: $mA1, mB1: $mB1")
   assert(mA1 < mB1)
 
-  info(s"mA2: $mA1, mB2: $mB2")
+  info(s"mA2: $mA2, mB2: $mB2")
   assert(mA2 < mB2)
 
 

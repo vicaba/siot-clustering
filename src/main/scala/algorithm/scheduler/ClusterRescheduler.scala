@@ -5,6 +5,7 @@ import algorithm.scheduler.Rescheduler.MatrixResult
 import algorithm.util.RelativeImprovement
 import metrics.Metric
 import collection._
+import com.typesafe.scalalogging.Logger
 import types.immutable.Point
 import types.mutable.Cluster
 import types.ops.SetOps._
@@ -12,6 +13,8 @@ import types.ops.SetOps._
 import scala.annotation.tailrec
 
 object ClusterRescheduler {
+
+  val logger = Logger("Rescheduler")
 
   def apply(clusters: List[Cluster], settings: Settings): List[(Cluster, List[PointChanged])] = {
 
@@ -52,6 +55,8 @@ object ClusterRescheduler {
                         improvement: Double,
                         memory: Int = 2): (Cluster, List[PointChanged]) = {
 
+    logger.info("Rescheduling cluster: {}", cluster.id)
+
     val initialMetric = metric(cluster)
 
     @tailrec
@@ -74,7 +79,7 @@ object ClusterRescheduler {
       }
     }
 
-    val newCluster = reschedule(initialMetric, RelativeImprovement((initialMetric, Type.deepCopy(cluster)), 0.01, cluster.size + (cluster.size / 2)), cluster, List.empty)
+    val newCluster = reschedule(initialMetric, RelativeImprovement((initialMetric, Type.deepCopy(cluster)), 0.01, cluster.size), cluster, List.empty)
 
     (cluster.setPoints(newCluster._1.points), Nil)
 

@@ -25,7 +25,9 @@ trait GenAlgorithm {
 
   def apply(clustererSettings: ClustererSettingsT): StepT[ClustererSettingsT] = {
 
-    logger.info(s"Clusterer. NumberOfClusters: ${clustererSettings.numberOfClusters}. Points: ${clustererSettings.points.size}")
+    logger.info(s"Clusterer. NumberOfClusters: {}. Points: {}",
+                clustererSettings.numberOfClusters,
+                clustererSettings.points.size)
 
     val clustererResult = clusterer(clustererSettings)
 
@@ -35,8 +37,9 @@ trait GenAlgorithm {
 
   def apply(clustererSettings: ClustererSettingsT, reschedulerSettings: ReschedulerSettingsT): Steps = {
 
-    logger.info("Clusterer")
-
+    logger.info(s"Clusterer. NumberOfClusters: {}. Points: {}",
+      clustererSettings.numberOfClusters,
+      clustererSettings.points.size)
     val step1 = apply(clustererSettings)
 
     logger.info("Rescheduler")

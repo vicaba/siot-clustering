@@ -54,7 +54,7 @@ object FlattenedEuclideanClusterer {
 
   object ClusteringOrder {
     def apply(numberOfPoints: Int, kClusters: Int): ClusteringOrder = {
-      val clusteringOrder             = MathUtils.factorize(numberOfPoints / kClusters).reverse
+      val clusteringOrder             = MathUtils.factorize(numberOfPoints / kClusters).sorted.reverse
       val outliersFromClusteringOrder = numberOfPoints % kClusters
 
       ClusteringOrder(clusteringOrder, outliersFromClusteringOrder)
