@@ -163,7 +163,11 @@ object EuclideanClusterer {
 
       val membersPerCluster = clusteringOrder.order(iterations)
 
-      _clusters = clustersToClusters(iterations = (_clusters.size - clusteringOrder.outliers) / membersPerCluster,
+      val clusteringIterations = if (iterations == 0)
+        (_clusters.size - clusteringOrder.outliers) / membersPerCluster
+      else _clusters.size / membersPerCluster
+
+      _clusters = clustersToClusters(iterations = clusteringIterations,
                                      centroid,
                                      _clusters,
                                      heuristic,

@@ -31,11 +31,8 @@ object ClusterRescheduler {
 
     val leafClusters: List[Cluster] = retrieveLeafClusters(clusters).distinct
 
-    val newClusterConfiguration =
-      if (leafClusters.nonEmpty)
-        leafClusters.map(rescheduleCluster(_, settings.metric, settings.improvement, settings.memory))
-      else clusters.map((_, Nil))
-    newClusterConfiguration
+    leafClusters.foreach(rescheduleCluster(_, settings.metric, settings.improvement, settings.memory))
+    clusters.map((_, Nil))
   }
 
   def apply(cluster: Cluster, settings: Settings): (Cluster, List[PointChanged]) =

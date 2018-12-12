@@ -99,10 +99,10 @@ object Main {
         val splits = Math.floor((batchRunSettingsBuilder.points.size * subsampleSize.v).toDouble).toInt / 2
         MonteCarlo(splits, subsampleSize)
       }
-    val stepsList = CrossFoldValidation.batchRun(EuclideanAlgorithm)(monteCarlos.toList, batchRunSettingsBuilder)
+    val stepsList = CrossFoldValidation.batchRunClusterer(EuclideanAlgorithm)(monteCarlos.toList, batchRunSettingsBuilder)
 
     Some(new PrintWriter(Configuration.summaryBatchRunFile)).foreach { p =>
-      val jsonList = ResultsJsonSerializer.summaryCrossfoldBatchRunAsJson(stepsList)
+      val jsonList = ResultsJsonSerializer.summaryCrossfoldBatchRunClustererAsJson(stepsList)
       p.write(Json.prettyPrint(Json.toJson(jsonList)).toString())
       p.close()
     }
