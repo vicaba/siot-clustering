@@ -42,7 +42,9 @@ object CrossFoldValidation {
         Random.shuffle(points).take(Math.floor((points.size * s.subsampleSize.v).toDouble).toInt)
       }
       val bulkBatchRunSettings = splits.map(p => batchRunSettings.copy(points = p))
-      bulkBatchRunSettings.map { builder => GenBatchRun.cluster(algorithm)(builder.build.map(_._1))
+      bulkBatchRunSettings.zipWithIndex.map { case (builder, idx) =>
+        logger.info("Split: {}", idx)
+        GenBatchRun.cluster(algorithm)(builder.build.map(_._1))
       }.toList
 
   }
