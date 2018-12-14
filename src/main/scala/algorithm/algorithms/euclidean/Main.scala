@@ -97,7 +97,7 @@ object Main {
       yield {
         val subsampleSize = Percentage.of(i / Max)
         val splits = Math.floor((batchRunSettingsBuilder.points.size * subsampleSize.v).toDouble).toInt / 2
-        MonteCarlo(splits, subsampleSize)
+        MonteCarlo(1, subsampleSize)
       }
     val stepsList = CrossFoldValidation.batchRunClusterer(EuclideanAlgorithm)(monteCarlos.toList, batchRunSettingsBuilder)
 

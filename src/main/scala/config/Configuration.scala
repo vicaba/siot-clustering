@@ -31,6 +31,19 @@ object Configuration extends Configuration {
 
   override val summaryBatchRunFile: String = conf.getString("output.summary-batch-run-file")
 
+  object ClusteringAlgorithm {
+
+    object LeafEnergyConsumption {
+      val pattern = """m(\d)""".r
+
+      def apply(averageEnergyConsumption: String): Double => Double = averageEnergyConsumption match {
+        case pattern(times) => (n1: Double) => n1 * times.toInt
+      }
+    }
+
+    val leafEnergyConsumption: Double => Double = LeafEnergyConsumption(conf.getString("clustering-algorithm.parameters.leaf-energy-consumption"))
+  }
+
   object BatchRun {
 
     object KRange {
