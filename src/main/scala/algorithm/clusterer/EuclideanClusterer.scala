@@ -79,14 +79,28 @@ object EuclideanClusterer {
                                       heuristic: Heuristic,
                                       untilHeuristic: Cluster => Boolean): (Cluster, IndexedSeq[Cluster]) = {
     @tailrec
-    def _clustersToClusterUntilHeuristic(c: Cluster, freeClusters: IndexedSeq[Cluster]): (Cluster, IndexedSeq[Cluster]) = {
-      if (!untilHeuristic(c) && freeClusters.nonEmpty) {
-        val (cluster, remainingClusters) = clustersToCluster(c, centroid, freeClusters, heuristic)
-        _clustersToClusterUntilHeuristic(cluster, remainingClusters)
+    def _clustersToClusterUntilHeuristic(c: Cluster, freeClusters: IndexedSeq[Cluster], iterationCount: Int): (Cluster, IndexedSeq[Cluster]) = {
+
+      val maxEnergyAllowed = sum(c.centroid) * (c.points.size + 1)
+      //TODO: his operation is expensive, we could perform a rollback instead
+      val cCopy = Type.deepCopy(c)
+
+      if (freeClusters.nonEmpty) {
+
+        val (clusterTry, _) = clustersToCluster(cCopy, centroid, freeClusters, heuristic)
+        val potentialMaxEnergy = sum(clusterTry.centroid) * clusterTry.points.size
+        if (potentialMaxEnergy <= maxEnergyAllowed) {
+          // if the energy is below, proceed, otherwise return and try with another cluster
+          val (cluster, remainingClusters) = clustersToCluster(c, centroid, freeClusters, heuristic)
+          _clustersToClusterUntilHeuristic(cluster, remainingClusters, iterationCount = 0)
+        } else {
+          (c, freeClusters)
+        }
+
       } else (c, freeClusters)
     }
 
-    _clustersToClusterUntilHeuristic(c, freeClusters)
+    _clustersToClusterUntilHeuristic(c, freeClusters, 0)
   }
 
   def clustersToClusterXTimes(c: Cluster,
