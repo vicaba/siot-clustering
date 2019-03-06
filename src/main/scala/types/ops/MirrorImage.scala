@@ -146,7 +146,7 @@ object MirrorImage {
   }
 
   /**
-  * The same as [[findClosestMirrors()]] but only returns the closest
+  * The same as [[types.ops.MirrorImage.findClosestMirrors()]] but only returns the closest
     */
   def findClosestMirror[T: Mirrored](origin: T, center: SyntheticDataType, points: IndexedSeq[T]): Option[T] =
     findClosestMirrors(origin, center, points).headOption.map(_._2)

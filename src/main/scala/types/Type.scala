@@ -8,9 +8,16 @@ import scala.annotation.tailrec
 
 object Type {
 
+  /**
+    * Converts a cluster or a point into a cluster. If _type is a [[types.mutable.Cluster]], _type is returned. If _type is a [[types.immutable.Point]],
+    * a [[types.mutable.Cluster]] that contains the _type is returned
+    *
+    * @param _type The type to convert from
+    * @return
+    */
   def toCluster(_type: Type): mutable.Cluster = _type match {
     case c: mutable.Cluster => c
-    case p: Point => mutable.Cluster(p.id, p.id.toString, Set(p), 0, None)(p.dataTypeMetadata)
+    case p: Point           => mutable.Cluster(p.id, p.id.toString, Set(p), 0, None)(p.dataTypeMetadata)
   }
 
   private def deepCopy(_type: Type, parent: Option[mutable.Cluster]): Type = _type match {
@@ -31,7 +38,7 @@ object Type {
 
     _type match {
       case c: mutable.Cluster => deepCopy(c)
-      case p: Point => deepCopy(p)
+      case p: Point           => deepCopy(p)
     }
 
   }
