@@ -20,14 +20,30 @@ import types.ops.SetOps._
 
 object EuclideanClusterer {
 
+  /**
+    * Settings for the euclidean clusterer
+    *
+    * @param numberOfClusters
+    * @param points
+    * @param metric
+    * @param improveIterations
+    */
   case class Settings(override val numberOfClusters: Int,
                       override val points: scala.Vector[Point],
                       override val metric: Metric,
                       override val improveIterations: Int = 1)
       extends algorithm.algorithms.ClustererSettings
 
+  /**
+    * Alias type that resumes the signature of heuristics
+    */
   type Heuristic = (Cluster, SyntheticDataType, IndexedSeq[Cluster]) => IndexedSeq[(Double, Cluster)]
 
+  /**
+    * Heuristic decorator that prunes some elements before returning the results of applying a heuristic
+    *
+    * @param heuristic the heuristic
+    */
   case class HeuristicDecorator(heuristic: Heuristic) extends Heuristic {
     override def apply(v1: Cluster, v2: SyntheticDataType, v3: IndexedSeq[Cluster]): IndexedSeq[(Double, Cluster)] = {
       val clusters              = heuristic.apply(v1, v2, v3)
@@ -37,6 +53,11 @@ object EuclideanClusterer {
     }
   }
 
+  /**
+    * Chains a list of heuristics
+    *
+    * @param heuristics the list of heuristics
+    */
   implicit class HeuristicChain(heuristics: List[Heuristic]) extends Heuristic {
     override def apply(v1: Cluster, v2: SyntheticDataType, v3: IndexedSeq[Cluster]): IndexedSeq[(Double, Cluster)] =
       heuristics.tail.foldLeft(heuristics.head.apply(v1, v2, v3)) {
@@ -45,6 +66,18 @@ object EuclideanClusterer {
       }
   }
 
+  /**
+    * Creates clusters by combining other clusters.
+    *
+    * @param iterations the max number of iterations that combine clusters
+    * @param centroid the centroid of all clusters/all members in the dataset
+    * @param freeClusters the remaining free clusters to assign to an upper level cluster
+    * @param heuristic the heuristic used to calculate the distance between clusters
+    * @param membersPerCluster the number of members per upper clusters
+    * @param clusters  the clusters already formed. It is an accumulative variable
+    * @param untilHeuristic if set, the heuristic that indicates when a given cluster is "full"
+    * @return higher level clusters
+    */
   @tailrec
   def clustersToClusters(iterations: Int,
                          centroid: SyntheticDataType,
@@ -58,13 +91,25 @@ object EuclideanClusterer {
       val head = freeClusters.head
       val c = Cluster(head.id + 1, UUID.randomUUID().toString, Set(head), head.hierarchyLevel + 1, None)(
         head.dataTypeMetadata)
-      val tail                         = freeClusters.tail
+      val tail = freeClusters.tail
       if (untilHeuristic.nonEmpty) {
-        val (cluster, remainingClusters) = clustersToClusterUntilHeuristic(c, centroid, tail, heuristic, untilHeuristic.get)
-        clustersToClusters(iterations - 1, centroid, remainingClusters, heuristic, membersPerCluster, cluster +: clusters, untilHeuristic)
+        val (cluster, remainingClusters) =
+          clustersToClusterUntilHeuristic(c, centroid, tail, heuristic, untilHeuristic.get)
+        clustersToClusters(iterations - 1,
+                           centroid,
+                           remainingClusters,
+                           heuristic,
+                           membersPerCluster,
+                           cluster +: clusters,
+                           untilHeuristic)
       } else {
         val (cluster, remainingClusters) = clustersToClusterXTimes(c, centroid, tail, heuristic, membersPerCluster)
-        clustersToClusters(iterations - 1, centroid, remainingClusters, heuristic, membersPerCluster, cluster +: clusters)
+        clustersToClusters(iterations - 1,
+                           centroid,
+                           remainingClusters,
+                           heuristic,
+                           membersPerCluster,
+                           cluster +: clusters)
       }
 
     } else {
@@ -79,7 +124,9 @@ object EuclideanClusterer {
                                       heuristic: Heuristic,
                                       untilHeuristic: Cluster => Boolean): (Cluster, IndexedSeq[Cluster]) = {
     @tailrec
-    def _clustersToClusterUntilHeuristic(c: Cluster, freeClusters: IndexedSeq[Cluster], iterationCount: Int): (Cluster, IndexedSeq[Cluster]) = {
+    def _clustersToClusterUntilHeuristic(c: Cluster,
+                                         freeClusters: IndexedSeq[Cluster],
+                                         iterationCount: Int): (Cluster, IndexedSeq[Cluster]) = {
 
       val maxEnergyAllowed = sum(c.centroid) * (c.points.size + 1)
       //TODO: his operation is expensive, we could perform a rollback instead
@@ -87,7 +134,7 @@ object EuclideanClusterer {
 
       if (freeClusters.nonEmpty) {
 
-        val (clusterTry, _) = clustersToCluster(cCopy, centroid, freeClusters, heuristic)
+        val (clusterTry, _)    = clustersToCluster(cCopy, centroid, freeClusters, heuristic)
         val potentialMaxEnergy = sum(clusterTry.centroid) * clusterTry.points.size
         if (potentialMaxEnergy <= maxEnergyAllowed) {
           // if the energy is below, proceed, otherwise return and try with another cluster
@@ -103,6 +150,17 @@ object EuclideanClusterer {
     _clustersToClusterUntilHeuristic(c, freeClusters, 0)
   }
 
+  /**
+    * Assigns clustersPerCluster number of clusters to a single cluster given freeClusters.
+    * Usually clustersPerClusters <= count(freeClusters)
+    *
+    * @param c
+    * @param centroid
+    * @param freeClusters
+    * @param heuristic
+    * @param clustersPerCluster
+    * @return
+    */
   def clustersToClusterXTimes(c: Cluster,
                               centroid: SyntheticDataType,
                               freeClusters: IndexedSeq[Cluster],
@@ -141,7 +199,8 @@ object EuclideanClusterer {
   }
 
   /**
-    * This mutates fixedClusters and freeClusters !
+    * Assigns freeClusters to fixedClusters.
+    * This mutates fixedClusters and freeClusters!
     *
     * @param centroid
     * @param fixedClusters mutable
@@ -176,6 +235,16 @@ object EuclideanClusterer {
 
   }
 
+  /**
+    * Given clusters, creates stopAtKClusters top-level clusters
+    *
+    * @param stopAtKClusters the number of top-level clusters to create
+    * @param stopAtIterationCount
+    * @param clusters the clusters to group
+    * @param heuristic the heuristic to use to group clusters
+    * @param startHeuristic if not empty, the heuristic to use to group the first level of clusters
+    * @return
+    */
   def cluster(stopAtKClusters: Int,
               stopAtIterationCount: Int,
               clusters: Seq[Cluster],
@@ -196,7 +265,8 @@ object EuclideanClusterer {
     EventManager.singleton.publish("clusters", _clusters.toList)
 
     if (startHeuristic.nonEmpty) {
-      _clusters = clustersToClusters(Int.MaxValue, centroid, _clusters, heuristic, Int.MaxValue, untilHeuristic = startHeuristic)
+      _clusters =
+        clustersToClusters(Int.MaxValue, centroid, _clusters, heuristic, Int.MaxValue, untilHeuristic = startHeuristic)
     }
 
     val clusteringOrder = ClusteringOrder(_clusters.size, stopAtKClusters)
@@ -237,6 +307,15 @@ object EuclideanClusterer {
 
   }
 
+  /**
+    * Clusters maxIterations times and outputs the best solution
+    *
+    * @param clusters the clusters to group
+    * @param metricToOptimize the metric that the grouping optimizes
+    * @param clusterer the algorithm that clusters
+    * @param maxIterations the maximum number of iterations to try to optimize metricToOptimize
+    * @return the best solution found
+    */
   def metricReductionCluster(clusters: LinearSeq[Cluster],
                              metricToOptimize: Metric,
                              clusterer: LinearSeq[Cluster] => LinearSeq[Cluster],
@@ -263,9 +342,9 @@ object EuclideanClusterer {
   def apply(settings: Settings): List[Cluster] = {
 
     val startHeuristic: Cluster => Boolean = c => {
-      val cluster = sum(c.syntheticValue)
+      val cluster  = sum(c.syntheticValue)
       val centroid = Configuration.ClusteringAlgorithm.leafEnergyConsumption(sum(centroidOf(settings.points)))
-      val r = cluster > centroid
+      val r        = cluster > centroid
       r
     }
 
@@ -281,10 +360,7 @@ object EuclideanClusterer {
   }
 
   def applyOnce(settings: Settings): List[Cluster] = {
-    val result = cluster(settings.numberOfClusters,
-                         Int.MaxValue,
-                         settings.points.map(Point.toCluster).toList,
-                         chain)
+    val result = cluster(settings.numberOfClusters, Int.MaxValue, settings.points.map(Point.toCluster).toList, chain)
     result.toList
   }
 

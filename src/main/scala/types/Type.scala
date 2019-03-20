@@ -13,13 +13,20 @@ object Type {
     * a [[types.mutable.Cluster]] that contains the _type is returned
     *
     * @param _type The type to convert from
-    * @return
+    * @return the Cluster
     */
   def toCluster(_type: Type): mutable.Cluster = _type match {
     case c: mutable.Cluster => c
     case p: Point           => mutable.Cluster(p.id, p.id.toString, Set(p), 0, None)(p.dataTypeMetadata)
   }
 
+  /**
+    * Performs a deepCopy of _type, linked with reverse links with parent are preserved
+    *
+    * @param _type the object to be copied
+    * @param parent the parent of the object
+    * @return the deepCopy of _type
+    */
   private def deepCopy(_type: Type, parent: Option[mutable.Cluster]): Type = _type match {
     case c: mutable.Cluster =>
       if (parent.isDefined) {
@@ -34,6 +41,13 @@ object Type {
 
   def deepCopy(types: Traversable[Type]): Traversable[Type] = types.map(deepCopy)
 
+  /**
+    * Performs a deepCopy of _type. Note that references to upper elements in the hierarchy of _type will remain the
+    * same (they are not copied)
+    *
+    * @param _type the object to be copied
+    * @return the deepCopy of _type
+    */
   def deepCopy(_type: Type): Type = {
 
     _type match {
@@ -43,12 +57,26 @@ object Type {
 
   }
 
+  /**
+    * Performs a deepCopy of c. Note that references to upper elements in the hierarchy of c will remain the
+    * same (they are not copied)
+    *
+    * @param c the cluster to be copied
+    * @return the deepCopy of c
+    */
   def deepCopy(c: Cluster): Cluster = {
     val clusterCopy = c.deepCopy()
     clusterCopy.points.foreach(t => deepCopy(t, Some(clusterCopy)))
     clusterCopy
   }
 
+  /**
+    * Performs a deepCopy of p. Note that references to upper elements in the hierarchy of _type will remain the
+    * same (they are not copied).
+    *
+    * @param p the point to be copied
+    * @return the deepCopy of p
+    */
   def deepCopy(p: Point): Point = {
     p.deepCopy()
   }
@@ -71,12 +99,26 @@ trait Type {
 
   def size: Int
 
+  /**
+    * Calculates the sum of the given [[types.DataTypeMetadata.DataType]] (sum of matrixes)
+    *
+    * @param remaining the remaining data to sum
+    * @param accum the accumulated sum
+    * @return the sum
+    */
   @tailrec
   final def sumPoints(remaining: List[DataType], accum: DataType): DataType = remaining match {
     case e :: tail => sumPoints(tail, accum + e)
     case Nil       => accum
   }
 
+  /**
+    * Calculates the sum of the given [[types.DataTypeMetadata.SyntheticDataType]] (sum of matrixes)
+    *
+    * @param remaining the remaining data to sum
+    * @param accum the accumulated sum
+    * @return the sum
+    */
   @tailrec
   final def sumVectors(remaining: List[SyntheticDataType], accum: SyntheticDataType): SyntheticDataType =
     remaining match {
@@ -85,6 +127,7 @@ trait Type {
     }
 
   override def toString: String = s"Type($id, $size)"
+
 
   def deepCopy(): ThisType
 
