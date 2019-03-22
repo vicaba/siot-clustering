@@ -11,7 +11,7 @@ trait DataTypeMetadata {
 
   type SyntheticDataType = DataTypeMetadata.SyntheticDataType
 
-  val Rows = 1
+  val Rows: Int = 1
 
   val Columns: Int
 

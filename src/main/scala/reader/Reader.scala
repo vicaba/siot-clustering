@@ -1,15 +1,12 @@
 package reader
 
-import org.apache.commons.csv.CSVFormat
-import java.io.{FileInputStream, FileReader}
+import java.io.FileInputStream
 
 import breeze.linalg.{DenseMatrix, DenseVector}
-import config.Configuration
 import play.api.libs.json.{JsValue, Json}
 import types.Types67_24
 import types.immutable.Point
 
-import scala.collection.JavaConverters._
 import scala.util.Try
 
 object Reader {
@@ -32,12 +29,7 @@ object Reader {
               jsList.map { jsPoint =>
                 val dataid = (jsPoint \ "dataid").validate[Int].get
                 val vectorList = (jsPoint \ "data").validate[List[List[Double]]].get.map { applianceList =>
-                  val vector = DenseVector(applianceList: _*)
-                  if (vector.length == 0) {
-                    vector
-                  } else {
-                    vector
-                  }
+                  DenseVector(applianceList: _*)
                 }
                 val data = DenseMatrix(vectorList: _*)
 

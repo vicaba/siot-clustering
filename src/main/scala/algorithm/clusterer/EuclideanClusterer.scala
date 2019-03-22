@@ -37,14 +37,18 @@ object EuclideanClusterer {
   /**
     * Alias type that resumes the signature of heuristics
     */
-  type Heuristic = (Cluster, SyntheticDataType, IndexedSeq[Cluster]) => IndexedSeq[(Double, Cluster)]
+  type ElementLocatorHeuristic = (Cluster, SyntheticDataType, IndexedSeq[Cluster]) => IndexedSeq[(Double, Cluster)]
+
+  trait ClusterLimitHeuristic extends ((Cluster, Cluster) => Boolean) {
+    def apply(clusterBefore: Cluster, clusterAfter: Cluster): Boolean
+  }
 
   /**
     * Heuristic decorator that prunes some elements before returning the results of applying a heuristic
     *
     * @param heuristic the heuristic
     */
-  case class HeuristicDecorator(heuristic: Heuristic) extends Heuristic {
+  case class HeuristicDecorator(heuristic: ElementLocatorHeuristic) extends ElementLocatorHeuristic {
     override def apply(v1: Cluster, v2: SyntheticDataType, v3: IndexedSeq[Cluster]): IndexedSeq[(Double, Cluster)] = {
       val clusters              = heuristic.apply(v1, v2, v3)
       val aprioriElementsToDrop = clusters.length / 2
@@ -58,7 +62,7 @@ object EuclideanClusterer {
     *
     * @param heuristics the list of heuristics
     */
-  implicit class HeuristicChain(heuristics: List[Heuristic]) extends Heuristic {
+  implicit class HeuristicChain(heuristics: List[ElementLocatorHeuristic]) extends ElementLocatorHeuristic {
     override def apply(v1: Cluster, v2: SyntheticDataType, v3: IndexedSeq[Cluster]): IndexedSeq[(Double, Cluster)] =
       heuristics.tail.foldLeft(heuristics.head.apply(v1, v2, v3)) {
         case (_clusters, _heuristic) =>
@@ -82,7 +86,7 @@ object EuclideanClusterer {
   def clustersToClusters(iterations: Int,
                          centroid: SyntheticDataType,
                          freeClusters: IndexedSeq[Cluster],
-                         heuristic: Heuristic,
+                         heuristic: ElementLocatorHeuristic,
                          membersPerCluster: Int,
                          clusters: IndexedSeq[Cluster] = IndexedSeq(),
                          untilHeuristic: Option[Cluster => Boolean] = None): IndexedSeq[Cluster] = {
@@ -118,36 +122,44 @@ object EuclideanClusterer {
 
   }
 
-  def clustersToClusterUntilHeuristic(c: Cluster,
+  object MaxEnergyHeuristic extends ClusterLimitHeuristic {
+    override def apply(clusterBefore: Cluster, clusterAfter: Cluster): Boolean = {
+      val maxEnergyAllowed   = sum(clusterBefore.centroid) * (clusterBefore.points.size + 1)
+      val potentialMaxEnergy = sum(clusterAfter.centroid) * clusterAfter.points.size
+
+      potentialMaxEnergy <= maxEnergyAllowed
+    }
+  }
+
+  def clustersToClusterUntilHeuristic(cluster: Cluster,
                                       centroid: SyntheticDataType,
                                       freeClusters: IndexedSeq[Cluster],
-                                      heuristic: Heuristic,
-                                      untilHeuristic: Cluster => Boolean): (Cluster, IndexedSeq[Cluster]) = {
+                                      heuristic: ElementLocatorHeuristic,
+                                      clusterLimitHeuristic: ClusterLimitHeuristic = MaxEnergyHeuristic): (Cluster, IndexedSeq[Cluster]) = {
     @tailrec
     def _clustersToClusterUntilHeuristic(c: Cluster,
                                          freeClusters: IndexedSeq[Cluster],
                                          iterationCount: Int): (Cluster, IndexedSeq[Cluster]) = {
 
-      val maxEnergyAllowed = sum(c.centroid) * (c.points.size + 1)
-      //TODO: his operation is expensive, we could perform a rollback instead
-      val cCopy = Type.deepCopy(c)
+      val clusterCopy = Type.deepCopy(c)
 
       if (freeClusters.nonEmpty) {
 
-        val (clusterTry, _)    = clustersToCluster(cCopy, centroid, freeClusters, heuristic)
-        val potentialMaxEnergy = sum(clusterTry.centroid) * clusterTry.points.size
-        if (potentialMaxEnergy <= maxEnergyAllowed) {
-          // if the energy is below, proceed, otherwise return and try with another cluster
+        val (clusterTry, _) = clustersToCluster(clusterCopy, centroid, freeClusters, heuristic)
+
+        if (clusterLimitHeuristic(clusterBefore = clusterCopy, clusterAfter = clusterTry)) {
+
           val (cluster, remainingClusters) = clustersToCluster(c, centroid, freeClusters, heuristic)
+
           _clustersToClusterUntilHeuristic(cluster, remainingClusters, iterationCount = 0)
-        } else {
-          (c, freeClusters)
-        }
+
+        } else (c, freeClusters)
 
       } else (c, freeClusters)
+
     }
 
-    _clustersToClusterUntilHeuristic(c, freeClusters, 0)
+    _clustersToClusterUntilHeuristic(cluster, freeClusters, 0)
   }
 
   /**
@@ -164,7 +176,7 @@ object EuclideanClusterer {
   def clustersToClusterXTimes(c: Cluster,
                               centroid: SyntheticDataType,
                               freeClusters: IndexedSeq[Cluster],
-                              heuristic: Heuristic,
+                              heuristic: ElementLocatorHeuristic,
                               clustersPerCluster: Int = 1): (Cluster, IndexedSeq[Cluster]) = {
 
     @tailrec
@@ -186,7 +198,7 @@ object EuclideanClusterer {
   def clustersToCluster(c: Cluster,
                         centroid: SyntheticDataType,
                         freeClusters: IndexedSeq[Cluster],
-                        heuristic: Heuristic): (Cluster, IndexedSeq[Cluster]) = {
+                        heuristic: ElementLocatorHeuristic): (Cluster, IndexedSeq[Cluster]) = {
     val closestMirror = heuristic(c, centroid, freeClusters)
     if (closestMirror.isEmpty) (c, freeClusters)
     else {
@@ -212,7 +224,7 @@ object EuclideanClusterer {
   def clustersToFixedClusters(fixedClusters: IndexedSeq[Cluster],
                               freeClusters: IndexedSeq[Cluster],
                               centroid: SyntheticDataType,
-                              heuristic: Heuristic): IndexedSeq[Cluster] = {
+                              heuristic: ElementLocatorHeuristic): IndexedSeq[Cluster] = {
 
     if (freeClusters.nonEmpty) {
 
@@ -248,7 +260,7 @@ object EuclideanClusterer {
   def cluster(stopAtKClusters: Int,
               stopAtIterationCount: Int,
               clusters: Seq[Cluster],
-              heuristic: Heuristic,
+              heuristic: ElementLocatorHeuristic,
               startHeuristic: Option[Cluster => Boolean] = None): LinearSeq[Cluster] = {
 
     val points   = clusters.flatMap(_.points)

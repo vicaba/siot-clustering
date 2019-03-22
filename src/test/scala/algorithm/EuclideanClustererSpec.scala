@@ -10,7 +10,7 @@ import types._
 import types.mutable.Cluster
 import types.immutable.Point
 
-class BruteClustererSpec extends FeatureSpec with GivenWhenThen {
+class EuclideanClustererSpec extends FeatureSpec with GivenWhenThen {
 
   implicit val types: DataTypeMetadata = DataTypeMetadata4Columns
 
