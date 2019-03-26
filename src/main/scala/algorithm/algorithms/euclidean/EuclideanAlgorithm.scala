@@ -1,22 +1,64 @@
 package algorithm.algorithms.euclidean
 
-import algorithm.algorithms.GenAlgorithm
 import algorithm.clusterer.EuclideanClusterer
 import algorithm.scheduler.ClusterRescheduler
+import com.typesafe.scalalogging.Logger
+import types.Type
 import types.mutable.Cluster
 
-object EuclideanAlgorithm extends GenAlgorithm {
+object EuclideanAlgorithm {
 
-  override type ClustererSettingsT = EuclideanClusterer.Settings
+  type ClustererSettingsT = EuclideanClusterer.Settings
 
-  override type ReschedulerSettingsT = algorithm.scheduler.Settings
+  type ReschedulerSettingsT = algorithm.scheduler.ReschedulerSettings
 
-  override type BatchRunSettingsBuilderT = BatchRunSettingsBuilder
+  val logger = Logger("Algorithm")
 
-  override def clusterer(settings: ClustererSettingsT): List[Cluster] = EuclideanClusterer.apply(settings)
+  case class ClustererOutput(settings: ClustererSettingsT, clusters: List[Cluster])
 
-  override def rescheduler(clusters: List[Cluster],
-                           settings: ReschedulerSettingsT): List[(Cluster, List[algorithm.scheduler.PointChanged])] =
+  case class ReschedulerOutput(settings: ReschedulerSettingsT, clusters: List[Cluster])
+
+  case class ClustererAndReschedulerOutput(clustererOutput: ClustererOutput, reschedulerOutput: ReschedulerOutput)
+
+  def clusterer(settings: ClustererSettingsT): List[Cluster] = EuclideanClusterer.apply(settings)
+
+  def rescheduler(clusters: List[Cluster],
+                  settings: ReschedulerSettingsT): List[(Cluster, List[algorithm.scheduler.PointChanged])] =
     ClusterRescheduler.apply(clusters, settings)
+
+  def apply(clustererSettings: ClustererSettingsT): ClustererOutput = {
+
+    logger.info(message = s"Running Clusterer. NumberOfClusters: {}. Points: {}",
+                clustererSettings.numberOfClusters,
+                clustererSettings.points.size)
+
+    val clustererResult = clusterer(clustererSettings)
+
+    ClustererOutput(clustererSettings, clustererResult)
+
+  }
+
+  def apply(clustererSettings: ClustererSettingsT,
+            reschedulerSettings: ReschedulerSettingsT): ClustererAndReschedulerOutput = {
+
+    logger.info(message = s"Running Clusterer. NumberOfClusters: {}. Points: {}",
+                clustererSettings.numberOfClusters,
+                clustererSettings.points.size)
+    val clustererOutput = apply(clustererSettings)
+
+    logger.info("Running Rescheduler.")
+
+    val clustersCopy = Type.deepCopy(clustererOutput.clusters).asInstanceOf[List[Cluster]]
+
+    val reschedulerResult = rescheduler(clustersCopy, reschedulerSettings)
+
+    logger.info("End")
+
+    ClustererAndReschedulerOutput(
+      clustererOutput = clustererOutput,
+      reschedulerOutput = ReschedulerOutput(reschedulerSettings, reschedulerResult.map(_._1))
+    )
+
+  }
 
 }

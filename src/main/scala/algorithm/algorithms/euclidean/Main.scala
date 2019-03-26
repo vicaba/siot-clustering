@@ -54,7 +54,7 @@ object Main {
 
   def batchRun(batchRunSettingsBuilder: BatchRunSettingsBuilder): Unit = {
 
-    val stepsList = GenBatchRun(EuclideanAlgorithm)(batchRunSettingsBuilder.build)
+    val stepsList = GenBatchRun(batchRunSettingsBuilder.build)
 
     Some(new PrintWriter(Configuration.batchRunFile)).foreach { p =>
       val jsonList = ResultsJsonSerializer.batchRunAsJson(stepsList)
@@ -64,7 +64,7 @@ object Main {
     }
 
     Some(new PrintWriter(Configuration.summaryBatchRunFile)).foreach { p =>
-      val jsonList = ResultsJsonSerializer.summaryBatchRunAsJson(stepsList)
+      val jsonList = ResultsJsonSerializer.Summary.batchRunAsJson(stepsList)
       p.write(Json.prettyPrint(Json.toJson(jsonList)).toString())
       p.close()
     }
@@ -73,17 +73,17 @@ object Main {
 
   def batchRunCluster(batchRunSettingsBuilder: BatchRunSettingsBuilder): Unit = {
 
-    val stepsList = GenBatchRun.cluster(EuclideanAlgorithm)(batchRunSettingsBuilder.build.map(_._1))
+    val stepsList = GenBatchRun.cluster(batchRunSettingsBuilder.build.map(_._1))
 
     Some(new PrintWriter(Configuration.batchRunFile)).foreach { p =>
-      val jsonList = ResultsJsonSerializer.clustererBatchRunAsJson(stepsList)
+      val jsonList = ResultsJsonSerializer.clustererOutputBatchRunAsJson(stepsList)
 
       p.write(Json.prettyPrint(Json.toJson(jsonList)).toString())
       p.close()
     }
 
     Some(new PrintWriter(Configuration.summaryBatchRunFile)).foreach { p =>
-      val jsonList = ResultsJsonSerializer.summaryStep1ListAsJson(stepsList)
+      val jsonList = ResultsJsonSerializer.Summary.clustererOutputListAsJson(stepsList)
       p.write(Json.prettyPrint(Json.toJson(jsonList)).toString())
       p.close()
     }
@@ -102,7 +102,7 @@ object Main {
     val stepsList = CrossFoldValidation.batchRunClusterer(EuclideanAlgorithm)(monteCarlos.toList, batchRunSettingsBuilder)
 
     Some(new PrintWriter(Configuration.summaryBatchRunFile)).foreach { p =>
-      val jsonList = ResultsJsonSerializer.summaryCrossfoldBatchRunClustererAsJson(stepsList)
+      val jsonList = ResultsJsonSerializer.Summary.crossfoldBatchRunAsJson(stepsList)
       p.write(Json.prettyPrint(Json.toJson(jsonList)).toString())
       p.close()
     }

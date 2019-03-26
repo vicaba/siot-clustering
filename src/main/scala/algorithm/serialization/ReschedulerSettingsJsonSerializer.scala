@@ -6,6 +6,6 @@ import metrics.serialization.MetricJsonSerializer._
 
 object ReschedulerSettingsJsonSerializer {
 
-  implicit val SchedulerSettingsWrites: OWrites[algorithm.scheduler.Settings] = Json.writes[algorithm.scheduler.Settings]
+  implicit val SchedulerSettingsWrites: OWrites[algorithm.scheduler.ReschedulerSettings] = Json.writes[algorithm.scheduler.ReschedulerSettings]
 
 }

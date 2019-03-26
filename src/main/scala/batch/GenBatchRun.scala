@@ -1,17 +1,21 @@
 package batch
-import algorithm.algorithms.GenAlgorithm
+
+import algorithm.algorithms.euclidean.EuclideanAlgorithm.{ClustererAndReschedulerOutput, ReschedulerSettingsT}
+import algorithm.algorithms.euclidean.EuclideanAlgorithm
 
 object GenBatchRun {
 
-  def apply(algorithm: GenAlgorithm)(settings: List[(algorithm.type#ClustererSettingsT, algorithm.type#ReschedulerSettingsT)]): List[algorithm.type#Steps] = {
-    settings.map { case (clustererSettings, reschedulerSettings) =>
-      algorithm.apply(clustererSettings, reschedulerSettings)
+  def apply(settings: List[(EuclideanAlgorithm.ClustererSettingsT, EuclideanAlgorithm.ReschedulerSettingsT)])
+    : List[ClustererAndReschedulerOutput] = {
+    settings.map {
+      case (clustererSettings, reschedulerSettings) =>
+        EuclideanAlgorithm.apply(clustererSettings, reschedulerSettings)
     }
   }
 
-  def cluster(algorithm: GenAlgorithm)(settings: List[algorithm.type#ClustererSettingsT]): List[algorithm.type#StepT[algorithm.type#ClustererSettingsT]] = {
+  def cluster(settings: List[EuclideanAlgorithm.ClustererSettingsT]): List[EuclideanAlgorithm.ClustererOutput] = {
     settings.map { clustererSettings =>
-      algorithm.apply(clustererSettings)
+      EuclideanAlgorithm.apply(clustererSettings)
     }
   }
 

@@ -126,7 +126,6 @@ object EuclideanClusterer {
     override def apply(clusterBefore: Cluster, clusterAfter: Cluster): Boolean = {
       val maxEnergyAllowed   = sum(clusterBefore.centroid) * (clusterBefore.points.size + 1)
       val potentialMaxEnergy = sum(clusterAfter.centroid) * clusterAfter.points.size
-
       potentialMaxEnergy <= maxEnergyAllowed
     }
   }

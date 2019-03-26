@@ -1,10 +1,9 @@
 package crossfold
-import algorithm.algorithms.GenAlgorithm
 import algorithm.algorithms.euclidean.BatchRunSettingsBuilder
+import algorithm.algorithms.euclidean.EuclideanAlgorithm.ClustererOutput
 import batch.GenBatchRun
 import com.typesafe.scalalogging.Logger
 
-import scala.collection.immutable
 import scala.util.Random
 
 object CrossFoldValidation {
@@ -33,9 +32,9 @@ object CrossFoldValidation {
 
   case class MonteCarlo(splits: Int, subsampleSize: Percentage) extends CrossFoldTypeSettings
 
-  def runClusterer(algorithm: GenAlgorithm)(settings: CrossFoldTypeSettings,
-                                   batchRunSettings: algorithm.BatchRunSettingsBuilderT)
-    : List[List[algorithm.type#StepT[algorithm.type#ClustererSettingsT]]] = settings match {
+  def runClusterer(settings: CrossFoldTypeSettings,
+                                   batchRunSettings: BatchRunSettingsBuilder)
+    : List[List[ClustererOutput]] = settings match {
     case s: MonteCarlo =>
       val points = batchRunSettings.points
       val splits = for (i <- 0 until s.splits) yield {

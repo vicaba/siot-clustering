@@ -16,7 +16,7 @@ object ClusterRescheduler {
 
   val logger = Logger("Rescheduler")
 
-  def apply(clusters: List[Cluster], settings: Settings): List[(Cluster, List[PointChanged])] = {
+  def apply(clusters: List[Cluster], settings: ReschedulerSettings): List[(Cluster, List[PointChanged])] = {
 
     // TODO: make tail recursive. Use trampoline?
     def retrieveLeafClusters(clusters: List[Type]): List[Cluster] = {
@@ -35,7 +35,7 @@ object ClusterRescheduler {
     clusters.map((_, Nil))
   }
 
-  def apply(cluster: Cluster, settings: Settings): (Cluster, List[PointChanged]) =
+  def apply(cluster: Cluster, settings: ReschedulerSettings): (Cluster, List[PointChanged]) =
     rescheduleCluster(cluster, settings.metric, settings.improvement, settings.memory)
 
   /**
