@@ -1,6 +1,6 @@
 package algorithm.serialization
 
-import algorithm.algorithms.euclidean.EuclideanAlgorithm._
+import algorithm.EuclideanAlgorithm._
 import play.api.libs.json._
 import types.serialization.ClusterJsonSerializer._
 import EuclideanClustererSettingsJsonSerializer._
@@ -12,19 +12,18 @@ object AlgorithmJsonSerializer {
 
   val ClustersKey = "clusters"
 
-  implicit def clustererOutputWrites(
-      implicit settingsWrites: OWrites[ClustererOutput]): OWrites[ClustererOutput] =
-    new OWrites[ClustererOutput] {
-      override def writes(o: ClustererOutput): JsObject = {
-        Json.obj(SettingsKey -> o.settings, ClustersKey -> o.clusters)
-      }
+  implicit val clustererOutputWrites: OWrites[ClustererOutput] = (o: ClustererOutput) => {
+      Json.obj(SettingsKey -> o.settings, ClustersKey -> o.clusters)
     }
 
-  implicit def reschedulerOutputWrites(
-      implicit settingsWrites: OWrites[ReschedulerOutput]): OWrites[ReschedulerOutput] =
-    new OWrites[ReschedulerOutput] {
-      override def writes(o: ReschedulerOutput): JsObject = {
-        Json.obj(SettingsKey -> o.settings, ClustersKey -> o.clusters)
-      }
+  implicit val reschedulerOutputWrites: OWrites[ReschedulerOutput] =
+    (o: ReschedulerOutput) => {
+      Json.obj(SettingsKey -> o.settings, ClustersKey -> o.clusters)
     }
+
+  implicit val clustererAndReschedulerOutputWrites: OWrites[ClustererAndReschedulerOutput] = (o: ClustererAndReschedulerOutput) => {
+    Json.obj("1" -> o.clustererOutput, "2" -> o.reschedulerOutput)
+  }
+
+
 }

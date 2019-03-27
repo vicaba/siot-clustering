@@ -1,6 +1,7 @@
 package crossfold
-import algorithm.algorithms.euclidean.BatchRunSettingsBuilder
-import algorithm.algorithms.euclidean.EuclideanAlgorithm.ClustererOutput
+
+import algorithm.BatchRunSettingsBuilder
+import algorithm.EuclideanAlgorithm.{ClustererAndReschedulerOutput, ClustererOutput}
 import batch.GenBatchRun
 import com.typesafe.scalalogging.Logger
 
@@ -42,22 +43,22 @@ object CrossFoldValidation {
       }
       val bulkBatchRunSettings = splits.map(p => batchRunSettings.copy(points = p))
       bulkBatchRunSettings.zipWithIndex.map { case (builder, idx) =>
-        logger.info("Split: {}", idx)
-        GenBatchRun.cluster(algorithm)(builder.build.map(_._1))
+        logger.info("Split: {}.", idx)
+        GenBatchRun.cluster(builder.build.map(_._1))
       }.toList
 
   }
 
-  def batchRunClusterer(algorithm: GenAlgorithm)(settings: List[CrossFoldTypeSettings],
-                                        batchRunSettings: algorithm.BatchRunSettingsBuilderT)
+  def batchRunClusterer(settings: List[CrossFoldTypeSettings],
+                                        batchRunSettings: BatchRunSettingsBuilder)
     : List[(CrossFoldValidation.CrossFoldTypeSettings, List[List
 
-    [algorithm.StepT[algorithm.ClustererSettingsT]]])] =
-    settings.map(s => (s, runClusterer(algorithm)(s, batchRunSettings)))
+    [ClustererOutput]])] =
+    settings.map(s => (s, runClusterer(s, batchRunSettings)))
 
-  def run(algorithm: GenAlgorithm)(settings: CrossFoldTypeSettings,
-                                   batchRunSettings: algorithm.BatchRunSettingsBuilderT)
-  : List[List[algorithm.type#Steps]] = settings match {
+  def run(settings: CrossFoldTypeSettings,
+                                   batchRunSettings: BatchRunSettingsBuilder)
+  : List[List[ClustererAndReschedulerOutput]] = settings match {
     case s: MonteCarlo =>
       val points = batchRunSettings.points
       val splits = for (i <- 0 until s.splits) yield {
@@ -65,15 +66,14 @@ object CrossFoldValidation {
       }
       val bulkBatchRunSettings = splits.map(p => batchRunSettings.copy(points = p))
       bulkBatchRunSettings.zipWithIndex.map { case (builder, idx) =>
-        logger.info("Split: {}", idx)
-        GenBatchRun.apply(algorithm)(builder.build)
+        logger.info("Split: {}.", idx)
+        GenBatchRun.apply(builder.build)
       }.toList
-
   }
 
-  def batchRun(algorithm: GenAlgorithm)(settings: List[CrossFoldTypeSettings],
-                                        batchRunSettings: algorithm.BatchRunSettingsBuilderT)
-  : List[(CrossFoldValidation.CrossFoldTypeSettings, List[List[algorithm.type#Steps]])] =
-    settings.map(s => (s, run(algorithm)(s, batchRunSettings)))
+  def batchRun(settings: List[CrossFoldTypeSettings],
+                                        batchRunSettings: BatchRunSettingsBuilder)
+  : List[(CrossFoldValidation.CrossFoldTypeSettings, List[List[ClustererAndReschedulerOutput]])] =
+    settings.map(s => (s, run(s, batchRunSettings)))
 
 }

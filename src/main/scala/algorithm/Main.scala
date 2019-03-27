@@ -1,20 +1,15 @@
-package algorithm.algorithms.euclidean
+package algorithm
 import java.io.PrintWriter
 
+import algorithm.serialization.ResultsJsonSerializer
 import batch.GenBatchRun
 import config.Configuration
-
-import metrics.Par
-import play.api.libs.json.Json
-import reader.Reader._
-import types.DataTypeMetadata2Columns
-import algorithm.serialization.EuclideanAlgorithmJsonSerializer._
-import algorithm.serialization.ResultsJsonSerializer
 import crossfold.CrossFoldValidation
 import crossfold.CrossFoldValidation.{MonteCarlo, Percentage}
-import types.serialization.ClusterJsonSerializer._
-
-import scala.collection.mutable
+import metrics.Par
+import play.api.libs.json.Json
+import reader.Reader.readEgaugeData
+import algorithm.serialization.AlgorithmJsonSerializer._
 
 object Main {
 
@@ -99,10 +94,10 @@ object Main {
         val splits = Math.floor((batchRunSettingsBuilder.points.size * subsampleSize.v).toDouble).toInt / 2
         MonteCarlo(splits, subsampleSize)
       }
-    val stepsList = CrossFoldValidation.batchRunClusterer(EuclideanAlgorithm)(monteCarlos.toList, batchRunSettingsBuilder)
+    val stepsList = CrossFoldValidation.batchRunClusterer(monteCarlos.toList, batchRunSettingsBuilder)
 
     Some(new PrintWriter(Configuration.summaryBatchRunFile)).foreach { p =>
-      val jsonList = ResultsJsonSerializer.Summary.crossfoldBatchRunAsJson(stepsList)
+      val jsonList = ResultsJsonSerializer.Summary.clustererOutputCrossfoldBatchRunAsJson(stepsList)
       p.write(Json.prettyPrint(Json.toJson(jsonList)).toString())
       p.close()
     }

@@ -1,6 +1,6 @@
 package algorithm.serialization
 
-import algorithm.algorithms.euclidean.EuclideanAlgorithm.{
+import algorithm.EuclideanAlgorithm.{
   ClustererAndReschedulerOutput,
   ClustererOutput,
   ReschedulerOutput

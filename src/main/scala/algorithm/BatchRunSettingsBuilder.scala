@@ -1,4 +1,4 @@
-package algorithm.algorithms.euclidean
+package algorithm
 
 import algorithm.clusterer.EuclideanClusterer
 import metrics.Metric

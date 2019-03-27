@@ -1,7 +1,6 @@
 package batch
-
-import algorithm.algorithms.euclidean.EuclideanAlgorithm.{ClustererAndReschedulerOutput, ReschedulerSettingsT}
-import algorithm.algorithms.euclidean.EuclideanAlgorithm
+import algorithm.EuclideanAlgorithm
+import algorithm.EuclideanAlgorithm.{ClustererAndReschedulerOutput, ReschedulerSettingsT}
 
 object GenBatchRun {
 

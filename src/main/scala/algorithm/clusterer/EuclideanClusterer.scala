@@ -1,9 +1,9 @@
 package algorithm.clusterer
 import java.util.UUID
 
-import algorithm.clusterer.FlattenedEuclideanClusterer.{ClusteringOrder, Settings, centroidOf}
+import algorithm.ClustererSettings
+import algorithm.util.ClusteringOrder
 import breeze.linalg.{Axis, sum}
-import config.Configuration
 import eventmanager.EventManager
 import metrics.{Metric, Par}
 import types.DataTypeMetadata.SyntheticDataType
@@ -16,7 +16,6 @@ import scala.annotation.tailrec
 import scala.collection.immutable.LinearSeq
 import scala.collection.mutable
 import scala.util.Random
-import types.ops.SetOps._
 
 object EuclideanClusterer {
 
@@ -32,7 +31,7 @@ object EuclideanClusterer {
                       override val points: scala.Vector[Point],
                       override val metric: Metric,
                       override val improveIterations: Int = 1)
-      extends algorithm.algorithms.ClustererSettings
+      extends ClustererSettings
 
   /**
     * Alias type that resumes the signature of heuristics
@@ -70,6 +69,12 @@ object EuclideanClusterer {
       }
   }
 
+  def centroidOf[T <: Type](points: Seq[T]): types.DataTypeMetadata.SyntheticDataType =
+    points.foldLeft(points.head.dataTypeMetadata.EmptySyntheticData()) {
+      case (accum, p) =>
+        accum + p.syntheticValue
+    } / points.length.toDouble
+
   /**
     * Creates clusters by combining other clusters.
     *
@@ -89,7 +94,7 @@ object EuclideanClusterer {
                          heuristic: ElementLocatorHeuristic,
                          membersPerCluster: Int,
                          clusters: IndexedSeq[Cluster] = IndexedSeq(),
-                         untilHeuristic: Option[Cluster => Boolean] = None): IndexedSeq[Cluster] = {
+                         untilHeuristic: Option[ClusterLimitHeuristic] = None): IndexedSeq[Cluster] = {
 
     if (iterations > 0 && freeClusters.nonEmpty) {
       val head = freeClusters.head
@@ -140,13 +145,11 @@ object EuclideanClusterer {
                                          freeClusters: IndexedSeq[Cluster],
                                          iterationCount: Int): (Cluster, IndexedSeq[Cluster]) = {
 
-      val clusterCopy = Type.deepCopy(c)
-
       if (freeClusters.nonEmpty) {
 
-        val (clusterTry, _) = clustersToCluster(clusterCopy, centroid, freeClusters, heuristic)
+        val (clusterTry, _) = clustersToCluster(Type.deepCopy(c), centroid, freeClusters, heuristic)
 
-        if (clusterLimitHeuristic(clusterBefore = clusterCopy, clusterAfter = clusterTry)) {
+        if (clusterLimitHeuristic(clusterBefore = c, clusterAfter = clusterTry)) {
 
           val (cluster, remainingClusters) = clustersToCluster(c, centroid, freeClusters, heuristic)
 
@@ -260,7 +263,7 @@ object EuclideanClusterer {
               stopAtIterationCount: Int,
               clusters: Seq[Cluster],
               heuristic: ElementLocatorHeuristic,
-              startHeuristic: Option[Cluster => Boolean] = None): LinearSeq[Cluster] = {
+              startHeuristic: Option[ClusterLimitHeuristic] = None): LinearSeq[Cluster] = {
 
     val points   = clusters.flatMap(_.points)
     val centroid = centroidOf(points)
@@ -352,17 +355,10 @@ object EuclideanClusterer {
 
   def apply(settings: Settings): List[Cluster] = {
 
-    val startHeuristic: Cluster => Boolean = c => {
-      val cluster  = sum(c.syntheticValue)
-      val centroid = Configuration.ClusteringAlgorithm.leafEnergyConsumption(sum(centroidOf(settings.points)))
-      val r        = cluster > centroid
-      r
-    }
-
     val result = metricReductionCluster(
       settings.points.map(Point.toCluster).toList,
       Metric.par,
-      cluster(settings.numberOfClusters, Int.MaxValue, _, chain, Option(startHeuristic)),
+      cluster(settings.numberOfClusters, Int.MaxValue, _, chain, Option(MaxEnergyHeuristic)),
       settings.improveIterations
     ).toList
 

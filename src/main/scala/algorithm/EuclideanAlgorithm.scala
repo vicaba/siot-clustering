@@ -1,5 +1,4 @@
-package algorithm.algorithms.euclidean
-
+package algorithm
 import algorithm.clusterer.EuclideanClusterer
 import algorithm.scheduler.ClusterRescheduler
 import com.typesafe.scalalogging.Logger
@@ -28,7 +27,7 @@ object EuclideanAlgorithm {
 
   def apply(clustererSettings: ClustererSettingsT): ClustererOutput = {
 
-    logger.info(message = s"Running Clusterer. NumberOfClusters: {}. Points: {}",
+    logger.info(s"Running Clusterer. NumberOfClusters: {}. Points: {}",
                 clustererSettings.numberOfClusters,
                 clustererSettings.points.size)
 
@@ -41,7 +40,7 @@ object EuclideanAlgorithm {
   def apply(clustererSettings: ClustererSettingsT,
             reschedulerSettings: ReschedulerSettingsT): ClustererAndReschedulerOutput = {
 
-    logger.info(message = s"Running Clusterer. NumberOfClusters: {}. Points: {}",
+    logger.info(s"Running Clusterer. NumberOfClusters: {}. Points: {}",
                 clustererSettings.numberOfClusters,
                 clustererSettings.points.size)
     val clustererOutput = apply(clustererSettings)

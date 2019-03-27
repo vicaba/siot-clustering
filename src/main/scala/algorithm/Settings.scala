@@ -1,4 +1,5 @@
-package algorithm.algorithms
+package algorithm
+
 import metrics.Metric
 import types.immutable.Point
 trait Settings {
