@@ -2,10 +2,11 @@ package algorithm.clusterer
 import java.util.UUID
 
 import algorithm.ClustererSettings
+import algorithm.clusterer.clusterlimitheuristic.{ClusterLimitHeuristic, MaxEnergyHeuristic}
+import algorithm.clusterer.elementlocatorheuristic.{ElementLocatorHeuristic, HeuristicChain, HeuristicDecorator}
 import algorithm.util.ClusteringOrder
-import breeze.linalg.{Axis, sum}
 import eventmanager.EventManager
-import metrics.{Metric, Par}
+import metrics.Metric
 import types.DataTypeMetadata.SyntheticDataType
 import types.Type
 import types.immutable.Point
@@ -32,42 +33,6 @@ object EuclideanClusterer {
                       override val metric: Metric,
                       override val improveIterations: Int = 1)
       extends ClustererSettings
-
-  /**
-    * Alias type that resumes the signature of heuristics
-    */
-  type ElementLocatorHeuristic = (Cluster, SyntheticDataType, IndexedSeq[Cluster]) => IndexedSeq[(Double, Cluster)]
-
-  trait ClusterLimitHeuristic extends ((Cluster, Cluster) => Boolean) {
-    def apply(clusterBefore: Cluster, clusterAfter: Cluster): Boolean
-  }
-
-  /**
-    * Heuristic decorator that prunes some elements before returning the results of applying a heuristic
-    *
-    * @param heuristic the heuristic
-    */
-  case class HeuristicDecorator(heuristic: ElementLocatorHeuristic) extends ElementLocatorHeuristic {
-    override def apply(v1: Cluster, v2: SyntheticDataType, v3: IndexedSeq[Cluster]): IndexedSeq[(Double, Cluster)] = {
-      val clusters              = heuristic.apply(v1, v2, v3)
-      val aprioriElementsToDrop = clusters.length / 2
-      val elementsToDrop        = if (aprioriElementsToDrop < 1) aprioriElementsToDrop + 1 else aprioriElementsToDrop
-      clusters.dropRight(aprioriElementsToDrop)
-    }
-  }
-
-  /**
-    * Chains a list of heuristics
-    *
-    * @param heuristics the list of heuristics
-    */
-  implicit class HeuristicChain(heuristics: List[ElementLocatorHeuristic]) extends ElementLocatorHeuristic {
-    override def apply(v1: Cluster, v2: SyntheticDataType, v3: IndexedSeq[Cluster]): IndexedSeq[(Double, Cluster)] =
-      heuristics.tail.foldLeft(heuristics.head.apply(v1, v2, v3)) {
-        case (_clusters, _heuristic) =>
-          _heuristic(v1, v2, _clusters.map(_._2))
-      }
-  }
 
   def centroidOf[T <: Type](points: Seq[T]): types.DataTypeMetadata.SyntheticDataType =
     points.foldLeft(points.head.dataTypeMetadata.EmptySyntheticData()) {
@@ -127,19 +92,12 @@ object EuclideanClusterer {
 
   }
 
-  object MaxEnergyHeuristic extends ClusterLimitHeuristic {
-    override def apply(clusterBefore: Cluster, clusterAfter: Cluster): Boolean = {
-      val maxEnergyAllowed   = sum(clusterBefore.centroid) * (clusterBefore.points.size + 1)
-      val potentialMaxEnergy = sum(clusterAfter.centroid) * clusterAfter.points.size
-      potentialMaxEnergy <= maxEnergyAllowed
-    }
-  }
-
-  def clustersToClusterUntilHeuristic(cluster: Cluster,
-                                      centroid: SyntheticDataType,
-                                      freeClusters: IndexedSeq[Cluster],
-                                      heuristic: ElementLocatorHeuristic,
-                                      clusterLimitHeuristic: ClusterLimitHeuristic = MaxEnergyHeuristic): (Cluster, IndexedSeq[Cluster]) = {
+  def clustersToClusterUntilHeuristic(
+      cluster: Cluster,
+      centroid: SyntheticDataType,
+      freeClusters: IndexedSeq[Cluster],
+      heuristic: ElementLocatorHeuristic,
+      clusterLimitHeuristic: ClusterLimitHeuristic = MaxEnergyHeuristic): (Cluster, IndexedSeq[Cluster]) = {
     @tailrec
     def _clustersToClusterUntilHeuristic(c: Cluster,
                                          freeClusters: IndexedSeq[Cluster],
@@ -350,8 +308,10 @@ object EuclideanClusterer {
     best
   }
 
-  val chain: HeuristicChain = List(
-    HeuristicDecorator(MirrorImage.findClosestMirrors(_, _, _)(MirrorImage.MirroredCluster))) ::: Nil
+  val mirrorElementLocator: ElementLocatorHeuristic =
+    ElementLocatorHeuristic(MirrorImage.findClosestMirrors(_, _, _)(MirrorImage.MirroredCluster))
+
+  val chain: HeuristicChain = HeuristicChain(HeuristicDecorator(mirrorElementLocator))
 
   def apply(settings: Settings): List[Cluster] = {
 
