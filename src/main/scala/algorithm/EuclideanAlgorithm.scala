@@ -1,15 +1,16 @@
 package algorithm
-import algorithm.clusterer.EuclideanClusterer
-import algorithm.scheduler.ClusterRescheduler
+
+import algorithm.clusterer.{EuclideanClusterer, EuclideanClustererSettings}
+import algorithm.scheduler.{ClusterRescheduler, ReschedulerSettings}
 import com.typesafe.scalalogging.Logger
 import types.Type
 import types.mutable.Cluster
 
 object EuclideanAlgorithm {
 
-  type ClustererSettingsT = EuclideanClusterer.Settings
+  type ClustererSettingsT = EuclideanClustererSettings
 
-  type ReschedulerSettingsT = algorithm.scheduler.ReschedulerSettings
+  type ReschedulerSettingsT = ReschedulerSettings
 
   val logger = Logger("Algorithm")
 

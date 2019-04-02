@@ -15,10 +15,10 @@ class BatchRunSettingsBuilder(val points: Vector[Point],
            timesToIterate: (Vector[Point], Int) => Int = this.timesToIterate): BatchRunSettingsBuilder =
     new BatchRunSettingsBuilder(points, numbersOfClusters, metrics, timesToIterate)
 
-  def build: List[(EuclideanClusterer.Settings, algorithm.scheduler.ReschedulerSettings)] = {
+  def build: List[(clusterer.EuclideanClustererSettings, algorithm.scheduler.ReschedulerSettings)] = {
     numbersOfClusters.flatMap { numberOfClusters =>
       metrics.map { metric =>
-        (EuclideanClusterer.Settings(numberOfClusters, points, metric, timesToIterate(points, numberOfClusters)),
+        (clusterer.EuclideanClustererSettings(numberOfClusters, points, metric, timesToIterate(points, numberOfClusters)),
          algorithm.scheduler.ReschedulerSettings(numberOfClusters, metric, 0.1, memory = 3))
       }
     }

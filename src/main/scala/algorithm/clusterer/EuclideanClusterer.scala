@@ -21,26 +21,6 @@ import scala.util.Random
 object EuclideanClusterer {
 
   /**
-    * Settings for the euclidean clusterer
-    *
-    * @param numberOfClusters
-    * @param points
-    * @param metric
-    * @param improveIterations
-    */
-  case class Settings(override val numberOfClusters: Int,
-                      override val points: scala.Vector[Point],
-                      override val metric: Metric,
-                      override val improveIterations: Int = 1)
-      extends ClustererSettings
-
-  def centroidOf[T <: Type](points: Seq[T]): types.DataTypeMetadata.SyntheticDataType =
-    points.foldLeft(points.head.dataTypeMetadata.EmptySyntheticData()) {
-      case (accum, p) =>
-        accum + p.syntheticValue
-    } / points.length.toDouble
-
-  /**
     * Creates clusters by combining other clusters.
     *
     * @param iterations the max number of iterations that combine clusters
@@ -223,16 +203,16 @@ object EuclideanClusterer {
               heuristic: ElementLocatorHeuristic,
               startHeuristic: Option[ClusterLimitHeuristic] = None): LinearSeq[Cluster] = {
 
+    if (clusters.isEmpty) return Nil
+    if (stopAtKClusters == 1)
+      return List(Cluster(1, "1", new mutable.HashSet[Cluster]() ++= clusters, 1, None)(clusters.head.dataTypeMetadata))
+
     val points   = clusters.flatMap(_.points)
-    val centroid = centroidOf(points)
+    val centroid = Type.centroidOf(points)
 
     var iterations                     = 0
     var kClusters                      = clusters.size
     var _clusters: IndexedSeq[Cluster] = clusters.toIndexedSeq
-
-    if (clusters.isEmpty) return Nil
-    if (stopAtKClusters == 1)
-      return List(Cluster(1, "1", new mutable.HashSet[Cluster]() ++= clusters, 1, None)(clusters.head.dataTypeMetadata))
 
     EventManager.singleton.publish("clusters", _clusters.toList)
 
@@ -243,11 +223,13 @@ object EuclideanClusterer {
 
     val clusteringOrder = ClusteringOrder(_clusters.size, stopAtKClusters)
 
-    def maxIterations: Boolean      = iterations == stopAtIterationCount
-    def clusteringOrderEnd: Boolean = iterations == clusteringOrder.order.size
-    def minClustersReached: Boolean = kClusters <= stopAtKClusters
+    def hasReachedMaxAllowedIterations: Boolean                = iterations == stopAtIterationCount
+    def hasReachedMaxIterationsBasedOnClusteringOrder: Boolean = iterations == clusteringOrder.order.size
+    def minimumClustersReached: Boolean                        = kClusters <= stopAtKClusters
 
-    while (!maxIterations && !clusteringOrderEnd && !minClustersReached) {
+    while (!hasReachedMaxAllowedIterations &&
+           !hasReachedMaxIterationsBasedOnClusteringOrder &&
+           !minimumClustersReached) {
 
       val membersPerCluster = clusteringOrder.order(iterations)
 
@@ -300,9 +282,9 @@ object EuclideanClusterer {
       val maxMetric       = metricToOptimize(result.maxBy(metricToOptimize(_)))
       if (i == 0) best = result
       else {
-        val currentAggregateMetricLowerThanBest = aggregateMetric <= metricToOptimize.aggregateOf(best)
-        val currentMaxMetricLowerThanBest       = maxMetric <= metricToOptimize(best.maxBy(metricToOptimize(_)))
-        if (currentAggregateMetricLowerThanBest && currentMaxMetricLowerThanBest) best = result
+        val isCurrentAggregateMetricLowerThanBest = aggregateMetric <= metricToOptimize.aggregateOf(best)
+        val isCurrentMaxMetricLowerThanBest       = maxMetric <= metricToOptimize(best.maxBy(metricToOptimize(_)))
+        if (isCurrentAggregateMetricLowerThanBest && isCurrentMaxMetricLowerThanBest) best = result
       }
     }
     best
@@ -313,7 +295,7 @@ object EuclideanClusterer {
 
   val chain: HeuristicChain = HeuristicChain(HeuristicDecorator(mirrorElementLocator))
 
-  def apply(settings: Settings): List[Cluster] = {
+  def apply(settings: EuclideanClustererSettings): List[Cluster] = {
 
     val result = metricReductionCluster(
       settings.points.map(Point.toCluster).toList,
@@ -326,7 +308,7 @@ object EuclideanClusterer {
 
   }
 
-  def applyOnce(settings: Settings): List[Cluster] = {
+  def applyOnce(settings: EuclideanClustererSettings): List[Cluster] = {
     val result = cluster(settings.numberOfClusters, Int.MaxValue, settings.points.map(Point.toCluster).toList, chain)
     result.toList
   }

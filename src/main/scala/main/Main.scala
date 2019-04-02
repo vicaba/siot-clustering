@@ -68,7 +68,7 @@ case class AlgorithmActor(gui: ActorRef) extends Actor {
 
     println(points)
 
-    EuclideanClusterer.applyOnce(EuclideanClusterer.Settings(4, points, Metric.par))
+    EuclideanClusterer.applyOnce(algorithm.clusterer.EuclideanClustererSettings(4, points, Metric.par))
 
   }
 

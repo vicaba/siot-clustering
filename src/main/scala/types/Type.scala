@@ -8,6 +8,12 @@ import scala.annotation.tailrec
 
 object Type {
 
+  def centroidOf[T <: Type](points: Seq[T]): types.DataTypeMetadata.SyntheticDataType =
+    points.foldLeft(points.head.dataTypeMetadata.EmptySyntheticData()) {
+      case (accum, p) =>
+        accum + p.syntheticValue
+    } / points.length.toDouble
+
   /**
     * Converts a cluster or a point into a cluster. If _type is a [[types.mutable.Cluster]], _type is returned. If _type is a [[types.immutable.Point]],
     * a [[types.mutable.Cluster]] that contains the _type is returned

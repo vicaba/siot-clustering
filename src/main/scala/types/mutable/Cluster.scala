@@ -177,6 +177,11 @@ object Cluster {
 
   }
 
+  /**
+  * Extracts points from clusters.
+    * @param cl
+    * @return
+    */
   def flatten(cl: TraversableOnce[Cluster]): Set[Point] = {
 
     @tailrec

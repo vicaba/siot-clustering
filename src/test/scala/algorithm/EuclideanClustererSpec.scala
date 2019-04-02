@@ -1,7 +1,7 @@
 package algorithm
 
 import algorithm.clusterer.EuclideanClusterer
-import algorithm.clusterer.EuclideanClusterer.Settings
+import algorithm.clusterer.EuclideanClustererSettings
 import breeze.linalg.{DenseMatrix, DenseVector}
 import metrics.{Metric, Par}
 import org.scalatest.Matchers._
@@ -80,7 +80,7 @@ class EuclideanClustererSpec extends FeatureSpec with GivenWhenThen {
       }.toVector
 
       When("asked to assign each point to a cluster, given 2 clusters")
-      val runSettings = Settings(1, points, Par.withAverageAggregate, improveIterations = 100)
+      val runSettings = EuclideanClustererSettings(1, points, Par.withAverageAggregate, improveIterations = 100)
       val result      = EuclideanClusterer(runSettings)
 
       Then("the two clusters have a PAR of 1")
