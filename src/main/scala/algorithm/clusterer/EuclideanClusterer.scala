@@ -2,7 +2,12 @@ package algorithm.clusterer
 import java.util.UUID
 
 import algorithm.ClustererSettings
-import algorithm.clusterer.clusterlimitheuristic.{ClusterLimitHeuristic, MaxEnergyHeuristic}
+import algorithm.clusterer.clusterlimitheuristic.{
+  ClusterLimitHeuristic,
+  ClusterLimitHeuristicTest,
+  ElementLimitHeuristicTest,
+  MaxEnergyHeuristic
+}
 import algorithm.clusterer.elementlocatorheuristic.{ElementLocatorHeuristic, HeuristicChain, HeuristicDecorator}
 import algorithm.util.ClusteringOrder
 import eventmanager.EventManager
@@ -57,7 +62,9 @@ object EuclideanClusterer {
                            cluster +: clusters,
                            untilHeuristic)
       } else {
-        val (cluster, remainingClusters) = clustersToClusterXTimes(c, centroid, tail, heuristic, membersPerCluster)
+        val lh                           = new ElementLimitHeuristicTest(c.points.size + membersPerCluster)
+        val lhContext                    = new lh.ElementLimitHeuristicContext(c.points.size + 1)
+        val (cluster, remainingClusters) = clustersToClusterXTimes(c, centroid, tail, heuristic, lh)(lhContext)
         clustersToClusters(iterations - 1,
                            centroid,
                            remainingClusters,
@@ -109,29 +116,30 @@ object EuclideanClusterer {
     * @param c
     * @param centroid
     * @param freeClusters
-    * @param heuristic
+    * @param elementLocatorHeuristic
     * @param clustersPerCluster
     * @return
     */
   def clustersToClusterXTimes(c: Cluster,
                               centroid: SyntheticDataType,
                               freeClusters: IndexedSeq[Cluster],
-                              heuristic: ElementLocatorHeuristic,
-                              clustersPerCluster: Int = 1): (Cluster, IndexedSeq[Cluster]) = {
+                              elementLocatorHeuristic: ElementLocatorHeuristic,
+                              clusterLimitHeuristic: ClusterLimitHeuristicTest)(
+      startingContext: clusterLimitHeuristic.Context): (Cluster, IndexedSeq[Cluster]) = {
 
     @tailrec
     def _clustersToClusterXTimes(c: Cluster,
                                  freeClusters: IndexedSeq[Cluster],
-                                 clustersPerCluster: Int): (Cluster, IndexedSeq[Cluster]) = {
-      clustersPerCluster match {
-        case 0 => (c, freeClusters)
-        case _ =>
-          val (cluster, remainingClusters) = clustersToCluster(c, centroid, freeClusters, heuristic)
-          _clustersToClusterXTimes(cluster, remainingClusters, clustersPerCluster - 1)
+                                 context: clusterLimitHeuristic.Context): (Cluster, IndexedSeq[Cluster]) = {
+      clusterLimitHeuristic.isFinished(context) match {
+        case true => (c, freeClusters)
+        case false =>
+          val (cluster, remainingClusters) = clustersToCluster(c, centroid, freeClusters, elementLocatorHeuristic)
+          _clustersToClusterXTimes(cluster, remainingClusters, clusterLimitHeuristic.next(context))
       }
     }
 
-    _clustersToClusterXTimes(c, freeClusters, clustersPerCluster - 1)
+    _clustersToClusterXTimes(c, freeClusters, startingContext)
 
   }
 
@@ -207,11 +215,8 @@ object EuclideanClusterer {
     if (stopAtKClusters == 1)
       return List(Cluster(1, "1", new mutable.HashSet[Cluster]() ++= clusters, 1, None)(clusters.head.dataTypeMetadata))
 
-    val points   = clusters.flatMap(_.points)
-    val centroid = Type.centroidOf(points)
-
-    var iterations                     = 0
-    var kClusters                      = clusters.size
+    val points                         = clusters.flatMap(_.points)
+    val centroid                       = Type.centroidOf(points)
     var _clusters: IndexedSeq[Cluster] = clusters.toIndexedSeq
 
     EventManager.singleton.publish("clusters", _clusters.toList)
@@ -221,6 +226,8 @@ object EuclideanClusterer {
         clustersToClusters(Int.MaxValue, centroid, _clusters, heuristic, Int.MaxValue, untilHeuristic = startHeuristic)
     }
 
+    var iterations      = 0
+    var kClusters       = _clusters.size
     val clusteringOrder = ClusteringOrder(_clusters.size, stopAtKClusters)
 
     def hasReachedMaxAllowedIterations: Boolean                = iterations == stopAtIterationCount
@@ -232,7 +239,6 @@ object EuclideanClusterer {
            !minimumClustersReached) {
 
       val membersPerCluster = clusteringOrder.order(iterations)
-
       val clusteringIterations =
         if (iterations == 0)
           (_clusters.size - clusteringOrder.outliers) / membersPerCluster

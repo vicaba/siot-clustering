@@ -23,7 +23,7 @@ object Main {
       }
       .toVector*/
 
-    val points = readEgaugeData(Configuration.userProfilesFile)
+    val points = readEgaugeData(Configuration.userProfilesFile).take(36)
 
     //TODO: Why defaulting to points.size + points.size/3?
     val batchRunSettingsBuilder =
@@ -92,7 +92,7 @@ object Main {
       yield {
         val subsampleSize = Percentage.of(i / Max)
         val splits = Math.floor((batchRunSettingsBuilder.points.size * subsampleSize.v).toDouble).toInt / 2
-        MonteCarlo(splits, subsampleSize)
+        MonteCarlo(1, subsampleSize)
       }
     val stepsList = CrossFoldValidation.batchRunClusterer(monteCarlos.toList, batchRunSettingsBuilder)
 

@@ -1,46 +1,75 @@
 package test
 
-trait LimitHeuristic {
+import algorithm.clusterer.clusterlimitheuristic.{ClusterLimitHeuristic, MaxEnergyHeuristic}
+import algorithm.clusterer.elementlocatorheuristic.ElementLocatorHeuristic
+import types.DataTypeMetadata.SyntheticDataType
+import types.mutable.Cluster
+
+trait LimitHeuristic[Feed] {
+
+  type F = Feed
 
   type Context
 
-  def apply(context: this.Context): (Boolean, this.Context)
+  def isFinished(context: this.Context): Boolean
+
+  def next(context: this.Context, feed: Feed): this.Context
 
 }
 
-class LimitHeuristicImpl extends LimitHeuristic {
+class LimitHeuristicImpl(val maxElements: Integer) extends LimitHeuristic[Integer] {
 
-  case class Context1(a: Int)
+  case class ContextImpl(currentElements: F)
 
-  override type Context = Context1
+  override type Context = ContextImpl
 
-  override def apply(context: this.Context): (Boolean, this.Context) = {
-    if (context.a == 3) (false, context) else (true, Context1(context.a + 1))
+  override def isFinished(context: this.Context): Boolean = context.currentElements == maxElements
+
+  override def next(context: this.Context, feed: F): this.Context = {
+    new ContextImpl(context.currentElements + feed)
   }
 }
 
-class LimitHeuristicImpl2 extends LimitHeuristic {
+class LimitHeuristicImpl2(val maxElements: Integer) extends LimitHeuristic[Integer] {
 
-  case class Context2()
+  case class ContextImpl(currentElements: F)
 
-  override type Context = Context2
+  override type Context = ContextImpl
 
-  override def apply(context: this.Context): (Boolean, this.Context) = (true, Context2())
+  override def isFinished(context: this.Context): Boolean = context.currentElements == maxElements
+
+  override def next(context: this.Context, feed: F): this.Context = {
+    new ContextImpl(context.currentElements - feed)
+  }
 }
 
 object Main {
 
-  def f(l: LimitHeuristic)(c: l.Context): String = {
-    val res = l.apply(c)
-    if (res._1) f(l)(res._2) else res._2.toString
+  def f(l: LimitHeuristic[Integer])(c: l.Context): String = {
+    val newContext = l.next(c, 1)
+    if (l.isFinished(newContext)) newContext.toString else f(l)(newContext)
   }
 
   def main(args: Array[String]): Unit = {
 
-    val lh = new LimitHeuristicImpl()
-    val lh2 = new LimitHeuristicImpl2()
+    val lh = new LimitHeuristicImpl(3)
+    val lh2 = new LimitHeuristicImpl2(-3)
 
-    println(f(lh)(lh.Context1(0)))
+    println(f(lh)(new lh.ContextImpl(1)))
 
   }
+
+  def clustersToClusterUntilHeuristic(
+                                       cluster: Cluster,
+                                       centroid: SyntheticDataType,
+                                       freeClusters: IndexedSeq[Cluster],
+                                       elementLocatorHeuristic: ElementLocatorHeuristic,
+                                       clusterLimitHeuristic: LimitHeuristic[Cluster]): (Cluster, IndexedSeq[Cluster]) = {
+
+    val e = elementLocatorHeuristic(cluster, centroid, freeClusters).head._2
+    clusterLimitHeuristic.next(e)
+
+
+  }
+
 }
