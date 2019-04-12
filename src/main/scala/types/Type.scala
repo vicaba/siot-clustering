@@ -8,11 +8,10 @@ import scala.annotation.tailrec
 
 object Type {
 
-  def centroidOf[T <: Type](points: Seq[T]): types.DataTypeMetadata.SyntheticDataType =
-    points.foldLeft(points.head.dataTypeMetadata.EmptySyntheticData()) {
-      case (accum, p) =>
-        accum + p.syntheticValue
-    } / points.length.toDouble
+  def centroidOf[T <: Type](points: Seq[T]): types.DataTypeMetadata.SyntheticDataType = {
+    val sum = sumVectors(points.map(_.syntheticValue).toList, points.head.dataTypeMetadata.EmptySyntheticData())
+    sum / points.length.toDouble
+  }
 
   /**
     * Converts a cluster or a point into a cluster. If _type is a [[types.mutable.Cluster]], _type is returned. If _type is a [[types.immutable.Point]],
@@ -87,24 +86,6 @@ object Type {
     p.deepCopy()
   }
 
-}
-
-trait Type {
-
-  type ThisType <: Type
-
-  def id: Int
-
-  def data: DataType
-
-  def syntheticValue: SyntheticDataType
-
-  def centroid: SyntheticDataType
-
-  def dataTypeMetadata: DataTypeMetadata
-
-  def size: Int
-
   /**
     * Calculates the sum of the given [[types.DataTypeMetadata.DataType]] (sum of matrixes)
     *
@@ -132,8 +113,37 @@ trait Type {
       case Nil       => accum
     }
 
-  override def toString: String = s"Type($id, $size)"
+}
 
+trait Type {
+
+  type ThisType <: Type
+
+  def id: Int
+
+  def data: DataType
+
+  def syntheticValue: SyntheticDataType
+
+  def centroid: SyntheticDataType
+
+  def dataTypeMetadata: DataTypeMetadata
+
+  def size: Int
+
+  /**
+    * See [[types.Type#sumPoints(scala.collection.immutable.List, breeze.linalg.DenseMatrix)]].
+    */
+  final def sumPoints(remaining: List[DataType], accum: DataType): DataType =
+    Type.sumPoints(remaining, accum)
+
+  /**
+    * See [[types.Type#sumVectors(scala.collection.immutable.List, breeze.linalg.DenseVector)]].
+    */
+  final def sumVectors(remaining: List[SyntheticDataType], accum: SyntheticDataType): SyntheticDataType =
+    Type.sumVectors(remaining, accum)
+
+  override def toString: String = s"Type($id, $size)"
 
   def deepCopy(): ThisType
 
