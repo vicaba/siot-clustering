@@ -157,7 +157,7 @@ object EuclideanClusterer {
               stopAtIterationCount: Int,
               clusters: Seq[Cluster],
               heuristic: ElementLocatorHeuristic,
-              startHeuristic: Option[KeepClusteringHeuristic] = None): LinearSeq[Cluster] = {
+              startHeuristic: Option[KeepClusteringHeuristic]): LinearSeq[Cluster] = {
 
     if (clusters.isEmpty) return Nil
     if (stopAtKClusters == 1)
@@ -260,7 +260,7 @@ object EuclideanClusterer {
     val result = metricReductionCluster(
       settings.points.map(Point.toCluster).toList,
       Metric.par,
-      cluster(settings.numberOfClusters, Int.MaxValue, _, chain, None),
+      cluster(settings.numberOfClusters, Int.MaxValue, _, chain, Some(MaxEnergyHeuristic)),
       settings.improveIterations
     ).toList
 
@@ -269,7 +269,7 @@ object EuclideanClusterer {
   }
 
   def applyOnce(settings: EuclideanClustererSettings): List[Cluster] = {
-    val result = cluster(settings.numberOfClusters, Int.MaxValue, settings.points.map(Point.toCluster).toList, chain)
+    val result = cluster(settings.numberOfClusters, Int.MaxValue, settings.points.map(Point.toCluster).toList, chain, Some(MaxEnergyHeuristic))
     result.toList
   }
 
