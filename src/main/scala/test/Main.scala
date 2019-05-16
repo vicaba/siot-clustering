@@ -23,7 +23,7 @@ object Main {
     //override def toString: String = "Element("+ position.toString + ", " + value.toString + ", " + approximateValue.toString + ")"
 
     override def toString: String =
-      "E(" + value.toString + " -> " + (if (approximateValue.isEmpty) "N" else approximateValue.get.toString) + ")"
+    "E(" + value.toString + " -> " + (if (approximateValue.isEmpty) "N" else approximateValue.get.toString) + ")"
 
   }
 
