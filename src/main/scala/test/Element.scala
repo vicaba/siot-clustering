@@ -14,7 +14,7 @@ class Element[E](val position: Int, val value: E, val approximateValue: Option[E
 
 object Element {
 
-  def toListOfElements[T](l: Seq[T]): Seq[Element[T]] = {
+  def toListOfElements[T](l: Vector[T]): Vector[Element[T]] = {
     l.zipWithIndex.map {case (e , i) => new Element[T](i, e, None)}
   }
 
