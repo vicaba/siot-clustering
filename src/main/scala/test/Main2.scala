@@ -34,18 +34,24 @@ object Main2 {
   def merge(loads: Loads): Loads = {
     val flexibleLoads = loads.flexibleLoads
     val fixedLoads = loads.fixedLoads
+    val fixedLoadsSize = fixedLoads.size
 
     @tailrec
-    def rec(flexibleLoads: Vector[LoadElement], fixedLoads: Vector[LoadElement]): Loads = flexibleLoads match {
+    def rec(flexibleLoads: Vector[LoadElement], fixedLoads: Vector[LoadElement], iterations: Int): Loads = flexibleLoads match {
       case flexibleLoad +: remainingFlexibleLoads =>
+        val assignment =
+          fixedLoads.tail :+ fixedLoads.head.copy(approximateValue = Some(flexibleLoad.value))
+
         rec(
           remainingFlexibleLoads,
-          fixedLoads.tail :+ fixedLoads.head.copy(approximateValue = Some(flexibleLoad.value))
+          if (iterations == fixedLoadsSize - 1) assignment sortWith (_.value < _.value)
+          else assignment,
+          iterations + 1
         )
       case IndexedSeq() => Loads(fixedLoads = fixedLoads, flexibleLoads = flexibleLoads)
     }
 
-    rec(flexibleLoads, fixedLoads)
+      rec(flexibleLoads, fixedLoads, 0)
 
   }
 
