@@ -39,7 +39,7 @@ class Main2Spec extends FeatureSpec with GivenWhenThen
 
       val metricFixedLoads = Metric.par(fixedLoads)
       val metricMergeFixedLoadsWithFlexibleLoads =
-        Metric.par(mergeResult.fixedLoads.map {fl => fl.approximateValue.getOrElse(fl.value)})
+        Metric.par(mergeResult.fixedLoads.map {fl => fl.addedFlexibleLoads.getOrElse(fl.value)})
 
       metricFixedLoads should be > metricMergeFixedLoadsWithFlexibleLoads
       info(s"Metric.par(fixedLoads): $metricFixedLoads; Metric.par(mergeResult.fixedLoads): $metricMergeFixedLoadsWithFlexibleLoads")
@@ -67,7 +67,7 @@ class Main2Spec extends FeatureSpec with GivenWhenThen
 
       val metricFixedLoads = Metric.par(fixedLoads)
       val metricMergeFixedLoadsWithFlexibleLoads =
-        Metric.par(mergeResult.fixedLoads.map {fl => fl.approximateValue.getOrElse(fl.value)})
+        Metric.par(mergeResult.fixedLoads.map {fl => fl.addedFlexibleLoads.getOrElse(fl.value)})
 
       metricFixedLoads should be > metricMergeFixedLoadsWithFlexibleLoads
       info(s"Metric.par(fixedLoads): $metricFixedLoads; Metric.par(mergeResult.fixedLoads): $metricMergeFixedLoadsWithFlexibleLoads")

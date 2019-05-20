@@ -3,42 +3,44 @@ package test
 import breeze.linalg.DenseVector
 import metrics.DenseVectorReprOps
 
-class Element[E](val position: Int, val value: E, val approximateValue: Option[E]) {
+class Element(val position: Int, val value: Double, val addedFlexibleLoads: List[Double]) {
 
   def copy(
             position: Int = this.position,
-            value: E = this.value,
-            approximateValue: Option[E] = this.approximateValue) = new Element(position, value, approximateValue)
+            value: Double = this.value,
+            addedFlexibleLoads: List[Double] = this.addedFlexibleLoads) = new Element(position, value, addedFlexibleLoads)
 
   override def toString: String =
-    "E(" + value.toString + " -> " + (if (approximateValue.isEmpty) "N" else approximateValue.get.toString) + ")"
+    "E(" + value.toString + " -> " + (if (addedFlexibleLoads.isEmpty) "N" else addedFlexibleLoads) + ")"
 
   override def equals(obj: Any): Boolean = obj match {
-    case e: Element[E] => this.position == e.position && this.value.getClass == e.value.getClass
+    case e: Element => this.position == e.position
     case _ => false
   }
 
   override def hashCode(): Int = this.position
 
+  def amplitude: Double = addedFlexibleLoads.foldLeft(this.value)(_ + _)
+
 }
 
 object Element {
 
-  def toListOfElements[T](l: Vector[T]): Vector[Element[T]] = {
-    l.zipWithIndex.map {case (e , i) => new Element[T](i, e, None)}
+  def toListOfElements(l: Vector[Double]): Vector[Element] = {
+    l.zipWithIndex.map {case (e , i) => new Element(i, e, Nil)}
   }
 
-  class ElementOrdering[T: Ordering] extends Ordering[Element[T]] {
-    override def compare(x: Element[T], y: Element[T]): Int = implicitly[Ordering[T]].compare(x.value, y.value)
+  class ElementOrdering extends Ordering[Element] {
+    override def compare(x: Element, y: Element): Int = implicitly[Ordering[Double]].compare(x.value, y.value)
   }
 
-  implicit def elementOrdering[E: Numeric]: ElementOrdering[E] = new ElementOrdering[E]
+  implicit val elementOrdering: ElementOrdering = new ElementOrdering
 
-  implicit val toVector: DenseVectorReprOps[Vector[Element[Double]]] = new DenseVectorReprOps[Vector[Element[Double]]] {
+  implicit val toVector: DenseVectorReprOps[Vector[Element]] = new DenseVectorReprOps[Vector[Element]] {
 
-    override def apply(t: Vector[Element[Double]]): DenseVector[Double] = DenseVector(t.map(_.value):_*)
+    override def apply(t: Vector[Element]): DenseVector[Double] = DenseVector(t.map(_.value):_*)
 
-    override def zero(t: Vector[Element[Double]]): DenseVector[Double] = DenseVector((for(_ <- 1 to t.size) yield 0.0):_*)
+    override def zero(t: Vector[Element]): DenseVector[Double] = DenseVector((for(_ <- 1 to t.size) yield 0.0):_*)
   }
 
 }

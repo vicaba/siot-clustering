@@ -6,15 +6,14 @@ import scala.annotation.tailrec
 
 object Main2 {
 
-  type LoadElement = Element[Double]
+  type LoadElement = Element
 
   class Loads(val fixedLoads: Vector[LoadElement], val flexibleLoads: Vector[LoadElement])
 
   object Loads {
 
-    def apply(fixedLoads: Vector[Element[Double]], flexibleLoads: Vector[Element[Double]]): Loads =
+    def apply(fixedLoads: Vector[Element], flexibleLoads: Vector[Element]): Loads =
       new Loads(fixedLoads, flexibleLoads)
-
   }
 
   def main(args: Array[String]): Unit = {
@@ -40,7 +39,7 @@ object Main2 {
     def rec(flexibleLoads: Vector[LoadElement], fixedLoads: Vector[LoadElement], iterations: Int): Loads = flexibleLoads match {
       case flexibleLoad +: remainingFlexibleLoads =>
         val assignment =
-          fixedLoads.tail :+ fixedLoads.head.copy(approximateValue = Some(flexibleLoad.value))
+          fixedLoads.tail :+ fixedLoads.head.copy(addedFlexibleLoads = flexibleLoad :: fixedLoads.head.addedFlexibleLoads)
 
         rec(
           remainingFlexibleLoads,
