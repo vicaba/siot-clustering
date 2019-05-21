@@ -1,3 +1,4 @@
+/*
 package test
 
 import breeze.linalg.DenseVector
@@ -76,3 +77,4 @@ class Main2Spec extends FeatureSpec with GivenWhenThen
   }
 
 }
+*/

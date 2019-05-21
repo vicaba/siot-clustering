@@ -31,7 +31,7 @@ object Main2 {
   }
 
   def merge(loads: Loads): Loads = {
-    val flexibleLoads = loads.flexibleLoads
+/*    val flexibleLoads = loads.flexibleLoads
     val fixedLoads = loads.fixedLoads
     val fixedLoadsSize = fixedLoads.size
 
@@ -50,7 +50,8 @@ object Main2 {
       case IndexedSeq() => Loads(fixedLoads = fixedLoads, flexibleLoads = flexibleLoads)
     }
 
-      rec(flexibleLoads, fixedLoads, 0)
+      rec(flexibleLoads, fixedLoads, 0)*/
+    ???
 
   }
 
