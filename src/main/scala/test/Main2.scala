@@ -1,63 +1,55 @@
 package test
 
-import test.Element._
+import test.Load._
+import test.Loads
 
 import scala.annotation.tailrec
+import scala.collection.generic.CanBuildFrom
 
 object Main2 {
 
-  type LoadElement = Element
-
-  class Loads(val fixedLoads: Vector[LoadElement], val flexibleLoads: Vector[LoadElement])
-
-  object Loads {
-
-    def apply(fixedLoads: Vector[Element], flexibleLoads: Vector[Element]): Loads =
-      new Loads(fixedLoads, flexibleLoads)
-  }
-
   def main(args: Array[String]): Unit = {
 
-    val fixedLoads = toListOfElements(Vector[Double](0, 1, 3, 2, 1, 0))
+    val fixedLoads = toFixedLoads(Vector[Double](0, 1, 3, 2, 1, 0))
 
-    val orderedFixedLoads = fixedLoads.sortWith (_.value < _.value)
+    val orderedFixedLoads = fixedLoads.sortWith (_.amplitude < _.amplitude)
 
-    val flexibleLoads = toListOfElements(Vector[Double](3, 3, 2, 2, 1))
+    val flexibleLoads = toFlexibleLoads(Vector[Double](3, 3, 2, 2, 1))
 
     val orderedFlexibleLoads = higherThanPeakOrderedDesc(maxPeakOf(fixedLoads), flexibleLoads)
 
-    merge(Loads(orderedFlexibleLoads, orderedFixedLoads))
+    merge(new Loads(orderedFixedLoads, orderedFlexibleLoads))
 
   }
 
-  def merge(loads: Loads): Loads = {
-/*    val flexibleLoads = loads.flexibleLoads
-    val fixedLoads = loads.fixedLoads
-    val fixedLoadsSize = fixedLoads.size
+  def merge(loads: Loads): Vector[AccumulatedLoad] = {
+    val flexibleLoads = loads.flexibleLoads
+    val accumulatedLoads = loads.fixedLoads.map(fl => AccumulatedLoad(fl.positionInT, List(fl)))
+    val accumulatedLoadsSize = accumulatedLoads.size
+
 
     @tailrec
-    def rec(flexibleLoads: Vector[LoadElement], fixedLoads: Vector[LoadElement], iterations: Int): Loads = flexibleLoads match {
+    def rec(flexibleLoads: Vector[FlexibleLoad], accumulatedLoads: Vector[AccumulatedLoad], iterations: Int): Vector[AccumulatedLoad] = flexibleLoads match {
       case flexibleLoad +: remainingFlexibleLoads =>
         val assignment =
-          fixedLoads.tail :+ fixedLoads.head.copy(addedFlexibleLoads = flexibleLoad :: fixedLoads.head.addedFlexibleLoads)
+          accumulatedLoads.tail :+ accumulatedLoads.head.copy(loads = flexibleLoad :: accumulatedLoads.head.loads)
 
         rec(
           remainingFlexibleLoads,
-          if (iterations == fixedLoadsSize - 1) assignment sortWith (_.value < _.value)
+          if (iterations == accumulatedLoadsSize - 1) assignment.sortWith(_.amplitude < _.amplitude)
           else assignment,
           iterations + 1
         )
-      case IndexedSeq() => Loads(fixedLoads = fixedLoads, flexibleLoads = flexibleLoads)
+      case IndexedSeq() => accumulatedLoads
     }
 
-      rec(flexibleLoads, fixedLoads, 0)*/
-    ???
+      rec(flexibleLoads, accumulatedLoads, 0)
 
   }
 
-  def maxPeakOf(v: scala.Seq[LoadElement]): LoadElement = v.max
+  def maxPeakOf[X <: Load, S[A] <: Seq[A]](s: Seq[Load]): Load = s.max
 
-  def higherThanPeakOrderedDesc(peak: LoadElement, loads: scala.Vector[LoadElement]): scala.Vector[LoadElement] =
-    loads filter (_.value >= peak.value) sortWith (_.value > _.value)
+  def higherThanPeakOrderedDesc[X <: Load, S[A] <: Seq[A]](peak: Load, loads: S[X])(implicit cbf: CanBuildFrom[Nothing, X, S[X]]): S[X] =
+    loads.filter(_.amplitude >= peak.amplitude).sortWith(_.amplitude > _.amplitude).to[S]
 
 }

@@ -1,3 +1,4 @@
+/*
 package test
 
 import scala.collection.generic.CanBuildFrom
@@ -8,7 +9,7 @@ class FixedLoad(val id: Int, val positionInT: Int, val amplitude: Double) {
 
 object Load {
 
-  implicit def toFixedLoads[S[_] <: Seq[Double]](l: S[Double])(implicit cbf: CanBuildFrom[Nothing, FixedLoad, S[FixedLoad]]): S[FixedLoad] = {
+  implicit def toFixedLoads[S[X] <: Seq[X]](l: S[Double])(implicit cbf: CanBuildFrom[Nothing, FixedLoad, S[FixedLoad]]): S[FixedLoad] = {
     l.map(_ => new FixedLoad(1, 1, 1)).to[S]
   }
 
@@ -17,3 +18,4 @@ object Load {
   }
 
 }
+*/

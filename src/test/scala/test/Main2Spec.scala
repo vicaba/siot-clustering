@@ -1,21 +1,21 @@
-/*
 package test
 
 import breeze.linalg.DenseVector
 import metrics.{DenseVectorReprOps, Metric}
 import org.scalatest.{FeatureSpec, GivenWhenThen}
 import org.scalatest.Matchers._
-import test.Element.toListOfElements
-import test.Main2.{Loads, higherThanPeakOrderedDesc, maxPeakOf, merge}
+import test.Load._
+import test.Loads
+import test._
+import test.Main2.{higherThanPeakOrderedDesc, maxPeakOf, merge}
 
-class Main2Spec extends FeatureSpec with GivenWhenThen
-{
+class Main2Spec extends FeatureSpec with GivenWhenThen {
 
   implicit def seqToDenseVector[S <: Seq[Double]]: DenseVectorReprOps[S] = new DenseVectorReprOps[S] {
 
-    override def apply(t: S): DenseVector[Double] = DenseVector(t:_*)
+    override def apply(t: S): DenseVector[Double] = DenseVector(t: _*)
 
-    override def zero(t: S): DenseVector[Double] = DenseVector((for(_ <- 1 to t.size) yield 0.0):_*)
+    override def zero(t: S): DenseVector[Double] = DenseVector((for (_ <- 1 to t.size) yield 0.0): _*)
   }
 
   feature("Merge fixed and flexible loads will reduce PAR") {
@@ -23,30 +23,30 @@ class Main2Spec extends FeatureSpec with GivenWhenThen
       "PAR(fixedLoads) > PAR(merge(fixedLoads + flexibleLoads))") {
 
       Given("6 fixed loads")
-      val fixedLoads = toListOfElements(Vector[Double](0, 1, 3, 2, 1, 0))
+      val fixedLoads = toFixedLoads(Vector[Double](0, 1, 3, 2, 1, 0))
 
       Given("5 flexible loads")
 
-      val flexibleLoads = toListOfElements(Vector[Double](3, 3, 2, 2, 1))
+      val flexibleLoads = toFlexibleLoads(Vector[Double](3, 3, 2, 2, 1))
 
       When("Merged")
 
-      val orderedFixedLoads = fixedLoads.sortWith (_.value < _.value)
+      val orderedFixedLoads = fixedLoads.sortWith(_.amplitude < _.amplitude)
       val orderedFlexibleLoads = higherThanPeakOrderedDesc(maxPeakOf(fixedLoads), flexibleLoads)
 
-      val mergeResult = merge(Loads(orderedFixedLoads, orderedFlexibleLoads))
+      val mergeResult = merge(new Loads(orderedFixedLoads, orderedFlexibleLoads))
 
       Then("PAR(fixedLoads) > PAR(merge(fixedLoads + flexibleLoads))")
 
-      val metricFixedLoads = Metric.par(fixedLoads)
+      val metricFixedLoads = Metric.par(fixedLoads)(Load.toVector)
       val metricMergeFixedLoadsWithFlexibleLoads =
-        Metric.par(mergeResult.fixedLoads.map {fl => fl.addedFlexibleLoads.getOrElse(fl.value)})
+        Metric.par(mergeResult)
 
       metricFixedLoads should be > metricMergeFixedLoadsWithFlexibleLoads
       info(s"Metric.par(fixedLoads): $metricFixedLoads; Metric.par(mergeResult.fixedLoads): $metricMergeFixedLoadsWithFlexibleLoads")
 
     }
-
+    /*
     scenario("the amount of flexible loads is more than the amount of fixed loads. When merged, " +
       "PAR(fixedLoads) > PAR(merge(fixedLoads + flexibleLoads))") {
 
@@ -74,7 +74,7 @@ class Main2Spec extends FeatureSpec with GivenWhenThen
       info(s"Metric.par(fixedLoads): $metricFixedLoads; Metric.par(mergeResult.fixedLoads): $metricMergeFixedLoadsWithFlexibleLoads")
 
     }
-  }
+  }*/
 
+  }
 }
-*/
