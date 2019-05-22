@@ -19,22 +19,22 @@ class Main2Spec extends FeatureSpec with GivenWhenThen {
   }
 
   feature("Merge fixed and flexible loads will reduce PAR") {
-    scenario("the amount of flexible loads is less than the amount of fixed loads. When merged, " +
-      "PAR(fixedLoads) > PAR(merge(fixedLoads + flexibleLoads))") {
+
+    scenario(
+      "The amount of flexible loads is less than the amount of fixed loads. When merged, " +
+        "PAR(fixedLoads) > PAR(merge(fixedLoads + flexibleLoads))") {
 
       Given("6 fixed loads")
+
       val fixedLoads = toFixedLoads(Vector[Double](0, 1, 3, 2, 1, 0))
 
       Given("5 flexible loads")
 
       val flexibleLoads = toFlexibleLoads(Vector[Double](3, 3, 2, 2, 1))
 
-      When("Merged")
+      When("merged")
 
-      val orderedFixedLoads = fixedLoads.sortWith(_.amplitude < _.amplitude)
-      val orderedFlexibleLoads = higherThanPeakOrderedDesc(maxPeakOf(fixedLoads), flexibleLoads)
-
-      val mergeResult = merge(new Loads(orderedFixedLoads, orderedFlexibleLoads))
+      val mergeResult = merge(new Loads(fixedLoads, flexibleLoads))
 
       Then("PAR(fixedLoads) > PAR(merge(fixedLoads + flexibleLoads))")
 
@@ -43,38 +43,71 @@ class Main2Spec extends FeatureSpec with GivenWhenThen {
         Metric.par(mergeResult)
 
       metricFixedLoads should be > metricMergeFixedLoadsWithFlexibleLoads
-      info(s"Metric.par(fixedLoads): $metricFixedLoads; Metric.par(mergeResult.fixedLoads): $metricMergeFixedLoadsWithFlexibleLoads")
+      info(
+        s"Metric.par(fixedLoads): $metricFixedLoads; Metric.par(mergeResult.fixedLoads): $metricMergeFixedLoadsWithFlexibleLoads")
 
     }
-    /*
-    scenario("the amount of flexible loads is more than the amount of fixed loads. When merged, " +
-      "PAR(fixedLoads) > PAR(merge(fixedLoads + flexibleLoads))") {
+
+    scenario(
+      "The amount of flexible loads is more than the amount of fixed loads. When merged, " +
+        "PAR(fixedLoads) > PAR(merge(fixedLoads + flexibleLoads))") {
 
       Given("6 fixed loads")
-      val fixedLoads = toListOfElements(Vector[Double](0, 1, 3, 2, 1, 0))
+
+      val fixedLoads = toFixedLoads(Vector[Double](0, 1, 3, 2, 1, 0))
 
       Given("8 flexible loads")
 
-      val flexibleLoads = toListOfElements(Vector[Double](3, 3, 2, 2, 1, 1, 1, 1))
+      val flexibleLoads = toFlexibleLoads(Vector[Double](3, 3, 2, 2, 1, 1, 1, 1))
 
-      When("Merged")
+      When("merged")
 
-      val orderedFixedLoads = fixedLoads.sortWith (_.value < _.value)
-      val orderedFlexibleLoads = higherThanPeakOrderedDesc(maxPeakOf(fixedLoads), flexibleLoads)
-
-      val mergeResult = merge(Loads(orderedFixedLoads, orderedFlexibleLoads))
+      val mergeResult = merge(new Loads(fixedLoads, flexibleLoads))
 
       Then("PAR(fixedLoads) > PAR(merge(fixedLoads + flexibleLoads))")
 
       val metricFixedLoads = Metric.par(fixedLoads)
       val metricMergeFixedLoadsWithFlexibleLoads =
-        Metric.par(mergeResult.fixedLoads.map {fl => fl.addedFlexibleLoads.getOrElse(fl.value)})
+        Metric.par(mergeResult)
 
       metricFixedLoads should be > metricMergeFixedLoadsWithFlexibleLoads
-      info(s"Metric.par(fixedLoads): $metricFixedLoads; Metric.par(mergeResult.fixedLoads): $metricMergeFixedLoadsWithFlexibleLoads")
+      info(
+        s"Metric.par(fixedLoads): $metricFixedLoads; Metric.par(mergeResult.fixedLoads): $metricMergeFixedLoadsWithFlexibleLoads")
 
     }
-  }*/
+
+    scenario(
+      "All flexible loads are higher in amplitude than the fixedLoad peak. When merged, " +
+        "PAR(fixedLoads) > PAR(merge(fixedLoads + flexibleLoads))") {
+
+      Given("6 fixed loads")
+
+      val fixedLoads = toFixedLoads(Vector[Double](0, 1, 3, 2, 1, 0))
+
+      Given("8 flexible loads")
+
+      val flexibleLoads =
+        toFlexibleLoads((for (_ <- 1 to fixedLoads.size + 2) yield maxPeakOf(fixedLoads).amplitude + 2).toVector)
+
+      When("merged")
+
+      val mergeResult = merge(new Loads(fixedLoads, flexibleLoads))
+
+      Then("PAR(fixedLoads) > PAR(merge(fixedLoads + flexibleLoads))")
+
+      val metricFixedLoads = Metric.par(fixedLoads)
+      val metricMergeFixedLoadsWithFlexibleLoads =
+        Metric.par(mergeResult)
+
+      metricFixedLoads should be > metricMergeFixedLoadsWithFlexibleLoads
+      info(
+        s"Metric.par(fixedLoads): $metricFixedLoads; Metric.par(mergeResult.fixedLoads): $metricMergeFixedLoadsWithFlexibleLoads")
+
+      Then("all flexible loads must be accumulated")
+
+      (Load.flatten(mergeResult).toSet -- flexibleLoads) shouldBe empty
+
+    }
 
   }
 }
