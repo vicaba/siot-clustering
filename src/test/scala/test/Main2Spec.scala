@@ -7,7 +7,7 @@ import org.scalatest.Matchers._
 import test.Load._
 import test.Loads
 import test._
-import test.Main2.{higherThanPeakOrderedDesc, maxPeakOf, merge}
+import test.Main2._
 
 class Main2Spec extends FeatureSpec with GivenWhenThen {
 
@@ -34,7 +34,7 @@ class Main2Spec extends FeatureSpec with GivenWhenThen {
 
       When("merged")
 
-      val mergeResult = merge(new Loads(fixedLoads, flexibleLoads))
+      val mergeResult = mergeAll(new Loads(fixedLoads, flexibleLoads))
 
       Then("PAR(fixedLoads) > PAR(merge(fixedLoads + flexibleLoads))")
 
@@ -62,7 +62,7 @@ class Main2Spec extends FeatureSpec with GivenWhenThen {
 
       When("merged")
 
-      val mergeResult = merge(new Loads(fixedLoads, flexibleLoads))
+      val mergeResult = mergeAll(new Loads(fixedLoads, flexibleLoads))
 
       Then("PAR(fixedLoads) > PAR(merge(fixedLoads + flexibleLoads))")
 
@@ -71,8 +71,12 @@ class Main2Spec extends FeatureSpec with GivenWhenThen {
         Metric.par(mergeResult)
 
       metricFixedLoads should be > metricMergeFixedLoadsWithFlexibleLoads
+
       info(
         s"Metric.par(fixedLoads): $metricFixedLoads; Metric.par(mergeResult.fixedLoads): $metricMergeFixedLoadsWithFlexibleLoads")
+      info(
+        s"${mergeResult.sorted(loadOrderingByPositionInTime)}"
+      )
 
     }
 
@@ -91,7 +95,7 @@ class Main2Spec extends FeatureSpec with GivenWhenThen {
 
       When("merged")
 
-      val mergeResult = merge(new Loads(fixedLoads, flexibleLoads))
+      val mergeResult = mergeAll(new Loads(fixedLoads, flexibleLoads))
 
       Then("PAR(fixedLoads) > PAR(merge(fixedLoads + flexibleLoads))")
 
@@ -102,6 +106,9 @@ class Main2Spec extends FeatureSpec with GivenWhenThen {
       metricFixedLoads should be > metricMergeFixedLoadsWithFlexibleLoads
       info(
         s"Metric.par(fixedLoads): $metricFixedLoads; Metric.par(mergeResult.fixedLoads): $metricMergeFixedLoadsWithFlexibleLoads")
+      info(
+        s"${mergeResult.sorted(loadOrderingByPositionInTime)}"
+      )
 
       Then("all flexible loads must be accumulated")
 

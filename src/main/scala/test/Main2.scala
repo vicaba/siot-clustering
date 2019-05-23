@@ -22,10 +22,10 @@ object Main2 {
 
   }
 
-  def mergeAll(loads: Loads): Vector[AccumulatedLoad] = {
+  def mergeAll(loads: Loads): Vector[OneSlotAccumulatedLoad] = {
 
     val accumulatedLoads =
-      loads.fixedLoads.sortWith(_.amplitude < _.amplitude).map(fl => AccumulatedLoad(fl.positionInT, List(fl)))
+      loads.fixedLoads.sortWith(_.amplitude < _.amplitude).map(fl => OneSlotAccumulatedLoad(fl.positionInT, List(fl)))
 
     val positiveAndOrderedFlexibleLoads =
       higherThanPeakOrderedDesc(maxPeakOf(loads.fixedLoads), loads.flexibleLoads.filter(_.amplitude >= 0))
@@ -39,17 +39,15 @@ object Main2 {
         .filter(_.isInstanceOf[FlexibleLoad]).asInstanceOf[Vector[FlexibleLoad]]
         .diff(loads.flexibleLoads)
 
-    merge(remainingFlexibleLoads, result1, result1.size, 0)
-
-    ???
+    merge(remainingFlexibleLoads.sortWith(_.amplitude > _.amplitude), result1.sortWith(_.amplitude < _.amplitude), result1.size, 0)
 
   }
 
   @tailrec
   def merge(flexibleLoads: Vector[FlexibleLoad],
-            accumulatedLoads: Vector[AccumulatedLoad],
+            accumulatedLoads: Vector[OneSlotAccumulatedLoad],
             accumulatedLoadsSize: Int,
-            iterations: Int): Vector[AccumulatedLoad] = flexibleLoads match {
+            iterations: Int): Vector[OneSlotAccumulatedLoad] = flexibleLoads match {
     case flexibleLoad +: remainingFlexibleLoads =>
       val assignment =
         accumulatedLoads.tail :+ accumulatedLoads.head.copy(loads = flexibleLoad :: accumulatedLoads.head.loads)
