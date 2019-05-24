@@ -1,71 +1,37 @@
 package test
 
 import test.Load._
-import test.Loads
-
-import scala.annotation.tailrec
-import scala.collection.generic.CanBuildFrom
 
 object Main2 {
 
   def main(args: Array[String]): Unit = {
 
-    val fixedLoads = toFixedLoads(Vector[Double](0, 1, 3, 2, 1, 0))
+    val fixedLoads = toFixedLoads(Vector[Double](1, 1, 1, 1, 1, 1, 1, 1))
 
-    val orderedFixedLoads = fixedLoads.sortWith(_.amplitude < _.amplitude)
+    val flexibleLoads = Vector(
+      SpanSlotFlexibleLoad(1, 0, 4, Vector[Double](1, 1, 1, 1)),
+      SpanSlotFlexibleLoad(1, 3, 4, Vector[Double](1, 1, 1, 1))
+    )
 
-    val flexibleLoads = toFlexibleLoads(Vector[Double](3, 3, 2, 2, 1))
+    val res1 = findBestContiguousSlots(fixedLoads, flexibleLoads(0))
 
-    val orderedFlexibleLoads = higherThanPeakOrderedDesc(maxPeakOf(fixedLoads), flexibleLoads)
-
-    mergeAll(new Loads(orderedFixedLoads, orderedFlexibleLoads))
 
   }
 
-  def mergeAll(loads: Loads): Vector[OneSlotAccumulatedLoad] = {
-
-    val accumulatedLoads =
-      loads.fixedLoads.sortWith(_.amplitude < _.amplitude).map(fl => OneSlotAccumulatedLoad(fl.positionInT, List(fl)))
-
-    val positiveAndOrderedFlexibleLoads =
-      higherThanPeakOrderedDesc(maxPeakOf(loads.fixedLoads), loads.flexibleLoads.filter(_.amplitude >= 0))
-
-
-    val result1 = merge(positiveAndOrderedFlexibleLoads, accumulatedLoads, accumulatedLoads.size, 0)
-
-    val remainingFlexibleLoads =
-      Load
-        .flatten(result1)
-        .filter(_.isInstanceOf[FlexibleLoad]).asInstanceOf[Vector[FlexibleLoad]]
-        .diff(loads.flexibleLoads)
-
-    merge(remainingFlexibleLoads.sortWith(_.amplitude > _.amplitude), result1.sortWith(_.amplitude < _.amplitude), result1.size, 0)
-
+  /**
+  *
+    * @param fixedLoads
+    * @param flexibleLoad
+    * @return the index of flexibleLoads where the flexible load start is better suited to reduce PAR
+    */
+  def findBestContiguousSlots(fixedLoads: Vector[FixedLoad], flexibleLoad: SpanSlotFlexibleLoad): Int = {
+    (for (i <- 0 until (fixedLoads.size - flexibleLoad.span)) yield {
+      (i,
+       flexibleLoad.amplitudePerSlot
+         .zip(fixedLoads.map(_.amplitude).slice(i, flexibleLoad.span + i))
+         .map { case (fl, fi) => Math.pow(fl + fi, 2) }
+         .sum)
+    }).max((x: (Int, Double), y: (Int, Double)) => implicitly[Ordering[Double]].compare(x._2, y._2))._1
   }
-
-  @tailrec
-  def merge(flexibleLoads: Vector[FlexibleLoad],
-            accumulatedLoads: Vector[OneSlotAccumulatedLoad],
-            accumulatedLoadsSize: Int,
-            iterations: Int): Vector[OneSlotAccumulatedLoad] = flexibleLoads match {
-    case flexibleLoad +: remainingFlexibleLoads =>
-      val assignment =
-        accumulatedLoads.tail :+ accumulatedLoads.head.copy(loads = flexibleLoad :: accumulatedLoads.head.loads)
-
-      merge(
-        remainingFlexibleLoads,
-        if (iterations == accumulatedLoadsSize - 1) assignment.sortWith(_.amplitude < _.amplitude)
-        else assignment,
-        accumulatedLoadsSize,
-        iterations + 1
-      )
-    case IndexedSeq() => accumulatedLoads
-  }
-
-  def maxPeakOf(s: Traversable[Load]): Load = s.max
-
-  def higherThanPeakOrderedDesc[X <: Load, S[A] <: Seq[A]](peak: Load, loads: S[X])(
-      implicit cbf: CanBuildFrom[Nothing, X, S[X]]): S[X] =
-    loads.filter(_.amplitude >= peak.amplitude).sortWith(_.amplitude > _.amplitude).to[S]
 
 }

@@ -7,9 +7,9 @@ import org.scalatest.Matchers._
 import test.Load._
 import test.Loads
 import test._
-import test.Main2._
+import test.Main._
 
-class Main2Spec extends FeatureSpec with GivenWhenThen {
+class MainSpec extends FeatureSpec with GivenWhenThen {
 
   implicit def seqToDenseVector[S <: Seq[Double]]: DenseVectorReprOps[S] = new DenseVectorReprOps[S] {
 

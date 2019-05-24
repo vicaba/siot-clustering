@@ -7,6 +7,9 @@ import scala.collection.generic.CanBuildFrom
 import scala.language.higherKinds
 
 sealed trait Load {
+  /**
+  * Indicates the slot time when this load starts
+    */
   def positionInT: Int
   def amplitude: Double
 }
@@ -41,7 +44,7 @@ case class FixedLoad(override val id: Int, override val positionInT: Int, overri
   override def toString: String = s"Fi($id, $positionInT, $amplitude)"
 }
 
-case class FlexibleLoad(override val id: Int, override val positionInT: Int, override val amplitude: Double)
+case class OneSlotFlexibleLoad(override val id: Int, override val positionInT: Int, override val amplitude: Double)
     extends OneSlotLoad
     with SingleLoad {
   override def toString: String = s"Fl($id, $positionInT, $amplitude)"
@@ -55,10 +58,10 @@ case class OneSlotAccumulatedLoad(override val positionInT: Int, loads: List[One
   override def toString: String = s"Acc($positionInT, $amplitude -> $loads)"
 }
 
-case class FlexibleLoadSpan(override val id: Int,
-                            override val positionInT: Int,
-                            override val span: Int,
-                            override val amplitudePerSlot: Vector[Double])
+case class SpanSlotFlexibleLoad(override val id: Int,
+                                override val positionInT: Int,
+                                override val span: Int,
+                                override val amplitudePerSlot: Vector[Double])
     extends SpanSlotLoad
     with SingleLoad {
   override def amplitude: Double = amplitudePerSlot.foldLeft(0.0)((accum, a) => accum + a)
@@ -67,27 +70,31 @@ case class FlexibleLoadSpan(override val id: Int,
 case class SpanSlotAccumulatedLoad(override val positionInT: Int,
                                    override val span: Int,
                                    fixedLoads: List[FixedLoad],
-                                   loads: List[FlexibleLoadSpan])
+                                   loads: List[SpanSlotFlexibleLoad])
     extends SpanSlotLoad
     with AccumulatedLoad {
   override val id: Int                          = positionInT
   def amplitude: Double                         = loads.foldLeft(0.0)((accum, load) => accum + load.amplitude)
   override def toString: String                 = s"Acc($positionInT, $amplitude -> $loads)"
-  override def amplitudePerSlot: Vector[Double] = ???
+  override def amplitudePerSlot: Vector[Double] = for {
+    i <- fixedLoads.indices
+    spanFlexibleLoad <- loads.filter( l => i >= l.positionInT && i <= l.positionInT)
+
+  }
 }
 
-class Loads(val fixedLoads: Vector[FixedLoad], val flexibleLoads: Vector[FlexibleLoad])
+class Loads(val fixedLoads: Vector[FixedLoad], val flexibleLoads: Vector[OneSlotFlexibleLoad])
 
 object Load {
 
   def toFixedLoads[S[X] <: Seq[X]](s: S[Double])(
       implicit cbf: CanBuildFrom[Nothing, FixedLoad, S[FixedLoad]]): S[FixedLoad] = {
-    s.zipWithIndex.map { case (e, idx) => FixedLoad(idx, idx, e) }.to[S]
+    s.zipWithIndex.map { case (e, idx) => FixedLoad(idx, idx - 1, e) }.to[S]
   }
 
   def toFlexibleLoads[S[X] <: Seq[X]](s: S[Double])(
-      implicit cbf: CanBuildFrom[Nothing, FlexibleLoad, S[FlexibleLoad]]): S[FlexibleLoad] = {
-    s.zipWithIndex.map { case (e, idx) => FlexibleLoad(idx, idx, e) }.to[S]
+      implicit cbf: CanBuildFrom[Nothing, OneSlotFlexibleLoad, S[OneSlotFlexibleLoad]]): S[OneSlotFlexibleLoad] = {
+    s.zipWithIndex.map { case (e, idx) => OneSlotFlexibleLoad(idx, idx - 1, e) }.to[S]
   }
 
   def flatten(s: Seq[Load]): Vector[IdLoad] =
