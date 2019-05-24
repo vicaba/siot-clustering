@@ -4,6 +4,7 @@ import breeze.linalg.DenseVector
 import metrics.DenseVectorReprOps
 
 import scala.collection.generic.CanBuildFrom
+import scala.collection.immutable
 import scala.language.higherKinds
 
 sealed trait Load {
@@ -73,14 +74,25 @@ case class SpanSlotAccumulatedLoad(override val positionInT: Int,
                                    loads: List[SpanSlotFlexibleLoad])
     extends SpanSlotLoad
     with AccumulatedLoad {
-  override val id: Int                          = positionInT
-  def amplitude: Double                         = loads.foldLeft(0.0)((accum, load) => accum + load.amplitude)
-  override def toString: String                 = s"Acc($positionInT, $amplitude -> $loads)"
-  override def amplitudePerSlot: Vector[Double] = for {
-    i <- fixedLoads.indices
-    spanFlexibleLoad <- loads.filter( l => i >= l.positionInT && i <= l.positionInT)
 
+  def expandSpanSlotFlexibleLoadToVector(load: SpanSlotFlexibleLoad, vectorSize: Int): Vector[Double] = {
+    ((for (_ <- 0 until load.positionInT) yield 0.0) ++ load.amplitudePerSlot ++ (for (_ <- span until vectorSize) yield 0.0)).toVector
   }
+
+  override val id: Int                          = positionInT
+
+  override val amplitudePerSlot: Vector[Double] = loads.map(expandSpanSlotFlexibleLoadToVector(_, fixedLoads.size)).toIterator
+    .foldLeft(fixedLoads.map(_.amplitude).toVector) { (itrA, itrB) =>
+      itrA.zip(itrB).map {
+        case (a, b) =>
+          a + b
+      }
+    }
+
+  def amplitude: Double                         = (fixedLoads.map(_.amplitude) ::: loads.map(_.amplitude)).foldLeft(0.0)((accum, l) => accum + l)
+
+  override def toString: String                 = s"Acc($positionInT, $amplitude -> $loads)"
+
 }
 
 class Loads(val fixedLoads: Vector[FixedLoad], val flexibleLoads: Vector[OneSlotFlexibleLoad])
