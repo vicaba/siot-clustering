@@ -91,7 +91,7 @@ class MainSpec extends FeatureSpec with GivenWhenThen {
       Given("8 flexible loads")
 
       val flexibleLoads =
-        toFlexibleLoads((for (_ <- 1 to fixedLoads.size + 2) yield maxPeakOf(fixedLoads).amplitude + 2).toVector)
+        toFlexibleLoads((for (_ <- 1 to fixedLoads.size + 2) yield maxPeakOf(fixedLoads).totalEnergy + 2).toVector)
 
       When("merged")
 

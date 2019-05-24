@@ -12,7 +12,7 @@ object Main {
 
     val fixedLoads = toFixedLoads(Vector[Double](0, 1, 3, 2, 1, 0))
 
-    val orderedFixedLoads = fixedLoads.sortWith(_.amplitude < _.amplitude)
+    val orderedFixedLoads = fixedLoads.sortWith(_.totalEnergy < _.totalEnergy)
 
     val flexibleLoads = toFlexibleLoads(Vector[Double](3, 3, 2, 2, 1))
 
@@ -25,10 +25,10 @@ object Main {
   def mergeAll(loads: Loads): Vector[OneSlotAccumulatedLoad] = {
 
     val accumulatedLoads =
-      loads.fixedLoads.sortWith(_.amplitude < _.amplitude).map(fl => OneSlotAccumulatedLoad(fl.positionInT, List(fl)))
+      loads.fixedLoads.sortWith(_.totalEnergy < _.totalEnergy).map(fl => OneSlotAccumulatedLoad(fl.positionInT, List(fl)))
 
     val positiveAndOrderedFlexibleLoads =
-      higherThanPeakOrderedDesc(maxPeakOf(loads.fixedLoads), loads.flexibleLoads.filter(_.amplitude >= 0))
+      higherThanPeakOrderedDesc(maxPeakOf(loads.fixedLoads), loads.flexibleLoads.filter(_.totalEnergy >= 0))
 
 
     val result1 = merge(positiveAndOrderedFlexibleLoads, accumulatedLoads, accumulatedLoads.size, 0)
@@ -39,7 +39,7 @@ object Main {
         .filter(_.isInstanceOf[OneSlotFlexibleLoad]).asInstanceOf[Vector[OneSlotFlexibleLoad]]
         .diff(loads.flexibleLoads)
 
-    merge(remainingFlexibleLoads.sortWith(_.amplitude > _.amplitude), result1.sortWith(_.amplitude < _.amplitude), result1.size, 0)
+    merge(remainingFlexibleLoads.sortWith(_.totalEnergy > _.totalEnergy), result1.sortWith(_.totalEnergy < _.totalEnergy), result1.size, 0)
 
   }
 
@@ -54,7 +54,7 @@ object Main {
 
       merge(
         remainingFlexibleLoads,
-        if (iterations == accumulatedLoadsSize - 1) assignment.sortWith(_.amplitude < _.amplitude)
+        if (iterations == accumulatedLoadsSize - 1) assignment.sortWith(_.totalEnergy < _.totalEnergy)
         else assignment,
         accumulatedLoadsSize,
         iterations + 1
@@ -66,6 +66,6 @@ object Main {
 
   def higherThanPeakOrderedDesc[X <: Load, S[A] <: Seq[A]](peak: Load, loads: S[X])(
       implicit cbf: CanBuildFrom[Nothing, X, S[X]]): S[X] =
-    loads.filter(_.amplitude >= peak.amplitude).sortWith(_.amplitude > _.amplitude).to[S]
+    loads.filter(_.totalEnergy >= peak.totalEnergy).sortWith(_.totalEnergy > _.totalEnergy).to[S]
 
 }
