@@ -79,16 +79,8 @@ case class SpanSlotAccumulatedLoad(override val positionInT: Int,
 
   override val id: Int = positionInT
 
-  override val amplitudePerSlot: Vector[Double] = loads
-    .map(expandSpanSlotFlexibleLoadToVector(_, fixedLoads.size))
-    .toIterator
-    .foldLeft(fixedLoads.map(_.totalEnergy).toVector) { (itrA, itrB) =>
-      itrA.zip(itrB).map {
-        case (a, b) =>
-          a + b
-      }
-    }
-
+  override val amplitudePerSlot: Vector[Double] =
+    SeqOps.sum(fixedLoads.map(_.totalEnergy).toVector :: loads.map(expandSpanSlotFlexibleLoadToVector(_, fixedLoads.size)).toList)
 
   def totalEnergy: Double =
     (fixedLoads.map(_.totalEnergy) ++: loads.map(_.totalEnergy)).foldLeft(0.0)((accum, l) => accum + l)
