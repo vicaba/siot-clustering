@@ -20,7 +20,7 @@ class SpanSlotAccumulatedLoadSpec extends FeatureSpec with GivenWhenThen {
 
       val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, fixedLoad.toList, Set.empty)
 
-      Then("amplitedePerSlot should contain a vector with a single element")
+      Then("amplitudePerSlot should contain a vector with a single element")
 
       spanSlotAccumulatedLoad.amplitudePerSlot should equal(rawFixedLoads)
 
@@ -42,7 +42,7 @@ class SpanSlotAccumulatedLoadSpec extends FeatureSpec with GivenWhenThen {
 
       val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, fixedLoad.toList, Set.empty)
 
-      Then("amplitedePerSlot should contain a vector with multiple elements")
+      Then("amplitudePerSlot should contain a vector with multiple elements")
 
       spanSlotAccumulatedLoad.amplitudePerSlot should equal(rawFixedLoads)
 
