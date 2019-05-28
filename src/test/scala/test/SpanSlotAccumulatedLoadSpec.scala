@@ -6,7 +6,7 @@ import org.scalatest.Matchers._
 
 class SpanSlotAccumulatedLoadSpec extends FeatureSpec with GivenWhenThen {
 
-  feature("SpanSlotAccumulatedLoad accumulates fixed loads") {
+/*  feature("SpanSlotAccumulatedLoad accumulates fixed loads") {
 
     scenario("SpanSlotAccumulatedLoad accumulates one FixedLoad") {
 
@@ -16,7 +16,7 @@ class SpanSlotAccumulatedLoadSpec extends FeatureSpec with GivenWhenThen {
 
       val fixedLoad = toFixedLoads(rawFixedLoads)
 
-      When("creating a SpanSlotAccumulatedLoad")
+      When("a SpanSlotAccumulatedLoad is created")
 
       val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, fixedLoad.toList, Set.empty)
 
@@ -38,7 +38,7 @@ class SpanSlotAccumulatedLoadSpec extends FeatureSpec with GivenWhenThen {
 
       val fixedLoad = toFixedLoads(rawFixedLoads)
 
-      When("creating a SpanSlotAccumulatedLoad")
+      When("a SpanSlotAccumulatedLoad is created")
 
       val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, fixedLoad.toList, Set.empty)
 
@@ -52,11 +52,11 @@ class SpanSlotAccumulatedLoadSpec extends FeatureSpec with GivenWhenThen {
 
     }
 
-  }
+  }*/
 
   feature("SpanSlotAccumulatedLoad accumulates flexible loads") {
 
-    scenario("SpanSlotAccumulatedLoad accumulates one FlexibleLoad") {
+/*    scenario("SpanSlotAccumulatedLoad accumulates one FlexibleLoad") {
 
       Given("one flexible load")
 
@@ -64,7 +64,7 @@ class SpanSlotAccumulatedLoadSpec extends FeatureSpec with GivenWhenThen {
 
       val flexibleLoad = SpanSlotFlexibleLoad(1, 0, rawFlexibleLoad)
 
-      When("creating a SpanSlotAccumulatedLoad")
+      When("a SpanSlotAccumulatedLoad is created")
 
       val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, List.empty, Set(flexibleLoad))
 
@@ -89,7 +89,7 @@ class SpanSlotAccumulatedLoadSpec extends FeatureSpec with GivenWhenThen {
 
       val flexibleLoads = rawFlexibleLoads.zipWithIndex.map { case (l, idx) =>  SpanSlotFlexibleLoad(idx, idx, l) }
 
-      When("creating a SpanSlotAccumulatedLoad")
+      When("a SpanSlotAccumulatedLoad is created")
 
       val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, List.empty, flexibleLoads.toSet)
 
@@ -100,6 +100,39 @@ class SpanSlotAccumulatedLoadSpec extends FeatureSpec with GivenWhenThen {
       And("span should be equal to the number of fixed loads")
 
       spanSlotAccumulatedLoad.span should equal(5)
+
+    }*/
+
+    scenario("SpanSlotAccumulatedLoad accumulates fixed and flexible loads") {
+
+      Given("a fixed loads and a flexible load")
+
+      val rawFixedLoads = Vector[Double](1.0, 2.0, 3.0, 4.0, 1.0, 34.0, 50.0, 100000.0)
+
+      val fixedLoad = SpanSlotFixedLoad(0, 0, rawFixedLoads)
+
+      val rawFlexibleLoads = List(
+        Vector[Double](1, 1, 1, 1),
+        Vector[Double](1, 1, 4, 3, 5)
+      )
+
+      val flexibleLoads = List(
+        SpanSlotFlexibleLoad(1, 0, rawFlexibleLoads(0)),
+        SpanSlotFlexibleLoad(2, 4, rawFlexibleLoads(1))
+      )
+
+
+      When("a SpanSlotAccumulatedLoad is created")
+
+      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, (fixedLoad :: flexibleLoads).toSet)
+
+      Then("amplitudePerSlot should contain a vector with multiple elements")
+
+      spanSlotAccumulatedLoad.amplitudePerSlot should equal(Vector[Double](2, 3, 4, 5, 2, 35, 54, 100003, 5))
+
+      And("span should be equal to the number of fixed loads")
+
+      spanSlotAccumulatedLoad.span should equal(rawFlexibleLoads.flatten.size)
 
     }
 
