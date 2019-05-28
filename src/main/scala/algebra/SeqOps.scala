@@ -1,8 +1,7 @@
-package test
+package algebra
 
-import scala.collection.generic.CanBuildFrom
-import scala.language.higherKinds
 import scala.collection.SeqLike
+import scala.collection.generic.CanBuildFrom
 
 object SeqOps {
 

@@ -1,10 +1,11 @@
 package test
 
+import algebra.SeqOps
 import breeze.linalg.DenseVector
 import metrics.DenseVectorReprOps
 
 import scala.collection.generic.CanBuildFrom
-import scala.collection.immutable
+import scala.collection.{AbstractSeq, immutable}
 import scala.language.higherKinds
 
 sealed trait Load {
@@ -62,35 +63,43 @@ case class OneSlotAccumulatedLoad(override val positionInT: Int, loads: List[One
 
 case class SpanSlotFlexibleLoad(override val id: Int,
                                 override val positionInT: Int,
-                                override val span: Int,
                                 override val amplitudePerSlot: Vector[Double])
     extends SpanSlotLoad
     with SingleLoad {
+  override val span: Int           = amplitudePerSlot.size
   override def totalEnergy: Double = amplitudePerSlot.foldLeft(0.0)((accum, a) => accum + a)
 }
 
 case class SpanSlotAccumulatedLoad(override val positionInT: Int,
-                                   fixedLoads: List[FixedLoad],
-                                   private val loads: Set[SpanSlotFlexibleLoad])
+                                   private val _fixedLoads: List[FixedLoad],
+                                   loads: Set[SpanSlotFlexibleLoad])
     extends SpanSlotLoad
     with AccumulatedLoad {
 
-  override val span: Int = fixedLoads.size
-
   override val id: Int = positionInT
 
+  override val span: Int = if (_fixedLoads.nonEmpty) _fixedLoads.size else loads.map(l => l.span + l.positionInT).max
+
+  val fixedLoads: List[FixedLoad] =
+    if (_fixedLoads.nonEmpty) _fixedLoads else Load.toFixedLoads(for (_ <- positionInT until span) yield 0.0).toList
+
   override val amplitudePerSlot: Vector[Double] =
-    SeqOps.sum(fixedLoads.map(_.totalEnergy).toVector :: loads.map(expandSpanSlotFlexibleLoadToVector(_, fixedLoads.size)).toList)
+    SeqOps.sum(
+      fixedLoads.map(_.totalEnergy).toVector :: loads
+        .map(expandSpanSlotFlexibleLoadToVector(_, span))
+        .toList)
 
   def totalEnergy: Double =
     (fixedLoads.map(_.totalEnergy) ++: loads.map(_.totalEnergy)).foldLeft(0.0)((accum, l) => accum + l)
 
   override def toString: String = s"Acc($positionInT, $totalEnergy -> $loads)"
 
-  private def expandSpanSlotFlexibleLoadToVector(load: SpanSlotFlexibleLoad, vectorSize: Int): Vector[Double] = {
-    ((for (_ <- 0 until load.positionInT) yield 0.0) ++ load.amplitudePerSlot ++ (for (_ <- span until vectorSize)
-      yield 0.0)).toVector
-  }
+  private def expandSpanSlotFlexibleLoadToVector(load: SpanSlotFlexibleLoad, vectorSize: Int): Vector[Double] =
+    (
+      (for (_ <- 0 until load.positionInT) yield 0.0) ++
+        load.amplitudePerSlot ++
+        (for (_ <- (load.positionInT + load.span) until span) yield 0.0)
+    ).toVector
 
 }
 
@@ -100,12 +109,12 @@ object Load {
 
   def toFixedLoads[S[X] <: Seq[X]](s: S[Double])(
       implicit cbf: CanBuildFrom[Nothing, FixedLoad, S[FixedLoad]]): S[FixedLoad] = {
-    s.zipWithIndex.map { case (e, idx) => FixedLoad(idx, idx - 1, e) }.to[S]
+    s.zipWithIndex.map { case (e, idx) => FixedLoad(idx, idx, e) }.to[S]
   }
 
   def toFlexibleLoads[S[X] <: Seq[X]](s: S[Double])(
       implicit cbf: CanBuildFrom[Nothing, OneSlotFlexibleLoad, S[OneSlotFlexibleLoad]]): S[OneSlotFlexibleLoad] = {
-    s.zipWithIndex.map { case (e, idx) => OneSlotFlexibleLoad(idx, idx - 1, e) }.to[S]
+    s.zipWithIndex.map { case (e, idx) => OneSlotFlexibleLoad(idx, idx, e) }.to[S]
   }
 
   def flatten(s: Seq[Load]): Vector[IdLoad] =

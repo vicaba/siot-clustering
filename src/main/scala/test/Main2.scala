@@ -9,8 +9,8 @@ object Main2 {
     //val fixedLoads = SpanSlotAccumulatedLoad(toFixedLoads(Vector[Double](1, 1, 1, 1, 1, 1, 1, 1))
 
     val flexibleLoads = Vector(
-      SpanSlotFlexibleLoad(1, 0, 4, Vector[Double](1, 1, 1, 1)),
-      SpanSlotFlexibleLoad(1, 3, 4, Vector[Double](1, 1, 1, 1))
+      SpanSlotFlexibleLoad(1, 0, Vector[Double](1, 1, 1, 1)),
+      SpanSlotFlexibleLoad(1, 3, Vector[Double](1, 1, 1, 1))
     )
 
     //val res1 = findBestContiguousSlots(fixedLoads, flexibleLoads(0))
