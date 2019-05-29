@@ -1,6 +1,7 @@
 package test
 
 import test.Load._
+import algebra.VectorOps._
 
 object Main2 {
 
@@ -19,7 +20,7 @@ object Main2 {
   }
 
   def f(s: SpanSlotAccumulatedLoad, flexibleLoads: Set[SpanSlotFlexibleLoad], accum: Set[SpanSlotFlexibleLoad]): SpanSlotAccumulatedLoad = {
-    s.amplitudePerSlot
+    s.amplitudePerSlot.sumVec(flexibleLoads.head.amplitudePerSlot)
   }
 
 /*  /**

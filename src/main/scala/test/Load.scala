@@ -3,6 +3,8 @@ package test
 import algebra.SeqOps
 import breeze.linalg.DenseVector
 import metrics.DenseVectorReprOps
+import algebra.VectorOps._
+import algebra.MyDenseVector
 
 import scala.collection.generic.CanBuildFrom
 import scala.collection.{AbstractSeq, immutable}

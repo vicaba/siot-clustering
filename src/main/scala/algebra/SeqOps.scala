@@ -5,10 +5,6 @@ import scala.collection.generic.CanBuildFrom
 
 object SeqOps {
 
-  implicit class SeqOps[X: Numeric, S[Y] <: Seq[Y]](s1: S[X]) {
-    def +(s2: S[X]): S[X] = sum(s1.toList ::: s2.toList)
-  }
-
   def sum[X: Numeric, S[Y] <: Seq[Y] with SeqLike[Y, S[Y]]]
   (s: Seq[S[X]])
   (implicit

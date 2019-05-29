@@ -1,21 +1,25 @@
 package algebra
 
-object MyDenseVector {
-  def point[X: Numeric](s: Seq[X]): MyDenseVector[X] = new MyDenseVector[X](s)
+import scala.collection.{AbstractSeq, IndexedSeqLike}
+import scala.collection.generic.GenericTraversableTemplate
+import scala.collection.immutable.Vector
+
+object VectorOps {
+
+  implicit def vectorToMyDenseVector[X: Numeric](v: Vector[X]): MyDenseVector[X] = MyDenseVector.point(v)
+
 }
 
-class MyDenseVector[X: Numeric](private val s: Seq[X]) {
+object MyDenseVector {
+  def point[X: Numeric](s: Vector[X]): MyDenseVector[X] = new MyDenseVector[X](s)
+}
 
-  def +(s2: MyDenseVector[X]): MyDenseVector[X] =
-    sum(s2)
+class MyDenseVector[X: Numeric](val underlying: Vector[X]) {
 
-  def -(s2: MyDenseVector[X]): MyDenseVector[X] =
-    subtract(s2)
+  def sumVec(s2: MyDenseVector[X]): MyDenseVector[X] =
+    MyDenseVector.point(SeqOps.sum(Seq(underlying ++ s2.underlying)))
 
-  def sum(s2: MyDenseVector[X]): MyDenseVector[X] =
-    MyDenseVector.point(SeqOps.sum(Seq(s ++ s2.s)))
-
-  def subtract(s2: MyDenseVector[X]): MyDenseVector[X] =
-    MyDenseVector.point(SeqOps.substract(Seq(s ++ s2.s)))
+  def subtractVec(s2: MyDenseVector[X]): MyDenseVector[X] =
+    MyDenseVector.point(SeqOps.substract(Seq(underlying ++ s2.underlying)))
 
 }
