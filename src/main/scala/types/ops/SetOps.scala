@@ -23,11 +23,6 @@ object SetOps {
       (s --= es) ++= es
     }
 
-    def ei() = {
-      println("hola")
-      1
-    }
-
   }
 
 }

@@ -3,11 +3,9 @@ package test
 import algebra.SeqOps
 import breeze.linalg.DenseVector
 import metrics.DenseVectorReprOps
-import algebra.VectorOps._
-import algebra.MyDenseVector
+import types.ops.SetOps._
 
-import scala.collection.generic.CanBuildFrom
-import scala.collection.{AbstractSeq, immutable}
+import scala.collection.mutable
 import scala.language.higherKinds
 
 sealed trait Load {
@@ -26,24 +24,18 @@ sealed trait Load {
     */
   def positionInT: Int
   def totalEnergy: Double
+  def span: Int
+  def amplitudePerSlot: Vector[Double]
 }
 
 sealed trait SingleLoad extends Load
 
 sealed trait AccumulatedLoad extends Load
 
-sealed trait OneSlotLoad extends Load
-
-sealed trait SpanSlotLoad extends Load {
-  def span: Int
-  def amplitudePerSlot: Vector[Double]
-}
-
 case class SpanSlotFixedLoad(override val id: Int,
                              override val positionInT: Int,
                              override val amplitudePerSlot: Vector[Double])
-    extends SpanSlotLoad
-    with SingleLoad {
+    extends SingleLoad {
   override def span: Int           = amplitudePerSlot.size
   override def totalEnergy: Double = amplitudePerSlot.foldLeft(0.0)((accum, a) => accum + a)
 }
@@ -51,20 +43,21 @@ case class SpanSlotFixedLoad(override val id: Int,
 case class SpanSlotFlexibleLoad(override val id: Int,
                                 override val positionInT: Int,
                                 override val amplitudePerSlot: Vector[Double])
-    extends SpanSlotLoad
-    with SingleLoad {
+    extends SingleLoad {
   override val span: Int           = amplitudePerSlot.size
   override def totalEnergy: Double = amplitudePerSlot.foldLeft(0.0)((accum, a) => accum + a)
 }
 
-case class SpanSlotAccumulatedLoad(override val positionInT: Int, val loads: Set[SpanSlotLoad])
-    extends SpanSlotLoad
-    with AccumulatedLoad {
+case class SpanSlotAccumulatedLoad(override val positionInT: Int, loads: mutable.Set[Load]) extends AccumulatedLoad {
 
+  val flexibleLoads: Set[SpanSlotFlexibleLoad] =
+    loads.filter(_.isInstanceOf[SpanSlotFlexibleLoad]).asInstanceOf[mutable.Set[SpanSlotFlexibleLoad]].toSet
 
-  val flexibleLoads: Set[SpanSlotFlexibleLoad] = loads.filter(_.isInstanceOf[SpanSlotFlexibleLoad]).asInstanceOf[Set[SpanSlotFlexibleLoad]]
+  val fixedLoads: Set[SpanSlotFixedLoad] =
+    loads.filter(_.isInstanceOf[SpanSlotFixedLoad]).asInstanceOf[mutable.Set[SpanSlotFixedLoad]].toSet
 
-  val fixedLoads: Set[SpanSlotFixedLoad] = loads.filter(_.isInstanceOf[SpanSlotFixedLoad]).asInstanceOf[Set[SpanSlotFixedLoad]]
+  val accumulatedLoads: Set[SpanSlotAccumulatedLoad] =
+    loads.filter(_.isInstanceOf[SpanSlotAccumulatedLoad]).asInstanceOf[mutable.Set[SpanSlotAccumulatedLoad]].toSet
 
   override val id: Int = positionInT
 
@@ -82,16 +75,18 @@ case class SpanSlotAccumulatedLoad(override val positionInT: Int, val loads: Set
 
   override def toString: String = s"Acc($positionInT, $totalEnergy -> $loads)"
 
-  private def expandSpanSlotLoadToVector(load: SpanSlotLoad, vectorSize: Int): Vector[Double] = {
-    val res = (
+  private def expandSpanSlotLoadToVector(load: Load, vectorSize: Int): Vector[Double] =
+    (
       (for (_ <- 0 until load.positionInT) yield 0.0) ++
         load.amplitudePerSlot ++
         (for (_ <- (load.positionInT + load.span) until vectorSize) yield 0.0)
     ).toVector
 
-    res
-  }
+}
 
+object SpanSlotAccumulatedLoad {
+  def apply(positionInT: Int, load: Load): SpanSlotAccumulatedLoad =
+    new SpanSlotAccumulatedLoad(positionInT, new scala.collection.mutable.HashSet[Load]() += load)
 }
 
 object Load {
@@ -115,6 +110,25 @@ object Load {
     override def apply(t: Vector[X]): DenseVector[Double] = DenseVector(t.map(_.totalEnergy): _*)
 
     override def zero(t: Vector[X]): DenseVector[Double] = DenseVector((for (_ <- 1 to t.size) yield 0.0): _*)
+
+  }
+
+  object LoadOps {
+
+    def +(x: SpanSlotAccumulatedLoad, y: Load): Load = {
+      x.loads += y
+      x
+    }
+
+    def -(x: SpanSlotAccumulatedLoad, y: Load): Load = {
+      x.loads -= y
+      x
+    }
+
+    def -/+(x: SpanSlotAccumulatedLoad, y: Load): Load = {
+      x.loads -/+= y
+      x
+    }
 
   }
 

@@ -137,7 +137,7 @@ case class Cluster private[types] (override val id: Int,
     case c: Cluster => c.topLevel_=(Some(this)).hierarchyLevel_=(this._hierarchyLevel - 1)
   }
 
-  def mutableSetOf[A](s: TraversableOnce[A]): scala.collection.mutable.Set[A] =
+  private def mutableSetOf[A](s: TraversableOnce[A]): scala.collection.mutable.Set[A] =
     Cluster.mutableSetOf(s)
 
 }

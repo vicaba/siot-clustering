@@ -4,6 +4,8 @@ import org.scalatest._
 import test.Load._
 import org.scalatest.Matchers._
 
+import scala.collection.mutable
+
 class SpanSlotAccumulatedLoadSpec extends FeatureSpec with GivenWhenThen {
 
   feature("SpanSlotAccumulatedLoad accumulates fixed loads") {
@@ -18,7 +20,7 @@ class SpanSlotAccumulatedLoadSpec extends FeatureSpec with GivenWhenThen {
 
       When("a SpanSlotAccumulatedLoad is created")
 
-      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, Set(fixedLoad))
+      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, fixedLoad)
 
       Then("amplitudePerSlot should contain a vector with a single element")
 
@@ -40,7 +42,7 @@ class SpanSlotAccumulatedLoadSpec extends FeatureSpec with GivenWhenThen {
 
       When("a SpanSlotAccumulatedLoad is created")
 
-      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, Set(fixedLoad))
+      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, fixedLoad)
 
       Then("amplitudePerSlot should contain a vector with multiple elements")
 
@@ -66,7 +68,7 @@ class SpanSlotAccumulatedLoadSpec extends FeatureSpec with GivenWhenThen {
 
       When("a SpanSlotAccumulatedLoad is created")
 
-      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, Set(flexibleLoad))
+      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, flexibleLoad)
 
       Then("amplitudePerSlot should contain a vector with multiple elements")
 
@@ -91,7 +93,7 @@ class SpanSlotAccumulatedLoadSpec extends FeatureSpec with GivenWhenThen {
 
       When("a SpanSlotAccumulatedLoad is created")
 
-      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, flexibleLoads.toSet)
+      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, new mutable.HashSet[Load] ++= flexibleLoads)
 
       Then("amplitudePerSlot should contain a vector with multiple elements")
 
@@ -123,7 +125,7 @@ class SpanSlotAccumulatedLoadSpec extends FeatureSpec with GivenWhenThen {
 
       When("a SpanSlotAccumulatedLoad is created")
 
-      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, (fixedLoad :: flexibleLoads).toSet)
+      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, new mutable.HashSet[Load] ++= (fixedLoad :: flexibleLoads))
 
       Then("amplitudePerSlot should contain a vector with multiple elements")
 
