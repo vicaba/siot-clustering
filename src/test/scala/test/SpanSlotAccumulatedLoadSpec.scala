@@ -6,27 +6,27 @@ import org.scalatest.Matchers._
 
 class SpanSlotAccumulatedLoadSpec extends FeatureSpec with GivenWhenThen {
 
-/*  feature("SpanSlotAccumulatedLoad accumulates fixed loads") {
+  feature("SpanSlotAccumulatedLoad accumulates fixed loads") {
 
     scenario("SpanSlotAccumulatedLoad accumulates one FixedLoad") {
 
       Given("one fixed load")
 
-      val rawFixedLoads = Vector[Double](1.0)
+      val rawFixedLoad = Vector[Double](1.0)
 
-      val fixedLoad = toFixedLoads(rawFixedLoads)
+      val fixedLoad = SpanSlotFixedLoad(0, 0, rawFixedLoad)
 
       When("a SpanSlotAccumulatedLoad is created")
 
-      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, fixedLoad.toList, Set.empty)
+      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, Set(fixedLoad))
 
       Then("amplitudePerSlot should contain a vector with a single element")
 
-      spanSlotAccumulatedLoad.amplitudePerSlot should equal(rawFixedLoads)
+      spanSlotAccumulatedLoad.amplitudePerSlot should equal(rawFixedLoad)
 
       And("span should be equal to the number of fixed loads")
 
-      spanSlotAccumulatedLoad.span should equal(rawFixedLoads.size)
+      spanSlotAccumulatedLoad.span should equal(rawFixedLoad.size)
 
     }
 
@@ -34,29 +34,29 @@ class SpanSlotAccumulatedLoadSpec extends FeatureSpec with GivenWhenThen {
 
       Given("several fixed loads")
 
-      val rawFixedLoads = Vector[Double](1.0, 2.0, 3.0, 4.0, 1.0, 34.0, 50.0, 100000.0)
+      val rawFixedLoad = Vector[Double](1.0, 2.0, 3.0, 4.0, 1.0, 34.0, 50.0, 100000.0)
 
-      val fixedLoad = toFixedLoads(rawFixedLoads)
+      val fixedLoad = SpanSlotFixedLoad(0, 0, rawFixedLoad)
 
       When("a SpanSlotAccumulatedLoad is created")
 
-      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, fixedLoad.toList, Set.empty)
+      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, Set(fixedLoad))
 
       Then("amplitudePerSlot should contain a vector with multiple elements")
 
-      spanSlotAccumulatedLoad.amplitudePerSlot should equal(rawFixedLoads)
+      spanSlotAccumulatedLoad.amplitudePerSlot should equal(rawFixedLoad)
 
       And("span should be equal to the number of fixed loads")
 
-      spanSlotAccumulatedLoad.span should equal(rawFixedLoads.size)
+      spanSlotAccumulatedLoad.span should equal(rawFixedLoad.size)
 
     }
 
-  }*/
+  }
 
   feature("SpanSlotAccumulatedLoad accumulates flexible loads") {
 
-/*    scenario("SpanSlotAccumulatedLoad accumulates one FlexibleLoad") {
+    scenario("SpanSlotAccumulatedLoad accumulates one FlexibleLoad") {
 
       Given("one flexible load")
 
@@ -66,7 +66,7 @@ class SpanSlotAccumulatedLoadSpec extends FeatureSpec with GivenWhenThen {
 
       When("a SpanSlotAccumulatedLoad is created")
 
-      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, List.empty, Set(flexibleLoad))
+      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, Set(flexibleLoad))
 
       Then("amplitudePerSlot should contain a vector with multiple elements")
 
@@ -87,11 +87,11 @@ class SpanSlotAccumulatedLoadSpec extends FeatureSpec with GivenWhenThen {
         Vector[Double](1, 1, 4, 3)
       )
 
-      val flexibleLoads = rawFlexibleLoads.zipWithIndex.map { case (l, idx) =>  SpanSlotFlexibleLoad(idx, idx, l) }
+      val flexibleLoads = rawFlexibleLoads.zipWithIndex.map { case (l, idx) => SpanSlotFlexibleLoad(idx, idx, l) }
 
       When("a SpanSlotAccumulatedLoad is created")
 
-      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, List.empty, flexibleLoads.toSet)
+      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, flexibleLoads.toSet)
 
       Then("amplitudePerSlot should contain a vector with multiple elements")
 
@@ -101,15 +101,15 @@ class SpanSlotAccumulatedLoadSpec extends FeatureSpec with GivenWhenThen {
 
       spanSlotAccumulatedLoad.span should equal(5)
 
-    }*/
+    }
 
     scenario("SpanSlotAccumulatedLoad accumulates fixed and flexible loads") {
 
       Given("a fixed loads and a flexible load")
 
-      val rawFixedLoads = Vector[Double](1.0, 2.0, 3.0, 4.0, 1.0, 34.0, 50.0, 100000.0)
+      val rawFixedLoad = Vector[Double](1.0, 2.0, 3.0, 4.0, 1.0, 34.0, 50.0, 100000.0)
 
-      val fixedLoad = SpanSlotFixedLoad(0, 0, rawFixedLoads)
+      val fixedLoad = SpanSlotFixedLoad(0, 0, rawFixedLoad)
 
       val rawFlexibleLoads = List(
         Vector[Double](1, 1, 1, 1),
@@ -120,7 +120,6 @@ class SpanSlotAccumulatedLoadSpec extends FeatureSpec with GivenWhenThen {
         SpanSlotFlexibleLoad(1, 0, rawFlexibleLoads(0)),
         SpanSlotFlexibleLoad(2, 4, rawFlexibleLoads(1))
       )
-
 
       When("a SpanSlotAccumulatedLoad is created")
 

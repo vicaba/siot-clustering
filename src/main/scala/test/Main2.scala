@@ -18,6 +18,10 @@ object Main2 {
 
   }
 
+  def f(s: SpanSlotAccumulatedLoad, flexibleLoads: Set[SpanSlotFlexibleLoad], accum: Set[SpanSlotFlexibleLoad]): SpanSlotAccumulatedLoad = {
+    s.amplitudePerSlot
+  }
+
 /*  /**
   *
     * @param flexibleLoad

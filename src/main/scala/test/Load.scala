@@ -55,13 +55,14 @@ case class SpanSlotFlexibleLoad(override val id: Int,
   override def totalEnergy: Double = amplitudePerSlot.foldLeft(0.0)((accum, a) => accum + a)
 }
 
-case class SpanSlotAccumulatedLoad(override val positionInT: Int, private val _loads: Set[SpanSlotLoad])
+case class SpanSlotAccumulatedLoad(override val positionInT: Int, val loads: Set[SpanSlotLoad])
     extends SpanSlotLoad
     with AccumulatedLoad {
 
-  val loads: Set[SpanSlotLoad] = _loads.filter(_.isInstanceOf[SpanSlotFlexibleLoad])
 
-  val fixedLoads: Set[SpanSlotLoad] = _loads.filter(_.isInstanceOf[SpanSlotFixedLoad])
+  val flexibleLoads: Set[SpanSlotFlexibleLoad] = loads.filter(_.isInstanceOf[SpanSlotFlexibleLoad]).asInstanceOf[Set[SpanSlotFlexibleLoad]]
+
+  val fixedLoads: Set[SpanSlotFixedLoad] = loads.filter(_.isInstanceOf[SpanSlotFixedLoad]).asInstanceOf[Set[SpanSlotFixedLoad]]
 
   override val id: Int = positionInT
 
