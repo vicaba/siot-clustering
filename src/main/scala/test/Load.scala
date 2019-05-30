@@ -7,6 +7,7 @@ import types.ops.SetOps._
 
 import scala.collection.mutable
 import scala.language.higherKinds
+import collection.CollecctionHelper._
 
 sealed trait Load {
 
@@ -26,6 +27,7 @@ sealed trait Load {
   def totalEnergy: Double
   def span: Int
   def amplitudePerSlot: Vector[Double]
+  def peak: Double = amplitudePerSlot.max
 }
 
 sealed trait SingleLoad extends Load
@@ -48,22 +50,24 @@ case class SpanSlotFlexibleLoad(override val id: Int,
   override def totalEnergy: Double = amplitudePerSlot.foldLeft(0.0)((accum, a) => accum + a)
 }
 
-case class SpanSlotAccumulatedLoad(override val positionInT: Int, loads: mutable.Set[Load]) extends AccumulatedLoad {
+case class SpanSlotAccumulatedLoad private (override val positionInT: Int, loads: mutable.Set[Load]) extends AccumulatedLoad {
 
-  val flexibleLoads: Set[SpanSlotFlexibleLoad] =
+  def copy(): SpanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(positionInT, loads.clone())
+
+  def flexibleLoads: Set[SpanSlotFlexibleLoad] =
     loads.filter(_.isInstanceOf[SpanSlotFlexibleLoad]).asInstanceOf[mutable.Set[SpanSlotFlexibleLoad]].toSet
 
-  val fixedLoads: Set[SpanSlotFixedLoad] =
+  def fixedLoads: Set[SpanSlotFixedLoad] =
     loads.filter(_.isInstanceOf[SpanSlotFixedLoad]).asInstanceOf[mutable.Set[SpanSlotFixedLoad]].toSet
 
-  val accumulatedLoads: Set[SpanSlotAccumulatedLoad] =
+  def accumulatedLoads: Set[SpanSlotAccumulatedLoad] =
     loads.filter(_.isInstanceOf[SpanSlotAccumulatedLoad]).asInstanceOf[mutable.Set[SpanSlotAccumulatedLoad]].toSet
 
-  override val id: Int = positionInT
+  override def id: Int = positionInT
 
-  override val span: Int = loads.map(l => l.span + l.positionInT).max
+  override def span: Int = loads.map(l => l.span + l.positionInT).max
 
-  override val amplitudePerSlot: Vector[Double] =
+  override def amplitudePerSlot: Vector[Double] =
     SeqOps.sum(
       loads
         .map(expandSpanSlotLoadToVector(_, span))
@@ -82,11 +86,31 @@ case class SpanSlotAccumulatedLoad(override val positionInT: Int, loads: mutable
         (for (_ <- (load.positionInT + load.span) until vectorSize) yield 0.0)
     ).toVector
 
+  def +=(y: Load): SpanSlotAccumulatedLoad = {
+    this.loads += y
+    this
+  }
+
+  def -=(y: Load): SpanSlotAccumulatedLoad = {
+    this.loads -= y
+    this
+  }
+
+  def -/+=(y: Load): SpanSlotAccumulatedLoad = {
+    this.loads -/+= y
+    this
+  }
+
 }
 
 object SpanSlotAccumulatedLoad {
+
   def apply(positionInT: Int, load: Load): SpanSlotAccumulatedLoad =
     new SpanSlotAccumulatedLoad(positionInT, new scala.collection.mutable.HashSet[Load]() += load)
+
+  def apply(positionInT: Int, loads: Traversable[Load]): SpanSlotAccumulatedLoad =
+    new SpanSlotAccumulatedLoad(positionInT, mutableSetOf(loads))
+
 }
 
 object Load {
@@ -105,30 +129,11 @@ object Load {
   implicit val loadOrderingByAmplitude: Ordering[Load] =
     (x: Load, y: Load) => implicitly[Ordering[Double]].compare(x.totalEnergy, y.totalEnergy)
 
-  implicit def toVector[X <: Load]: DenseVectorReprOps[Vector[X]] = new DenseVectorReprOps[Vector[X]] {
+  implicit def toVector[X <: Load]: DenseVectorReprOps[X] = new DenseVectorReprOps[X] {
 
-    override def apply(t: Vector[X]): DenseVector[Double] = DenseVector(t.map(_.totalEnergy): _*)
+    override def apply(t: X): DenseVector[Double] = DenseVector(t.amplitudePerSlot:_*)
 
-    override def zero(t: Vector[X]): DenseVector[Double] = DenseVector((for (_ <- 1 to t.size) yield 0.0): _*)
-
-  }
-
-  object LoadOps {
-
-    def +(x: SpanSlotAccumulatedLoad, y: Load): Load = {
-      x.loads += y
-      x
-    }
-
-    def -(x: SpanSlotAccumulatedLoad, y: Load): Load = {
-      x.loads -= y
-      x
-    }
-
-    def -/+(x: SpanSlotAccumulatedLoad, y: Load): Load = {
-      x.loads -/+= y
-      x
-    }
+    override def zero(t: X): DenseVector[Double] = DenseVector((for (_ <- 1 to t.span) yield 0.0): _*)
 
   }
 

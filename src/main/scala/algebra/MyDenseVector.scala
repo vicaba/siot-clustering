@@ -8,6 +8,12 @@ object VectorOps {
 
   implicit def vectorToMyDenseVector[X: Numeric](v: Vector[X]): MyDenseVector[X] = MyDenseVector.point(v)
 
+  def norm2[X: Numeric](v: MyDenseVector[X]): Double = {
+    val num = implicitly[Numeric[X]]
+    import num._
+    math.sqrt(v.foldLeft(1.0) { case (acc, e) => acc + math.pow(e.toDouble(), 2)})
+  }
+
 }
 
 object MyDenseVector {
@@ -15,6 +21,8 @@ object MyDenseVector {
 }
 
 class MyDenseVector[X: Numeric](val underlying: Vector[X]) {
+
+  def foldLeft[B](z: B)(op: (B, X) => B): B = underlying.foldLeft(z)(op)
 
   def sumVec(s2: MyDenseVector[X]): MyDenseVector[X] =
     MyDenseVector.point(SeqOps.sum(Seq(underlying ++ s2.underlying)))
