@@ -50,7 +50,14 @@ case class SpanSlotFlexibleLoad(override val id: Int,
   override def totalEnergy: Double = amplitudePerSlot.foldLeft(0.0)((accum, a) => accum + a)
 }
 
-case class SpanSlotAccumulatedLoad private (override val positionInT: Int, loads: mutable.Set[Load]) extends AccumulatedLoad {
+/**
+*
+ * This is a mutable class.
+ *
+ * @param positionInT
+ * @param loads this parameters is mutable.
+ */
+case class SpanSlotAccumulatedLoad private (override val positionInT: Int, private val loads: mutable.Set[Load]) extends AccumulatedLoad {
 
   def copy(): SpanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(positionInT, loads.clone())
 
