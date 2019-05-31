@@ -3,6 +3,8 @@ package test
 import test.Load._
 import algebra.VectorOps._
 
+import scala.annotation.tailrec
+
 object Rescheduler {
 
   def main(args: Array[String]): Unit = {
@@ -18,8 +20,21 @@ object Rescheduler {
 
   }
 
-  def reschedule(accumulatedLoad: SpanSlotAccumulatedLoad,
-                 flexibleLoad: SpanSlotFlexibleLoad): SpanSlotAccumulatedLoad = {
+  def reschedule(acc: SpanSlotAccumulatedLoad): SpanSlotAccumulatedLoad = {
+
+    @tailrec
+    def _reschedule(_acc: SpanSlotAccumulatedLoad,
+                    _remainingFlexibleLoads: List[SpanSlotFlexibleLoad]): SpanSlotAccumulatedLoad =
+      _remainingFlexibleLoads match {
+        case x :: xs => _reschedule(rescheduleFlexibleLoad(_acc, x), xs)
+        case Nil     => _acc
+      }
+
+    _reschedule(acc, acc.flexibleLoads.toList)
+  }
+
+  def rescheduleFlexibleLoad(accumulatedLoad: SpanSlotAccumulatedLoad,
+                             flexibleLoad: SpanSlotFlexibleLoad): SpanSlotAccumulatedLoad = {
 
     // Used to perform mutable operations
     val temporaryX = accumulatedLoad.copy()
@@ -27,9 +42,14 @@ object Rescheduler {
     def localPeakInFlexibleLoadWindow(m: Movement): Double =
       m.acc.amplitudePerSlot.slice(m.fl.positionInT, m.fl.positionInT + m.fl.span).max
 
-    class Movement(val acc: SpanSlotAccumulatedLoad, val fl: SpanSlotFlexibleLoad)
+    def incrementInWindow(m: Movement): Double = {
+      val slice = m.acc.amplitudePerSlot.slice(m.fl.positionInT, m.fl.positionInT + m.fl.span)
+      slice.foldLeft(0.0) {
+        case (acc, e) => acc + e * e
+      } / slice.size
+    }
 
-    var first = true
+    class Movement(val acc: SpanSlotAccumulatedLoad, val fl: SpanSlotFlexibleLoad)
 
     var bestMovement: Movement = new Movement(accumulatedLoad, flexibleLoad)
 
@@ -38,11 +58,9 @@ object Rescheduler {
       val flexibleLoadMovement = flexibleLoad.copy(positionInT = i)
       val temporaryNewMovement = new Movement(temporaryX -/+= flexibleLoadMovement, flexibleLoadMovement)
 
-      if (first ||
-          ((temporaryNewMovement.acc.peak < bestMovement.acc.peak) &&
-          (localPeakInFlexibleLoadWindow(temporaryNewMovement) < localPeakInFlexibleLoadWindow(bestMovement)))) {
+      if ((temporaryNewMovement.acc.peak <= bestMovement.acc.peak) &&
+          (incrementInWindow(temporaryNewMovement) <= incrementInWindow(bestMovement))) {
 
-        first = false
         bestMovement = new Movement(temporaryNewMovement.acc.copy(), temporaryNewMovement.fl)
 
       }
