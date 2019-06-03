@@ -39,9 +39,6 @@ object Rescheduler {
     // Used to perform mutable operations
     val temporaryX = accumulatedLoad.copy()
 
-    def localPeakInFlexibleLoadWindow(m: Movement): Double =
-      m.acc.amplitudePerSlot.slice(m.fl.positionInT, m.fl.positionInT + m.fl.span).max
-
     def incrementInWindow(m: Movement): Double = {
       val slice = m.acc.amplitudePerSlot.slice(m.fl.positionInT, m.fl.positionInT + m.fl.span)
       slice.foldLeft(0.0) {
