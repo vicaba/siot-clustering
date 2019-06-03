@@ -77,21 +77,22 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
       spanSlotAccumulatedLoad.amplitudePerSlot should equal(flexibleLoad.amplitudePerSlot)
     }
 
-    scenario("Rescheduler with two flexible loads") {
+    scenario("Rescheduler with two flexible loads and one fixed load as base") {
 
-      Given("an SpanSlotAccumulatedLoad with two loads")
+      Given("an SpanSlotAccumulatedLoad with three loads")
 
       val rawFlexibleLoads = List(
         Vector[Double](1, 1, 1, 2),
         Vector[Double](2, 2, 2, 1)
       )
 
-      val flexibleLoads = List(
+      val loads = List(
         SpanSlotFlexibleLoad(1, 0, rawFlexibleLoads(0)),
-        SpanSlotFlexibleLoad(2, 4, rawFlexibleLoads(1))
+        SpanSlotFlexibleLoad(2, 4, rawFlexibleLoads(1)),
+        SpanSlotFixedLoad(3, 0, Vector[Double](1, 1, 1, 1, 1, 1, 1, 1))
       )
 
-      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, flexibleLoads)
+      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, loads)
 
       When("the Rescheduler is called")
 

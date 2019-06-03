@@ -9,6 +9,8 @@ import scala.collection.mutable
 import scala.language.higherKinds
 import collection.CollecctionHelper._
 
+import scala.util.Try
+
 sealed trait Load {
 
   def id: Int
@@ -55,36 +57,38 @@ case class SpanSlotFlexibleLoad(override val id: Int,
  * This is a mutable class.
  *
  * @param positionInT
- * @param loads this parameters is mutable.
+ * @param _loads this parameters is mutable.
  */
-case class SpanSlotAccumulatedLoad private (override val positionInT: Int, private val loads: mutable.Set[Load]) extends AccumulatedLoad {
+case class SpanSlotAccumulatedLoad private (override val positionInT: Int, private val _loads: mutable.Set[Load]) extends AccumulatedLoad {
 
-  def copy(): SpanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(positionInT, loads.clone())
+  def copy(loads: Set[Load] = this._loads.toSet): SpanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(positionInT, mutableSetOf(loads))
+
+  def loads: Set[Load] = _loads.toSet
 
   def flexibleLoads: Set[SpanSlotFlexibleLoad] =
-    loads.filter(_.isInstanceOf[SpanSlotFlexibleLoad]).asInstanceOf[mutable.Set[SpanSlotFlexibleLoad]].toSet
+    loads.filter(_.isInstanceOf[SpanSlotFlexibleLoad]).asInstanceOf[Set[SpanSlotFlexibleLoad]]
 
   def fixedLoads: Set[SpanSlotFixedLoad] =
-    loads.filter(_.isInstanceOf[SpanSlotFixedLoad]).asInstanceOf[mutable.Set[SpanSlotFixedLoad]].toSet
+    loads.filter(_.isInstanceOf[SpanSlotFixedLoad]).asInstanceOf[Set[SpanSlotFixedLoad]]
 
   def accumulatedLoads: Set[SpanSlotAccumulatedLoad] =
-    loads.filter(_.isInstanceOf[SpanSlotAccumulatedLoad]).asInstanceOf[mutable.Set[SpanSlotAccumulatedLoad]].toSet
+    loads.filter(_.isInstanceOf[SpanSlotAccumulatedLoad]).asInstanceOf[Set[SpanSlotAccumulatedLoad]]
 
   override def id: Int = positionInT
 
-  override def span: Int = loads.map(l => l.span + l.positionInT).max
+  override def span: Int = Try(_loads.map(l => l.span + l.positionInT).max).getOrElse(0)
 
   override def amplitudePerSlot: Vector[Double] =
     SeqOps.sum(
-      loads
+      _loads
         .map(expandSpanSlotLoadToVector(_, span))
         .toList
     )
 
   def totalEnergy: Double =
-    (fixedLoads.map(_.totalEnergy) ++: loads.map(_.totalEnergy)).foldLeft(0.0)((accum, l) => accum + l)
+    (fixedLoads.map(_.totalEnergy) ++: _loads.map(_.totalEnergy)).foldLeft(0.0)((accum, l) => accum + l)
 
-  override def toString: String = s"Acc($positionInT, $totalEnergy -> $loads)"
+  override def toString: String = s"Acc($positionInT, $totalEnergy -> ${_loads})"
 
   private def expandSpanSlotLoadToVector(load: Load, vectorSize: Int): Vector[Double] =
     (
@@ -94,17 +98,17 @@ case class SpanSlotAccumulatedLoad private (override val positionInT: Int, priva
     ).toVector
 
   def +=(y: Load): SpanSlotAccumulatedLoad = {
-    this.loads += y
+    this._loads += y
     this
   }
 
   def -=(y: Load): SpanSlotAccumulatedLoad = {
-    this.loads -= y
+    this._loads -= y
     this
   }
 
   def -/+=(y: Load): SpanSlotAccumulatedLoad = {
-    this.loads -/+= y
+    this._loads -/+= y
     this
   }
 

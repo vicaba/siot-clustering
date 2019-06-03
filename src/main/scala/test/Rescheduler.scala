@@ -30,14 +30,19 @@ object Rescheduler {
         case Nil     => _acc
       }
 
-    _reschedule(acc, acc.flexibleLoads.toList)
+    val remainingLoadsAfterRemovingFlexibleLoads = acc.loads -- acc.flexibleLoads
+
+    if (remainingLoadsAfterRemovingFlexibleLoads.nonEmpty)
+      _reschedule(acc.copy(loads = remainingLoadsAfterRemovingFlexibleLoads), acc.flexibleLoads.toList)
+    else
+      acc.copy()
   }
 
   def rescheduleFlexibleLoad(accumulatedLoad: SpanSlotAccumulatedLoad,
                              flexibleLoad: SpanSlotFlexibleLoad): SpanSlotAccumulatedLoad = {
 
     // Used to perform mutable operations
-    val temporaryX = accumulatedLoad.copy()
+    val temporaryX: SpanSlotAccumulatedLoad = accumulatedLoad.copy()
 
     def incrementInWindow(m: Movement): Double = {
       val slice = m.acc.amplitudePerSlot.slice(m.fl.positionInT, m.fl.positionInT + m.fl.span)
@@ -64,23 +69,9 @@ object Rescheduler {
 
     }
 
+    // TODO: Notice that we are returning a copy of the AccumulatedLoad, with a new mutable Set of Loads.
     bestMovement.acc
 
   }
-
-  /*  /**
- *
- * @param flexibleLoad
- * @return the index of flexibleLoads where the flexible load start is better suited to reduce PAR
- */
-  def findBestContiguousSlots(accumulatedLoad: SpanSlotAccumulatedLoad, flexibleLoad: SpanSlotFlexibleLoad): Int = {
-    (for (i <- 0 until (fixedLoads.size - flexibleLoad.span)) yield {
-      (i,
-       flexibleLoad.amplitudePerSlot
-         .zip(fixedLoads.map(_.amplitude).slice(i, flexibleLoad.span + i))
-         .map { case (fl, fi) => Math.pow(fl + fi, 2) }
-         .sum)
-    }).max((x: (Int, Double), y: (Int, Double)) => implicitly[Ordering[Double]].compare(x._2, y._2))._1
-  }*/
 
 }
