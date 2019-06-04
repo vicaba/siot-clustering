@@ -8,26 +8,73 @@ import org.scalatest.Matchers._
 
 class MovementSpec extends FeatureSpec with GivenWhenThen {
 
-  feature("Movement.biasedPeak reduces peak") {
+  feature("Movement.biasedPeak reduces peak if in range") {
 
-    Given("a Movement")
+    scenario("Movement.biasedPeak reduces peak when FlexibleLoad is in range") {
 
-    val flexibleLoad = SpanSlotFlexibleLoad(1, 0, Vector[Double](1, 1))
+      Given("a Movement")
 
-    val fixedLoad = SpanSlotFixedLoad(2, 0, Vector[Double](1, 1, 8))
+      val flexibleLoad = SpanSlotFlexibleLoad(1, 0, Vector[Double](1, 1))
 
-    val acc = SpanSlotAccumulatedLoad(1, Set(fixedLoad, flexibleLoad))
+      val fixedLoad = SpanSlotFixedLoad(2, 0, Vector[Double](1, 1, 8))
 
-    val mov = new Movement(acc, flexibleLoad, List(0, 1))
+      val acc = SpanSlotAccumulatedLoad(1, Set(fixedLoad, flexibleLoad))
 
-    When("Movement.biasedPeak is called")
+      val mov = new Movement(acc, flexibleLoad, List(0, 1))
 
-    val result = mov.biasedPeak
+      When("Movement.biasedPeak is called")
 
-    Then("it should return peak - 20%")
+      val result = mov.biasedPeak
 
-    result shouldBe (acc.peak * 0.2)
+      Then("it should return peak - 20%")
 
+      result shouldEqual (acc.peak - (acc.peak * 0.2))
+
+    }
+
+    scenario("Movement.biasedPeak does not reduce peak when FlexibleLoad is out range") {
+
+      Given("a Movement")
+
+      val flexibleLoad = SpanSlotFlexibleLoad(1, 0, Vector[Double](1, 1))
+
+      val fixedLoad = SpanSlotFixedLoad(2, 0, Vector[Double](1, 1, 8, 8))
+
+      val acc = SpanSlotAccumulatedLoad(1, Set(fixedLoad, flexibleLoad))
+
+      val mov = new Movement(acc, flexibleLoad, List(2, 3))
+
+      When("Movement.biasedPeak is called")
+
+      val result = mov.biasedPeak
+
+      Then("it should return peak")
+
+      result shouldEqual acc.peak
+
+    }
+
+    scenario("Movement.biasedPeak does not reduce peak when FlexibleLoad is halfo out range") {
+
+      Given("a Movement")
+
+      val flexibleLoad = SpanSlotFlexibleLoad(1, 1, Vector[Double](1, 1))
+
+      val fixedLoad = SpanSlotFixedLoad(2, 0, Vector[Double](1, 1, 8, 8))
+
+      val acc = SpanSlotAccumulatedLoad(1, Set(fixedLoad, flexibleLoad))
+
+      val mov = new Movement(acc, flexibleLoad, List(2, 3))
+
+      When("Movement.biasedPeak is called")
+
+      val result = mov.biasedPeak
+
+      Then("it should return peak")
+
+      result shouldEqual acc.peak
+
+    }
 
 
   }
