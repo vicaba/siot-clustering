@@ -1,32 +1,26 @@
 package test
 
-import types.immutable.Point
-
 class UserAllocator {
 
 }
 
 object UserAllocator {
-  def allocate(users: List[SpanSlotAccumulatedLoad], numOfSlots: Int, slotsWindowSize: Int): List[Int] = {
-    var positions: List[Int] = List()
+  def allocate(users: List[SpanSlotAccumulatedLoad], numOfSlots: Int, slotsWindowSize: Int): SpanSlotAccumulatedLoad = {
+    var usersAsFlexibleLoads: List[SpanSlotFlexibleLoad] = List()
 
-    val fixedLoadPerSlots: Array[Double] = Array.fill(numOfSlots){0.0}
-    val averageLoadPerSlot = users.map(_.amplitudePerSlot.sum).sum / numOfSlots
+    for (user <- users) {
+      val rawUserLoad = user.accumulatedLoads.flatMap(_.flexibleLoads.flatMap(_.amplitudePerSlot)).sum
 
-    users.foreach(_.fixedLoads.foreach(fixedLoad => {
-      val positionInT = fixedLoad.positionInT
-      val amplitudePerSlot = fixedLoad.amplitudePerSlot
-      for (i <- amplitudePerSlot.indices) {
-        fixedLoadPerSlots(positionInT + i ) += amplitudePerSlot(i)
-      }
-    }))
+      val loadVector: Vector[Double] = (for (_ <- 0 until slotsWindowSize) yield {
+        rawUserLoad / numOfSlots
+      }).toVector
 
-    //Rescheduler.rescheduleFlexibleLoad()
+      usersAsFlexibleLoads = SpanSlotFlexibleLoad(user.id, 0, loadVector) :: usersAsFlexibleLoads
+    }
 
+    val fixedLoads = users.flatMap(_.fixedLoads)
+    val accumulatedLoads = SpanSlotAccumulatedLoad(-1, fixedLoads ::: usersAsFlexibleLoads)
 
-
-
-
-    positions
+    Rescheduler.reschedule(accumulatedLoads)
   }
 }
