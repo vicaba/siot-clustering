@@ -58,7 +58,7 @@ object Rescheduler {
       val flexibleLoadMovement = flexibleLoad.copy(positionInT = i)
       val temporaryNewMovement = new Movement(temporaryX -/+= flexibleLoadMovement, flexibleLoadMovement, preferredSlots)
 
-      if (temporaryNewMovement.acc.peak < bestMovement.acc.peak) {
+      if (temporaryNewMovement.biasedPeak < bestMovement.biasedPeak) {
 
         bestMovement = new Movement(temporaryNewMovement.acc.copy(), temporaryNewMovement.fl, preferredSlots)
 
