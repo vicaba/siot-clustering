@@ -77,6 +77,27 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
       spanSlotAccumulatedLoad.amplitudePerSlot should equal(flexibleLoad.amplitudePerSlot)
     }
 
+    scenario("Rescheduler with one fixed load and one flexible load") {
+
+      Given("an SpanSlotAccumulatedLoad with two loads")
+
+      val loads = List(
+        SpanSlotFlexibleLoad(1, 0, Vector[Double](1, 1)),
+        SpanSlotFixedLoad(0, 0, Vector[Double](2, 1, 1, 2))
+      )
+
+      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, loads)
+
+      When("the Rescheduler is called")
+
+      val result = Rescheduler.reschedule(spanSlotAccumulatedLoad)
+
+      Then("nothing should have happened")
+
+      Metric.par(result) shouldEqual Metric.par(spanSlotAccumulatedLoad)
+
+    }
+
     scenario("Rescheduler with two flexible loads and one fixed load as base") {
 
       Given("an SpanSlotAccumulatedLoad with three loads")
@@ -100,28 +121,7 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
       Then("nothing should have happened")
 
-      Metric.par(result) should be <= Metric.par(spanSlotAccumulatedLoad)
-
-    }
-
-    scenario("Rescheduler with one fixed load and one flexible load") {
-
-      Given("an SpanSlotAccumulatedLoad with two loads")
-
-      val loads = List(
-        SpanSlotFlexibleLoad(1, 0, Vector[Double](1, 1)),
-        SpanSlotFixedLoad(0, 0, Vector[Double](2, 1, 1, 2))
-      )
-
-      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, loads)
-
-      When("the Rescheduler is called")
-
-      val result = Rescheduler.reschedule(spanSlotAccumulatedLoad)
-
-      Then("nothing should have happened")
-
-      Metric.par(result) should be <= Metric.par(spanSlotAccumulatedLoad)
+      Metric.par(result) shouldEqual Metric.par(spanSlotAccumulatedLoad)
 
     }
 

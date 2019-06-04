@@ -20,13 +20,13 @@ object Rescheduler {
 
   }
 
-  def reschedule(acc: SpanSlotAccumulatedLoad): SpanSlotAccumulatedLoad = {
+  def reschedule(acc: SpanSlotAccumulatedLoad, preferredSlots: List[Int] = Nil): SpanSlotAccumulatedLoad = {
 
     @tailrec
     def _reschedule(_acc: SpanSlotAccumulatedLoad,
                     _remainingFlexibleLoads: List[SpanSlotFlexibleLoad]): SpanSlotAccumulatedLoad =
       _remainingFlexibleLoads match {
-        case x :: xs => _reschedule(rescheduleFlexibleLoad(_acc, x), xs)
+        case x :: xs => _reschedule(rescheduleFlexibleLoad(_acc, x, preferredSlots), xs)
         case Nil     => _acc
       }
 
@@ -39,7 +39,7 @@ object Rescheduler {
   }
 
   def rescheduleFlexibleLoad(accumulatedLoad: SpanSlotAccumulatedLoad,
-                             flexibleLoad: SpanSlotFlexibleLoad): SpanSlotAccumulatedLoad = {
+                             flexibleLoad: SpanSlotFlexibleLoad, preferredSlots: List[Int] = Nil): SpanSlotAccumulatedLoad = {
 
     // Used to perform mutable operations
     val temporaryX: SpanSlotAccumulatedLoad = accumulatedLoad.copy()
@@ -51,19 +51,16 @@ object Rescheduler {
       } / slice.size
     }
 
-    class Movement(val acc: SpanSlotAccumulatedLoad, val fl: SpanSlotFlexibleLoad)
+    var bestMovement: Movement = new Movement(accumulatedLoad -/+= flexibleLoad, flexibleLoad, preferredSlots)
 
-    var bestMovement: Movement = new Movement(accumulatedLoad, flexibleLoad)
-
-    for (i <- accumulatedLoad.positionInT to (accumulatedLoad.span - flexibleLoad.span)) {
+    for (i <- accumulatedLoad.positionInT until ((accumulatedLoad.span - flexibleLoad.span) + 1)) {
 
       val flexibleLoadMovement = flexibleLoad.copy(positionInT = i)
-      val temporaryNewMovement = new Movement(temporaryX -/+= flexibleLoadMovement, flexibleLoadMovement)
+      val temporaryNewMovement = new Movement(temporaryX -/+= flexibleLoadMovement, flexibleLoadMovement, preferredSlots)
 
-      if ((temporaryNewMovement.acc.peak <= bestMovement.acc.peak) &&
-          (incrementInWindow(temporaryNewMovement) <= incrementInWindow(bestMovement))) {
+      if (temporaryNewMovement.acc.peak < bestMovement.acc.peak) {
 
-        bestMovement = new Movement(temporaryNewMovement.acc.copy(), temporaryNewMovement.fl)
+        bestMovement = new Movement(temporaryNewMovement.acc.copy(), temporaryNewMovement.fl, preferredSlots)
 
       }
 
