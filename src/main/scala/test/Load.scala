@@ -76,11 +76,12 @@ case class SpanSlotAccumulatedLoad private (override val positionInT: Int, priva
 
   override def id: Int = positionInT
 
-  override def span: Int = Try(_loads.map(l => l.span + l.positionInT).max).getOrElse(0)
+  // Todo: changed
+  override def span: Int = Try(loads.map(l => l.span + l.positionInT).max - loads.map(_.positionInT).min).getOrElse(0)
 
   override def amplitudePerSlot: Vector[Double] =
     SeqOps.sum(
-      _loads
+      loads
         .map(expandSpanSlotLoadToVector(_, span))
         .toList
     )
