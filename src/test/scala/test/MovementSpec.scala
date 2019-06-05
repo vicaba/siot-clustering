@@ -18,7 +18,7 @@ class MovementSpec extends FeatureSpec with GivenWhenThen {
 
       val fixedLoad = SpanSlotFixedLoad(2, 0, Vector[Double](1, 1, 8))
 
-      val acc = SpanSlotAccumulatedLoad(1, Set(fixedLoad, flexibleLoad))
+      val acc = SpanSlotAccumulatedLoad(1, 0, Set(fixedLoad, flexibleLoad))
 
       val mov = new Movement(acc, flexibleLoad, List(0, 1))
 
@@ -40,7 +40,7 @@ class MovementSpec extends FeatureSpec with GivenWhenThen {
 
       val fixedLoad = SpanSlotFixedLoad(2, 0, Vector[Double](1, 1, 8, 8))
 
-      val acc = SpanSlotAccumulatedLoad(1, Set(fixedLoad, flexibleLoad))
+      val acc = SpanSlotAccumulatedLoad(1, 0, Set(fixedLoad, flexibleLoad))
 
       val mov = new Movement(acc, flexibleLoad, List(2, 3))
 
@@ -62,7 +62,7 @@ class MovementSpec extends FeatureSpec with GivenWhenThen {
 
       val fixedLoad = SpanSlotFixedLoad(2, 0, Vector[Double](1, 1, 8, 8))
 
-      val acc = SpanSlotAccumulatedLoad(1, Set(fixedLoad, flexibleLoad))
+      val acc = SpanSlotAccumulatedLoad(1, 0, Set(fixedLoad, flexibleLoad))
 
       val mov = new Movement(acc, flexibleLoad, List(2, 3))
 

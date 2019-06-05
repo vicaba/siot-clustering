@@ -17,7 +17,7 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
       val flexibleLoad = SpanSlotFlexibleLoad(1, 0, rawFlexibleLoad)
 
-      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, flexibleLoad)
+      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, 0, flexibleLoad)
 
       When("the Rescheduler is called")
 
@@ -42,7 +42,7 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
         SpanSlotFlexibleLoad(2, 4, rawFlexibleLoads(1))
       )
 
-      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, flexibleLoads)
+      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, 0, flexibleLoads)
 
       When("the Rescheduler is called")
 
@@ -66,7 +66,7 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
       val flexibleLoad = SpanSlotFlexibleLoad(1, 0, rawFlexibleLoad)
 
-      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, flexibleLoad)
+      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, 0, flexibleLoad)
 
       When("the Rescheduler is called")
 
@@ -86,7 +86,7 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
         SpanSlotFixedLoad(0, 0, Vector[Double](2, 1, 1, 2))
       )
 
-      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, loads)
+      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, 0, loads)
 
       When("the Rescheduler is called")
 
@@ -113,7 +113,7 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
         SpanSlotFixedLoad(3, 0, Vector[Double](1, 1, 1, 1, 1, 1, 1, 1))
       )
 
-      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, loads)
+      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, 0, loads)
 
       When("the Rescheduler is called")
 
