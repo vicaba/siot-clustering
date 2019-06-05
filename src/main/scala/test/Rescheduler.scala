@@ -1,8 +1,5 @@
 package test
 
-import test.Load._
-import algebra.VectorOps._
-
 import scala.annotation.tailrec
 
 object Rescheduler {
@@ -39,7 +36,8 @@ object Rescheduler {
   }
 
   def rescheduleFlexibleLoad(accumulatedLoad: SpanSlotAccumulatedLoad,
-                             flexibleLoad: SpanSlotFlexibleLoad, preferredSlots: List[Int] = Nil): SpanSlotAccumulatedLoad = {
+                             flexibleLoad: SpanSlotFlexibleLoad,
+                             preferredSlots: List[Int] = Nil): SpanSlotAccumulatedLoad = {
 
     // Used to perform mutable operations
     val temporaryX: SpanSlotAccumulatedLoad = accumulatedLoad.copy()
@@ -51,17 +49,24 @@ object Rescheduler {
       } / slice.size
     }
 
-    var bestMovement: Movement = new Movement(accumulatedLoad -/+= flexibleLoad, flexibleLoad, preferredSlots)
-
+    var bestMovement: Movement = new Movement(accumulatedLoad += flexibleLoad, flexibleLoad, preferredSlots)
+    //println(s"Trying load ${flexibleLoad.id}, load vector = ${flexibleLoad.amplitudePerSlot.toString()}")
     for (i <- accumulatedLoad.positionInT until ((accumulatedLoad.span - flexibleLoad.span) + 1)) {
 
       val flexibleLoadMovement = flexibleLoad.copy(positionInT = i)
-      val temporaryNewMovement = new Movement(temporaryX -/+= flexibleLoadMovement, flexibleLoadMovement, preferredSlots)
+      val temporaryNewMovement =
+        new Movement(temporaryX -/+= flexibleLoadMovement, flexibleLoadMovement, preferredSlots)
 
-      if (temporaryNewMovement.biasedPeak < bestMovement.biasedPeak) {
+
+      //print(s"\tat position $i -> tempPeak = ${temporaryNewMovement.biasedPeak}, bestPeak = ${bestMovement.biasedPeak}")
+
+      if (temporaryNewMovement.acc.peak < bestMovement.acc.peak) {
+        //println("\tIs best")
 
         bestMovement = new Movement(temporaryNewMovement.acc.copy(), temporaryNewMovement.fl, preferredSlots)
 
+      } else {
+        //println("\tNot best")
       }
 
     }

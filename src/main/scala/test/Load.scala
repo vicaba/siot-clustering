@@ -81,13 +81,12 @@ case class SpanSlotAccumulatedLoad private (override val positionInT: Int, priva
 
   override def amplitudePerSlot: Vector[Double] =
     SeqOps.sum(
-      loads
+      loads.toList
         .map(expandSpanSlotLoadToVector(_, span))
-        .toList
     )
 
   def totalEnergy: Double =
-    (fixedLoads.map(_.totalEnergy) ++: _loads.map(_.totalEnergy)).foldLeft(0.0)((accum, l) => accum + l)
+    loads.toList.map(_.totalEnergy).foldLeft(0.0)((accum, l) => accum + l)
 
   override def toString: String = s"Acc($positionInT, $totalEnergy -> ${_loads})"
 
