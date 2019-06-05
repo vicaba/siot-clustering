@@ -41,17 +41,17 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen {
   def getUsers: List[SpanSlotAccumulatedLoad] = {
     val usersSimulation: List[SpanSlotAccumulatedLoad] = List(
       SpanSlotAccumulatedLoad(100, 0, List(
-        SpanSlotFixedLoad(101, 0, Vector(1, 3, 1)),
+        SpanSlotFixedLoad(101, 0, Vector(1, 4, 1)),
         SpanSlotFlexibleLoad(151, 0, Vector(2))
       )),
 
       SpanSlotAccumulatedLoad(200, 0, List(
-        SpanSlotFixedLoad(201, 0, Vector(0, 0, 0)),
-        SpanSlotFlexibleLoad(251, 0, Vector(1))
+        SpanSlotFixedLoad(201, 0, Vector(1, 4, 1)),
+        SpanSlotFlexibleLoad(251, 0, Vector(2))
       )),
 
       SpanSlotAccumulatedLoad(300, 0, List(
-        SpanSlotFixedLoad(301, 0, Vector(0, 0, 0)),
+        SpanSlotFixedLoad(301, 0, Vector(1, 4, 1)),
         SpanSlotFlexibleLoad(351, 0, Vector(2))
       ))
     )
