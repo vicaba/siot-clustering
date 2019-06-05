@@ -1,5 +1,6 @@
 package test
 
+import algebra.SeqOps
 import org.scalatest._
 import test.Load._
 import org.scalatest.Matchers._
@@ -22,7 +23,7 @@ class SpanSlotAccumulatedLoadSpec extends FeatureSpec with GivenWhenThen {
 
       val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, fixedLoad)
 
-      Then("amplitudePerSlot should contain a vector with a single element")
+      Then("amplitudePerSlot should contain a vector equal to the fixed load")
 
       spanSlotAccumulatedLoad.amplitudePerSlot should equal(rawFixedLoad)
 
@@ -36,21 +37,23 @@ class SpanSlotAccumulatedLoadSpec extends FeatureSpec with GivenWhenThen {
 
       Given("several fixed loads")
 
-      val rawFixedLoad = Vector[Double](1.0, 2.0, 3.0, 4.0, 1.0, 34.0, 50.0, 100000.0)
 
-      val fixedLoad = SpanSlotFixedLoad(0, 0, rawFixedLoad)
+      val fixedLoads = List(
+        SpanSlotFixedLoad(0, 0, Vector[Double](1, 2)),
+        SpanSlotFixedLoad(1, 0, Vector[Double](1, 2)),
+      )
 
       When("a SpanSlotAccumulatedLoad is created")
 
-      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, fixedLoad)
+      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, fixedLoads)
 
-      Then("amplitudePerSlot should contain a vector with multiple elements")
+      Then("amplitudePerSlot should contain a vector equal to the sum of rawFixedLoads")
 
-      spanSlotAccumulatedLoad.amplitudePerSlot should equal(rawFixedLoad)
+      spanSlotAccumulatedLoad.amplitudePerSlot should equal(SeqOps.sum(fixedLoads.toList.map(_.amplitudePerSlot)))
 
       And("span should be equal to the number of fixed loads")
 
-      spanSlotAccumulatedLoad.span should equal(rawFixedLoad.size)
+      spanSlotAccumulatedLoad.span should equal(fixedLoads.size)
 
     }
 
