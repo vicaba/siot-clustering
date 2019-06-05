@@ -17,13 +17,13 @@ object Rescheduler {
 
   }
 
-  def reschedule(acc: SpanSlotAccumulatedLoad, preferredSlots: List[Int] = Nil): SpanSlotAccumulatedLoad = {
+  def reschedule(acc: SpanSlotAccumulatedLoad, preferredSlots: List[Int] = Nil, verbose: Boolean = false): SpanSlotAccumulatedLoad = {
 
     @tailrec
     def _reschedule(_acc: SpanSlotAccumulatedLoad,
                     _remainingFlexibleLoads: List[SpanSlotFlexibleLoad]): SpanSlotAccumulatedLoad =
       _remainingFlexibleLoads match {
-        case x :: xs => _reschedule(rescheduleFlexibleLoad(_acc, x, preferredSlots), xs)
+        case x :: xs => _reschedule(rescheduleFlexibleLoad(_acc, x, preferredSlots, verbose), xs)
         case Nil     => _acc
       }
 
@@ -37,7 +37,8 @@ object Rescheduler {
 
   def rescheduleFlexibleLoad(accumulatedLoad: SpanSlotAccumulatedLoad,
                              flexibleLoad: SpanSlotFlexibleLoad,
-                             preferredSlots: List[Int] = Nil): SpanSlotAccumulatedLoad = {
+                             preferredSlots: List[Int] = Nil,
+                             verbose: Boolean = false): SpanSlotAccumulatedLoad = {
 
     // Used to perform mutable operations
     val temporaryX: SpanSlotAccumulatedLoad = accumulatedLoad.copy()
@@ -50,7 +51,7 @@ object Rescheduler {
     }
 
     var bestMovement: Movement = new Movement(accumulatedLoad += flexibleLoad, flexibleLoad, preferredSlots)
-    //println(s"Trying load ${flexibleLoad.id}, load vector = ${flexibleLoad.amplitudePerSlot.toString()}")
+    if (verbose) println(s"Trying load ${flexibleLoad.id}, load vector = ${flexibleLoad.amplitudePerSlot.toString()}")
     for (i <- accumulatedLoad.positionInT until ((accumulatedLoad.span - flexibleLoad.span) + 1)) {
 
       val flexibleLoadMovement = flexibleLoad.copy(positionInT = i)
@@ -58,15 +59,16 @@ object Rescheduler {
         new Movement(temporaryX -/+= flexibleLoadMovement, flexibleLoadMovement, preferredSlots)
 
 
-      //print(s"\tat position $i -> tempPeak = ${temporaryNewMovement.biasedPeak}, bestPeak = ${bestMovement.biasedPeak}")
+      if (verbose)println(s"\tat position $i -> tempPeak = ${temporaryNewMovement.acc.peak}, bestPeak = ${bestMovement.acc.peak}")
+      if (verbose)println(s"\tat position $i -> tempBiasedPeak = ${temporaryNewMovement.biasedPeak}, bestBiasedPeak = ${bestMovement.biasedPeak}")
 
-      if (temporaryNewMovement.acc.peak < bestMovement.acc.peak) {
-        //println("\tIs best")
+      if (temporaryNewMovement.biasedPeak < bestMovement.biasedPeak) {
+        if (verbose) println("\tIs best")
 
         bestMovement = new Movement(temporaryNewMovement.acc.copy(), temporaryNewMovement.fl, preferredSlots)
 
       } else {
-        //println("\tNot best")
+        if (verbose) println("\tNot best")
       }
 
     }

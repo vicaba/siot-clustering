@@ -59,9 +59,9 @@ case class SpanSlotFlexibleLoad(override val id: Int,
  * @param positionInT
  * @param _loads this parameters is mutable.
  */
-case class SpanSlotAccumulatedLoad private (override val positionInT: Int, private val _loads: mutable.Set[Load]) extends AccumulatedLoad {
+case class SpanSlotAccumulatedLoad private (override val id: Int, override val positionInT: Int, private val _loads: mutable.Set[Load]) extends AccumulatedLoad {
 
-  def copy(loads: Set[Load] = this._loads.toSet): SpanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(positionInT, mutableSetOf(loads))
+  def copy(loads: Set[Load] = this._loads.toSet): SpanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(id, positionInT, mutableSetOf(loads))
 
   def loads: Set[Load] = _loads.toSet
 
@@ -73,8 +73,6 @@ case class SpanSlotAccumulatedLoad private (override val positionInT: Int, priva
 
   def accumulatedLoads: Set[SpanSlotAccumulatedLoad] =
     loads.filter(_.isInstanceOf[SpanSlotAccumulatedLoad]).asInstanceOf[Set[SpanSlotAccumulatedLoad]]
-
-  override def id: Int = positionInT
 
   // Todo: changed
   override def span: Int = Try(loads.map(l => l.span + l.positionInT).max - loads.map(_.positionInT).min).getOrElse(0)
@@ -116,11 +114,11 @@ case class SpanSlotAccumulatedLoad private (override val positionInT: Int, priva
 
 object SpanSlotAccumulatedLoad {
 
-  def apply(positionInT: Int, load: Load): SpanSlotAccumulatedLoad =
-    new SpanSlotAccumulatedLoad(positionInT, new scala.collection.mutable.HashSet[Load]() += load)
+  def apply(id: Int, positionInT: Int, load: Load): SpanSlotAccumulatedLoad =
+    new SpanSlotAccumulatedLoad(id, positionInT, new scala.collection.mutable.HashSet[Load]() += load)
 
-  def apply(positionInT: Int, loads: Traversable[Load]): SpanSlotAccumulatedLoad =
-    new SpanSlotAccumulatedLoad(positionInT, mutableSetOf(loads))
+  def apply(id: Int, positionInT: Int, loads: Traversable[Load]): SpanSlotAccumulatedLoad =
+    new SpanSlotAccumulatedLoad(id, positionInT, mutableSetOf(loads))
 
 }
 

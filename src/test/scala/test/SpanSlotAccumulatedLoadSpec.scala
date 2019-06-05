@@ -21,7 +21,7 @@ class SpanSlotAccumulatedLoadSpec extends FeatureSpec with GivenWhenThen {
 
       When("a SpanSlotAccumulatedLoad is created")
 
-      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, fixedLoad)
+      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, 0, fixedLoad)
 
       Then("amplitudePerSlot should contain a vector equal to the fixed load")
 
@@ -45,7 +45,8 @@ class SpanSlotAccumulatedLoadSpec extends FeatureSpec with GivenWhenThen {
 
       When("a SpanSlotAccumulatedLoad is created")
 
-      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, fixedLoads)
+      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, 0, fixedLoads)
+
 
       Then("amplitudePerSlot should contain a vector equal to the sum of rawFixedLoads")
 
@@ -71,7 +72,7 @@ class SpanSlotAccumulatedLoadSpec extends FeatureSpec with GivenWhenThen {
 
       When("a SpanSlotAccumulatedLoad is created")
 
-      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, flexibleLoad)
+      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, 0, flexibleLoad)
 
       Then("amplitudePerSlot should contain a vector with multiple elements")
 
@@ -96,7 +97,7 @@ class SpanSlotAccumulatedLoadSpec extends FeatureSpec with GivenWhenThen {
 
       When("a SpanSlotAccumulatedLoad is created")
 
-      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, new mutable.HashSet[Load] ++= flexibleLoads)
+      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, 0, new mutable.HashSet[Load] ++= flexibleLoads)
 
       Then("amplitudePerSlot should contain a vector with multiple elements")
 
@@ -128,7 +129,7 @@ class SpanSlotAccumulatedLoadSpec extends FeatureSpec with GivenWhenThen {
 
       When("a SpanSlotAccumulatedLoad is created")
 
-      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, new mutable.HashSet[Load] ++= (fixedLoad :: flexibleLoads))
+      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, 0, new mutable.HashSet[Load] ++= (fixedLoad :: flexibleLoads))
 
       Then("amplitudePerSlot should contain a vector with multiple elements")
 
