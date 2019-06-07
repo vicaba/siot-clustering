@@ -21,7 +21,7 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
       When("the Rescheduler is called")
 
-      val result = Rescheduler.rescheduleFlexibleLoad(spanSlotAccumulatedLoad, flexibleLoad)
+      val result = Rescheduler.rescheduleFlexibleLoad(spanSlotAccumulatedLoad, flexibleLoad, rescheduleType = RescheduleType.MinimizePeak)
 
       Then("nothing should have happened")
 
@@ -46,7 +46,7 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
       When("the Rescheduler is called")
 
-      val result = Rescheduler.rescheduleFlexibleLoad(spanSlotAccumulatedLoad, flexibleLoads(1))
+      val result = Rescheduler.rescheduleFlexibleLoad(spanSlotAccumulatedLoad, flexibleLoads(1), rescheduleType = RescheduleType.MinimizePeak)
 
       Then("nothing should have happened")
 
@@ -70,7 +70,7 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
       When("the Rescheduler is called")
 
-      val result = Rescheduler.reschedule(spanSlotAccumulatedLoad)
+      val result = Rescheduler.reschedule(spanSlotAccumulatedLoad, rescheduleType = RescheduleType.MinimizePeak)
 
       Then("nothing should have happened")
 
@@ -90,7 +90,7 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
       When("the Rescheduler is called")
 
-      val result = Rescheduler.reschedule(spanSlotAccumulatedLoad)
+      val result = Rescheduler.reschedule(spanSlotAccumulatedLoad, rescheduleType = RescheduleType.MinimizePeak)
 
       Then("nothing should have happened")
 
@@ -117,7 +117,7 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
       When("the Rescheduler is called")
 
-      val result = Rescheduler.reschedule(spanSlotAccumulatedLoad)
+      val result = Rescheduler.reschedule(spanSlotAccumulatedLoad, rescheduleType = RescheduleType.MinimizePeak)
 
       Then("nothing should have happened")
 

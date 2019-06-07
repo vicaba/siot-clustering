@@ -1,62 +1,142 @@
 package test
 
-import org.scalatest.{FeatureSpec, GivenWhenThen}
+import org.scalatest._
 import Load._
 import metrics.Metric
+import test.RescheduleType.RescheduleType
 
-class BenchmarkSpec extends FeatureSpec with GivenWhenThen {
+class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
   feature("Benchmark between the input PAR and the output PAR of the two alternatives (with and without prefered slots per user)") {
-    scenario("Simple case") {
-      val users = getUsers
+    scenario("3 slots with 3 users and a flexible load each") {
+      val users: List[SpanSlotAccumulatedLoad] = List(
+        SpanSlotAccumulatedLoad(100, 0, List(
+          SpanSlotFixedLoad(101, 0, Vector(2, 4, 1)),
+          SpanSlotFlexibleLoad(151, 0, Vector(3))
+        )),
 
-      println(s"IN total PAR = ${Metric.par(SpanSlotAccumulatedLoad(-1, 0, users))}")
-      val maxNumOfSlots = users.flatMap(_.loads.map(_.amplitudePerSlot.size)).max
-      val usersPreferedSlots = UserAllocator.allocate(users = users, numOfSlots = maxNumOfSlots, slotsWindowSize = 1)
+        SpanSlotAccumulatedLoad(200, 0, List(
+          SpanSlotFixedLoad(201, 0, Vector(2, 4, 1)),
+          SpanSlotFlexibleLoad(251, 0, Vector(3))
+        )),
 
-      var resultsWithoutPreferedSlots: List[SpanSlotAccumulatedLoad] = List()
-      var resultsWithPreferedSlots: List[SpanSlotAccumulatedLoad] = List()
+        SpanSlotAccumulatedLoad(300, 0, List(
+          SpanSlotFixedLoad(301, 0, Vector(2, 4, 1)),
+          SpanSlotFlexibleLoad(351, 0, Vector(3))
+        ))
+      )
 
-      for (i <- users.indices) {
-        val user = users(i)
-        val userPreferedSlots = usersPreferedSlots(i)
+      val expectedTotalLoad: List[Vector[Double]] = List(
+        Vector[Double](12, 12, 6),
+        Vector[Double](6, 12, 12),
+        Vector[Double](9, 12, 9)
+      )
 
-        println(s"\tUser ${user.id}")
-        println(s"\t\tIN PAR = ${Metric.par(user)}")
-        println(s"\t\tPrefred slots -> ${userPreferedSlots.toString()}")
+      executeTest(
+        users,
+        expectedTotalLoad,
+        RescheduleType.MinimizeMeanDistance,
+        testVerbose = false,
+        schedulerVerbose = false,
+        printLoads = false
+      )
+    }
 
-        val resultWithoutPreferedSlots = Rescheduler.reschedule(user)
-        resultsWithoutPreferedSlots = resultWithoutPreferedSlots :: resultsWithoutPreferedSlots
-        println(s"\t\tOUT (without prefered slots) PAR = ${Metric.par(resultWithoutPreferedSlots)}, flex pos -> ${userFlexibleLoadsPositionToString(resultWithoutPreferedSlots)}")
+    scenario("All the same") {
+      val users: List[SpanSlotAccumulatedLoad] = List(
+        SpanSlotAccumulatedLoad(100, 0, List(
+          SpanSlotFixedLoad(101, 0, Vector(1, 1, 1)),
+          SpanSlotFlexibleLoad(151, 0, Vector(1, 1, 1))
+        )),
 
-        val resultWithPreferedSlots = Rescheduler.reschedule(user, userPreferedSlots, verbose = false)
-        resultsWithPreferedSlots = resultWithPreferedSlots :: resultsWithPreferedSlots
-        println(s"\t\tOUT (with prefered slots) PAR = ${Metric.par(resultWithPreferedSlots)}, flex pos -> ${userFlexibleLoadsPositionToString(resultWithPreferedSlots)}")
-      }
+        SpanSlotAccumulatedLoad(200, 0, List(
+          SpanSlotFixedLoad(201, 0, Vector(1, 1, 1)),
+          SpanSlotFlexibleLoad(251, 0, Vector(1, 1, 1))
+        ))
+      )
 
-      println(s"OUT total (without prefered slots) PAR = ${Metric.par(SpanSlotAccumulatedLoad(-2, 0, resultsWithoutPreferedSlots))}")
-      println(s"OUT total (with prefered slots) PAR = ${Metric.par(SpanSlotAccumulatedLoad(-3, 0, resultsWithPreferedSlots))}")
+      val expectedTotalLoad: List[Vector[Double]] = List(
+        Vector[Double](4, 4, 4)
+      )
+
+      executeTest(
+        users,
+        expectedTotalLoad,
+        RescheduleType.MinimizeMeanDistance,
+        testVerbose = false,
+        schedulerVerbose = false,
+        printLoads = false
+      )
+    }
+
+    scenario("With a gap, 2 users with 1 flexible load each to the middle") {
+      val users: List[SpanSlotAccumulatedLoad] = List(
+        SpanSlotAccumulatedLoad(100, 0, List(
+          SpanSlotFixedLoad(101, 0, Vector(4, 0, 4)),
+          SpanSlotFlexibleLoad(151, 0, Vector(3))
+        )),
+
+        SpanSlotAccumulatedLoad(200, 0, List(
+          SpanSlotFixedLoad(201, 0, Vector(4, 0, 4)),
+          SpanSlotFlexibleLoad(251, 0, Vector(3))
+        ))
+      )
+
+      val expectedTotalLoad: List[Vector[Double]] = List(
+        Vector[Double](8, 6, 8)
+      )
+
+      executeTest(
+        users,
+        expectedTotalLoad,
+        RescheduleType.MinimizeMeanDistance,
+        testVerbose = false,
+        schedulerVerbose = false,
+        printLoads = false
+      )
+    }
+
+    scenario("With a gap, 2 users with 1 flexible load, the highest to the middle the other to one of the sides") {
+      val users: List[SpanSlotAccumulatedLoad] = List(
+        SpanSlotAccumulatedLoad(100, 0, List(
+          SpanSlotFixedLoad(101, 0, Vector(4, 0, 4)),
+          SpanSlotFlexibleLoad(151, 0, Vector(11))
+        )),
+
+        SpanSlotAccumulatedLoad(200, 0, List(
+          SpanSlotFixedLoad(201, 0, Vector(4, 0, 4)),
+          SpanSlotFlexibleLoad(251, 0, Vector(12))
+        ))
+      )
+
+      val expectedTotalLoad: List[Vector[Double]] = List(
+        Vector[Double](19, 12, 8),
+        Vector[Double](8, 12, 19),
+      )
+
+      executeTest(
+        users,
+        expectedTotalLoad,
+        RescheduleType.MinimizeMeanDistance,
+        testVerbose = false,
+        schedulerVerbose = false,
+        printLoads = false
+      )
     }
   }
 
-  def getUsers: List[SpanSlotAccumulatedLoad] = {
-    val usersSimulation: List[SpanSlotAccumulatedLoad] = List(
-      SpanSlotAccumulatedLoad(100, 0, List(
-        SpanSlotFixedLoad(101, 0, Vector(1, 4, 1)),
-        SpanSlotFlexibleLoad(151, 0, Vector(2))
-      )),
 
-      SpanSlotAccumulatedLoad(200, 0, List(
-        SpanSlotFixedLoad(201, 0, Vector(1, 4, 1)),
-        SpanSlotFlexibleLoad(251, 0, Vector(2))
-      )),
 
-      SpanSlotAccumulatedLoad(300, 0, List(
-        SpanSlotFixedLoad(301, 0, Vector(1, 4, 1)),
-        SpanSlotFlexibleLoad(351, 0, Vector(2))
-      ))
-    )
+  def loadInSlots(load: Load, fromSlot: Int, toSlot: Int): List[String] = {
+    val inSlot = "-"
+    val outSlot = ""
 
-    usersSimulation
+    var strings: List[String] = List()
+    for (i <- fromSlot to toSlot) {
+      if (i >= load.positionInT && i < (load.positionInT + load.span)) strings = inSlot :: strings
+      else strings = outSlot :: strings
+    }
+
+    strings.reverse
   }
 
   def userFlexibleLoadsPositionToString(user: SpanSlotAccumulatedLoad): String = {
@@ -64,4 +144,137 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen {
 
     flexLoadsPosition.toString()
   }
+
+  def executeTest(
+                   users: List[SpanSlotAccumulatedLoad],
+                   expectedTotalLoad: List[Vector[Double]],
+                   rescheduleType: RescheduleType,
+                   printLoads: Boolean = false,
+                   testVerbose: Boolean = false,
+                   schedulerVerbose: Boolean = false
+                 ): Unit = {
+    val initialPar = computePar(users)
+
+    if (testVerbose) info(s"IN total PAR = $initialPar")
+
+    val (resultsWithoutPriority, resultsWithPriority, usersPreferedSlots) = executeBenchmark(users, RescheduleType.MinimizeMeanDistance, schedulerVerbose)
+
+    for (i <- users.indices) {
+      val user = users(i)
+      val userPreferedSlots = usersPreferedSlots(i)
+      val resultWithoutPriority = resultsWithoutPriority(i)
+      val userParWithoutPriority = computePar(resultWithoutPriority)
+      val resultWithPriority = resultsWithPriority(i)
+      val userParWithPriority = computePar(resultWithPriority)
+
+      val fromSlot = user.positionInT
+      val toSlot = user.positionInT + user.span - 1
+
+      val userInitialTable = new TableList("load_id" :: (fromSlot to toSlot).map(_.toString).toList)
+      for (load <- user.loads.toList.sortBy(_.id)) {
+        userInitialTable.addRow(load.id.toString :: loadInSlots(load, fromSlot, toSlot))
+      }
+      val userTableWithoutPriority = new TableList("load_id" :: (fromSlot to toSlot).map(_.toString).toList)
+      for (load <- resultWithoutPriority.loads.toList.sortBy(_.id)) {
+        userTableWithoutPriority.addRow(load.id.toString :: loadInSlots(load, fromSlot, toSlot))
+      }
+      val userTableWithPriority = new TableList("load_id" :: (fromSlot to toSlot).map(_.toString).toList)
+      for (load <- resultWithPriority.loads.toList.sortBy(_.id)) {
+        userTableWithPriority.addRow(load.id.toString :: loadInSlots(load, fromSlot, toSlot))
+      }
+      if (printLoads) println(s"User ${user.id} | Prefered slots -> ${preferedSlotsToString(userPreferedSlots)}")
+      if (printLoads) println(s"\tInitial | PAR = ${computePar(user)}")
+      if (printLoads) userInitialTable.print(1)
+      if (printLoads) println(s"\tOutput without priority | PAR = $userParWithoutPriority")
+      if (printLoads) userTableWithoutPriority.print(1)
+      if (printLoads) println(s"\tOutput with priority | PAR = $userParWithPriority")
+      if (printLoads) userTableWithPriority.print(1)
+      if (printLoads)  println()
+    }
+
+    val accumulatedLoadWithoutPriority = SpanSlotAccumulatedLoad(-1, 0, resultsWithoutPriority)
+    val accumulatedLoadWithPriority = SpanSlotAccumulatedLoad(-1, 0, resultsWithPriority)
+
+    if (testVerbose)  info(accumulatedLoadWithPriority.amplitudePerSlot.toString())
+
+    expectedTotalLoad match {
+      case Nil =>
+      case x :: Nil => accumulatedLoadWithPriority.amplitudePerSlot shouldBe x
+      case x :: y :: Nil => List(accumulatedLoadWithPriority.amplitudePerSlot) should contain oneOf(x, y)
+      case x :: y :: xs =>  List(accumulatedLoadWithPriority.amplitudePerSlot) should contain oneOf (x, y, xs:_*)
+    }
+
+    val outputParWithoutPriority = computePar(resultsWithoutPriority)
+    if (testVerbose) info(s"OUT total (without priority) PAR = $outputParWithoutPriority")
+
+    val outputParWithPriority = computePar(resultsWithPriority)
+    if (testVerbose) info(s"OUT total (with priority) PAR = $outputParWithPriority")
+
+
+    val initialAccumulated = SpanSlotAccumulatedLoad(-1, 0, users)
+    val initialTotalTable = new TableList("load_id" :: (initialAccumulated.positionInT until (initialAccumulated.positionInT + initialAccumulated.span)).map(_.toString).toList)
+    for (load <- users.flatMap(_.loads).sortBy(_.id)) {
+      initialTotalTable.addRow(load.id.toString :: loadInSlots(load, initialAccumulated.positionInT, initialAccumulated.positionInT + initialAccumulated.span - 1))
+    }
+    val totalTableWithoutPriority = new TableList("load_id" :: (accumulatedLoadWithoutPriority.positionInT until (accumulatedLoadWithoutPriority.positionInT + accumulatedLoadWithoutPriority.span)).map(_.toString).toList)
+    for (load <- resultsWithoutPriority.flatMap(_.loads).sortBy(_.id)) {
+      totalTableWithoutPriority.addRow(load.id.toString :: loadInSlots(load, accumulatedLoadWithoutPriority.positionInT, accumulatedLoadWithoutPriority.positionInT + accumulatedLoadWithoutPriority.span - 1))
+    }
+    val totalTableWithPriority = new TableList("load_id" :: (accumulatedLoadWithPriority.positionInT until (accumulatedLoadWithPriority.positionInT + accumulatedLoadWithPriority.span)).map(_.toString).toList)
+    for (load <- resultsWithPriority.flatMap(_.loads).sortBy(_.id)) {
+      totalTableWithPriority.addRow(load.id.toString :: loadInSlots(load, accumulatedLoadWithPriority.positionInT, accumulatedLoadWithPriority.positionInT + accumulatedLoadWithPriority.span - 1))
+    }
+
+    if (printLoads) println(s"Average load per user = ${users.map(_.totalEnergy).sum / SpanSlotAccumulatedLoad(-1, 0, users).span / users.size}")
+    if (printLoads) println(s"Initial total loads | PAR = $initialPar")
+    if (printLoads) initialTotalTable.print(1)
+    if (printLoads) println(s"Output total loads without priority | PAR = $outputParWithoutPriority")
+    if (printLoads) totalTableWithoutPriority.print(1)
+    if (printLoads) println(s"Output total loads with priority | PAR = $outputParWithPriority")
+    if (printLoads) totalTableWithPriority.print(1)
+    if (printLoads)  println()
+
+  }
+
+  def preferedSlotsToString(preferedSlots: List[Int]): String = {
+    val sb = StringBuilder.newBuilder
+
+    for (i <- preferedSlots.indices) {
+      if (i != 0) sb.append(", ")
+      sb.append(preferedSlots(i).toString)
+    }
+
+    sb.toString
+  }
+
+  def executeBenchmark(
+                        users: List[SpanSlotAccumulatedLoad],
+                        rescheduleType: RescheduleType,
+                        verbose: Boolean = false
+                      ): (List[SpanSlotAccumulatedLoad], List[SpanSlotAccumulatedLoad], List[List[Int]]) = {
+    val numOfSlots = SpanSlotAccumulatedLoad(-1, 0, users).span
+    val usersPreferedSlots = UserAllocator.allocate(users = users, numOfSlots = numOfSlots, slotsWindowSize = 1)
+
+    var resultsWithoutPreferedSlots: List[SpanSlotAccumulatedLoad] = List()
+    var resultsWithPreferedSlots: List[SpanSlotAccumulatedLoad] = List()
+
+    val referenceAverage = users.map(_.totalEnergy).sum / numOfSlots / users.size
+    //info(s"Reference average = $referenceAverage")
+
+    for (i <- users.indices) {
+      val user = users(i)
+      val userPreferedSlots = usersPreferedSlots(i)
+
+      val resultWithoutPreferedSlots = Rescheduler.reschedule(user, rescheduleType = RescheduleType.MinimizeMeanDistance, referenceAverage = referenceAverage)
+      resultsWithoutPreferedSlots = resultWithoutPreferedSlots :: resultsWithoutPreferedSlots
+
+      val resultWithPreferedSlots = Rescheduler.reschedule(user, userPreferedSlots,rescheduleType = RescheduleType.MinimizeMeanDistance,  referenceAverage = referenceAverage, verbose = verbose)
+      resultsWithPreferedSlots = resultWithPreferedSlots :: resultsWithPreferedSlots
+    }
+
+    (resultsWithoutPreferedSlots.reverse, resultsWithPreferedSlots.reverse, usersPreferedSlots)
+  }
+
+  def computePar(loads: Iterable[Load]): Double =  Metric.par(SpanSlotAccumulatedLoad(-1, 0, loads))
+  def computePar(load: Load): Double =  Metric.par(SpanSlotAccumulatedLoad(-1, 0, load))
 }

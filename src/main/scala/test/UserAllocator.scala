@@ -28,7 +28,7 @@ object UserAllocator {
     val fixedLoads = users.flatMap(_.fixedLoads)
     val accumulatedLoads = SpanSlotAccumulatedLoad(0, users.flatMap(_.loads).map(_.positionInT).min, fixedLoads ::: usersAsFlexibleLoads)
 
-    val result = Rescheduler.reschedule(accumulatedLoads)
+    val result = Rescheduler.reschedule(accumulatedLoads, rescheduleType = RescheduleType.MinimizePeak)
 
     var usersPreferedSlots: List[List[Int]] = List()
     for (userId <- users.map(_.id)) {
