@@ -43,6 +43,8 @@ object UserAllocator {
       }
     }
 
-    usersPreferedSlots
+    println(usersPreferedSlots.reverse)
+
+    usersPreferedSlots.reverse
   }
 }

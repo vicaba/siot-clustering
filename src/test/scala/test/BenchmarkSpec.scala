@@ -5,6 +5,8 @@ import Load._
 import metrics.Metric
 import test.RescheduleType.RescheduleType
 
+import scala.util.Try
+
 class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
   feature("Benchmark between the input PAR and the output PAR of the two alternatives (with and without prefered slots per user)") {
     scenario("3 slots with 3 users and a flexible load each") {
@@ -119,12 +121,53 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
         RescheduleType.MinimizeMeanDistance,
         testVerbose = false,
         schedulerVerbose = false,
+        printLoads = true
+      )
+    }
+
+    scenario("6 slots with some low loads in between, 3 users") {
+      val users: List[SpanSlotAccumulatedLoad] = List(
+        SpanSlotAccumulatedLoad(100, 0, List(
+          SpanSlotFixedLoad(101, 0, Vector(3, 3, 3, 0, 1, 2)),
+          SpanSlotFlexibleLoad(151, 0, Vector(2, 3))
+        )),
+
+        SpanSlotAccumulatedLoad(200, 0, List(
+          SpanSlotFixedLoad(201, 0, Vector(3, 1, 0, 5, 2, 1)),
+          SpanSlotFlexibleLoad(251, 0, Vector(5, 3))
+        )),
+
+        SpanSlotAccumulatedLoad(300, 0, List(
+          SpanSlotFixedLoad(301, 0, Vector(2, 0, 4, 5, 3, 1)),
+          SpanSlotFlexibleLoad(351, 0, Vector(4, 4))
+        ))
+      )
+
+      val expectedTotalLoad: List[Vector[Double]] = List(
+        Vector[Double](19, 12, 8),
+        Vector[Double](8, 12, 19),
+      )
+
+      executeTest(
+        users,
+        expectedTotalLoad,
+        RescheduleType.MinimizeMeanDistance,
+        testVerbose = false,
+        schedulerVerbose = false,
         printLoads = false
       )
     }
   }
 
 
+
+  def loadPerSlot(load: Load): List[String] = {
+    var strings: List[String] = List()
+    for (amplitude <- load.amplitudePerSlot) {
+      strings = amplitude.toString :: strings
+    }
+    strings
+  }
 
   def loadInSlots(load: Load, fromSlot: Int, toSlot: Int): List[String] = {
     val inSlot = "-"
@@ -174,14 +217,17 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
       for (load <- user.loads.toList.sortBy(_.id)) {
         userInitialTable.addRow(load.id.toString :: loadInSlots(load, fromSlot, toSlot))
       }
+      userInitialTable.addRow("total_load" :: user.amplitudePerSlot.toList.map(_.toString))
       val userTableWithoutPriority = new TableList("load_id" :: (fromSlot to toSlot).map(_.toString).toList)
       for (load <- resultWithoutPriority.loads.toList.sortBy(_.id)) {
         userTableWithoutPriority.addRow(load.id.toString :: loadInSlots(load, fromSlot, toSlot))
       }
+      userTableWithoutPriority.addRow("total_load" :: resultWithoutPriority.amplitudePerSlot.toList.map(_.toString))
       val userTableWithPriority = new TableList("load_id" :: (fromSlot to toSlot).map(_.toString).toList)
       for (load <- resultWithPriority.loads.toList.sortBy(_.id)) {
         userTableWithPriority.addRow(load.id.toString :: loadInSlots(load, fromSlot, toSlot))
       }
+      userTableWithPriority.addRow("total_load" :: resultWithPriority.amplitudePerSlot.toList.map(_.toString))
       if (printLoads) println(s"User ${user.id} | Prefered slots -> ${preferedSlotsToString(userPreferedSlots)}")
       if (printLoads) println(s"\tInitial | PAR = ${computePar(user)}")
       if (printLoads) userInitialTable.print(1)
@@ -197,13 +243,6 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
 
     if (testVerbose)  info(accumulatedLoadWithPriority.amplitudePerSlot.toString())
 
-    expectedTotalLoad match {
-      case Nil =>
-      case x :: Nil => accumulatedLoadWithPriority.amplitudePerSlot shouldBe x
-      case x :: y :: Nil => List(accumulatedLoadWithPriority.amplitudePerSlot) should contain oneOf(x, y)
-      case x :: y :: xs =>  List(accumulatedLoadWithPriority.amplitudePerSlot) should contain oneOf (x, y, xs:_*)
-    }
-
     val outputParWithoutPriority = computePar(resultsWithoutPriority)
     if (testVerbose) info(s"OUT total (without priority) PAR = $outputParWithoutPriority")
 
@@ -216,14 +255,17 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
     for (load <- users.flatMap(_.loads).sortBy(_.id)) {
       initialTotalTable.addRow(load.id.toString :: loadInSlots(load, initialAccumulated.positionInT, initialAccumulated.positionInT + initialAccumulated.span - 1))
     }
+    initialTotalTable.addRow("total_load" :: initialAccumulated.amplitudePerSlot.toList.map(_.toString))
     val totalTableWithoutPriority = new TableList("load_id" :: (accumulatedLoadWithoutPriority.positionInT until (accumulatedLoadWithoutPriority.positionInT + accumulatedLoadWithoutPriority.span)).map(_.toString).toList)
     for (load <- resultsWithoutPriority.flatMap(_.loads).sortBy(_.id)) {
       totalTableWithoutPriority.addRow(load.id.toString :: loadInSlots(load, accumulatedLoadWithoutPriority.positionInT, accumulatedLoadWithoutPriority.positionInT + accumulatedLoadWithoutPriority.span - 1))
     }
+    totalTableWithoutPriority.addRow("total_load" :: accumulatedLoadWithoutPriority.amplitudePerSlot.toList.map(_.toString))
     val totalTableWithPriority = new TableList("load_id" :: (accumulatedLoadWithPriority.positionInT until (accumulatedLoadWithPriority.positionInT + accumulatedLoadWithPriority.span)).map(_.toString).toList)
     for (load <- resultsWithPriority.flatMap(_.loads).sortBy(_.id)) {
       totalTableWithPriority.addRow(load.id.toString :: loadInSlots(load, accumulatedLoadWithPriority.positionInT, accumulatedLoadWithPriority.positionInT + accumulatedLoadWithPriority.span - 1))
     }
+    totalTableWithPriority.addRow("total_load" :: accumulatedLoadWithPriority.amplitudePerSlot.toList.map(_.toString))
 
     if (printLoads) println(s"Average load per user = ${users.map(_.totalEnergy).sum / SpanSlotAccumulatedLoad(-1, 0, users).span / users.size}")
     if (printLoads) println(s"Initial total loads | PAR = $initialPar")
@@ -234,6 +276,12 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
     if (printLoads) totalTableWithPriority.print(1)
     if (printLoads)  println()
 
+    expectedTotalLoad match {
+      case Nil =>
+      case x :: Nil => accumulatedLoadWithPriority.amplitudePerSlot shouldBe x
+      case x :: y :: Nil => List(accumulatedLoadWithPriority.amplitudePerSlot) should contain oneOf(x, y)
+      case x :: y :: xs =>  List(accumulatedLoadWithPriority.amplitudePerSlot) should contain oneOf (x, y, xs:_*)
+    }
   }
 
   def preferedSlotsToString(preferedSlots: List[Int]): String = {
@@ -253,7 +301,10 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
                         verbose: Boolean = false
                       ): (List[SpanSlotAccumulatedLoad], List[SpanSlotAccumulatedLoad], List[List[Int]]) = {
     val numOfSlots = SpanSlotAccumulatedLoad(-1, 0, users).span
-    val usersPreferedSlots = UserAllocator.allocate(users = users, numOfSlots = numOfSlots, slotsWindowSize = 1)
+    val flexibleLoads = users.flatMap(_.flexibleLoads)
+    val slotsWindowSize = Try(flexibleLoads.map(_.span).sum / flexibleLoads.size).getOrElse(1)
+    info(s"Num of slots = $numOfSlots, SlotsWindowSize = $slotsWindowSize")
+    val usersPreferedSlots = UserAllocator.allocate(users = users, numOfSlots = numOfSlots, slotsWindowSize = slotsWindowSize)
 
     var resultsWithoutPreferedSlots: List[SpanSlotAccumulatedLoad] = List()
     var resultsWithPreferedSlots: List[SpanSlotAccumulatedLoad] = List()

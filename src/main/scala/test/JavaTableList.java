@@ -54,7 +54,7 @@ public class JavaTableList {
         this.aligns = new EnumAlignment[columns];
         this.comparator = null;
         for (int i = 0; i < aligns.length; i++) {
-            aligns[i] = EnumAlignment.LEFT;
+            aligns[i] = EnumAlignment.CENTER;
         }
     }
 
