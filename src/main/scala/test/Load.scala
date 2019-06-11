@@ -120,6 +120,9 @@ object SpanSlotAccumulatedLoad {
   def apply(id: Int, positionInT: Int, loads: Traversable[Load]): SpanSlotAccumulatedLoad =
     new SpanSlotAccumulatedLoad(id, positionInT, mutableSetOf(loads))
 
+  def keepLoadOrder(id: Int, positionInT: Int, loads: Traversable[Load]): SpanSlotAccumulatedLoad =
+    new SpanSlotAccumulatedLoad(id, positionInT, orderedMutableSetOf(loads))
+
 }
 
 object Load {

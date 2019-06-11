@@ -28,7 +28,7 @@ object UserAllocator {
     val fixedLoads = sortedUsers.flatMap(_.fixedLoads)
 
     val accumulatedLoads =
-      SpanSlotAccumulatedLoad(0, sortedUsers.flatMap(_.loads).map(_.positionInT).min, fixedLoads ::: usersAsFlexibleLoads)
+      SpanSlotAccumulatedLoad.keepLoadOrder(0, sortedUsers.flatMap(_.loads).map(_.positionInT).min, fixedLoads ::: usersAsFlexibleLoads)
     println(accumulatedLoads.flexibleLoads.map(_.id))
 
     val result = Rescheduler.reschedule(accumulatedLoads, rescheduleType = RescheduleType.MinimizePeak)
