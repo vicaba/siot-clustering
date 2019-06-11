@@ -99,12 +99,12 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
 
     scenario("With a gap, 2 users with 1 flexible load, the highest to the middle the other to one of the sides") {
       val users: List[SpanSlotAccumulatedLoad] = List(
-        SpanSlotAccumulatedLoad(100, 0, List(
+        SpanSlotAccumulatedLoad(500, 0, List(
           SpanSlotFixedLoad(101, 0, Vector(4, 0, 4)),
           SpanSlotFlexibleLoad(151, 0, Vector(11))
         )),
 
-        SpanSlotAccumulatedLoad(200, 0, List(
+        SpanSlotAccumulatedLoad(600, 0, List(
           SpanSlotFixedLoad(201, 0, Vector(4, 0, 4)),
           SpanSlotFlexibleLoad(251, 0, Vector(12))
         ))

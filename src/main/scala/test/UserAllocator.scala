@@ -1,14 +1,13 @@
 package test
 
-class UserAllocator {
-
-}
+class UserAllocator {}
 
 object UserAllocator {
   def allocate(users: List[SpanSlotAccumulatedLoad], numOfSlots: Int, slotsWindowSize: Int): List[List[Int]] = {
     var usersAsFlexibleLoads: List[SpanSlotFlexibleLoad] = List()
 
-    for (user <- users) {
+    val sortedUsers = users.sortBy(_.flexibleLoads.toList.map(_.totalEnergy).sum).reverse
+    for (user <- sortedUsers) {
       //TODO: arreglar esto, ya funciona pero es un poco feo
       val rawUserFlexibleLoad = {
         var sum = 0.0
@@ -24,9 +23,13 @@ object UserAllocator {
 
       usersAsFlexibleLoads = SpanSlotFlexibleLoad(user.id, 0, flexibleLoadVector) :: usersAsFlexibleLoads
     }
+    usersAsFlexibleLoads = usersAsFlexibleLoads.reverse
 
-    val fixedLoads = users.flatMap(_.fixedLoads)
-    val accumulatedLoads = SpanSlotAccumulatedLoad(0, users.flatMap(_.loads).map(_.positionInT).min, fixedLoads ::: usersAsFlexibleLoads)
+    val fixedLoads = sortedUsers.flatMap(_.fixedLoads)
+
+    val accumulatedLoads =
+      SpanSlotAccumulatedLoad(0, sortedUsers.flatMap(_.loads).map(_.positionInT).min, fixedLoads ::: usersAsFlexibleLoads)
+    println(accumulatedLoads.flexibleLoads.map(_.id))
 
     val result = Rescheduler.reschedule(accumulatedLoads, rescheduleType = RescheduleType.MinimizePeak)
 
@@ -43,7 +46,6 @@ object UserAllocator {
       }
     }
 
-    println(usersPreferedSlots.reverse)
 
     usersPreferedSlots.reverse
   }

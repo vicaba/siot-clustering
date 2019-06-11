@@ -43,6 +43,7 @@ object Rescheduler {
                              referenceAverage: Double = 0.0,
                              verbose: Boolean = false): SpanSlotAccumulatedLoad = {
 
+    println(s"Rescheduling load ${flexibleLoad.id}")
     // Used to perform mutable operations
     val temporaryX: SpanSlotAccumulatedLoad = accumulatedLoad.copy()
 
