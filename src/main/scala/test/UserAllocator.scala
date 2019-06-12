@@ -9,6 +9,8 @@ object UserAllocator {
     val sortedUsers = users.sortBy(_.flexibleLoads.toList.map(_.totalEnergy).sum).reverse
     for (user <- sortedUsers) {
       //TODO: arreglar esto, ya funciona pero es un poco feo
+      // val rawUserFlexibleLoad2 = user.flexibleLoads.foldLeft(0.0)(_ + _.amplitudePerSlot.sum)
+
       val rawUserFlexibleLoad = {
         var sum = 0.0
         for (flexibleLoad <- user.flexibleLoads) {
