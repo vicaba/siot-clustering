@@ -112,7 +112,7 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
 
       val expectedTotalLoad: List[Vector[Double]] = List(
         Vector[Double](19, 12, 8),
-        Vector[Double](8, 12, 19),
+        Vector[Double](8, 12, 19)
       )
 
       executeTest(
@@ -121,7 +121,7 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
         RescheduleType.MinimizeMeanDistance,
         testVerbose = false,
         schedulerVerbose = false,
-        printLoads = true
+        printLoads = false
       )
     }
 
@@ -144,8 +144,8 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
       )
 
       val expectedTotalLoad: List[Vector[Double]] = List(
-        Vector[Double](19, 12, 8),
-        Vector[Double](8, 12, 19),
+        Vector[Double](10, 12, 10, 10, 8),
+        Vector[Double](8, 9, 10, 12, 11)
       )
 
       executeTest(
@@ -153,8 +153,8 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
         expectedTotalLoad,
         RescheduleType.MinimizeMeanDistance,
         testVerbose = false,
-        schedulerVerbose = false,
-        printLoads = false
+        schedulerVerbose = true,
+        printLoads = true
       )
     }
   }
@@ -303,7 +303,7 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
     val numOfSlots = SpanSlotAccumulatedLoad(-1, 0, users).span
     val flexibleLoads = users.flatMap(_.flexibleLoads)
     val slotsWindowSize = Try(flexibleLoads.map(_.span).sum / flexibleLoads.size).getOrElse(1)
-    info(s"Num of slots = $numOfSlots, SlotsWindowSize = $slotsWindowSize")
+    println(s"Num of slots = $numOfSlots, SlotsWindowSize = $slotsWindowSize")
     val usersPreferedSlots = UserAllocator.allocate(users = users, numOfSlots = numOfSlots, slotsWindowSize = slotsWindowSize)
 
     var resultsWithoutPreferedSlots: List[SpanSlotAccumulatedLoad] = List()

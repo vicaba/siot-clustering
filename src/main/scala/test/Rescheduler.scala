@@ -43,7 +43,6 @@ object Rescheduler {
                              referenceAverage: Double = 0.0,
                              verbose: Boolean = false): SpanSlotAccumulatedLoad = {
 
-    println(s"Rescheduling load ${flexibleLoad.id}")
     // Used to perform mutable operations
     val temporaryX: SpanSlotAccumulatedLoad = accumulatedLoad.copy()
 
@@ -89,12 +88,8 @@ object Rescheduler {
         (temporaryNewMovement.acc.peak, bestMovement.acc.peak)
 
       case test.RescheduleType.MinimizeMeanDistance =>
-        val tempSlotsWithPriority = computeSlotsWithPriority(temporaryNewMovement.fl, preferedSlots)
-        val bestSlotsWithPriority = computeSlotsWithPriority(bestMovement.fl, preferedSlots)
-
-
-        (computeAverageDistanceMetric2(referenceAverage, temporaryNewMovement, preferedSlots),
-          computeAverageDistanceMetric2(referenceAverage, bestMovement, preferedSlots))
+        (computeAverageDistanceMetric(referenceAverage, temporaryNewMovement, preferedSlots),
+          computeAverageDistanceMetric(referenceAverage, bestMovement, preferedSlots))
         /*(computeAverageDistanceMetric(referenceAverage, computeAverageAtLoadPosition(temporaryNewMovement.acc, temporaryNewMovement.fl), tempSlotsWithPriority),
           computeAverageDistanceMetric(referenceAverage, computeAverageAtLoadPosition(bestMovement.acc, bestMovement.fl), bestSlotsWithPriority))*/
 
@@ -107,20 +102,39 @@ object Rescheduler {
 
   def computeSlotsWithPriority(load: Load, preferedSlots: List[Int]): Double = {
     val howManySlots = (load.positionInT until (load.positionInT + load.span)).count(p => preferedSlots.contains(p))
+    //println(s"howManySlots = $howManySlots, size = ${preferedSlots.size}")
 
-    if (preferedSlots.isEmpty) 0
-    else howManySlots / preferedSlots.size
+    if (preferedSlots.isEmpty) 0.0
+    else howManySlots.toDouble / preferedSlots.size.toDouble
   }
 
-  def computeAverageDistanceMetric2(referenceAverage: Double, movement: Movement, preferedSlots: List[Int], bias: Double = 0.5): Double = {
+  def computeAverageDistanceMetric2(referenceAverage: Double, movement: Movement, preferedSlots: List[Int], bias: Double = 0.50): Double = {
     val actualAverage = computeBiasedAverageAtLoadPosition(movement.acc, movement.fl, preferedSlots, bias)
-    val distance = Math.pow(Math.abs(referenceAverage - actualAverage), 1)
+
+    val distance = Math.pow(Math.abs(referenceAverage - actualAverage), 2)
 
     distance
+    /*var distance = 0.0
+    val p = 1
+
+    val flexLoad = movement.fl
+
+    for (i <- flexLoad.positionInT until (flexLoad.positionInT + flexLoad.span)) {
+      distance += Math.pow(Math.abs(referenceAverage - movement.acc.amplitudePerSlot(i)), p) * (1 - bias)
+    }
+
+    Math.pow(distance, 1 / p) * (1 - bias)*/
   }
 
-  def computeAverageDistanceMetric(referenceAverage: Double, actualAverage: Double, slotsWithPriority: Double, bias: Double = 0.65): Double = {
+  def computeAverageDistanceMetric(referenceAverage: Double, movement: Movement, preferedSlots: List[Int], bias: Double = 0.50): Double = {
+    val acc = movement.acc
+    val flexibleLoad = movement.fl
+
+    val actualAverage = computeAverageAtLoadPosition(acc, flexibleLoad)
+    val slotsWithPriority = computeSlotsWithPriority(flexibleLoad, preferedSlots)
+
     val distance = Math.pow(Math.abs(referenceAverage - actualAverage), 1)
+    println(s"average_ref = $referenceAverage, bias = $bias, slotsWithPriority = $slotsWithPriority")
 
     distance * (1 - bias * slotsWithPriority)
   }
