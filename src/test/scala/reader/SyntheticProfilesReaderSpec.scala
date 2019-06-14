@@ -3,7 +3,7 @@ package reader
 import org.scalatest.FlatSpec
 import test.SpanSlotAccumulatedLoad
 
-::import scala.io.Source
+import scala.io.Source
 import scala.util.Try
 
 class SyntheticProfilesReaderSpec extends FlatSpec {
