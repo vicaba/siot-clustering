@@ -15,6 +15,8 @@ sealed trait Load {
 
   def id: Int
 
+  val label = ""
+
   override def equals(obj: Any): Boolean = obj match {
     case s: Load => s.id == this.id && this.getClass == s.getClass
     case _       => false
@@ -38,7 +40,7 @@ sealed trait AccumulatedLoad extends Load
 
 case class SpanSlotFixedLoad(override val id: Int,
                              override val positionInT: Int,
-                             override val amplitudePerSlot: Vector[Double])
+                             override val amplitudePerSlot: Vector[Double], override val label: String = "")
     extends SingleLoad {
   override def span: Int           = amplitudePerSlot.size
   override def totalEnergy: Double = amplitudePerSlot.foldLeft(0.0)((accum, a) => accum + a)
@@ -46,7 +48,7 @@ case class SpanSlotFixedLoad(override val id: Int,
 
 case class SpanSlotFlexibleLoad(override val id: Int,
                                 override val positionInT: Int,
-                                override val amplitudePerSlot: Vector[Double])
+                                override val amplitudePerSlot: Vector[Double], override val label: String = "")
     extends SingleLoad {
   override val span: Int           = amplitudePerSlot.size
   override def totalEnergy: Double = amplitudePerSlot.foldLeft(0.0)((accum, a) => accum + a)
@@ -59,7 +61,7 @@ case class SpanSlotFlexibleLoad(override val id: Int,
  * @param positionInT
  * @param _loads this parameters is mutable.
  */
-case class SpanSlotAccumulatedLoad private (override val id: Int, override val positionInT: Int, private val _loads: mutable.Set[Load]) extends AccumulatedLoad {
+case class SpanSlotAccumulatedLoad private (override val id: Int, override val positionInT: Int, private val _loads: mutable.Set[Load], override val label: String = "") extends AccumulatedLoad {
 
   def copy(loads: Set[Load] = this._loads.toSet): SpanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(id, positionInT, mutableSetOf(loads))
 

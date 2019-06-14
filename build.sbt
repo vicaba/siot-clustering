@@ -7,6 +7,8 @@ version := "0.1"
 
 scalaVersion := "2.12.8"
 
+resourceDirectory in Test := baseDirectory.value / "test-resources"
+
 enablePlugins(JavaAppPackaging)
 
 lazy val deployTask = TaskKey[Unit]("deploy", "Copies assembly jar to remote location")
