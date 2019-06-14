@@ -40,7 +40,8 @@ sealed trait AccumulatedLoad extends Load
 
 case class SpanSlotFixedLoad(override val id: Int,
                              override val positionInT: Int,
-                             override val amplitudePerSlot: Vector[Double], override val label: String = "")
+                             override val amplitudePerSlot: Vector[Double],
+                             override val label: String = "")
     extends SingleLoad {
   override def span: Int           = amplitudePerSlot.size
   override def totalEnergy: Double = amplitudePerSlot.foldLeft(0.0)((accum, a) => accum + a)
@@ -48,22 +49,28 @@ case class SpanSlotFixedLoad(override val id: Int,
 
 case class SpanSlotFlexibleLoad(override val id: Int,
                                 override val positionInT: Int,
-                                override val amplitudePerSlot: Vector[Double], override val label: String = "")
+                                override val amplitudePerSlot: Vector[Double],
+                                override val label: String = "")
     extends SingleLoad {
   override val span: Int           = amplitudePerSlot.size
   override def totalEnergy: Double = amplitudePerSlot.foldLeft(0.0)((accum, a) => accum + a)
 }
 
 /**
-*
- * This is a mutable class.
- *
- * @param positionInT
- * @param _loads this parameters is mutable.
- */
-case class SpanSlotAccumulatedLoad private (override val id: Int, override val positionInT: Int, private val _loads: mutable.Set[Load], override val label: String = "") extends AccumulatedLoad {
+  *
+  * This is a mutable class.
+  *
+  * @param positionInT
+  * @param _loads this parameters is mutable.
+  */
+case class SpanSlotAccumulatedLoad private (override val id: Int,
+                                            override val positionInT: Int,
+                                            private val _loads: mutable.Set[Load],
+                                            override val label: String = "")
+    extends AccumulatedLoad {
 
-  def copy(loads: Set[Load] = this._loads.toSet): SpanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(id, positionInT, mutableSetOf(loads))
+  def copy(loads: Set[Load] = this._loads.toSet): SpanSlotAccumulatedLoad =
+    SpanSlotAccumulatedLoad(id, positionInT, mutableSetOf(loads))
 
   def loads: Set[Load] = _loads.toSet
 
@@ -145,7 +152,7 @@ object Load {
 
   implicit def toVector[X <: Load]: DenseVectorReprOps[X] = new DenseVectorReprOps[X] {
 
-    override def apply(t: X): DenseVector[Double] = DenseVector(t.amplitudePerSlot:_*)
+    override def apply(t: X): DenseVector[Double] = DenseVector(t.amplitudePerSlot: _*)
 
     override def zero(t: X): DenseVector[Double] = DenseVector((for (_ <- 1 to t.span) yield 0.0): _*)
 

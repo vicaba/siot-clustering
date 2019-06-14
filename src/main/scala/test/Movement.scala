@@ -1,6 +1,9 @@
 package test
 
-class Movement(val acc: SpanSlotAccumulatedLoad, val fl: SpanSlotFlexibleLoad, preferredSlots: List[Int], bias: Double = 0.2)  {
+class Movement(val acc: SpanSlotAccumulatedLoad,
+               val fl: SpanSlotFlexibleLoad,
+               preferredSlots: List[Int],
+               bias: Double = 0.2) {
   lazy val biasedPeak: Double = {
     val flRange = for (i <- fl.positionInT until (fl.positionInT + fl.span)) yield i
     if (flRange.forall(preferredSlots.contains(_))) {
@@ -11,7 +14,6 @@ class Movement(val acc: SpanSlotAccumulatedLoad, val fl: SpanSlotFlexibleLoad, p
       //println(s"\tAccMean = $accMean, AccPeak = ${acc.peak}, Bias = $newBias")
       acc.peak - acc.peak * newBias
       acc.peak - (acc.peak * bias)
-    }
-    else acc.peak
+    } else acc.peak
   }
 }
