@@ -88,7 +88,7 @@ object Rescheduler {
 
   }
 
-  private def computeMetrics(rescheduleType: RescheduleType,
+  def computeMetrics(rescheduleType: RescheduleType,
                              referenceAverage: Double,
                              bestMovement: Movement,
                              temporaryNewMovement: Movement,
