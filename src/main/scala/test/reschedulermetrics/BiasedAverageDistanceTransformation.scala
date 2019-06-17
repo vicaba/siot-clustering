@@ -1,6 +1,5 @@
 package test.reschedulermetrics
-import test.Rescheduler.{computeAverageAtLoadPosition, computeSlotsWithPriority}
-import test.{Movement, Rescheduler}
+import test.{Load, Movement, SpanSlotAccumulatedLoad}
 
 class BiasedAverageDistanceTransformation(val bias: Double = 0.50) extends MetricTransformation {
 
@@ -22,6 +21,23 @@ class BiasedAverageDistanceTransformation(val bias: Double = 0.50) extends Metri
     println(s"average_ref = $referenceAverage, bias = $bias, slotsWithPriority = $slotsWithPriority")
 
     distance * (1 - bias * slotsWithPriority)
+  }
+
+  private def computeSlotsWithPriority(load: Load, preferedSlots: List[Int]): Double = {
+    val howManySlots = (load.positionInT until (load.positionInT + load.span)).count(p => preferedSlots.contains(p))
+    //println(s"howManySlots = $howManySlots, size = ${preferedSlots.size}")
+
+    if (preferedSlots.isEmpty) 0.0
+    else howManySlots.toDouble / preferedSlots.size.toDouble
+  }
+
+  private def computeAverageAtLoadPosition(accumulatedLoad: SpanSlotAccumulatedLoad, load: Load): Double = {
+    val fromSlot  = load.positionInT
+    val untilSlot = load.positionInT + load.span
+
+    val average = accumulatedLoad.amplitudePerSlot.slice(fromSlot, untilSlot).sum / load.span
+
+    average
   }
 
 }

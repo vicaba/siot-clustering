@@ -75,7 +75,7 @@ object Rescheduler {
       if (verbose) println(s"\t\tbestMetric = $bestMetric, peak = ${bestMovement.acc.peak}")
       if (verbose) print(s"\t\ttempMetric = $temporaryMetric, peak = ${temporaryNewMovement.acc.peak}")
 
-      if (temporaryMetric < bestMetric) {
+       if (temporaryMetric < bestMetric) {
         if (verbose) println(" - Is best")
 
         bestMovement = new Movement(temporaryNewMovement.acc.copy(), temporaryNewMovement.fl, preferredSlots)
@@ -89,46 +89,7 @@ object Rescheduler {
 
   }
 
-  def computeSlotsWithPriority(load: Load, preferedSlots: List[Int]): Double = {
-    val howManySlots = (load.positionInT until (load.positionInT + load.span)).count(p => preferedSlots.contains(p))
-    //println(s"howManySlots = $howManySlots, size = ${preferedSlots.size}")
-
-    if (preferedSlots.isEmpty) 0.0
-    else howManySlots.toDouble / preferedSlots.size.toDouble
-  }
-
-  def computeBiasedAverageAtLoadPosition(accumulatedLoad: SpanSlotAccumulatedLoad,
-                                         load: Load,
-                                         preferedSlots: List[Int],
-                                         bias: Double): Double = {
-    val fromSlot  = load.positionInT
-    val untilSlot = load.positionInT + load.span
-
-    var sum = 0.0
-    for (i <- fromSlot until untilSlot) {
-      val amplitude = accumulatedLoad.amplitudePerSlot(i)
-      val biasedAmplitude = {
-        if (preferedSlots.contains(i)) amplitude * bias
-        else amplitude
-      }
-      sum += biasedAmplitude
-    }
-
-    val average = sum / load.span
-
-    average
-  }
-
-  def computeAverageAtLoadPosition(accumulatedLoad: SpanSlotAccumulatedLoad, load: Load): Double = {
-    val fromSlot  = load.positionInT
-    val untilSlot = load.positionInT + load.span
-
-    val average = accumulatedLoad.amplitudePerSlot.slice(fromSlot, untilSlot).sum / load.span
-
-    average
-  }
-
-  def isLoadOnPreferedSlots(load: Load, preferedSlots: List[Int]): Boolean = {
+  def isLoadOnPreferredSlots(load: Load, preferedSlots: List[Int]): Boolean = {
     val flRange = for (i <- load.positionInT until (load.positionInT + load.span)) yield i
 
     flRange.forall(preferedSlots.contains(_))

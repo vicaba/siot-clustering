@@ -1,6 +1,5 @@
 package test.reschedulermetrics
-import test.Rescheduler.computeBiasedAverageAtLoadPosition
-import test.{Movement, Rescheduler}
+import test.{Load, Movement, SpanSlotAccumulatedLoad}
 
 object AverageDistanceTransformation extends MetricTransformation {
   override def apply(referenceAverage: Double, bestMovement: Movement, temporaryMovement: Movement, preferredSlots: List[Int]): (Double, Double) =
@@ -27,5 +26,28 @@ object AverageDistanceTransformation extends MetricTransformation {
 
     Math.pow(distance, 1 / p) * (1 - bias)*/
   }
+
+  private def computeBiasedAverageAtLoadPosition(accumulatedLoad: SpanSlotAccumulatedLoad,
+                                         load: Load,
+                                         preferedSlots: List[Int],
+                                         bias: Double): Double = {
+    val fromSlot  = load.positionInT
+    val untilSlot = load.positionInT + load.span
+
+    var sum = 0.0
+    for (i <- fromSlot until untilSlot) {
+      val amplitude = accumulatedLoad.amplitudePerSlot(i)
+      val biasedAmplitude = {
+        if (preferedSlots.contains(i)) amplitude * bias
+        else amplitude
+      }
+      sum += biasedAmplitude
+    }
+
+    val average = sum / load.span
+
+    average
+  }
+
 
 }
