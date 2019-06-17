@@ -13,7 +13,7 @@ class SyntheticProfilesReaderSpec extends FlatSpec {
   val LightingOutputFileName   = "lighting_output.csv"
   val MaxProfiles              = 1
 
-  def rawRead(l: SpanSlotAccumulatedLoad, totalsFile: String, windowSize: Int): Vector[Double] = {
+  def readRawHeadRow(l: SpanSlotAccumulatedLoad, totalsFile: String, windowSize: Int): Vector[Double] = {
 
     val source = Source.fromFile(totalsFile)
 
@@ -27,18 +27,21 @@ class SyntheticProfilesReaderSpec extends FlatSpec {
     }
   }
 
-  val subFoldersAndIds: List[(String, Int)] = List((0 + "/", 0))
+  "The first SpanSlotAccumulatedLoad.amplitudePerSlot" should "be equal to the windowed first line of the file" in {
+    val subFoldersAndIds: List[(String, Int)] = List((0 + "/", 0))
 
-  val res = SyntheticProflesReader(MainFolder,
-                         subFoldersAndIds.map(_._1),
-                         AppliancesOutputFileName,
-                         LightingOutputFileName,
-                         subFoldersAndIds.map(_._2), windowSize = 60)
+    val res = SyntheticProflesReader(MainFolder,
+      subFoldersAndIds.map(_._1),
+      AppliancesOutputFileName,
+      LightingOutputFileName,
+      subFoldersAndIds.map(_._2), windowSize = 60)
 
 
-  val rawRead: Vector[Double] = rawRead(res.head, MainFolder + "0/" + "totals.csv", windowSize = 60)
+    val rawRead: Vector[Double] = readRawHeadRow(res.head, MainFolder + "0/" + "totals.csv", windowSize = 60)
 
-  assert(rawRead.head == res.head.amplitudePerSlot.head, s"${rawRead.head} was not equal to ${res.head.amplitudePerSlot.head}")
+    assert(rawRead.head == res.head.amplitudePerSlot.head, s"${rawRead.head} was not equal to ${res.head.amplitudePerSlot.head}")
+  }
+
 
 
 }
