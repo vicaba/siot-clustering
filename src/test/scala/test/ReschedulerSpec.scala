@@ -4,6 +4,7 @@ import org.scalatest._
 import collection.CollecctionHelper._
 import metrics.Metric
 import org.scalatest.Matchers._
+import test.reschedulermetrics.NoTransformation
 
 class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
@@ -21,7 +22,7 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
       When("the Rescheduler is called")
 
-      val result = Rescheduler.rescheduleFlexibleLoad(spanSlotAccumulatedLoad, flexibleLoad, rescheduleType = RescheduleType.MinimizePeak)
+      val result = Rescheduler.rescheduleFlexibleLoad(spanSlotAccumulatedLoad, flexibleLoad, metricTransformation = NoTransformation)
 
       Then("nothing should have happened")
 
@@ -46,7 +47,7 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
       When("the Rescheduler is called")
 
-      val result = Rescheduler.rescheduleFlexibleLoad(spanSlotAccumulatedLoad, flexibleLoads(1), rescheduleType = RescheduleType.MinimizePeak)
+      val result = Rescheduler.rescheduleFlexibleLoad(spanSlotAccumulatedLoad, flexibleLoads(1), metricTransformation = NoTransformation)
 
       Then("nothing should have happened")
 
@@ -70,7 +71,7 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
       When("the Rescheduler is called")
 
-      val result = Rescheduler.reschedule(spanSlotAccumulatedLoad, rescheduleType = RescheduleType.MinimizePeak)
+      val result = Rescheduler.reschedule(spanSlotAccumulatedLoad, metricTransformation = NoTransformation)
 
       Then("nothing should have happened")
 
@@ -90,7 +91,7 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
       When("the Rescheduler is called")
 
-      val result = Rescheduler.reschedule(spanSlotAccumulatedLoad, rescheduleType = RescheduleType.MinimizePeak)
+      val result = Rescheduler.reschedule(spanSlotAccumulatedLoad, metricTransformation = NoTransformation)
 
       Then("nothing should have happened")
 
@@ -117,7 +118,7 @@ class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
 
       When("the Rescheduler is called")
 
-      val result = Rescheduler.reschedule(spanSlotAccumulatedLoad, rescheduleType = RescheduleType.MinimizePeak)
+      val result = Rescheduler.reschedule(spanSlotAccumulatedLoad, metricTransformation = NoTransformation)
 
       Then("nothing should have happened")
 

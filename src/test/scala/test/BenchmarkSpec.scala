@@ -4,10 +4,14 @@ import org.scalatest._
 import Load._
 import metrics.Metric
 import test.RescheduleType.RescheduleType
+import test.reschedulermetrics.BiasedAverageDistanceTransformation
 
 import scala.util.Try
 
 class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
+
+  val metricTransformation = new BiasedAverageDistanceTransformation()
+
   feature("Benchmark between the input PAR and the output PAR of the two alternatives (with and without prefered slots per user)") {
     scenario("3 slots with 3 users and a flexible load each") {
       val users: List[SpanSlotAccumulatedLoad] = List(
@@ -316,10 +320,10 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
       val user = users(i)
       val userPreferedSlots = usersPreferedSlots(i)
 
-      val resultWithoutPreferedSlots = Rescheduler.reschedule(user, rescheduleType = RescheduleType.MinimizeMeanDistance, referenceAverage = referenceAverage)
+      val resultWithoutPreferedSlots = Rescheduler.reschedule(user, metricTransformation = metricTransformation, referenceAverage = referenceAverage)
       resultsWithoutPreferedSlots = resultWithoutPreferedSlots :: resultsWithoutPreferedSlots
 
-      val resultWithPreferedSlots = Rescheduler.reschedule(user, userPreferedSlots,rescheduleType = RescheduleType.MinimizeMeanDistance,  referenceAverage = referenceAverage, verbose = verbose)
+      val resultWithPreferedSlots = Rescheduler.reschedule(user, userPreferedSlots, metricTransformation = metricTransformation,  referenceAverage = referenceAverage, verbose = verbose)
       resultsWithPreferedSlots = resultWithPreferedSlots :: resultsWithPreferedSlots
     }
 

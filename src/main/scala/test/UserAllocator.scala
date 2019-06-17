@@ -1,5 +1,7 @@
 package test
 
+import test.reschedulermetrics.NoTransformation
+
 class UserAllocator {}
 
 object UserAllocator {
@@ -34,7 +36,7 @@ object UserAllocator {
                                             sortedUsers.flatMap(_.loads).map(_.positionInT).min,
                                             fixedLoads ::: usersAsFlexibleLoads)
 
-    val result = Rescheduler.reschedule(accumulatedLoads, rescheduleType = RescheduleType.MinimizePeak)
+    val result = Rescheduler.reschedule(accumulatedLoads, metricTransformation = NoTransformation)
 
     var usersPreferedSlots: List[List[Int]] = List()
     for (userId <- users.map(_.id)) {

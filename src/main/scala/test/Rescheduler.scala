@@ -1,6 +1,7 @@
 package test
 
 import test.RescheduleType.RescheduleType
+import test.reschedulermetrics.{BiasedAverageDistanceTransformation, BiasedPeakTransformation, MetricTransformation, NoTransformation}
 
 import scala.annotation.tailrec
 
@@ -20,7 +21,7 @@ object Rescheduler {
 
   def reschedule(acc: SpanSlotAccumulatedLoad,
                  preferredSlots: List[Int] = Nil,
-                 rescheduleType: RescheduleType,
+                 metricTransformation: MetricTransformation,
                  referenceAverage: Double = 0.0,
                  verbose: Boolean = false): SpanSlotAccumulatedLoad = {
 
@@ -29,7 +30,7 @@ object Rescheduler {
                     _remainingFlexibleLoads: List[SpanSlotFlexibleLoad]): SpanSlotAccumulatedLoad =
       _remainingFlexibleLoads match {
         case x :: xs =>
-          _reschedule(rescheduleFlexibleLoad(_acc, x, preferredSlots, rescheduleType, referenceAverage, verbose), xs)
+          _reschedule(rescheduleFlexibleLoad(_acc, x, preferredSlots, metricTransformation, referenceAverage, verbose), xs)
         case Nil => _acc
       }
 
@@ -44,7 +45,7 @@ object Rescheduler {
   def rescheduleFlexibleLoad(accumulatedLoad: SpanSlotAccumulatedLoad,
                              flexibleLoad: SpanSlotFlexibleLoad,
                              preferredSlots: List[Int] = Nil,
-                             rescheduleType: RescheduleType,
+                             metricTransformation: MetricTransformation,
                              referenceAverage: Double = 0.0,
                              verbose: Boolean = false): SpanSlotAccumulatedLoad = {
 
@@ -69,7 +70,7 @@ object Rescheduler {
         new Movement(temporaryX -/+= flexibleLoadMovement, flexibleLoadMovement, preferredSlots)
 
       val (temporaryMetric, bestMetric) =
-        computeMetrics(rescheduleType, referenceAverage, bestMovement, temporaryNewMovement, preferredSlots)
+        computeMetricsRefactor(metricTransformation, referenceAverage, bestMovement, temporaryNewMovement, preferredSlots)
 
       if (verbose) println(s"\t\tbestMetric = $bestMetric, peak = ${bestMovement.acc.peak}")
       if (verbose) print(s"\t\ttempMetric = $temporaryMetric, peak = ${temporaryNewMovement.acc.peak}")
@@ -88,11 +89,25 @@ object Rescheduler {
 
   }
 
-  def computeMetrics(rescheduleType: RescheduleType,
+  def computeMetricsRefactor(t: MetricTransformation,
                              referenceAverage: Double,
                              bestMovement: Movement,
-                             temporaryNewMovement: Movement,
-                             preferedSlots: List[Int]) = {
+                             temporaryMovement: Movement,
+                             preferredSlots: List[Int]): (Double, Double) =
+    t(referenceAverage, bestMovement, temporaryMovement, preferredSlots)
+
+  def rescheduleTypeToMetricTransformation(r: RescheduleType) = r match {
+    case test.RescheduleType.MinimizePeak => NoTransformation
+    case test.RescheduleType.MinimizeMeanDistance => new BiasedAverageDistanceTransformation()
+    case test.RescheduleType.BiasedPeak => new BiasedPeakTransformation()
+    case _ => NoTransformation
+  }
+
+  def computeMetrics(rescheduleType: RescheduleType,
+                     referenceAverage: Double,
+                     bestMovement: Movement,
+                     temporaryNewMovement: Movement,
+                     preferedSlots: List[Int]) = {
     rescheduleType match {
       case test.RescheduleType.MinimizePeak =>
         (temporaryNewMovement.acc.peak, bestMovement.acc.peak)
