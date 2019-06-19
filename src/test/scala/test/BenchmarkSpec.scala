@@ -4,7 +4,7 @@ import org.scalatest._
 import Load._
 import metrics.Metric
 import test.RescheduleType.RescheduleType
-import test.reschedulermetrics.BiasedAverageDistanceTransformation
+import test.reschedulermetrics.{BiasedAverageDistanceTransformation, MetricTransformation}
 
 import scala.util.Try
 
@@ -40,7 +40,7 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
       executeTest(
         users,
         expectedTotalLoad,
-        RescheduleType.MinimizeMeanDistance,
+        metricTransformation,
         testVerbose = false,
         schedulerVerbose = false,
         printLoads = false
@@ -67,7 +67,7 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
       executeTest(
         users,
         expectedTotalLoad,
-        RescheduleType.MinimizeMeanDistance,
+        metricTransformation,
         testVerbose = false,
         schedulerVerbose = false,
         printLoads = false
@@ -94,7 +94,7 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
       executeTest(
         users,
         expectedTotalLoad,
-        RescheduleType.MinimizeMeanDistance,
+        metricTransformation,
         testVerbose = false,
         schedulerVerbose = false,
         printLoads = false
@@ -122,7 +122,7 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
       executeTest(
         users,
         expectedTotalLoad,
-        RescheduleType.MinimizeMeanDistance,
+        metricTransformation,
         testVerbose = false,
         schedulerVerbose = false,
         printLoads = false
@@ -155,7 +155,7 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
       executeTest(
         users,
         expectedTotalLoad,
-        RescheduleType.MinimizeMeanDistance,
+        metricTransformation,
         testVerbose = false,
         schedulerVerbose = true,
         printLoads = true
@@ -195,7 +195,7 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
   def executeTest(
                    users: List[SpanSlotAccumulatedLoad],
                    expectedTotalLoad: List[Vector[Double]],
-                   rescheduleType: RescheduleType,
+                   metricTransformation: MetricTransformation,
                    printLoads: Boolean = false,
                    testVerbose: Boolean = false,
                    schedulerVerbose: Boolean = false
@@ -204,7 +204,7 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
 
     if (testVerbose) info(s"IN total PAR = $initialPar")
 
-    val (resultsWithoutPriority, resultsWithPriority, usersPreferedSlots) = executeBenchmark(users, RescheduleType.MinimizeMeanDistance, schedulerVerbose)
+    val (resultsWithoutPriority, resultsWithPriority, usersPreferedSlots) = executeBenchmark(users, metricTransformation, schedulerVerbose)
 
     for (i <- users.indices) {
       val user = users(i)
@@ -301,7 +301,7 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
 
   def executeBenchmark(
                         users: List[SpanSlotAccumulatedLoad],
-                        rescheduleType: RescheduleType,
+                        metricTransformation: MetricTransformation,
                         verbose: Boolean = false
                       ): (List[SpanSlotAccumulatedLoad], List[SpanSlotAccumulatedLoad], List[List[Int]]) = {
     val numOfSlots = SpanSlotAccumulatedLoad(-1, 0, users).span
