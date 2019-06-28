@@ -2,6 +2,7 @@ package reader
 
 import test.{SingleLoad, SpanSlotAccumulatedLoad, SpanSlotFixedLoad, SpanSlotFlexibleLoad}
 
+import scala.annotation.tailrec
 import scala.collection.immutable
 import scala.io.Source
 import scala.util.{Random, Try}
@@ -81,18 +82,29 @@ object SyntheticProflesReader {
 
   }
 
-  def partitionSpanSlotFlexibleLoad(idC: Int, fl: SpanSlotFlexibleLoad, partitionBy: Double => Boolean): Unit = {
-
-    val positionInT = 0
+  //TODO: Needs testing
+  def partitionSpanSlotFlexibleLoad(idC: Int, fl: SpanSlotFlexibleLoad, partitionBy: Double => Boolean): Vector[SpanSlotFlexibleLoad] = {
 
     val amplitudePerSlot = fl.amplitudePerSlot
 
-    val (extracted, remainingWithZeroes) = amplitudePerSlot.partition(partitionBy)
-    val newPositionInT = positionInT + extracted.size
-    val newSpanSlotFlexibleLoad = SpanSlotFlexibleLoad(idC, newPositionInT, extracted)
-    val (consecutiveZeroes, remainingInfo) = remainingWithZeroes.partition(partitionBy)
+    @tailrec
+    def rec(remainingAmplitude: Vector[Double],
+            positionInT: Int,
+            accId: Int,
+            accLoads: Vector[SpanSlotFlexibleLoad]): Vector[SpanSlotFlexibleLoad] =
+      if (remainingAmplitude.isEmpty) accLoads
+      else {
+        val (extracted, remainingAmplitudeWithLeadingZeros)  = remainingAmplitude.partition(partitionBy)
+        val newPositionInT                                   = positionInT + extracted.size
+        val newSpanSlotFlexibleLoad                          = SpanSlotFlexibleLoad(idC, newPositionInT, extracted)
+        val (leadingConsecutiveZeroes, remainingInformation) = remainingAmplitudeWithLeadingZeros.partition(partitionBy)
+        rec(remainingInformation,
+            positionInT + extracted.size + leadingConsecutiveZeroes.size,
+            accId + 1,
+            newSpanSlotFlexibleLoad +: accLoads)
+      }
 
-
+    rec(fl.amplitudePerSlot, fl.positionInT, idC, Vector())
 
   }
 
