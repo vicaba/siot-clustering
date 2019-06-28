@@ -81,6 +81,21 @@ object SyntheticProflesReader {
 
   }
 
+  def partitionSpanSlotFlexibleLoad(idC: Int, fl: SpanSlotFlexibleLoad, partitionBy: Double => Boolean): Unit = {
+
+    val positionInT = 0
+
+    val amplitudePerSlot = fl.amplitudePerSlot
+
+    val (extracted, remainingWithZeroes) = amplitudePerSlot.partition(partitionBy)
+    val newPositionInT = positionInT + extracted.size
+    val newSpanSlotFlexibleLoad = SpanSlotFlexibleLoad(idC, newPositionInT, extracted)
+    val (consecutiveZeroes, remainingInfo) = remainingWithZeroes.partition(partitionBy)
+
+
+
+  }
+
   /**
     *
     * Reads files applianceOutputFileName, lightingOutputFileName for each profile.
