@@ -378,6 +378,7 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
     }
 
     BenchmarkResult(res.map(_._1), res.map(_._2), schedulerPreferredSlots)
+
   }
 
   def computePar(loads: Iterable[Load]): Double = Metric.par(SpanSlotAccumulatedLoad(-1, 0, loads))
