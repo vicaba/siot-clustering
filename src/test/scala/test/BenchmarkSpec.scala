@@ -200,6 +200,7 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
                    testVerbose: Boolean = false,
                    schedulerVerbose: Boolean = false
                  ): Unit = {
+
     val initialPar = computePar(users)
 
     if (testVerbose) info(s"IN total PAR = $initialPar")
@@ -304,30 +305,31 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
                         metricTransformation: MetricTransformation,
                         verbose: Boolean = false
                       ): (List[SpanSlotAccumulatedLoad], List[SpanSlotAccumulatedLoad], List[List[Int]]) = {
-    val numOfSlots = SpanSlotAccumulatedLoad(-1, 0, users).span
-    val flexibleLoads = users.flatMap(_.flexibleLoads)
-    val slotsWindowSize = Try(flexibleLoads.map(_.span).sum / flexibleLoads.size).getOrElse(1)
-    println(s"Num of slots = $numOfSlots, SlotsWindowSize = $slotsWindowSize")
-    val usersPreferedSlots = UserAllocator.allocate(users = users, numOfSlots = numOfSlots, slotsWindowSize = slotsWindowSize)
+
+    val numberOfSlots = SpanSlotAccumulatedLoad(-1, 0, users).span
+    val allFlexibleLoads = users.flatMap(_.flexibleLoads)
+    val windowSize = Try(allFlexibleLoads.map(_.span).sum / allFlexibleLoads.size).getOrElse(1)
+    println(s"Num of slots = $numberOfSlots, SlotsWindowSize = $windowSize")
+    val schedulingPreferredSlots = UserAllocator.allocate(users = users, numOfSlots = numberOfSlots, slotsWindowSize = windowSize)
 
     var resultsWithoutPreferedSlots: List[SpanSlotAccumulatedLoad] = List()
     var resultsWithPreferedSlots: List[SpanSlotAccumulatedLoad] = List()
 
-    val referenceAverage = users.map(_.totalEnergy).sum / numOfSlots / users.size
+    val referenceAverage = users.map(_.totalEnergy).sum / numberOfSlots / users.size
     //info(s"Reference average = $referenceAverage")
 
     for (i <- users.indices) {
       val user = users(i)
-      val userPreferedSlots = usersPreferedSlots(i)
+      val schedulingPreferredSlotsForUser = schedulingPreferredSlots(i)
 
       val resultWithoutPreferedSlots = Rescheduler.reschedule(user, metricTransformation = metricTransformation, referenceAverage = referenceAverage)
       resultsWithoutPreferedSlots = resultWithoutPreferedSlots :: resultsWithoutPreferedSlots
 
-      val resultWithPreferedSlots = Rescheduler.reschedule(user, userPreferedSlots, metricTransformation = metricTransformation,  referenceAverage = referenceAverage, verbose = verbose)
+      val resultWithPreferedSlots = Rescheduler.reschedule(user, schedulingPreferredSlotsForUser, metricTransformation = metricTransformation,  referenceAverage = referenceAverage, verbose = verbose)
       resultsWithPreferedSlots = resultWithPreferedSlots :: resultsWithPreferedSlots
     }
 
-    (resultsWithoutPreferedSlots.reverse, resultsWithPreferedSlots.reverse, usersPreferedSlots)
+    (resultsWithoutPreferedSlots.reverse, resultsWithPreferedSlots.reverse, schedulingPreferredSlots)
   }
 
   def computePar(loads: Iterable[Load]): Double =  Metric.par(SpanSlotAccumulatedLoad(-1, 0, loads))
