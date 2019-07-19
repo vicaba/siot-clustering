@@ -310,7 +310,7 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
     val allFlexibleLoads = users.flatMap(_.flexibleLoads)
     val windowSize = Try(allFlexibleLoads.map(_.span).sum / allFlexibleLoads.size).getOrElse(1)
     println(s"Num of slots = $numberOfSlots, SlotsWindowSize = $windowSize")
-    val schedulerPreferredSlots = UserAllocator.allocate(users = users, numOfSlots = numberOfSlots, windowSize = windowSize)
+    val schedulerPreferredSlots = UserAllocator.allocate(users = users, numberOfSlots = numberOfSlots, windowSize = windowSize)
 
     var resultsWithoutPreferedSlots: List[SpanSlotAccumulatedLoad] = List()
     var resultsWithPreferedSlots: List[SpanSlotAccumulatedLoad] = List()
@@ -318,6 +318,7 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
     val referenceAverage = users.map(_.totalEnergy).sum / numberOfSlots / users.size
     //info(s"Reference average = $referenceAverage")
 
+    // TODO: It seems like the order of users is assumed to be the same
     for (i <- users.indices) {
       val user = users(i)
       val schedulingPreferredSlotsForUser = schedulerPreferredSlots(i)

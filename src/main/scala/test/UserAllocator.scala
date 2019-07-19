@@ -2,11 +2,18 @@ package test
 
 import test.reschedulermetrics.NoTransformation
 
-class UserAllocator {}
-
 object UserAllocator {
 
-  def allocate(users: List[SpanSlotAccumulatedLoad], numOfSlots: Int, windowSize: Int): List[List[Int]] = {
+  /**
+   * Allocates users along the complete timespan. The algorithm "transforms" each user as a flexible load of windowSize and
+   * consumption per slot flexibleLoad.totalEnergy / windowSize. Then it uses the rescheduler to assign each user to the best timeslots.+
+   *
+   * @param users
+   * @param numberOfSlots
+   * @param windowSize
+   * @return A list in the same order as users with schedulerPreferredTimeSlots per each user as an inner List[Int]
+   */
+  def allocate(users: List[SpanSlotAccumulatedLoad], numberOfSlots: Int, windowSize: Int): List[List[Int]] = {
 
     val sortedUsers = users.sortBy(_.flexibleLoads.toList.map(_.totalEnergy).sum).reverse
 
@@ -28,18 +35,19 @@ object UserAllocator {
     val accumulatedLoads =
       SpanSlotAccumulatedLoad.keepLoadOrder(0, lowestPositionInT, fixedLoads ::: usersAsFlexibleLoads)
 
-    val result = Rescheduler.reschedule(accumulatedLoads, metricTransformation = NoTransformation)
+    val allocationResult = Rescheduler.reschedule(accumulatedLoads, metricTransformation = NoTransformation)
 
-    val schedulerPreferredSlotsForEachUser: List[List[Int]] = for {
-      userId <- users.map(_.id)
-      userAsFlexibleLoad <- result.flexibleLoads
+    // Reorder per "users" input
+    // TODO: This can be optimized
+    val orderedAllocationResult = for {
+      userId             <- users.map(_.id)
+      userAsFlexibleLoad <- allocationResult.flexibleLoads
       if userId == userAsFlexibleLoad.id
-    } yield {
-      val userPreferredSlots = (for (i <- userAsFlexibleLoad.positionInT until (userAsFlexibleLoad.positionInT + windowSize)) yield i).toList
-      userPreferredSlots
-    }
+    } yield userAsFlexibleLoad
 
-    schedulerPreferredSlotsForEachUser
+    orderedAllocationResult.map { userAsFlexibleLoad =>
+      (for (i <- userAsFlexibleLoad.positionInT until (userAsFlexibleLoad.positionInT + windowSize)) yield i).toList
+    }
 
   }
 }
