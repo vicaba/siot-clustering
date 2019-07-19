@@ -41,9 +41,9 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
         users,
         expectedTotalLoad,
         metricTransformation,
-        testVerbose = false,
-        schedulerVerbose = false,
-        printLoads = false
+        testVerbose = true,
+        schedulerVerbose = true,
+        printLoads = true
       )
     }
 
@@ -68,9 +68,9 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
         users,
         expectedTotalLoad,
         metricTransformation,
-        testVerbose = false,
-        schedulerVerbose = false,
-        printLoads = false
+        testVerbose = true,
+        schedulerVerbose = true,
+        printLoads = true
       )
     }
 
@@ -95,9 +95,9 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
         users,
         expectedTotalLoad,
         metricTransformation,
-        testVerbose = false,
-        schedulerVerbose = false,
-        printLoads = false
+        testVerbose = true,
+        schedulerVerbose = true,
+        printLoads = true
       )
     }
 
@@ -123,9 +123,9 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
         users,
         expectedTotalLoad,
         metricTransformation,
-        testVerbose = false,
-        schedulerVerbose = false,
-        printLoads = false
+        testVerbose = true,
+        schedulerVerbose = true,
+        printLoads = true
       )
     }
 
@@ -156,7 +156,7 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
         users,
         expectedTotalLoad,
         metricTransformation,
-        testVerbose = false,
+        testVerbose = true,
         schedulerVerbose = true,
         printLoads = true
       )
@@ -310,7 +310,7 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
     val allFlexibleLoads = users.flatMap(_.flexibleLoads)
     val windowSize = Try(allFlexibleLoads.map(_.span).sum / allFlexibleLoads.size).getOrElse(1)
     println(s"Num of slots = $numberOfSlots, SlotsWindowSize = $windowSize")
-    val schedulingPreferredSlots = UserAllocator.allocate(users = users, numOfSlots = numberOfSlots, slotsWindowSize = windowSize)
+    val schedulerPreferredSlots = UserAllocator.allocate(users = users, numOfSlots = numberOfSlots, windowSize = windowSize)
 
     var resultsWithoutPreferedSlots: List[SpanSlotAccumulatedLoad] = List()
     var resultsWithPreferedSlots: List[SpanSlotAccumulatedLoad] = List()
@@ -320,7 +320,7 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
 
     for (i <- users.indices) {
       val user = users(i)
-      val schedulingPreferredSlotsForUser = schedulingPreferredSlots(i)
+      val schedulingPreferredSlotsForUser = schedulerPreferredSlots(i)
 
       val resultWithoutPreferedSlots = Rescheduler.reschedule(user, metricTransformation = metricTransformation, referenceAverage = referenceAverage)
       resultsWithoutPreferedSlots = resultWithoutPreferedSlots :: resultsWithoutPreferedSlots
@@ -329,7 +329,7 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
       resultsWithPreferedSlots = resultWithPreferedSlots :: resultsWithPreferedSlots
     }
 
-    (resultsWithoutPreferedSlots.reverse, resultsWithPreferedSlots.reverse, schedulingPreferredSlots)
+    (resultsWithoutPreferedSlots.reverse, resultsWithPreferedSlots.reverse, schedulerPreferredSlots)
   }
 
   def computePar(loads: Iterable[Load]): Double =  Metric.par(SpanSlotAccumulatedLoad(-1, 0, loads))

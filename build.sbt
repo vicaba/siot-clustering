@@ -41,3 +41,5 @@ libraryDependencies ++= Seq(
   scalactic,
   scalaTest
 )
+
+parallelExecution in Test := false

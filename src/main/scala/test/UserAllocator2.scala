@@ -2,15 +2,15 @@ package test
 
 import test.reschedulermetrics.NoTransformation
 
-class UserAllocator {}
+class UserAllocator2 {}
 
-object UserAllocator {
+object UserAllocator2 {
 
   def allocate(users: List[SpanSlotAccumulatedLoad], numOfSlots: Int, windowSize: Int): List[List[Int]] = {
 
     val sortedUsers = users.sortBy(_.flexibleLoads.toList.map(_.totalEnergy).sum).reverse
 
-    val usersAsFlexibleLoads = for (user <- sortedUsers) yield {
+    val usersAsFlexibleLoads = (for (user <- sortedUsers) yield {
 
       val totalEnergyFromFlexibleLoads: Double = user.flexibleLoads.foldLeft(0.0)(_ + _.amplitudePerSlot.sum)
 
@@ -20,26 +20,30 @@ object UserAllocator {
 
       SpanSlotFlexibleLoad(user.id, 0, flexibleLoadVector)
 
-    }
+    }).reverse
 
     val fixedLoads = sortedUsers.flatMap(_.fixedLoads)
 
-    val lowestPositionInT = sortedUsers.flatMap(_.loads).map(_.positionInT).min
     val accumulatedLoads =
-      SpanSlotAccumulatedLoad.keepLoadOrder(0, lowestPositionInT, fixedLoads ::: usersAsFlexibleLoads)
+      SpanSlotAccumulatedLoad.keepLoadOrder(0,
+        sortedUsers.flatMap(_.loads).map(_.positionInT).min,
+        fixedLoads ::: usersAsFlexibleLoads)
 
     val result = Rescheduler.reschedule(accumulatedLoads, metricTransformation = NoTransformation)
 
-    val schedulerPreferredSlotsForEachUser: List[List[Int]] = for {
-      userId <- users.map(_.id)
-      userAsFlexibleLoad <- result.flexibleLoads
-      if userId == userAsFlexibleLoad.id
-    } yield {
-      val userPreferredSlots = (for (i <- userAsFlexibleLoad.positionInT until (userAsFlexibleLoad.positionInT + windowSize)) yield i).toList
-      userPreferredSlots
+    var usersPreferedSlots: List[List[Int]] = List()
+    for (userId <- users.map(_.id)) {
+      for (flexUser <- result.flexibleLoads) {
+        if (userId == flexUser.id) {
+          var userPreferedSlots: List[Int] = List()
+          for (i <- flexUser.positionInT until (flexUser.positionInT + windowSize)) {
+            userPreferedSlots = i :: userPreferedSlots
+          }
+          usersPreferedSlots = userPreferedSlots.reverse :: usersPreferedSlots
+        }
+      }
     }
 
-    schedulerPreferredSlotsForEachUser
-
+    usersPreferedSlots.reverse
   }
 }
