@@ -211,6 +211,8 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
     val accumulatedLoadWithoutPriority = SpanSlotAccumulatedLoad(-1, 0, benchmarkResult.resultsWithoutPriority)
     val accumulatedLoadWithPriority    = SpanSlotAccumulatedLoad(-1, 0, benchmarkResult.resultsWithPriority)
 
+    computePar(accumulatedLoadWithPriority) should be <= computePar(accumulatedLoadWithoutPriority)
+
     expectedTotalLoad match {
       case Nil           =>
       case x :: Nil      => accumulatedLoadWithPriority.amplitudePerSlot shouldBe x

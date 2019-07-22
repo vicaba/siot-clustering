@@ -20,6 +20,7 @@ class BiasedAverageDistanceTransformation(val bias: Double = 0.50) extends Metri
     val distance = Math.pow(Math.abs(referenceAverage - actualAverage), 1)
     println(s"average_ref = $referenceAverage, bias = $bias, slotsWithPriority = $slotsWithPriority")
 
+    // TODO: It seems that removing bias works better
     distance * (1 - bias * slotsWithPriority)
   }
 
