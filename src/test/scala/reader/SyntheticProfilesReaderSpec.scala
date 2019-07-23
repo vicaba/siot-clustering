@@ -11,7 +11,6 @@ class SyntheticProfilesReaderSpec extends FlatSpec {
   val MainFolder               = "files/syn_loads/"
   val AppliancesOutputFileName = "appliance_output.csv"
   val LightingOutputFileName   = "lighting_output.csv"
-  val MaxProfiles              = 1
 
   def readRawHeadRow(l: SpanSlotAccumulatedLoad, totalsFile: String, windowSize: Int): Vector[Double] = {
 
