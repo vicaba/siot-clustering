@@ -29,7 +29,7 @@ class SyntheticProfilesReaderSpec extends FlatSpec {
   "The first SpanSlotAccumulatedLoad.amplitudePerSlot" should "be equal to the windowed first line of the file" in {
     val subFoldersAndIds: List[(String, Int)] = List((0 + "/", 0))
 
-    val res = SyntheticProflesReader(MainFolder,
+    val res = SyntheticProfilesReader(MainFolder,
       subFoldersAndIds.map(_._1),
       AppliancesOutputFileName,
       LightingOutputFileName,
@@ -39,6 +39,24 @@ class SyntheticProfilesReaderSpec extends FlatSpec {
     val rawRead: Vector[Double] = readRawHeadRow(res.head, MainFolder + "0/" + "totals.csv", windowSize = 60)
 
     assert(rawRead.head == res.head.amplitudePerSlot.head, s"${rawRead.head} was not equal to ${res.head.amplitudePerSlot.head}")
+  }
+
+  "Partitioning the first SpanSlotAccumulatedLoad" should "split flexible loads" in {
+    val subFoldersAndIds: List[(String, Int)] = List((0 + "/", 0))
+
+    val res = SyntheticProfilesReader(MainFolder,
+      subFoldersAndIds.map(_._1),
+      AppliancesOutputFileName,
+      LightingOutputFileName,
+      subFoldersAndIds.map(_._2), windowSize = 60)
+
+    res.head.flexibleLoads.foreach { fl =>
+
+    }
+
+    println(SyntheticProfilesReader.splitSequenceBySequenceOfElements(res.head.flexibleLoads.head.amplitudePerSlot, 0.0))
+    println(res.head.flexibleLoads.head.amplitudePerSlot)
+
   }
 
 

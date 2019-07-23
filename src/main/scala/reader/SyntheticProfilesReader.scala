@@ -7,7 +7,7 @@ import scala.collection.immutable
 import scala.io.Source
 import scala.util.{Random, Try}
 
-object SyntheticProflesReader {
+object SyntheticProfilesReader {
 
   def apply(mainFolder: String,
             subFolders: Iterable[String],
@@ -17,31 +17,62 @@ object SyntheticProflesReader {
             windowSize: Int): Vector[SpanSlotAccumulatedLoad] =
     readSyntheticProfiles(mainFolder, subFolders, applianceOutputFileName, lightingOutputFileName, ids, windowSize)
 
+  def splitSequenceBySequenceOfElements[E](seq: Seq[E], sequenceOfElementsValue: E): Seq[(Int, Seq[E])] = {
+
+    case class Extracted(extractedSeq: Seq[E], remainingSeq: Seq[E])
+
+    @tailrec
+    def _extractSequenceOfElements(_seq: Seq[E], accum: Seq[E], comparator: (E, E) => Boolean): Extracted = {
+      if (_seq.isEmpty) return Extracted(accum, _seq)
+      if (comparator(_seq.head, sequenceOfElementsValue))
+        _extractSequenceOfElements(_seq.tail, _seq.head +: accum, comparator)
+      else Extracted(accum, _seq)
+    }
+
+    @tailrec
+    def _splitSequenceBySequenceOfElements(index: Int,
+                                           remainingSeq: Seq[E],
+                                           accum: Seq[(Int, Seq[E])]): Seq[(Int, Seq[E])] = {
+      if (remainingSeq.isEmpty) return accum
+      if (remainingSeq.head == sequenceOfElementsValue) {
+        val extracted = _extractSequenceOfElements(remainingSeq, Seq(), (e1, e2) => e1 == e2)
+        _splitSequenceBySequenceOfElements(index + extracted.extractedSeq.length, extracted.remainingSeq, accum)
+      } else {
+        val extracted = _extractSequenceOfElements(remainingSeq, Seq(), (e1, e2) => e1 != e2)
+        _splitSequenceBySequenceOfElements(index + extracted.extractedSeq.length,
+                                           extracted.remainingSeq,
+                                           (index, extracted.extractedSeq) +: accum)
+      }
+
+    }
+
+    _splitSequenceBySequenceOfElements(index = 0, seq, Seq())
+
+  }
+
   def readSyntheticLoads(applianceOutputFile: String,
                          lightingOutputFile: String,
-                         windowSize: Int): Seq[SingleLoad] = {
+                         windowSize: Int): Vector[SingleLoad] = {
 
-    var counter = 0
-
-    trait LoadBuilder extends ((Int, Seq[Double], String) => Seq[SingleLoad]) {
-      def apply(id: Int, values: Seq[Double], label: String): Seq[SingleLoad]
+    trait LoadBuilder extends ((Int, Vector[Double], String) => Seq[SingleLoad]) {
+      def apply(id: Int, values: Vector[Double], label: String): Seq[SingleLoad]
     }
 
     class RandomLoadBuilder extends LoadBuilder {
-      override def apply(id: Int, values: Seq[Double], label: String): Seq[SingleLoad] =
+      override def apply(id: Int, values: Vector[Double], label: String): Seq[SingleLoad] =
         if (Random.nextBoolean()) {
-          List(SpanSlotFixedLoad(id, 0, values.toVector, label))
+          List(SpanSlotFixedLoad(id, 0, values, label))
         } else {
-          List(SpanSlotFlexibleLoad(id, 0, values.toVector, label))
+          List(SpanSlotFlexibleLoad(id, 0, values, label))
         }
     }
 
     class FixedLoadBuilder extends LoadBuilder {
-      override def apply(id: Int, values: Seq[Double], label: String): Seq[SingleLoad] =
-        List(SpanSlotFixedLoad(id, 0, values.toVector, label))
+      override def apply(id: Int, values: Vector[Double], label: String): Seq[SingleLoad] =
+        List(SpanSlotFixedLoad(id, 0, values, label))
     }
 
-    def readCsv(file: String, loadBuilder: LoadBuilder)(id: Int): (Int, Seq[SingleLoad]) = {
+    def readCsv(file: String, loadBuilder: LoadBuilder)(id: Int): (Int, Vector[SingleLoad]) = {
 
       var idC    = id
       val source = Source.fromFile(file)
@@ -63,7 +94,7 @@ object SyntheticProflesReader {
         }
     }
 
-    def rec(fs: List[Int => (Int, Seq[SingleLoad])], accId: Int, accLoads: Seq[SingleLoad]): Seq[SingleLoad] =
+    def rec(fs: List[Int => (Int, Vector[SingleLoad])], accId: Int, accLoads: Vector[SingleLoad]): Vector[SingleLoad] =
       fs match {
         case x :: xs =>
           val (idC, loads) = x(accId)
@@ -79,33 +110,6 @@ object SyntheticProflesReader {
       accId = 0,
       Vector.empty[SingleLoad]
     )
-
-  }
-
-  class PartitionSpanSlotFlexibleLoadResult(val lastUsedIdC: Int, val partitions: Seq[SpanSlotFlexibleLoad])
-  //TODO: Needs testing
-  def partitionSpanSlotFlexibleLoad(idC: Int, fl: SpanSlotFlexibleLoad, partitionBy: Double => Boolean): Seq[SpanSlotFlexibleLoad] = {
-
-    val amplitudePerSlot = fl.amplitudePerSlot
-
-    @tailrec
-    def rec(remainingAmplitude: Vector[Double],
-            positionInT: Int,
-            accId: Int,
-            accLoads: Seq[SpanSlotFlexibleLoad]): Seq[SpanSlotFlexibleLoad] =
-      if (remainingAmplitude.isEmpty) accLoads
-      else {
-        val (extracted, remainingAmplitudeWithLeadingZeros)  = remainingAmplitude.partition(partitionBy)
-        val newPositionInT                                   = positionInT + extracted.size
-        val newSpanSlotFlexibleLoad                          = SpanSlotFlexibleLoad(idC, newPositionInT, extracted)
-        val (leadingConsecutiveZeroes, remainingInformation) = remainingAmplitudeWithLeadingZeros.partition(partitionBy)
-        rec(remainingInformation,
-            positionInT + extracted.size + leadingConsecutiveZeroes.size,
-            accId + 1,
-            newSpanSlotFlexibleLoad +: accLoads)
-      }
-
-    rec(fl.amplitudePerSlot, fl.positionInT, idC, Vector())
 
   }
 
