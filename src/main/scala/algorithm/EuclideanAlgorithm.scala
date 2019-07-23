@@ -23,7 +23,7 @@ object EuclideanAlgorithm {
   def clusterer(settings: ClustererSettingsT): List[Cluster] = EuclideanClusterer.apply(settings)
 
   def rescheduler(clusters: List[Cluster],
-                  settings: ReschedulerSettingsT): List[(Cluster, List[algorithm.scheduler.PointChanged])] =
+                  settings: ReschedulerSettingsT): List[(Cluster, List[Nothing])] =
     ClusterRescheduler.apply(clusters, settings)
 
   def apply(clustererSettings: ClustererSettingsT): ClustererOutput = {

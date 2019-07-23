@@ -6,7 +6,7 @@ import metrics.Metric
 import org.scalatest.Matchers._
 import test.reschedulermetrics.NoTransformation
 
-class ReschedulerSpec extends FeatureSpec with GivenWhenThen {
+class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
   feature("Rescheduler.rescheduleFlexibleLoad") {
 

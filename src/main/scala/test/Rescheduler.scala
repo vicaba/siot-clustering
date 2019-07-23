@@ -7,18 +7,6 @@ import scala.annotation.tailrec
 
 object Rescheduler {
 
-  def main(args: Array[String]): Unit = {
-    //val fixedLoads = SpanSlotAccumulatedLoad(toFixedLoads(Vector[Double](1, 1, 1, 1, 1, 1, 1, 1))
-
-    val flexibleLoads = Vector(
-      SpanSlotFlexibleLoad(1, 0, Vector[Double](1, 1, 1, 1)),
-      SpanSlotFlexibleLoad(1, 3, Vector[Double](1, 1, 1, 1))
-    )
-
-    //val res1 = findBestContiguousSlots(fixedLoads, flexibleLoads(0))
-
-  }
-
   def reschedule(acc: SpanSlotAccumulatedLoad,
                  preferredSlots: List[Int] = Nil,
                  metricTransformation: MetricTransformation,
