@@ -9,6 +9,42 @@ import scala.util.{Random, Try}
 
 object SyntheticProfilesReader {
 
+  object Appliances {
+    val FridgeFreezer    = "FRIDGE_FREEZER"
+    val Fridge           = "FRIDGE"
+    val UprightFreezer   = "UPRIGHT_FREEZER"
+    val AnswerMachine    = "ANSWER_MACHINE"
+    val CdPlayer         = "CD_PLAYER"
+    val Clock            = "CLOCK"
+    val Phone            = "PHONE"
+    val Hifi             = "HIFI"
+    val Iron             = "IRON"
+    val Vacuum           = "VACUUM"
+    val Fax              = "FAX"
+    val Pc               = "PC"
+    val Printer          = "PRINTER"
+    val Tv1              = "TV1"
+    val Tv2              = "TV2"
+    val Tv3              = "TV3"
+    val VcrDvd           = "VCR_DVD"
+    val Receiver         = "RECEIVER"
+    val Hob              = "HOB"
+    val Oven             = "OVEN"
+    val Microwave        = "MICROWAVE"
+    val Kettle           = "KETTLE"
+    val SmallCooking     = "SMALL_COOKING"
+    val DishWasher       = "DISH_WASHER"
+    val TumbleDryer      = "TUMBLE_DRYER"
+    val WashingMachine   = "WASHING_MACHINE"
+    val WasherDryer      = "WASHER_DRYER"
+    val Deswh            = "DESWH"
+    val EInst            = "E_INST"
+    val ElecShower       = "ELEC_SHOWER"
+    val StorageHeater    = "STORAGE_HEATER"
+    val ElecSpaceHeating = "ELEC_SPACE_HEATING"
+
+  }
+
   def apply(mainFolder: String,
             subFolders: Iterable[String],
             applianceOutputFileName: String,
@@ -58,13 +94,16 @@ object SyntheticProfilesReader {
       def apply(id: Int, values: Vector[Double], label: String): Seq[SingleLoad]
     }
 
-    class RandomLoadBuilder extends LoadBuilder {
+    class ApplianceLoadBuilder extends LoadBuilder {
+      import Appliances._
       override def apply(id: Int, values: Vector[Double], label: String): Seq[SingleLoad] =
-        if (Random.nextBoolean()) {
-          List(SpanSlotFixedLoad(id, 0, values, label))
-        } else {
-          List(SpanSlotFlexibleLoad(id, 0, values, label))
-        }
+        List(label match {
+          case DishWasher     => SpanSlotFlexibleLoad(id, 0, values, label)
+          case TumbleDryer    => SpanSlotFlexibleLoad(id, 0, values, label)
+          case WashingMachine => SpanSlotFlexibleLoad(id, 0, values, label)
+          case WasherDryer    => SpanSlotFlexibleLoad(id, 0, values, label)
+          case _              => SpanSlotFixedLoad(id, 0, values, label)
+        })
     }
 
     class FixedLoadBuilder extends LoadBuilder {
@@ -104,7 +143,8 @@ object SyntheticProfilesReader {
 
     rec(
       List(
-        readCsv(applianceOutputFile, new RandomLoadBuilder),
+        //TODO: Change RandomLadBuilder so it always builds the same fixed and flexible loads by label
+        readCsv(applianceOutputFile, new ApplianceLoadBuilder),
         readCsv(lightingOutputFile, new FixedLoadBuilder)
       ),
       accId = 0,

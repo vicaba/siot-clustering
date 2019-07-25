@@ -18,7 +18,7 @@ sealed trait Load {
   val label = ""
 
   override def equals(obj: Any): Boolean = obj match {
-    case s: Load => s.id == this.id && this.getClass == s.getClass
+    case s: Load => this.getClass == s.getClass && s.id == this.id && s.label == this.label
     case _       => false
   }
 
@@ -109,8 +109,18 @@ case class SpanSlotAccumulatedLoad private (override val id: Int,
     this
   }
 
+  def ++=(y: Iterable[Load]): SpanSlotAccumulatedLoad = {
+    this._loads ++= y
+    this
+  }
+
   def -=(y: Load): SpanSlotAccumulatedLoad = {
     this._loads -= y
+    this
+  }
+
+  def --=(y: Iterable[Load]): SpanSlotAccumulatedLoad = {
+    this._loads --= y
     this
   }
 

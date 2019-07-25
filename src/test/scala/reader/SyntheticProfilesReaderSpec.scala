@@ -30,35 +30,42 @@ class SyntheticProfilesReaderSpec extends FlatSpec {
     val subFoldersAndIds: List[(String, Int)] = List((0 + "/", 0))
 
     val res = SyntheticProfilesReader(MainFolder,
-      subFoldersAndIds.map(_._1),
-      AppliancesOutputFileName,
-      LightingOutputFileName,
-      subFoldersAndIds.map(_._2), windowSize = 60)
-
+                                      subFoldersAndIds.map(_._1),
+                                      AppliancesOutputFileName,
+                                      LightingOutputFileName,
+                                      subFoldersAndIds.map(_._2),
+                                      windowSize = 60)
 
     val rawRead: Vector[Double] = readRawHeadRow(res.head, MainFolder + "0/" + "totals.csv", windowSize = 60)
 
-    assert(rawRead.head == res.head.amplitudePerSlot.head, s"${rawRead.head} was not equal to ${res.head.amplitudePerSlot.head}")
+    assert(rawRead.head == res.head.amplitudePerSlot.head,
+           s"${rawRead.head} was not equal to ${res.head.amplitudePerSlot.head}")
   }
 
   "Partitioning the first SpanSlotAccumulatedLoad" should "split flexible loads" in {
-    val subFoldersAndIds: List[(String, Int)] = List((0 + "/", 0))
+    val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 until 200) yield (i + "/", i)).toList
 
     val res = SyntheticProfilesReader(MainFolder,
-      subFoldersAndIds.map(_._1),
-      AppliancesOutputFileName,
-      LightingOutputFileName,
-      subFoldersAndIds.map(_._2), windowSize = 60)
+                                      subFoldersAndIds.map(_._1),
+                                      AppliancesOutputFileName,
+                                      LightingOutputFileName,
+                                      subFoldersAndIds.map(_._2),
+                                      windowSize = 30)
 
-    res.head.flexibleLoads.foreach { fl =>
-
+    res.foreach { acc =>
+      println(acc.id)
+      acc.flexibleLoads.foreach { fl =>
+        val sequenceOfElementsValue = fl.amplitudePerSlot.foldLeft(Map.empty[Double, Int].withDefaultValue(0)) {
+          case (m, v) => m.updated(v, m(v) + 1)
+        }.maxBy(_._2)._1
+        println(fl.label)
+        println(s"sequenceV: $sequenceOfElementsValue")
+        println(SyntheticProfilesReader.splitSequenceBySequenceOfElements(fl.amplitudePerSlot, sequenceOfElementsValue))
+      }
     }
 
-    println(SyntheticProfilesReader.splitSequenceBySequenceOfElements(res.head.flexibleLoads.head.amplitudePerSlot, 0.0))
-    println(res.head.flexibleLoads.head.amplitudePerSlot)
+    //println(res.head.flexibleLoads.head.amplitudePerSlot)
 
   }
-
-
 
 }
