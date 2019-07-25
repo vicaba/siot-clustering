@@ -3,7 +3,8 @@ package reader
 import test.{SingleLoad, SpanSlotAccumulatedLoad, SpanSlotFixedLoad, SpanSlotFlexibleLoad}
 
 import scala.annotation.tailrec
-import scala.collection.immutable
+import scala.collection.{immutable, mutable}
+import scala.collection.mutable.ListBuffer
 import scala.io.Source
 import scala.util.{Random, Try}
 
@@ -58,10 +59,10 @@ object SyntheticProfilesReader {
     case class Extracted(extractedSeq: Seq[E], remainingSeq: Seq[E])
 
     @tailrec
-    def _extractSequenceOfElements(_seq: Seq[E], accum: Seq[E], comparator: (E, E) => Boolean): Extracted = {
+    def _extractSequenceOfElements(_seq: Seq[E], accum: mutable.ListBuffer[E] = new ListBuffer[E], comparator: (E, E) => Boolean): Extracted = {
       if (_seq.isEmpty) return Extracted(accum, _seq)
       if (comparator(_seq.head, sequenceOfElementsValue))
-        _extractSequenceOfElements(_seq.tail, _seq.head +: accum, comparator)
+        _extractSequenceOfElements(_seq.tail, accum += _seq.head, comparator)
       else Extracted(accum, _seq)
     }
 
@@ -71,10 +72,10 @@ object SyntheticProfilesReader {
                                            accum: Seq[(Int, Seq[E])]): Seq[(Int, Seq[E])] = {
       if (remainingSeq.isEmpty) return accum
       if (remainingSeq.head == sequenceOfElementsValue) {
-        val extracted = _extractSequenceOfElements(remainingSeq, Seq(), (e1, e2) => e1 == e2)
+        val extracted = _extractSequenceOfElements(remainingSeq, new ListBuffer[E], (e1, e2) => e1 == e2)
         _splitSequenceBySequenceOfElements(index + extracted.extractedSeq.length, extracted.remainingSeq, accum)
       } else {
-        val extracted = _extractSequenceOfElements(remainingSeq, Seq(), (e1, e2) => e1 != e2)
+        val extracted = _extractSequenceOfElements(remainingSeq, new ListBuffer[E], (e1, e2) => e1 != e2)
         _splitSequenceBySequenceOfElements(index + extracted.extractedSeq.length,
                                            extracted.remainingSeq,
                                            (index, extracted.extractedSeq) +: accum)

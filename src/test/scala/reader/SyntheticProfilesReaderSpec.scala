@@ -1,6 +1,7 @@
 package reader
 
 import org.scalatest.FlatSpec
+import org.scalatest.Matchers._
 import test.SpanSlotAccumulatedLoad
 
 import scala.io.Source
@@ -8,7 +9,7 @@ import scala.util.Try
 
 class SyntheticProfilesReaderSpec extends FlatSpec {
 
-  val MainFolder               = "files/syn_loads/"
+  val MainFolder               = "files/syn_loads_test/"
   val AppliancesOutputFileName = "appliance_output.csv"
   val LightingOutputFileName   = "lighting_output.csv"
 
@@ -43,7 +44,7 @@ class SyntheticProfilesReaderSpec extends FlatSpec {
   }
 
   "Partitioning the first SpanSlotAccumulatedLoad" should "split flexible loads" in {
-    val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 until 200) yield (i + "/", i)).toList
+    val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 4) yield (i + "/", i)).toList
 
     val res = SyntheticProfilesReader(MainFolder,
                                       subFoldersAndIds.map(_._1),
@@ -52,7 +53,14 @@ class SyntheticProfilesReaderSpec extends FlatSpec {
                                       subFoldersAndIds.map(_._2),
                                       windowSize = 30)
 
-    res.foreach { acc =>
+    val flexibleLoad = res.head.flexibleLoads.filter(_.label == SyntheticProfilesReader.Appliances.WashingMachine).head
+    val sequenceOfElementsValue = flexibleLoad.amplitudePerSlot.foldLeft(Map.empty[Double, Int].withDefaultValue(0)) {
+      case (m, v) => m.updated(v, m(v) + 1)
+    }.maxBy(_._2)._1
+    SyntheticProfilesReader.splitSequenceBySequenceOfElements(flexibleLoad.amplitudePerSlot, sequenceOfElementsValue) should not be empty
+
+
+/*    res.foreach { acc =>
       println(acc.id)
       acc.flexibleLoads.foreach { fl =>
         val sequenceOfElementsValue = fl.amplitudePerSlot.foldLeft(Map.empty[Double, Int].withDefaultValue(0)) {
@@ -62,7 +70,7 @@ class SyntheticProfilesReaderSpec extends FlatSpec {
         println(s"sequenceV: $sequenceOfElementsValue")
         println(SyntheticProfilesReader.splitSequenceBySequenceOfElements(fl.amplitudePerSlot, sequenceOfElementsValue))
       }
-    }
+    }*/
 
     //println(res.head.flexibleLoads.head.amplitudePerSlot)
 

@@ -31,7 +31,7 @@ object Scheduler {
           user,
           schedulingPreferredSlotsForUser,
           metricTransformation = metricTransformation,
-          referenceAverage = referenceAverage, verbose = true
+          referenceAverage = referenceAverage, verbose = false
         )
     }
 
