@@ -121,7 +121,6 @@ trait TemplateForSyntheticProfilesReader {
 
     rec(
       List(
-        //TODO: Change RandomLadBuilder so it always builds the same fixed and flexible loads by label
         readCsv(applianceFileAndBuilder),
         readCsv(lightingFileAndBuilder)
       ),
