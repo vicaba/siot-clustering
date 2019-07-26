@@ -3,7 +3,6 @@ package test
 import org.scalatest._
 import Load._
 import metrics.Metric
-import test.RescheduleType.RescheduleType
 import test.reschedulermetrics.{BiasedAverageDistanceTransformation, MetricTransformation}
 
 import scala.util.Try

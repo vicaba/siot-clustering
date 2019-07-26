@@ -47,14 +47,34 @@ case class SpanSlotFixedLoad(override val id: Int,
   override def totalEnergy: Double = amplitudePerSlot.foldLeft(0.0)((accum, a) => accum + a)
 }
 
-case class SpanSlotFlexibleLoad(override val id: Int,
-                                override val positionInT: Int,
-                                override val amplitudePerSlot: Vector[Double],
-                                override val label: String = "")
+object SpanSlotFlexibleLoad {
+
+  def apply(id: Int, positionInT: Int, amplitudePerSlot: Vector[Double], label: String = ""): SpanSlotFlexibleLoad =
+    new SpanSlotFlexibleLoad(id, positionInT, amplitudePerSlot, label)
+
+}
+
+class SpanSlotFlexibleLoad(override val id: Int,
+                           override val positionInT: Int,
+                           override val amplitudePerSlot: Vector[Double],
+                           override val label: String = "")
     extends SingleLoad {
   override val span: Int           = amplitudePerSlot.size
   override def totalEnergy: Double = amplitudePerSlot.foldLeft(0.0)((accum, a) => accum + a)
+  def copy(id: Int = this.id,
+           positionInT: Int = this.positionInT,
+           amplitudePerSlot: Vector[Double] = this.amplitudePerSlot,
+           label: String = this.label): SpanSlotFlexibleLoad =
+    SpanSlotFlexibleLoad(id, positionInT, amplitudePerSlot, label)
+
 }
+
+case class SpanSlotFlexibleLoadSubTask(parentId: Int,
+                                       override val id: Int,
+                                       override val positionInT: Int,
+                                       override val amplitudePerSlot: Vector[Double],
+                                       override val label: String = "")
+    extends SpanSlotFlexibleLoad(id, positionInT, amplitudePerSlot, label) {}
 
 /**
   *

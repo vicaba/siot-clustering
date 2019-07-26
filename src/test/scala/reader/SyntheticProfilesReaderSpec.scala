@@ -2,7 +2,7 @@ package reader
 
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers._
-import test.SpanSlotAccumulatedLoad
+import test.{SpanSlotAccumulatedLoad, SequenceSplitByConsecutiveElements}
 
 import scala.io.Source
 import scala.util.Try
@@ -44,7 +44,7 @@ class SyntheticProfilesReaderSpec extends FlatSpec {
   }
 
   "Partitioning the first SpanSlotAccumulatedLoad" should "split flexible loads" in {
-    val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 4) yield (i + "/", i)).toList
+    val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 1) yield (i + "/", i)).toList
 
     val res = SyntheticProfilesReader(MainFolder,
                                       subFoldersAndIds.map(_._1),
@@ -54,25 +54,7 @@ class SyntheticProfilesReaderSpec extends FlatSpec {
                                       windowSize = 30)
 
     val flexibleLoad = res.head.flexibleLoads.filter(_.label == SyntheticProfilesReader.Appliances.WashingMachine).head
-    val sequenceOfElementsValue = flexibleLoad.amplitudePerSlot.foldLeft(Map.empty[Double, Int].withDefaultValue(0)) {
-      case (m, v) => m.updated(v, m(v) + 1)
-    }.maxBy(_._2)._1
-    SyntheticProfilesReader.splitSequenceBySequenceOfElements(flexibleLoad.amplitudePerSlot, sequenceOfElementsValue) should not be empty
-
-
-/*    res.foreach { acc =>
-      println(acc.id)
-      acc.flexibleLoads.foreach { fl =>
-        val sequenceOfElementsValue = fl.amplitudePerSlot.foldLeft(Map.empty[Double, Int].withDefaultValue(0)) {
-          case (m, v) => m.updated(v, m(v) + 1)
-        }.maxBy(_._2)._1
-        println(fl.label)
-        println(s"sequenceV: $sequenceOfElementsValue")
-        println(SyntheticProfilesReader.splitSequenceBySequenceOfElements(fl.amplitudePerSlot, sequenceOfElementsValue))
-      }
-    }*/
-
-    //println(res.head.flexibleLoads.head.amplitudePerSlot)
+    SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount(flexibleLoad.amplitudePerSlot) should not be empty
 
   }
 

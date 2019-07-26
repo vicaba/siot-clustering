@@ -5,12 +5,12 @@ import metrics.Metric
 import org.scalatest.{FeatureSpec, GivenWhenThen}
 import org.scalatest.Matchers._
 import reader.SyntheticProfilesReader
-import test.{Load, SpanSlotAccumulatedLoad, SpanSlotFlexibleLoad}
+import test.{Load, SpanSlotAccumulatedLoad, SpanSlotFlexibleLoad, SequenceSplitByConsecutiveElements}
 import test.reschedulermetrics.BiasedAverageDistanceTransformation
 
 class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
-  val MainFolder               = "files/syn_loads_test/"
+  val MainFolder               = "files/syn_loads/"
   val AppliancesOutputFileName = "appliance_output.csv"
   val LightingOutputFileName   = "lighting_output.csv"
 
@@ -18,9 +18,9 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
     scenario("With synthetic data, PAR is minimized after rescheduling") {
 
-      Given("Synthetically generated data")
+      Given("Synthetically generated loads as UnscheduledLoads")
 
-      val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 4) yield (i + "/", i)).toList
+      val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 49) yield (i + "/", i)).toList
 
       val unscheduledLoads = SyntheticProfilesReader(MainFolder,
                                                      subFoldersAndIds.map(_._1),
@@ -31,19 +31,14 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
       unscheduledLoads.foreach { accLoad =>
         val splitResult = accLoad.flexibleLoads.map { fLoad =>
-          val sequenceOfElementsValue = fLoad.amplitudePerSlot
-            .foldLeft(Map.empty[Double, Int].withDefaultValue(0)) {
-              case (m, v) => m.updated(v, m(v) + 1)
-            }
-            .maxBy(_._2)
-            ._1
-          val split =
-            SyntheticProfilesReader.splitSequenceBySequenceOfElements(fLoad.amplitudePerSlot, sequenceOfElementsValue)
-          val splitFlexibleLoad = split.zipWithIndex.map {
-            case (s, idx) =>
-              SpanSlotFlexibleLoad(idx, s._1, s._2.toVector, fLoad.label)
-
-          }
+          val splitFlexibleLoad =
+            SequenceSplitByConsecutiveElements
+              .withConsecutiveValueAsTheHighestCount(fLoad.amplitudePerSlot)
+              .zipWithIndex
+              .map {
+                case (s, idx) =>
+                  SpanSlotFlexibleLoad(idx, s.index, s.seq.toVector, fLoad.label)
+              }
           (fLoad, splitFlexibleLoad)
         }
 
@@ -57,10 +52,13 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
         accLoad --= flexibleLoadsToRemove
         accLoad ++= flexibleLoadsToAdd
-        println("--")
       }
 
+      When("Scheduling loads")
+
       val scheduledLoads = Scheduler.apply(unscheduledLoads, new BiasedAverageDistanceTransformation)
+
+      Then("ScheduledLoads PAR is lower than UnscheduledLoads PAR.")
 
       val unscheduledLoadsPar = computePar(unscheduledLoads)
       val scheduledLoadsPar   = computePar(scheduledLoads)

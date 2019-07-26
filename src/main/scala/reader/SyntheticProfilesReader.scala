@@ -54,39 +54,6 @@ object SyntheticProfilesReader {
             windowSize: Int): Vector[SpanSlotAccumulatedLoad] =
     readSyntheticProfiles(mainFolder, subFolders, applianceOutputFileName, lightingOutputFileName, ids, windowSize)
 
-  def splitSequenceBySequenceOfElements[E](seq: Seq[E], sequenceOfElementsValue: E): Seq[(Int, Seq[E])] = {
-
-    case class Extracted(extractedSeq: Seq[E], remainingSeq: Seq[E])
-
-    @tailrec
-    def _extractSequenceOfElements(_seq: Seq[E], accum: mutable.ListBuffer[E] = new ListBuffer[E], comparator: (E, E) => Boolean): Extracted = {
-      if (_seq.isEmpty) return Extracted(accum, _seq)
-      if (comparator(_seq.head, sequenceOfElementsValue))
-        _extractSequenceOfElements(_seq.tail, accum += _seq.head, comparator)
-      else Extracted(accum, _seq)
-    }
-
-    @tailrec
-    def _splitSequenceBySequenceOfElements(index: Int,
-                                           remainingSeq: Seq[E],
-                                           accum: Seq[(Int, Seq[E])]): Seq[(Int, Seq[E])] = {
-      if (remainingSeq.isEmpty) return accum
-      if (remainingSeq.head == sequenceOfElementsValue) {
-        val extracted = _extractSequenceOfElements(remainingSeq, new ListBuffer[E], (e1, e2) => e1 == e2)
-        _splitSequenceBySequenceOfElements(index + extracted.extractedSeq.length, extracted.remainingSeq, accum)
-      } else {
-        val extracted = _extractSequenceOfElements(remainingSeq, new ListBuffer[E], (e1, e2) => e1 != e2)
-        _splitSequenceBySequenceOfElements(index + extracted.extractedSeq.length,
-                                           extracted.remainingSeq,
-                                           (index, extracted.extractedSeq) +: accum)
-      }
-
-    }
-
-    _splitSequenceBySequenceOfElements(index = 0, seq, Seq())
-
-  }
-
   def readSyntheticLoads(applianceOutputFile: String,
                          lightingOutputFile: String,
                          windowSize: Int): Vector[SingleLoad] = {

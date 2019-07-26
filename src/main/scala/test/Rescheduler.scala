@@ -1,6 +1,5 @@
 package test
 
-import test.RescheduleType.RescheduleType
 import test.reschedulermetrics.{BiasedAverageDistanceTransformation, BiasedPeakTransformation, MetricTransformation, NoTransformation}
 
 import scala.annotation.tailrec
@@ -30,6 +29,7 @@ object Rescheduler {
       acc.copy()
   }
 
+  // It deals with loads in sequence
   def rescheduleFlexibleLoad(accumulatedLoad: SpanSlotAccumulatedLoad,
                              flexibleLoad: SpanSlotFlexibleLoad,
                              preferredSlots: List[Int] = Nil,
@@ -39,13 +39,6 @@ object Rescheduler {
 
     // Used to perform mutable operations
     val temporaryX: SpanSlotAccumulatedLoad = accumulatedLoad.copy()
-
-    def incrementInWindow(m: Movement): Double = {
-      val slice = m.acc.amplitudePerSlot.slice(m.fl.positionInT, m.fl.positionInT + m.fl.span)
-      slice.foldLeft(0.0) {
-        case (acc, e) => acc + e * e
-      } / slice.size
-    }
 
     var bestMovement: Movement = new Movement(accumulatedLoad += flexibleLoad, flexibleLoad, preferredSlots)
     if (verbose) println(s"Trying load ${flexibleLoad.id}, load vector = ${flexibleLoad.amplitudePerSlot.toString()}")
