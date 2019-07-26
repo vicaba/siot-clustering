@@ -25,6 +25,8 @@ object Main {
 
     val points = EgaugeReader(Configuration.userProfilesFile)
 
+
+
     //TODO: Why defaulting to points.size + points.size/3?
     val batchRunSettingsBuilder =
       new BatchRunSettingsBuilder(points,

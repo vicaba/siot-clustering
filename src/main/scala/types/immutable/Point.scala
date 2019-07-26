@@ -1,7 +1,5 @@
 package types.immutable
 
-import breeze.linalg.DenseVector
-import metrics.DenseVectorReprOps
 import types.DataTypeMetadata.{DataType, SyntheticDataType}
 import types.mutable.Cluster
 import types.{DataTypeMetadata, PointLike, PointLikeCompanion, Type}
@@ -9,6 +7,7 @@ import types.{DataTypeMetadata, PointLike, PointLikeCompanion, Type}
 case class Point(
     override val id: Int,
     override val data: DataType,
+    dataLabels: List[String] = Nil,
     override val assignedToCluster: Option[Cluster] = None)(implicit override val dataTypeMetadata: DataTypeMetadata)
     extends PointLike {
 
@@ -29,7 +28,7 @@ case class Point(
 
   def isAssignedToCluster: Boolean = this.assignedToCluster.isDefined
 
-  def setValues(data: DataType): Point = this.copy(data = data)
+  def setValues(data: DataType, dataLabels: List[String] = Nil): Point = this.copy(data = data)
 
   def syntheticValue: SyntheticDataType = dataTypeMetadata.synthesizeValues(this.data)
 

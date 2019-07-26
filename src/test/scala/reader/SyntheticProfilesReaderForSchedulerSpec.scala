@@ -7,7 +7,7 @@ import test.{SpanSlotAccumulatedLoad, SequenceSplitByConsecutiveElements}
 import scala.io.Source
 import scala.util.Try
 
-class SyntheticProfilesReaderSpec extends FlatSpec {
+class SyntheticProfilesReaderForSchedulerSpec extends FlatSpec {
 
   val MainFolder               = "files/syn_loads_test/"
   val AppliancesOutputFileName = "appliance_output.csv"
@@ -30,7 +30,7 @@ class SyntheticProfilesReaderSpec extends FlatSpec {
   "The first SpanSlotAccumulatedLoad.amplitudePerSlot" should "be equal to the windowed first line of the file" in {
     val subFoldersAndIds: List[(String, Int)] = List((0 + "/", 0))
 
-    val res = SyntheticProfilesReader.applyDefault(MainFolder,
+    val res = SyntheticProfilesReaderForScheduler.applyDefault(MainFolder,
                                       subFoldersAndIds.map(_._1),
                                       AppliancesOutputFileName,
                                       LightingOutputFileName,
@@ -46,14 +46,14 @@ class SyntheticProfilesReaderSpec extends FlatSpec {
   "Partitioning the first SpanSlotAccumulatedLoad" should "split flexible loads" in {
     val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 1) yield (i + "/", i)).toList
 
-    val res = SyntheticProfilesReader.applyDefault(MainFolder,
+    val res = SyntheticProfilesReaderForScheduler.applyDefault(MainFolder,
                                       subFoldersAndIds.map(_._1),
                                       AppliancesOutputFileName,
                                       LightingOutputFileName,
                                       subFoldersAndIds.map(_._2),
                                       windowSize = 30)
 
-    val flexibleLoad = res.head.flexibleLoads.filter(_.label == SyntheticProfilesReader.Appliances.WashingMachine).head
+    val flexibleLoad = res.head.flexibleLoads.filter(_.label == SyntheticProfilesReaderForScheduler.Appliances.WashingMachine).head
     SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount(flexibleLoad.amplitudePerSlot) should not be empty
 
   }

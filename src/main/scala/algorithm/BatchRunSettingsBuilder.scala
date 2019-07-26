@@ -1,6 +1,5 @@
 package algorithm
 
-import algorithm.clusterer.EuclideanClusterer
 import metrics.Metric
 import types.immutable.Point
 

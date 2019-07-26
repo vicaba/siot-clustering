@@ -2,7 +2,7 @@ package reader
 
 import test.{SingleLoad, SpanSlotAccumulatedLoad, SpanSlotFixedLoad, SpanSlotFlexibleLoad}
 
-object SyntheticProfilesReader extends TemplateForSyntheticProfilesReader {
+object SyntheticProfilesReaderForScheduler extends TemplateForSyntheticProfilesReader {
 
   override type SingleLoadOutputType = SingleLoad
 

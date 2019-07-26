@@ -76,7 +76,7 @@ class EuclideanClustererSpec extends FeatureSpec with GivenWhenThen {
         DenseMatrix((0.0, 12.0, 12.0, 12.0))
       ).zipWithIndex.map {
         case (m, idx) =>
-          Point(idx, m, None)
+          Point(idx, m, Nil, None)
       }.toVector
 
       When("asked to assign each point to a cluster, given 2 clusters")

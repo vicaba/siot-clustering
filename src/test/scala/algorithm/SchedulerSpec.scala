@@ -4,7 +4,7 @@ import algorithm.scheduler.Scheduler
 import metrics.Metric
 import org.scalatest.{FeatureSpec, GivenWhenThen}
 import org.scalatest.Matchers._
-import reader.SyntheticProfilesReader
+import reader.SyntheticProfilesReaderForScheduler
 import test.{Load, SpanSlotAccumulatedLoad, SpanSlotFlexibleLoad, SequenceSplitByConsecutiveElements}
 import test.reschedulermetrics.BiasedAverageDistanceTransformation
 
@@ -22,7 +22,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
       val subFoldersAndIds: List[(String, Int)] = (for (i <- 2 to 3) yield (i + "/", i)).toList
 
-      val unscheduledLoads = SyntheticProfilesReader.applyDefault(MainFolder,
+      val unscheduledLoads = SyntheticProfilesReaderForScheduler.applyDefault(MainFolder,
                                                      subFoldersAndIds.map(_._1),
                                                      AppliancesOutputFileName,
                                                      LightingOutputFileName,

@@ -12,7 +12,7 @@ class FlattenedEuclideanClustererSpec extends FeatureSpec with GivenWhenThen {
   implicit val types: DataTypeMetadata = DataTypeMetadata2Columns
 
   def createPoint(v: Vector[Double]): Point = {
-    Point(0, DenseMatrix(v), None)
+    Point(0, DenseMatrix(v), Nil, None)
   }
 
   feature("algorithm2.Ops.findMirror") {
@@ -39,7 +39,7 @@ class FlattenedEuclideanClustererSpec extends FeatureSpec with GivenWhenThen {
         DenseMatrix((10.0, 13.0)),
       ).zipWithIndex.map {
         case (m, idx) =>
-          Point(idx, m, None)(DataTypeMetadata2Columns)
+          Point(idx, m, Nil, None)(DataTypeMetadata2Columns)
       }.toVector
 
       Given("A point")

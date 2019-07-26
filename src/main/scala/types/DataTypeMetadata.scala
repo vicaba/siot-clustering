@@ -54,3 +54,7 @@ object DataTypeMetadata24Columns extends DataTypeMetadata {
 object Types67_24 extends DataTypeMetadata {
   override val Columns: Int = 24
 }
+
+object TypesX_48 extends DataTypeMetadata {
+  override val Columns: Int = 48
+}

@@ -33,7 +33,7 @@ object EgaugeReader {
                 }
                 val data = DenseMatrix(vectorList: _*)
 
-                val point = Point(dataid, data, None)(Types67_24)
+                val point = Point(dataid, data, Nil, None)(Types67_24)
 
                 point
               }.toVector
