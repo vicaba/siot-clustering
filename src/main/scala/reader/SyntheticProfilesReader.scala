@@ -50,9 +50,9 @@ object SyntheticProfilesReader {
             subFolders: Iterable[String],
             applianceOutputFileName: String,
             lightingOutputFileName: String,
-            ids: Iterable[Int],
+            folderIds: Iterable[Int],
             windowSize: Int): Vector[SpanSlotAccumulatedLoad] =
-    readSyntheticProfiles(mainFolder, subFolders, applianceOutputFileName, lightingOutputFileName, ids, windowSize)
+    readSyntheticProfiles(mainFolder, subFolders, applianceOutputFileName, lightingOutputFileName, folderIds, windowSize)
 
   def readSyntheticLoads(applianceOutputFile: String,
                          lightingOutputFile: String,
