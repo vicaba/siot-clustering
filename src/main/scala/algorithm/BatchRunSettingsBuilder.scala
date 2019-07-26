@@ -3,6 +3,14 @@ package algorithm
 import metrics.Metric
 import types.immutable.Point
 
+/**
+  * This class builds permutations of Clusterer and Rescheduler settings given a List containing the number of clusters
+  * and a List containing the metrics to try.
+  * @param points
+  * @param numbersOfClusters
+  * @param metrics
+  * @param timesToIterate
+  */
 class BatchRunSettingsBuilder(val points: Vector[Point],
                               val numbersOfClusters: List[Int],
                               val metrics: List[Metric],
@@ -17,7 +25,10 @@ class BatchRunSettingsBuilder(val points: Vector[Point],
   def build: List[(clusterer.EuclideanClustererSettings, algorithm.scheduler.ReschedulerSettings)] = {
     numbersOfClusters.flatMap { numberOfClusters =>
       metrics.map { metric =>
-        (clusterer.EuclideanClustererSettings(numberOfClusters, points, metric, timesToIterate(points, numberOfClusters)),
+        (clusterer.EuclideanClustererSettings(numberOfClusters,
+                                              points,
+                                              metric,
+                                              timesToIterate(points, numberOfClusters)),
          algorithm.scheduler.ReschedulerSettings(numberOfClusters, metric, 0.1, memory = 3))
       }
     }

@@ -27,19 +27,21 @@ object CrossFoldValidation {
 
   sealed trait CrossFoldTypeSettings
 
-  case class LeavePOut(p: Int) extends CrossFoldTypeSettings
+  case class MonteCarlo(splits: Int, subSampleSize: Percentage) extends CrossFoldTypeSettings
 
-  case class KFold(k: Int) extends CrossFoldTypeSettings
-
-  case class MonteCarlo(splits: Int, subsampleSize: Percentage) extends CrossFoldTypeSettings
-
+  /**
+    * Creates "splits" number of BatchRunSettingsBuilder taking a subsampleSize percentage of the total points
+    * @param settings
+    * @param batchRunSettings
+    * @return
+    */
   def runClusterer(settings: CrossFoldTypeSettings,
                                    batchRunSettings: BatchRunSettingsBuilder)
     : List[List[ClustererOutput]] = settings match {
     case s: MonteCarlo =>
       val points = batchRunSettings.points
       val splits = for (i <- 0 until s.splits) yield {
-        Random.shuffle(points).take(Math.floor((points.size * s.subsampleSize.v).toDouble).toInt)
+        Random.shuffle(points).take(Math.floor((points.size * s.subSampleSize.v).toDouble).toInt)
       }
       val bulkBatchRunSettings = splits.map(p => batchRunSettings.copy(points = p))
       bulkBatchRunSettings.zipWithIndex.map { case (builder, idx) =>
@@ -49,6 +51,13 @@ object CrossFoldValidation {
 
   }
 
+  /**
+    * For each CrossFoldTypeSettings (that indicates the number of splits and the subSample size), create "splits" number
+    * of BatchRunSettingsBuilder taking a subSampleSize percentage of the total points
+    * @param settings
+    * @param batchRunSettings
+    * @return
+    */
   def batchRunClusterer(settings: List[CrossFoldTypeSettings],
                                         batchRunSettings: BatchRunSettingsBuilder)
     : List[(CrossFoldValidation.CrossFoldTypeSettings, List[List
@@ -62,7 +71,7 @@ object CrossFoldValidation {
     case s: MonteCarlo =>
       val points = batchRunSettings.points
       val splits = for (i <- 0 until s.splits) yield {
-        Random.shuffle(points).take(Math.floor((points.size * s.subsampleSize.v).toDouble).toInt)
+        Random.shuffle(points).take(Math.floor((points.size * s.subSampleSize.v).toDouble).toInt)
       }
       val bulkBatchRunSettings = splits.map(p => batchRunSettings.copy(points = p))
       bulkBatchRunSettings.zipWithIndex.map { case (builder, idx) =>

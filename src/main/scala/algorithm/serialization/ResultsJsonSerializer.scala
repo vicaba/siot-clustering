@@ -101,7 +101,7 @@ object ResultsJsonSerializer {
         case m: MonteCarlo =>
           Json.obj(
             "splits"     -> m.splits,
-            "sampleSize" -> m.subsampleSize.v
+            "sampleSize" -> m.subSampleSize.v
           )
       }
     }
