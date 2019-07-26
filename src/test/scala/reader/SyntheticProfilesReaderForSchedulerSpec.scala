@@ -13,13 +13,13 @@ class SyntheticProfilesReaderForSchedulerSpec extends FlatSpec {
   val AppliancesOutputFileName = "appliance_output.csv"
   val LightingOutputFileName   = "lighting_output.csv"
 
-  def readRawHeadRow(l: SpanSlotAccumulatedLoad, totalsFile: String, windowSize: Int): Vector[Double] = {
+  def readRawHeadRow(totalsFile: String, windowSize: Int): Vector[Double] = {
 
     val source = Source.fromFile(totalsFile)
 
     Try {
       val line   = source.getLines().toList.head.split(",")
-      val values = line.tail.map(_.toDouble).grouped(60).map(_.sum).toVector
+      val values = line.tail.map(_.toDouble).grouped(windowSize).map(_.sum).toVector
       values
     }.getOrElse {
       source.close()
@@ -37,10 +37,10 @@ class SyntheticProfilesReaderForSchedulerSpec extends FlatSpec {
                                       subFoldersAndIds.map(_._2),
                                       windowSize = 60)
 
-    val rawRead: Vector[Double] = readRawHeadRow(res.head, MainFolder + "0/" + "totals.csv", windowSize = 60)
+    val rawRead: Vector[Double] = readRawHeadRow(MainFolder + "0/" + "totals.csv", windowSize = 60)
 
-    assert(rawRead.head == res.head.amplitudePerSlot.head,
-           s"${rawRead.head} was not equal to ${res.head.amplitudePerSlot.head}")
+    assert(rawRead == res.head.amplitudePerSlot,
+           s"${rawRead} was not equal to ${res.head.amplitudePerSlot}")
   }
 
   "Partitioning the first SpanSlotAccumulatedLoad" should "split flexible loads" in {

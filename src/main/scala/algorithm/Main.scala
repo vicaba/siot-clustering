@@ -9,7 +9,7 @@ import crossfold.CrossFoldValidation.{MonteCarlo, Percentage}
 import metrics.Par
 import play.api.libs.json.Json
 import algorithm.serialization.AlgorithmJsonSerializer._
-import reader.EgaugeReader
+import reader.{EgaugeReader, SyntheticProfilesReaderForEuclideanClusterer}
 
 object Main {
 
@@ -24,7 +24,6 @@ object Main {
       .toVector*/
 
     val points = EgaugeReader(Configuration.userProfilesFile)
-
 
 
     //TODO: Why defaulting to points.size + points.size/3?

@@ -92,6 +92,8 @@ trait TemplateForSyntheticProfilesReader {
       val loadBuilder = fileAndBuilder.loadBuilder
 
       var idC    = id
+
+      //TODO: Review this part, exception and file close is not properly handled
       val source = Source.fromFile(file)
 
       Try {

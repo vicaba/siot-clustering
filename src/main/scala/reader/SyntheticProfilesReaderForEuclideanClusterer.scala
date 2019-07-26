@@ -9,12 +9,24 @@ object SyntheticProfilesReaderForEuclideanClusterer extends TemplateForSynthetic
   override type SingleLoadOutputType      = (String, DenseVector[Double])
   override type AccumulatedLoadOutputType = Point
 
+  class DefaultLoadBuilder extends LoadBuilder {
+    override def apply(id: Int, values: Vector[Double], label: String): Seq[(String, DenseVector[Double])] =
+      List((label, DenseVector(values: _*)))
+  }
+
   override def applyDefault(mainFolder: String,
                             subFolders: Iterable[String],
                             applianceOutputFileName: String,
                             lightingOutputFileName: String,
                             ids: Iterable[Int],
-                            windowSize: Int): Vector[AccumulatedLoadOutputType] = ???
+                            windowSize: Int): Vector[AccumulatedLoadOutputType] = apply(
+    mainFolder,
+    subFolders,
+    subFolder => LoadFileAndLoadBuilder(mainFolder + subFolder + applianceOutputFileName, new DefaultLoadBuilder),
+    subFolder => LoadFileAndLoadBuilder(mainFolder + subFolder + lightingOutputFileName, new DefaultLoadBuilder),
+    ids,
+    windowSize
+  )
 
   /**
     *
@@ -45,19 +57,17 @@ object SyntheticProfilesReaderForEuclideanClusterer extends TemplateForSynthetic
       .zip(ids)
       .map {
         case (subFolder, id) =>
-            val r: Seq[(String, DenseVector[Double])] = readSyntheticLoads(
-              applianceFileAndBuilder(subFolder),
-              lightingFileAndBuilder(subFolder),
-              windowSize
-            )
+          val r: Seq[(String, DenseVector[Double])] = readSyntheticLoads(
+            applianceFileAndBuilder(subFolder),
+            lightingFileAndBuilder(subFolder),
+            windowSize
+          )
           val dataLabels = r.map(_._1).toList
-          val data = DenseMatrix(r.map(_._2): _*)
+          val data       = DenseMatrix(r.map(_._2): _*)
           Point(id, data, dataLabels, None)(TypesX_48)
 
       }
       .toVector
   }
-
-
 
 }
