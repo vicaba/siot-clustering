@@ -30,7 +30,7 @@ class SyntheticProfilesReaderSpec extends FlatSpec {
   "The first SpanSlotAccumulatedLoad.amplitudePerSlot" should "be equal to the windowed first line of the file" in {
     val subFoldersAndIds: List[(String, Int)] = List((0 + "/", 0))
 
-    val res = SyntheticProfilesReader(MainFolder,
+    val res = SyntheticProfilesReader.applyDefault(MainFolder,
                                       subFoldersAndIds.map(_._1),
                                       AppliancesOutputFileName,
                                       LightingOutputFileName,
@@ -46,7 +46,7 @@ class SyntheticProfilesReaderSpec extends FlatSpec {
   "Partitioning the first SpanSlotAccumulatedLoad" should "split flexible loads" in {
     val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 1) yield (i + "/", i)).toList
 
-    val res = SyntheticProfilesReader(MainFolder,
+    val res = SyntheticProfilesReader.applyDefault(MainFolder,
                                       subFoldersAndIds.map(_._1),
                                       AppliancesOutputFileName,
                                       LightingOutputFileName,

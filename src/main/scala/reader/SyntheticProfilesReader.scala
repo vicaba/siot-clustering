@@ -2,123 +2,25 @@ package reader
 
 import test.{SingleLoad, SpanSlotAccumulatedLoad, SpanSlotFixedLoad, SpanSlotFlexibleLoad}
 
-import scala.annotation.tailrec
-import scala.collection.{immutable, mutable}
-import scala.collection.mutable.ListBuffer
-import scala.io.Source
-import scala.util.{Random, Try}
+object SyntheticProfilesReader extends TemplateForSyntheticProfilesReader {
 
-object SyntheticProfilesReader {
+  override type SingleLoadOutputType = SingleLoad
 
-  object Appliances {
-    val FridgeFreezer    = "FRIDGE_FREEZER"
-    val Fridge           = "FRIDGE"
-    val UprightFreezer   = "UPRIGHT_FREEZER"
-    val AnswerMachine    = "ANSWER_MACHINE"
-    val CdPlayer         = "CD_PLAYER"
-    val Clock            = "CLOCK"
-    val Phone            = "PHONE"
-    val Hifi             = "HIFI"
-    val Iron             = "IRON"
-    val Vacuum           = "VACUUM"
-    val Fax              = "FAX"
-    val Pc               = "PC"
-    val Printer          = "PRINTER"
-    val Tv1              = "TV1"
-    val Tv2              = "TV2"
-    val Tv3              = "TV3"
-    val VcrDvd           = "VCR_DVD"
-    val Receiver         = "RECEIVER"
-    val Hob              = "HOB"
-    val Oven             = "OVEN"
-    val Microwave        = "MICROWAVE"
-    val Kettle           = "KETTLE"
-    val SmallCooking     = "SMALL_COOKING"
-    val DishWasher       = "DISH_WASHER"
-    val TumbleDryer      = "TUMBLE_DRYER"
-    val WashingMachine   = "WASHING_MACHINE"
-    val WasherDryer      = "WASHER_DRYER"
-    val Deswh            = "DESWH"
-    val EInst            = "E_INST"
-    val ElecShower       = "ELEC_SHOWER"
-    val StorageHeater    = "STORAGE_HEATER"
-    val ElecSpaceHeating = "ELEC_SPACE_HEATING"
+  override type AccumulatedLoadOutputType = SpanSlotAccumulatedLoad
 
-  }
+  def applyDefault(mainFolder: String,
+                   subFolders: Iterable[String],
+                   applianceOutputFileName: String,
+                   lightingOutputFileName: String,
+                   ids: Iterable[Int],
+                   windowSize: Int): Vector[AccumulatedLoadOutputType] = {
 
-  def apply(mainFolder: String,
-            subFolders: Iterable[String],
-            applianceOutputFileName: String,
-            lightingOutputFileName: String,
-            folderIds: Iterable[Int],
-            windowSize: Int): Vector[SpanSlotAccumulatedLoad] =
-    readSyntheticProfiles(mainFolder, subFolders, applianceOutputFileName, lightingOutputFileName, folderIds, windowSize)
-
-  def readSyntheticLoads(applianceOutputFile: String,
-                         lightingOutputFile: String,
-                         windowSize: Int): Vector[SingleLoad] = {
-
-    trait LoadBuilder extends ((Int, Vector[Double], String) => Seq[SingleLoad]) {
-      def apply(id: Int, values: Vector[Double], label: String): Seq[SingleLoad]
-    }
-
-    class ApplianceLoadBuilder extends LoadBuilder {
-      import Appliances._
-      override def apply(id: Int, values: Vector[Double], label: String): Seq[SingleLoad] =
-        List(label match {
-          case DishWasher     => SpanSlotFlexibleLoad(id, 0, values, label)
-          case TumbleDryer    => SpanSlotFlexibleLoad(id, 0, values, label)
-          case WashingMachine => SpanSlotFlexibleLoad(id, 0, values, label)
-          case WasherDryer    => SpanSlotFlexibleLoad(id, 0, values, label)
-          case _              => SpanSlotFixedLoad(id, 0, values, label)
-        })
-    }
-
-    class FixedLoadBuilder extends LoadBuilder {
-      override def apply(id: Int, values: Vector[Double], label: String): Seq[SingleLoad] =
-        List(SpanSlotFixedLoad(id, 0, values, label))
-    }
-
-    def readCsv(file: String, loadBuilder: LoadBuilder)(id: Int): (Int, Vector[SingleLoad]) = {
-
-      var idC    = id
-      val source = Source.fromFile(file)
-
-      Try {
-        (for {
-          line <- source.getLines()
-        } yield {
-          idC = idC + 1
-          val items  = line.split(",").toList
-          val label  = items.head
-          val values = items.tail.map(_.toDouble).grouped(windowSize).map(_.sum).toVector
-          loadBuilder.apply(idC, values, label)
-        }).toVector.flatten
-      }.map((idC, _))
-        .getOrElse {
-          source.close()
-          (idC, Vector.empty)
-        }
-    }
-
-    def rec(fs: List[Int => (Int, Vector[SingleLoad])], accId: Int, accLoads: Vector[SingleLoad]): Vector[SingleLoad] =
-      fs match {
-        case x :: xs =>
-          val (idC, loads) = x(accId)
-          rec(xs, idC, loads ++: accLoads)
-        case Nil => accLoads
-      }
-
-    rec(
-      List(
-        //TODO: Change RandomLadBuilder so it always builds the same fixed and flexible loads by label
-        readCsv(applianceOutputFile, new ApplianceLoadBuilder),
-        readCsv(lightingOutputFile, new FixedLoadBuilder)
-      ),
-      accId = 0,
-      Vector.empty[SingleLoad]
+    apply(
+      mainFolder,
+      subFolders,
+      subFolder => LoadFileAndLoadBuilder(mainFolder + subFolder + applianceOutputFileName, new ApplianceLoadBuilder),
+      subFolder => LoadFileAndLoadBuilder(mainFolder + subFolder + lightingOutputFileName, new FixedLoadBuilder), ids, windowSize
     )
-
   }
 
   /**
@@ -130,18 +32,18 @@ object SyntheticProfilesReader {
     *
     * @param mainFolder
     * @param subFolders
-    * @param applianceOutputFileName
-    * @param lightingOutputFileName
+    * @param applianceFileAndBuilder
+    * @param lightingFileAndBuilder
     * @param ids
     * @param windowSize
     * @return
     */
-  def readSyntheticProfiles(mainFolder: String,
-                            subFolders: Iterable[String],
-                            applianceOutputFileName: String,
-                            lightingOutputFileName: String,
-                            ids: Iterable[Int],
-                            windowSize: Int): Vector[SpanSlotAccumulatedLoad] = {
+  def apply(mainFolder: String,
+            subFolders: Iterable[String],
+            applianceFileAndBuilder: String => this.LoadFileAndLoadBuilder,
+            lightingFileAndBuilder: String => this.LoadFileAndLoadBuilder,
+            ids: Iterable[Int],
+            windowSize: Int): Vector[AccumulatedLoadOutputType] = {
     assert(subFolders.size == ids.size, "the number of subFolders is not equal to the number of ids")
 
     subFolders
@@ -151,14 +53,31 @@ object SyntheticProfilesReader {
           val l = SpanSlotAccumulatedLoad(id,
                                           0,
                                           readSyntheticLoads(
-                                            mainFolder + subFolder + applianceOutputFileName,
-                                            mainFolder + subFolder + lightingOutputFileName,
+                                            applianceFileAndBuilder(subFolder),
+                                            lightingFileAndBuilder(subFolder),
                                             windowSize
                                           ))
           l
 
       }
       .toVector
+  }
+
+  class ApplianceLoadBuilder extends LoadBuilder {
+    import Appliances._
+    override def apply(id: Int, values: Vector[Double], label: String): Seq[SingleLoad] =
+      List(label match {
+        case DishWasher     => SpanSlotFlexibleLoad(id, 0, values, label)
+        case TumbleDryer    => SpanSlotFlexibleLoad(id, 0, values, label)
+        case WashingMachine => SpanSlotFlexibleLoad(id, 0, values, label)
+        case WasherDryer    => SpanSlotFlexibleLoad(id, 0, values, label)
+        case _              => SpanSlotFixedLoad(id, 0, values, label)
+      })
+  }
+
+  class FixedLoadBuilder extends LoadBuilder {
+    override def apply(id: Int, values: Vector[Double], label: String): Seq[SingleLoad] =
+      List(SpanSlotFixedLoad(id, 0, values, label))
   }
 
 }
