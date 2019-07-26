@@ -10,7 +10,7 @@ import test.reschedulermetrics.BiasedAverageDistanceTransformation
 
 class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
-  val MainFolder               = "files/syn_loads/"
+  val MainFolder               = "files/syn_loads_test/"
   val AppliancesOutputFileName = "appliance_output.csv"
   val LightingOutputFileName   = "lighting_output.csv"
 
@@ -20,7 +20,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
       Given("Synthetically generated loads as UnscheduledLoads")
 
-      val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 49) yield (i + "/", i)).toList
+      val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 4) yield (i + "/", i)).toList
 
       val unscheduledLoads = SyntheticProfilesReader(MainFolder,
                                                      subFoldersAndIds.map(_._1),

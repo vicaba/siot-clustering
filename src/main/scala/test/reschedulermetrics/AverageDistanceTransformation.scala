@@ -2,15 +2,20 @@ package test.reschedulermetrics
 import test.{Load, Movement, SpanSlotAccumulatedLoad}
 
 object AverageDistanceTransformation extends MetricTransformation {
-  override def apply(referenceAverage: Double, bestMovement: Movement, temporaryMovement: Movement, preferredSlots: List[Int]): (Double, Double) =
-    (computeAverageDistanceMetric2(referenceAverage, temporaryMovement, preferredSlots),
-      computeAverageDistanceMetric2(referenceAverage, bestMovement, preferredSlots))
+  override def apply(referenceAverage: Double,
+                     bestMovement: Movement,
+                     temporaryMovement: Movement,
+                     preferredSlots: List[Int]): MetricTransformationResult =
+    MetricTransformationResult(
+      computeAverageDistanceMetric2(referenceAverage, bestMovement, preferredSlots),
+      computeAverageDistanceMetric2(referenceAverage, temporaryMovement, preferredSlots)
+    )
 
   private def computeAverageDistanceMetric2(referenceAverage: Double,
-                                    movement: Movement,
-                                    preferedSlots: List[Int],
-                                    bias: Double = 0.50): Double = {
-    val actualAverage = computeBiasedAverageAtLoadPosition(movement.acc, movement.fl, preferedSlots, bias)
+                                            movement: Movement,
+                                            preferredSlots: List[Int],
+                                            bias: Double = 0.50): Double = {
+    val actualAverage = computeBiasedAverageAtLoadPosition(movement.acc, movement.fl, preferredSlots, bias)
 
     val distance = Math.pow(Math.abs(referenceAverage - actualAverage), 2)
 
@@ -28,9 +33,9 @@ object AverageDistanceTransformation extends MetricTransformation {
   }
 
   private def computeBiasedAverageAtLoadPosition(accumulatedLoad: SpanSlotAccumulatedLoad,
-                                         load: Load,
-                                         preferedSlots: List[Int],
-                                         bias: Double): Double = {
+                                                 load: Load,
+                                                 preferredSlots: List[Int],
+                                                 bias: Double): Double = {
     val fromSlot  = load.positionInT
     val untilSlot = load.positionInT + load.span
 
@@ -38,7 +43,7 @@ object AverageDistanceTransformation extends MetricTransformation {
     for (i <- fromSlot until untilSlot) {
       val amplitude = accumulatedLoad.amplitudePerSlot(i)
       val biasedAmplitude = {
-        if (preferedSlots.contains(i)) amplitude * bias
+        if (preferredSlots.contains(i)) amplitude * bias
         else amplitude
       }
       sum += biasedAmplitude
@@ -48,6 +53,5 @@ object AverageDistanceTransformation extends MetricTransformation {
 
     average
   }
-
 
 }

@@ -47,19 +47,22 @@ object Rescheduler {
       if (verbose) println(s"\tAt position $i")
 
       val flexibleLoadMovement = flexibleLoad.copy(positionInT = i)
-      val temporaryNewMovement =
+      val temporaryMovement =
         new Movement(temporaryX -/+= flexibleLoadMovement, flexibleLoadMovement, preferredSlots)
 
-      val (temporaryMetric, bestMetric) =
-        metricTransformation(referenceAverage, bestMovement, temporaryNewMovement, preferredSlots)
+      val metricResult =
+        metricTransformation(referenceAverage, bestMovement, temporaryMovement, preferredSlots)
+
+      val temporaryMetric = metricResult.temporaryMovementMetric
+      val bestMetric = metricResult.bestMovementMetric
 
       if (verbose) println(s"\t\tbestMetric = $bestMetric, peak = ${bestMovement.acc.peak}")
-      if (verbose) print(s"\t\ttempMetric = $temporaryMetric, peak = ${temporaryNewMovement.acc.peak}")
+      if (verbose) print(s"\t\ttempMetric = $temporaryMetric, peak = ${temporaryMovement.acc.peak}")
 
        if (temporaryMetric < bestMetric) {
         if (verbose) println(" - Is best")
 
-        bestMovement = new Movement(temporaryNewMovement.acc.copy(), temporaryNewMovement.fl, preferredSlots)
+        bestMovement = new Movement(temporaryMovement.acc.copy(), temporaryMovement.fl, preferredSlots)
       } else {
         if (verbose) println(" - Not best")
       }

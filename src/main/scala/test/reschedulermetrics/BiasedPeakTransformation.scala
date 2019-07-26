@@ -7,8 +7,8 @@ class BiasedPeakTransformation(bias: Double = 0.2) extends MetricTransformation 
   override def apply(referenceAverage: Double,
                      bestMovement: Movement,
                      temporaryMovement: Movement,
-                     preferredSlots: List[Int]): (Double, Double) =
-    (biasedPeak(temporaryMovement, preferredSlots), biasedPeak(bestMovement, preferredSlots))
+                     preferredSlots: List[Int]): MetricTransformationResult =
+    MetricTransformationResult(biasedPeak(bestMovement, preferredSlots), biasedPeak(temporaryMovement, preferredSlots))
 
   private def biasedPeak(m: Movement, preferredSlots: List[Int]): Double = {
 

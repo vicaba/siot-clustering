@@ -6,9 +6,11 @@ class BiasedAverageDistanceTransformation(val bias: Double = 0.50) extends Metri
   override def apply(referenceAverage: Double,
                      bestMovement: Movement,
                      temporaryMovement: Movement,
-                     preferredSlots: List[Int]): (Double, Double) =
-    (computeAverageDistanceMetric(referenceAverage, temporaryMovement, preferredSlots, bias),
-     computeAverageDistanceMetric(referenceAverage, bestMovement, preferredSlots, bias))
+                     preferredSlots: List[Int]): MetricTransformationResult =
+    MetricTransformationResult(
+      computeAverageDistanceMetric(referenceAverage, bestMovement, preferredSlots, bias),
+      computeAverageDistanceMetric(referenceAverage, temporaryMovement, preferredSlots, bias)
+    )
 
   private def computeAverageDistanceMetric(referenceAverage: Double,
                                            movement: Movement,

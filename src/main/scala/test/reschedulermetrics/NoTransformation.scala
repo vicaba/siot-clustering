@@ -6,6 +6,6 @@ object NoTransformation extends MetricTransformation {
   override def apply(referenceAverage: Double,
                      bestMovement: Movement,
                      temporaryMovement: Movement,
-                     preferredSlots: List[Int]): (Double, Double) =
-    (temporaryMovement.acc.peak, bestMovement.acc.peak)
+                     preferredSlots: List[Int]): MetricTransformationResult =
+    MetricTransformationResult(bestMovement.acc.peak, temporaryMovement.acc.peak)
 }
