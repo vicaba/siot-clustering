@@ -9,7 +9,7 @@ object SyntheticProfilesReaderForEuclideanClusterer extends TemplateForSynthetic
   override type SingleLoadOutputType      = (String, DenseVector[Double])
   override type AccumulatedLoadOutputType = Point
 
-  class DefaultLoadBuilder extends LoadBuilder {
+  object DefaultLoadBuilder extends LoadBuilder {
     override def apply(id: Int, values: Vector[Double], label: String): Seq[(String, DenseVector[Double])] =
       List((label, DenseVector(values: _*)))
   }
@@ -22,8 +22,8 @@ object SyntheticProfilesReaderForEuclideanClusterer extends TemplateForSynthetic
                             windowSize: Int): Vector[AccumulatedLoadOutputType] = apply(
     mainFolder,
     subFolders,
-    subFolder => LoadFileAndLoadBuilder(mainFolder + subFolder + applianceOutputFileName, new DefaultLoadBuilder),
-    subFolder => LoadFileAndLoadBuilder(mainFolder + subFolder + lightingOutputFileName, new DefaultLoadBuilder),
+    subFolder => LoadFileAndLoadBuilder(mainFolder + subFolder + applianceOutputFileName, DefaultLoadBuilder),
+    subFolder => LoadFileAndLoadBuilder(mainFolder + subFolder + lightingOutputFileName, DefaultLoadBuilder),
     ids,
     windowSize
   )

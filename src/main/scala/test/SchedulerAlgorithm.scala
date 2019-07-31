@@ -4,7 +4,7 @@ import test.reschedulermetrics.{BiasedAverageDistanceTransformation, BiasedPeakT
 
 import scala.annotation.tailrec
 
-object Rescheduler {
+object SchedulerAlgorithm {
 
   def reschedule(acc: SpanSlotAccumulatedLoad,
                  preferredSlots: List[Int] = Nil,

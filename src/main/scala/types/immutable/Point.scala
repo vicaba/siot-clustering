@@ -18,7 +18,11 @@ case class Point(
     case _        => false
   }
 
-  override def size: Int = 1
+  /**
+    * Returns the number of rows of data in this Point
+    * @return
+    */
+  override def size: Int = data.rows
 
   override def hashCode(): Int = this.id
 

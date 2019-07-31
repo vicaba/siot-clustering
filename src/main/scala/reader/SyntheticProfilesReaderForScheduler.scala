@@ -2,6 +2,8 @@ package reader
 
 import test.{SingleLoad, SpanSlotAccumulatedLoad, SpanSlotFixedLoad, SpanSlotFlexibleLoad}
 
+import scala.util.Try
+
 object SyntheticProfilesReaderForScheduler extends TemplateForSyntheticProfilesReader {
 
   override type SingleLoadOutputType = SingleLoad
@@ -18,8 +20,8 @@ object SyntheticProfilesReaderForScheduler extends TemplateForSyntheticProfilesR
     apply(
       mainFolder,
       subFolders,
-      subFolder => LoadFileAndLoadBuilder(mainFolder + subFolder + applianceOutputFileName, new ApplianceLoadBuilder),
-      subFolder => LoadFileAndLoadBuilder(mainFolder + subFolder + lightingOutputFileName, new FixedLoadBuilder), ids, windowSize
+      subFolder => LoadFileAndLoadBuilder(mainFolder + subFolder + applianceOutputFileName, ApplianceLoadBuilder),
+      subFolder => LoadFileAndLoadBuilder(mainFolder + subFolder + lightingOutputFileName, FixedLoadBuilder), ids, windowSize
     )
   }
 
@@ -63,19 +65,18 @@ object SyntheticProfilesReaderForScheduler extends TemplateForSyntheticProfilesR
       .toVector
   }
 
-  class ApplianceLoadBuilder extends LoadBuilder {
+  object ApplianceLoadBuilder extends LoadBuilder {
     import Appliances._
     override def apply(id: Int, values: Vector[Double], label: String): Seq[SingleLoad] =
-      List(label match {
+      Try(List(label match {
         case DishWasher     => SpanSlotFlexibleLoad(id, 0, values, label)
         case TumbleDryer    => SpanSlotFlexibleLoad(id, 0, values, label)
         case WashingMachine => SpanSlotFlexibleLoad(id, 0, values, label)
         case WasherDryer    => SpanSlotFlexibleLoad(id, 0, values, label)
-        case _              => SpanSlotFixedLoad(id, 0, values, label)
-      })
+      })).getOrElse(FixedLoadBuilder(id, values, label))
   }
 
-  class FixedLoadBuilder extends LoadBuilder {
+  object FixedLoadBuilder extends LoadBuilder {
     override def apply(id: Int, values: Vector[Double], label: String): Seq[SingleLoad] =
       List(SpanSlotFixedLoad(id, 0, values, label))
   }

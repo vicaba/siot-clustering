@@ -1,6 +1,6 @@
 package algorithm.scheduler
 
-import test.{Rescheduler, SpanSlotAccumulatedLoad, UserAllocator}
+import test.{SchedulerAlgorithm, SpanSlotAccumulatedLoad, UserAllocator}
 import test.reschedulermetrics.MetricTransformation
 
 import scala.util.Try
@@ -12,7 +12,7 @@ object Scheduler {
             metricTransformation: MetricTransformation,
             referenceAverage: Double = 0.0,
             verbose: Boolean = false): SpanSlotAccumulatedLoad =
-    test.Rescheduler.reschedule(acc, preferredSlots, metricTransformation, referenceAverage, verbose)
+    test.SchedulerAlgorithm.reschedule(acc, preferredSlots, metricTransformation, referenceAverage, verbose)
 
   def apply(clusters: List[SpanSlotAccumulatedLoad],
             metricTransformation: MetricTransformation): List[SpanSlotAccumulatedLoad] = {
@@ -27,7 +27,7 @@ object Scheduler {
 
     clusters.zip(schedulerPreferredSlots).map {
       case (user, schedulingPreferredSlotsForUser) =>
-        Rescheduler.reschedule(
+        SchedulerAlgorithm.reschedule(
           user,
           schedulingPreferredSlotsForUser,
           metricTransformation = metricTransformation,

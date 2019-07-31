@@ -35,7 +35,7 @@ object UserAllocator {
     val accumulatedLoads =
       SpanSlotAccumulatedLoad.keepLoadOrder(0, lowestPositionInT, fixedLoads ::: usersAsFlexibleLoads)
 
-    val allocationResult = Rescheduler.reschedule(accumulatedLoads, metricTransformation = NoTransformation)
+    val allocationResult = SchedulerAlgorithm.reschedule(accumulatedLoads, metricTransformation = NoTransformation)
 
     // Reorder per "users" input
     // TODO: This can be optimized

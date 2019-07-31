@@ -367,9 +367,9 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
     val res = users.zip(schedulerPreferredSlots).map {
       case (user, schedulingPreferredSlotsForUser) =>
         val resultWithoutPreferredSlots =
-          Rescheduler.reschedule(user, metricTransformation = metricTransformation, referenceAverage = referenceAverage)
+          SchedulerAlgorithm.reschedule(user, metricTransformation = metricTransformation, referenceAverage = referenceAverage)
 
-        val resultWithPreferredSlots = Rescheduler.reschedule(user,
+        val resultWithPreferredSlots = SchedulerAlgorithm.reschedule(user,
                                                               schedulingPreferredSlotsForUser,
                                                               metricTransformation = metricTransformation,
                                                               referenceAverage = referenceAverage,

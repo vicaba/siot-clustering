@@ -6,7 +6,7 @@ import metrics.Metric
 import org.scalatest.Matchers._
 import test.reschedulermetrics.NoTransformation
 
-class SchedulerSpec extends FeatureSpec with GivenWhenThen {
+class SchedulerAlgorithmSpec extends FeatureSpec with GivenWhenThen {
 
   feature("Rescheduler.rescheduleFlexibleLoad") {
 
@@ -22,7 +22,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
       When("the Rescheduler is called")
 
-      val result = Rescheduler.rescheduleFlexibleLoad(spanSlotAccumulatedLoad, flexibleLoad, metricTransformation = NoTransformation)
+      val result = SchedulerAlgorithm.rescheduleFlexibleLoad(spanSlotAccumulatedLoad, flexibleLoad, metricTransformation = NoTransformation)
 
       Then("nothing should have happened")
 
@@ -47,7 +47,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
       When("the Rescheduler is called")
 
-      val result = Rescheduler.rescheduleFlexibleLoad(spanSlotAccumulatedLoad, flexibleLoads(1), metricTransformation = NoTransformation)
+      val result = SchedulerAlgorithm.rescheduleFlexibleLoad(spanSlotAccumulatedLoad, flexibleLoads(1), metricTransformation = NoTransformation)
 
       Then("nothing should have happened")
 
@@ -71,7 +71,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
       When("the Rescheduler is called")
 
-      val result = Rescheduler.reschedule(spanSlotAccumulatedLoad, metricTransformation = NoTransformation)
+      val result = SchedulerAlgorithm.reschedule(spanSlotAccumulatedLoad, metricTransformation = NoTransformation)
 
       Then("nothing should have happened")
 
@@ -91,7 +91,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
       When("the Rescheduler is called")
 
-      val result = Rescheduler.reschedule(spanSlotAccumulatedLoad, metricTransformation = NoTransformation)
+      val result = SchedulerAlgorithm.reschedule(spanSlotAccumulatedLoad, metricTransformation = NoTransformation)
 
       Then("nothing should have happened")
 
@@ -118,7 +118,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
       When("the Rescheduler is called")
 
-      val result = Rescheduler.reschedule(spanSlotAccumulatedLoad, metricTransformation = NoTransformation)
+      val result = SchedulerAlgorithm.reschedule(spanSlotAccumulatedLoad, metricTransformation = NoTransformation)
 
       Then("nothing should have happened")
 
