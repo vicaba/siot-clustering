@@ -1,14 +1,16 @@
 package reader
 
-import breeze.linalg._
+import org.scalatest.{FeatureSpec, FlatSpec, GivenWhenThen}
+
 import scala.collection.immutable.{Vector => scalaVector}
-import org.scalatest.FlatSpec
 import org.scalatest.Matchers._
-import test.{SequenceSplitByConsecutiveElements, SpanSlotAccumulatedLoad}
+import org.scalatest.Matchers._
+import types.immutable.Point
+
 import scala.io.Source
 import scala.util.Try
 
-class SyntheticProfilesReaderForEuclideanClustererSpec extends FlatSpec {
+class SyntheticProfilesReaderForEuclideanClustererSpec extends FlatSpec with GivenWhenThen {
 
   val MainFolder               = "files/syn_loads_test/"
   val AppliancesOutputFileName = "appliance_output.csv"
@@ -28,38 +30,53 @@ class SyntheticProfilesReaderForEuclideanClustererSpec extends FlatSpec {
     }
   }
 
-  "The first SpanSlotAccumulatedLoad.amplitudePerSlot" should "be equal to the windowed first line of the file" in {
-    val subFoldersAndIds: List[(String, Int)] = List((0 + "/", 0))
+  val subFoldersAndIds: List[(String, Int)] = List((0 + "/", 0))
 
-    val res = SyntheticProfilesReaderForEuclideanClusterer.applyDefault(MainFolder,
-                                                                        subFoldersAndIds.map(_._1),
-                                                                        AppliancesOutputFileName,
-                                                                        LightingOutputFileName,
-                                                                        subFoldersAndIds.map(_._2),
-                                                                        windowSize = 60)
+  val resultFromReader: Vector[Point] = SyntheticProfilesReaderForEuclideanClusterer.applyDefault(
+    MainFolder,
+    subFoldersAndIds.map(_._1),
+    AppliancesOutputFileName,
+    LightingOutputFileName,
+    subFoldersAndIds.map(_._2),
+    windowSize = 60)
 
-    val resHeadAmplitudePerSlot = res.head.syntheticValue.toScalaVector
+    "The first SpanSlotAccumulatedLoad.amplitudePerSlot" should "be equal to the windowed first line of the file" in {
 
-    val rawRead: scalaVector[Double] = readRawHeadRow(MainFolder + "0/" + "totals.csv", windowSize = 60)
+      Given("The first user amplitude per slot read from appliances and lightning files as a Point")
 
-    assert(rawRead == resHeadAmplitudePerSlot, s"$rawRead was not equal to $resHeadAmplitudePerSlot")
-  }
+      val resHead = resultFromReader.head
 
-  // TODO: Check if dataLabels are placed correctly
-  "Partitioning the first SpanSlotAccumulatedLoad" should "split flexible loads" in {
-    val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 1) yield (i + "/", i)).toList
+      And("The first user amplitude per slot read from totals file")
 
-    val res = SyntheticProfilesReaderForScheduler.applyDefault(MainFolder,
-                                                               subFoldersAndIds.map(_._1),
-                                                               AppliancesOutputFileName,
-                                                               LightingOutputFileName,
-                                                               subFoldersAndIds.map(_._2),
-                                                               windowSize = 30)
+      val rawRead: scalaVector[Double] = readRawHeadRow(MainFolder + "0/" + "totals.csv", windowSize = 60)
 
-    val flexibleLoad =
-      res.head.flexibleLoads.filter(_.label == SyntheticProfilesReaderForScheduler.Appliances.WashingMachine).head
-    SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount(flexibleLoad.amplitudePerSlot) should not be empty
+      When("Totals are calculated from the Point")
 
-  }
+      val resHeadAmplitudePerSlot = resHead.syntheticValue.toScalaVector
+
+      Then("The amplitude per slot from the totals.csv file should be equal to the calculated totals from the Point")
+
+      resHeadAmplitudePerSlot shouldBe rawRead
+    }
+
+    "dataLabels" should "be placed correctly" in {
+
+      Given("The first user amplitude per slot read from appliances and lightning files as a Point")
+
+      val resHead = resultFromReader.head
+
+      When("Getting the number of dataLabels in the Point")
+
+      val nDataLabels = resHead.dataLabels.length
+
+      Then("There should be 58 labels")
+
+      nDataLabels shouldBe 58
+
+      And("No label is empty string")
+
+      assert(0 == resHead.dataLabels.count(_ == ""), "no label is empty")
+
+    }
 
 }
