@@ -22,23 +22,25 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
       val subFoldersAndIds: List[(String, Int)] = (for (i <- 2 to 3) yield (i + "/", i)).toList
 
-      val unscheduledLoads = SyntheticProfilesReaderForScheduler.applyDefault(MainFolder,
-                                                     subFoldersAndIds.map(_._1),
-                                                     AppliancesOutputFileName,
-                                                     LightingOutputFileName,
-                                                     subFoldersAndIds.map(_._2),
-                                                     windowSize = 30).toList
+      val unscheduledLoads = SyntheticProfilesReaderForScheduler
+        .applyDefault(MainFolder,
+                      subFoldersAndIds.map(_._1),
+                      AppliancesOutputFileName,
+                      LightingOutputFileName,
+                      subFoldersAndIds.map(_._2),
+                      windowSize = 30)
+        .toList
 
       unscheduledLoads.foreach { accLoad =>
         val splitResult = accLoad.flexibleLoads.map { fLoad =>
-          val splitFlexibleLoad =
+          val splitResults =
             SequenceSplitByConsecutiveElements
               .withConsecutiveValueAsTheHighestCount(fLoad.amplitudePerSlot)
-              .zipWithIndex
-              .map {
-                case (s, idx) =>
-                  SpanSlotFlexibleLoad(idx, s.index, s.seq.toVector, fLoad.label)
-              }
+          val splitFlexibleLoad = splitResults.results.zipWithIndex
+            .map {
+              case (s, idx) =>
+                SpanSlotFlexibleLoad(idx, s.index, s.seq.toVector, fLoad.label)
+            }
           (fLoad, splitFlexibleLoad)
         }
 

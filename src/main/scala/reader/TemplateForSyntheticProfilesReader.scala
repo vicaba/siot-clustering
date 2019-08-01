@@ -46,8 +46,8 @@ trait TemplateForSyntheticProfilesReader {
 
   }
 
-  trait LoadBuilder extends ((Int, Vector[Double], String) => Seq[SingleLoadOutputType]) {
-    def apply(id: Int, values: Vector[Double], label: String): Seq[SingleLoadOutputType]
+  trait LoadBuilder extends ((Int, Vector[Double], String) => SingleLoadOutputType) {
+    def apply(id: Int, values: Vector[Double], label: String): SingleLoadOutputType
   }
 
   case class LoadFileAndLoadBuilder(file: String, loadBuilder: LoadBuilder)
@@ -105,7 +105,7 @@ trait TemplateForSyntheticProfilesReader {
           val label  = items.head
           val values = items.tail.map(_.toDouble).grouped(windowSize).map(_.sum).toVector
           loadBuilder.apply(idC, values, label)
-        }).toVector.flatten
+        }).toVector
       }.map((idC, _))
         .getOrElse {
           source.close()

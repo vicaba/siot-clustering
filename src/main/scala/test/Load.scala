@@ -69,12 +69,50 @@ class SpanSlotFlexibleLoad(override val id: Int,
 
 }
 
-case class SpanSlotFlexibleLoadSubTask(parentId: Int,
-                                       override val id: Int,
-                                       override val positionInT: Int,
-                                       override val amplitudePerSlot: Vector[Double],
-                                       override val label: String = "")
-    extends SpanSlotFlexibleLoad(id, positionInT, amplitudePerSlot, label) {}
+object SpanSlotFlexibleLoadAggregate {
+
+  def buildMemory(original: SpanSlotFlexibleLoad,
+                  offValue: Double,
+                  aggregatees: Seq[SpanSlotFlexibleLoad]): SpanSlotFlexibleLoadAggregateMemory =
+    new SpanSlotFlexibleLoadAggregateMemory(
+      OriginalSpanSlotFlexibleLoadData(original),
+      offValue,
+      aggregatees.map(agregatee => new AggregateeData(agregatee.id, agregatee.label)))
+
+  object OriginalSpanSlotFlexibleLoadData {
+    def apply(load: SpanSlotFlexibleLoad): OriginalSpanSlotFlexibleLoadData =
+      new OriginalSpanSlotFlexibleLoadData(load.id, load.positionInT, load.amplitudePerSlot, load.label)
+  }
+
+  class OriginalSpanSlotFlexibleLoadData(val id: Int,
+                                         val positionInT: Int,
+                                         val amplitudePerSlot: Vector[Double],
+                                         val label: String = "")
+
+  private class AggregateeData(val id: Int, val label: String)
+
+  class SpanSlotFlexibleLoadAggregateMemory(
+      val originalData: SpanSlotFlexibleLoadAggregate.OriginalSpanSlotFlexibleLoadData,
+      val offValue: Double,
+      private val aggregatees: Seq[AggregateeData]) {
+    assert(!aggregatees.exists(_.label != originalData.label),
+           "At least one of the aggregatees does not have the same label as the original flexible load")
+/*    def merge(allPossibleAggregatees: Seq[SpanSlotFlexibleLoad]): (SpanSlotFlexibleLoad, Seq[SpanSlotFlexibleLoad]) = {
+      allPossibleAggregatees.filter(_.label == originalData.label)
+      val newAggregatees = for {
+        agg     <- allPossibleAggregatees.filter(_.label == originalData.label)
+        aggData <- aggregatees
+        if agg.id == aggData.id
+      } yield agg
+
+      val maxPosIntT = new
+
+      for (i <- )
+
+    }*/
+  }
+
+}
 
 /**
   *
@@ -104,7 +142,7 @@ case class SpanSlotAccumulatedLoad private (override val id: Int,
     loads.filter(_.isInstanceOf[SpanSlotAccumulatedLoad]).asInstanceOf[Set[SpanSlotAccumulatedLoad]]
 
   // Todo: changed
-  override def span: Int = Try(loads.map(l => l.span + l.positionInT).max - loads.map(_.positionInT).min).getOrElse(0)
+  override def span: Int = Load.span(loads)
 
   override def amplitudePerSlot: Vector[Double] =
     SeqOps.sum(
@@ -169,6 +207,8 @@ object Load {
   def toSpanSlotFixedLoad(s: Seq[Double]): SpanSlotFixedLoad = {
     SpanSlotFixedLoad(0, 0, s.toVector)
   }
+
+  def span(loads: Traversable[Load]): Int = Try(loads.map(l => l.span + l.positionInT).max - loads.map(_.positionInT).min).getOrElse(0)
 
   class LoadOrdering extends Ordering[Load] {
     override def compare(x: Load, y: Load): Int = implicitly[Ordering[Double]].compare(x.totalEnergy, y.totalEnergy)

@@ -3,17 +3,13 @@ package test
 import scala.annotation.tailrec
 import scala.collection.mutable.ListBuffer
 
-trait SubTaskSplitter {
-
-  def split(s: SpanSlotFlexibleLoad, splitStrategy: SequenceSplitStrategy[Double]): Seq[SpanSlotFlexibleLoadSubTask]
-
-}
-
 case class SplitResult[E](index: Int, seq: Seq[E])
+
+case class SplitResults[E](sourceSeq: Seq[E], consecutiveValue: E, results: Seq[SplitResult[E]])
 
 trait SequenceSplitStrategy[E] {
 
-  def apply(seq: Seq[E]): Seq[SplitResult[E]]
+  def apply(seq: Seq[E]): SplitResults[E]
 
 }
 
@@ -38,8 +34,12 @@ object SequenceSplitByConsecutiveElements {
 
 class SequenceSplitByConsecutiveElements[E](val consecutiveValue: Seq[E] => E) extends SequenceSplitStrategy[E] {
 
-  override def apply(seq: Seq[E]): Seq[SplitResult[E]] =
-    splitSequenceBySequenceOfElements(seq, consecutiveValue(seq)).map(r => SplitResult(r._1, r._2))
+  override def apply(seq: Seq[E]): SplitResults[E] = {
+    val _consecutiveValue = consecutiveValue(seq)
+    SplitResults(seq,
+                 _consecutiveValue,
+                 splitSequenceBySequenceOfElements(seq, _consecutiveValue).map(r => SplitResult(r._1, r._2)))
+  }
 
   private def splitSequenceBySequenceOfElements(seq: Seq[E], consecutiveValue: E): Seq[(Int, Seq[E])] = {
 

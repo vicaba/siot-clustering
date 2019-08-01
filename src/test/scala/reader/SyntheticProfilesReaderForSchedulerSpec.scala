@@ -54,7 +54,7 @@ class SyntheticProfilesReaderForSchedulerSpec extends FlatSpec {
                                       windowSize = 30)
 
     val flexibleLoad = res.head.flexibleLoads.filter(_.label == SyntheticProfilesReaderForScheduler.Appliances.WashingMachine).head
-    SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount(flexibleLoad.amplitudePerSlot) should not be empty
+    SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount(flexibleLoad.amplitudePerSlot).results should not be empty
 
   }
 

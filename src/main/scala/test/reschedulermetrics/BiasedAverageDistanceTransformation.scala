@@ -23,10 +23,10 @@ class BiasedAverageDistanceTransformation(val bias: Double = 0.50) extends Metri
     val slotsWithPriorityOverlapRatio = computeSlotsWithPriorityOverlapRatio(flexibleLoad, preferedSlots)
 
     val distance = Math.abs(referenceAverage - currentAverage)
-    //println(s"average_ref = $referenceAverage, bias = $bias, slotsWithPriority = $slotsWithPriorityOverlapRatio")
+    println(s"average_ref = $referenceAverage, bias = $bias, slotsWithPriority = $slotsWithPriorityOverlapRatio")
 
     // TODO: It seems that removing bias works better
-    distance * (1 - slotsWithPriorityOverlapRatio)
+    distance * (1 - bias * slotsWithPriorityOverlapRatio)
   }
 
   private def computeSlotsWithPriorityOverlapRatio(load: Load, preferredSlots: List[Int]): Double =

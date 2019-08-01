@@ -15,8 +15,7 @@ object EuclideanClustererToSchedulerDataTypeTransformation {
       case (p, pIdx) =>
         p.data(breeze.linalg.*, ::).iterator.zip(p.dataLabels.toIterator).zipWithIndex.map {
           case ((dv, label), loadIdx) =>
-            // TODO: Change builder return type to remove collection
-            builder(pIdx * maxDataPerPoint + loadIdx, dv.toScalaVector(), label).head
+            builder(pIdx * maxDataPerPoint + loadIdx, dv.toScalaVector(), label)
         }
     }
     SpanSlotAccumulatedLoad(spanSlotAccumulatedLoadId, 0, allLoads)

@@ -67,18 +67,18 @@ object SyntheticProfilesReaderForScheduler extends TemplateForSyntheticProfilesR
 
   object ApplianceLoadBuilder extends LoadBuilder {
     import Appliances._
-    override def apply(id: Int, values: Vector[Double], label: String): Seq[SingleLoad] =
-      Try(List(label match {
+    override def apply(id: Int, values: Vector[Double], label: String): SingleLoad =
+      Try(label match {
         case DishWasher     => SpanSlotFlexibleLoad(id, 0, values, label)
         case TumbleDryer    => SpanSlotFlexibleLoad(id, 0, values, label)
         case WashingMachine => SpanSlotFlexibleLoad(id, 0, values, label)
         case WasherDryer    => SpanSlotFlexibleLoad(id, 0, values, label)
-      })).getOrElse(FixedLoadBuilder(id, values, label))
+      }).getOrElse(FixedLoadBuilder(id, values, label))
   }
 
   object FixedLoadBuilder extends LoadBuilder {
-    override def apply(id: Int, values: Vector[Double], label: String): Seq[SingleLoad] =
-      List(SpanSlotFixedLoad(id, 0, values, label))
+    override def apply(id: Int, values: Vector[Double], label: String): SingleLoad =
+      SpanSlotFixedLoad(id, 0, values, label)
   }
 
 }
