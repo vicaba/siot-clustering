@@ -46,8 +46,8 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
         expectedTotalLoad,
         metricTransformation,
         testVerbose = true,
-        schedulerVerbose = true,
-        printLoads = true
+        schedulerVerbose = false,
+        printLoads = false
       )
     }
 
@@ -76,8 +76,8 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
         expectedTotalLoad,
         metricTransformation,
         testVerbose = true,
-        schedulerVerbose = true,
-        printLoads = true
+        schedulerVerbose = false,
+        printLoads = false
       )
     }
 
@@ -106,8 +106,8 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
         expectedTotalLoad,
         metricTransformation,
         testVerbose = true,
-        schedulerVerbose = true,
-        printLoads = true
+        schedulerVerbose = false,
+        printLoads = false
       )
     }
 
@@ -137,8 +137,8 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
         expectedTotalLoad,
         metricTransformation,
         testVerbose = true,
-        schedulerVerbose = true,
-        printLoads = true
+        schedulerVerbose = false,
+        printLoads = false
       )
     }
 
@@ -174,8 +174,8 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
         expectedTotalLoad,
         metricTransformation,
         testVerbose = true,
-        schedulerVerbose = true,
-        printLoads = true
+        schedulerVerbose = false,
+        printLoads = false
       )
     }
   }
