@@ -11,9 +11,12 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
 
   val metricTransformation = new BiasedAverageDistanceTransformation()
 
+  def enableLog(bool: Boolean)(f: => Any): Unit = if (bool) f
+
   feature(
     "Benchmark between the input PAR and the output PAR of the two alternatives (with and without prefered slots per user)") {
     scenario("3 slots with 3 users and a flexible load each") {
+      val scenarioName = "3 slots with 3 users and a flexible load each"
       val users: List[SpanSlotAccumulatedLoad] = List(
         SpanSlotAccumulatedLoad(100,
                                 0,
@@ -41,17 +44,20 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
         Vector[Double](9, 12, 9)
       )
 
-      executeTest(
+      executeScenario(
         users,
         expectedTotalLoad,
         metricTransformation,
         testVerbose = true,
         schedulerVerbose = false,
-        printLoads = false
+        printLoads = true,
+        scenarioName = scenarioName
       )
     }
 
-    scenario("All the same") {
+    scenario("All users have the same loads") {
+      val scenarioName = "All users have the same loads"
+
       val users: List[SpanSlotAccumulatedLoad] = List(
         SpanSlotAccumulatedLoad(100,
                                 0,
@@ -71,17 +77,19 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
         Vector[Double](4, 4, 4)
       )
 
-      executeTest(
+      executeScenario(
         users,
         expectedTotalLoad,
         metricTransformation,
         testVerbose = true,
         schedulerVerbose = false,
-        printLoads = false
+        printLoads = true,
+        scenarioName = scenarioName
       )
     }
 
     scenario("With a gap, 2 users with 1 flexible load each to the middle") {
+      val scenarioName = "With a gap, 2 users with 1 flexible load each to the middle"
       val users: List[SpanSlotAccumulatedLoad] = List(
         SpanSlotAccumulatedLoad(100,
                                 0,
@@ -101,17 +109,20 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
         Vector[Double](8, 6, 8)
       )
 
-      executeTest(
+      executeScenario(
         users,
         expectedTotalLoad,
         metricTransformation,
         testVerbose = true,
         schedulerVerbose = false,
-        printLoads = false
+        printLoads = true,
+        scenarioName = scenarioName
       )
     }
 
     scenario("With a gap, 2 users with 1 flexible load, the highest to the middle the other to one of the sides") {
+      val scenarioName = "With a gap, 2 users with 1 flexible load, the highest to the middle the other to one of the sides"
+
       val users: List[SpanSlotAccumulatedLoad] = List(
         SpanSlotAccumulatedLoad(500,
                                 0,
@@ -132,17 +143,20 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
         Vector[Double](8, 12, 19)
       )
 
-      executeTest(
+      executeScenario(
         users,
         expectedTotalLoad,
         metricTransformation,
         testVerbose = true,
         schedulerVerbose = false,
-        printLoads = false
+        printLoads = true,
+        scenarioName = scenarioName
       )
     }
 
     scenario("6 slots with some low loads in between, 3 users") {
+      val scenarioName = "6 slots with some low loads in between, 3 users"
+
       val users: List[SpanSlotAccumulatedLoad] = List(
         SpanSlotAccumulatedLoad(100,
                                 0,
@@ -169,13 +183,14 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
         Vector[Double](8, 9, 10, 12, 11)
       )
 
-      executeTest(
+      executeScenario(
         users,
         expectedTotalLoad,
         metricTransformation,
         testVerbose = true,
         schedulerVerbose = false,
-        printLoads = false
+        printLoads = false,
+        scenarioName = scenarioName
       )
     }
   }
@@ -193,19 +208,21 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
     strings.reverse
   }
 
-  def executeTest(
+  def executeScenario(
       users: List[SpanSlotAccumulatedLoad],
       expectedTotalLoad: List[Vector[Double]],
       metricTransformation: MetricTransformation,
       printLoads: Boolean = false,
       testVerbose: Boolean = false,
-      schedulerVerbose: Boolean = false
+      schedulerVerbose: Boolean = false,
+      scenarioName: String = "",
+      enableGenerateTables: Boolean = false
   ): Unit = {
 
     val benchmarkResult =
       executeBenchmark(users, metricTransformation, schedulerVerbose)
 
-    printTable(users, benchmarkResult, printLoads, testVerbose)
+    generateLoadsLog(users, benchmarkResult, printLoads, testVerbose, scenarioName, enableGenerateTables)
 
     val accumulatedLoadWithoutPriority = SpanSlotAccumulatedLoad(-1, 0, benchmarkResult.resultsWithoutPriority)
     val accumulatedLoadWithPriority    = SpanSlotAccumulatedLoad(-1, 0, benchmarkResult.resultsWithPriority)
@@ -220,17 +237,29 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
     }
   }
 
-  def printTable(users: List[SpanSlotAccumulatedLoad],
-                 benchmarkResult: BenchmarkResult,
-                 printLoads: Boolean,
-                 testVerbose: Boolean): Unit = {
+  def generateLoadsLog(users: List[SpanSlotAccumulatedLoad],
+                       benchmarkResult: BenchmarkResult,
+                       printLoads: Boolean,
+                       testVerbose: Boolean,
+                       scenarioName: String,
+                       enableGenerateTables: Boolean): Unit = {
 
     val resultsWithoutPriority = benchmarkResult.resultsWithoutPriority
     val resultsWithPriority    = benchmarkResult.resultsWithPriority
     val usersPreferredSlots    = benchmarkResult.usersPreferredSlots
 
     val initialPar = computePar(users)
-    if (testVerbose) info(s"IN total PAR = $initialPar")
+
+    val outScenarioName = "Scenario name: " + scenarioName
+    println("START OF SCENARIO")
+    println("Scenario name: " + scenarioName)
+    println(List.fill(outScenarioName.length)('-').mkString(""))
+
+    enableLog(testVerbose){
+      println(s"IN total PAR = $initialPar")
+      println(
+        s"Average load per user = ${users.map(_.totalEnergy).sum / SpanSlotAccumulatedLoad(-1, 0, users).span / users.size}")
+    }
 
     for (i <- users.indices) {
       val user                   = users(i)
@@ -243,93 +272,115 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
       val fromSlot = user.positionInT
       val toSlot   = user.positionInT + user.span - 1
 
-      val userInitialTable = new TableList("load_id" :: (fromSlot to toSlot).map(_.toString).toList)
-      for (load <- user.loads.toList.sortBy(_.id)) {
-        userInitialTable.addRow(load.id.toString :: loadInSlots(load, fromSlot, toSlot))
-      }
-      userInitialTable.addRow("total_load" :: user.amplitudePerSlot.toList.map(_.toString))
-      val userTableWithoutPriority = new TableList("load_id" :: (fromSlot to toSlot).map(_.toString).toList)
-      for (load <- resultWithoutPriority.loads.toList.sortBy(_.id)) {
-        userTableWithoutPriority.addRow(load.id.toString :: loadInSlots(load, fromSlot, toSlot))
-      }
-      userTableWithoutPriority.addRow("total_load" :: resultWithoutPriority.amplitudePerSlot.toList.map(_.toString))
-      val userTableWithPriority = new TableList("load_id" :: (fromSlot to toSlot).map(_.toString).toList)
-      for (load <- resultWithPriority.loads.toList.sortBy(_.id)) {
-        userTableWithPriority.addRow(load.id.toString :: loadInSlots(load, fromSlot, toSlot))
-      }
-      userTableWithPriority.addRow("total_load" :: resultWithPriority.amplitudePerSlot.toList.map(_.toString))
-      if (printLoads) {
+      enableLog(printLoads) {
         println(s"User ${user.id} | Prefered slots -> ${preferredSlotsToString(userPreferredSlots)}")
         println(s"\tInitial | PAR = ${computePar(user)}")
-        userInitialTable.print(1)
-        println(s"\tOutput without priority | PAR = $userParWithoutPriority")
-        userTableWithoutPriority.print(1)
-        println(s"\tOutput with priority | PAR = $userParWithPriority")
-        userTableWithPriority.print(1)
-        println()
       }
-
+      enableLog(enableGenerateTables) {
+        val userInitialTable = new TableList("load_id" :: (fromSlot to toSlot).map(_.toString).toList)
+        for (load <- user.loads.toList.sortBy(_.id)) {
+          userInitialTable.addRow(load.id.toString :: loadInSlots(load, fromSlot, toSlot))
+        }
+        userInitialTable.addRow("total_load" :: user.amplitudePerSlot.toList.map(_.toString))
+        userInitialTable.print(1)
+      }
+      enableLog(printLoads)(println(s"\tOutput without priority | PAR = $userParWithoutPriority"))
+      enableLog(enableGenerateTables) {
+        val userTableWithoutPriority = new TableList("load_id" :: (fromSlot to toSlot).map(_.toString).toList)
+        for (load <- resultWithoutPriority.loads.toList.sortBy(_.id)) {
+          userTableWithoutPriority.addRow(load.id.toString :: loadInSlots(load, fromSlot, toSlot))
+        }
+        userTableWithoutPriority.addRow("total_load" :: resultWithoutPriority.amplitudePerSlot.toList.map(_.toString))
+        userTableWithoutPriority.print(1)
+      }
+      enableLog(printLoads)(println(s"\tOutput with priority | PAR = $userParWithPriority"))
+      enableLog(enableGenerateTables) {
+        val userTableWithPriority = new TableList("load_id" :: (fromSlot to toSlot).map(_.toString).toList)
+        for (load <- resultWithPriority.loads.toList.sortBy(_.id)) {
+          userTableWithPriority.addRow(load.id.toString :: loadInSlots(load, fromSlot, toSlot))
+        }
+        userTableWithPriority.addRow("total_load" :: resultWithPriority.amplitudePerSlot.toList.map(_.toString))
+        userTableWithPriority.print(1)
+      }
+      enableLog(enableGenerateTables | printLoads)(println())
     }
 
     val accumulatedLoadWithoutPriority = SpanSlotAccumulatedLoad(-1, 0, resultsWithoutPriority)
     val accumulatedLoadWithPriority    = SpanSlotAccumulatedLoad(-1, 0, resultsWithPriority)
 
-    if (testVerbose) info(accumulatedLoadWithPriority.amplitudePerSlot.toString())
-
     val outputParWithoutPriority = computePar(resultsWithoutPriority)
-    if (testVerbose) info(s"OUT total (without priority) PAR = $outputParWithoutPriority")
+    enableLog(testVerbose){
+      println(s"OUT total (without priority) PAR = $outputParWithoutPriority")
+      println(accumulatedLoadWithoutPriority.amplitudePerSlot.toString())
+    }
+
 
     val outputParWithPriority = computePar(resultsWithPriority)
-    if (testVerbose) info(s"OUT total (with priority) PAR = $outputParWithPriority")
+    enableLog(testVerbose) {
+      println(s"OUT total (with priority) PAR = $outputParWithPriority")
+      println(accumulatedLoadWithPriority.amplitudePerSlot.toString())
+    }
+
 
     val initialAccumulated = SpanSlotAccumulatedLoad(-1, 0, users)
-    val initialTotalTable = new TableList(
-      "load_id" :: (initialAccumulated.positionInT until (initialAccumulated.positionInT + initialAccumulated.span))
-        .map(_.toString)
-        .toList)
-    for (load <- users.flatMap(_.loads).sortBy(_.id)) {
-      initialTotalTable.addRow(
-        load.id.toString :: loadInSlots(load,
-                                        initialAccumulated.positionInT,
-                                        initialAccumulated.positionInT + initialAccumulated.span - 1))
-    }
-    initialTotalTable.addRow("total_load" :: initialAccumulated.amplitudePerSlot.toList.map(_.toString))
-    val totalTableWithoutPriority = new TableList(
-      "load_id" :: (accumulatedLoadWithoutPriority.positionInT until (accumulatedLoadWithoutPriority.positionInT + accumulatedLoadWithoutPriority.span))
-        .map(_.toString)
-        .toList)
-    for (load <- resultsWithoutPriority.flatMap(_.loads).sortBy(_.id)) {
-      totalTableWithoutPriority.addRow(
-        load.id.toString :: loadInSlots(
-          load,
-          accumulatedLoadWithoutPriority.positionInT,
-          accumulatedLoadWithoutPriority.positionInT + accumulatedLoadWithoutPriority.span - 1))
-    }
-    totalTableWithoutPriority.addRow(
-      "total_load" :: accumulatedLoadWithoutPriority.amplitudePerSlot.toList.map(_.toString))
-    val totalTableWithPriority = new TableList(
-      "load_id" :: (accumulatedLoadWithPriority.positionInT until (accumulatedLoadWithPriority.positionInT + accumulatedLoadWithPriority.span))
-        .map(_.toString)
-        .toList)
-    for (load <- resultsWithPriority.flatMap(_.loads).sortBy(_.id)) {
-      totalTableWithPriority.addRow(
-        load.id.toString :: loadInSlots(load,
-                                        accumulatedLoadWithPriority.positionInT,
-                                        accumulatedLoadWithPriority.positionInT + accumulatedLoadWithPriority.span - 1))
-    }
-    totalTableWithPriority.addRow("total_load" :: accumulatedLoadWithPriority.amplitudePerSlot.toList.map(_.toString))
+    enableLog(enableGenerateTables) {
 
-    if (printLoads) {
-      println(
-        s"Average load per user = ${users.map(_.totalEnergy).sum / SpanSlotAccumulatedLoad(-1, 0, users).span / users.size}")
-      println(s"Initial total loads | PAR = $initialPar")
+      val initialTotalTable = new TableList(
+        "load_id" :: (initialAccumulated.positionInT until (initialAccumulated.positionInT + initialAccumulated.span))
+          .map(_.toString)
+          .toList)
+      for (load <- users.flatMap(_.loads).sortBy(_.id)) {
+        initialTotalTable.addRow(
+          load.id.toString :: loadInSlots(load,
+                                          initialAccumulated.positionInT,
+                                          initialAccumulated.positionInT + initialAccumulated.span - 1))
+      }
+      initialTotalTable.addRow("total_load" :: initialAccumulated.amplitudePerSlot.toList.map(_.toString))
+
       initialTotalTable.print(1)
+    }
+
+    enableLog(enableGenerateTables) {
+      val totalTableWithoutPriority = new TableList(
+        "load_id" :: (accumulatedLoadWithoutPriority.positionInT until (accumulatedLoadWithoutPriority.positionInT + accumulatedLoadWithoutPriority.span))
+          .map(_.toString)
+          .toList)
+      for (load <- resultsWithoutPriority.flatMap(_.loads).sortBy(_.id)) {
+        totalTableWithoutPriority.addRow(
+          load.id.toString :: loadInSlots(
+            load,
+            accumulatedLoadWithoutPriority.positionInT,
+            accumulatedLoadWithoutPriority.positionInT + accumulatedLoadWithoutPriority.span - 1))
+      }
+      totalTableWithoutPriority.addRow(
+        "total_load" :: accumulatedLoadWithoutPriority.amplitudePerSlot.toList.map(_.toString))
+
       println(s"Output total loads without priority | PAR = $outputParWithoutPriority")
       totalTableWithoutPriority.print(1)
+    }
+
+    enableLog(enableGenerateTables) {
+      val totalTableWithPriority = new TableList(
+        "load_id" :: (accumulatedLoadWithPriority.positionInT until (accumulatedLoadWithPriority.positionInT + accumulatedLoadWithPriority.span))
+          .map(_.toString)
+          .toList)
+      for (load <- resultsWithPriority.flatMap(_.loads).sortBy(_.id)) {
+        totalTableWithPriority.addRow(
+          load.id.toString :: loadInSlots(
+            load,
+            accumulatedLoadWithPriority.positionInT,
+            accumulatedLoadWithPriority.positionInT + accumulatedLoadWithPriority.span - 1))
+      }
+      totalTableWithPriority.addRow("total_load" :: accumulatedLoadWithPriority.amplitudePerSlot.toList.map(_.toString))
+
       println(s"Output total loads with priority | PAR = $outputParWithPriority")
       totalTableWithPriority.print(1)
-      println()
     }
+
+    enableLog(printLoads | enableGenerateTables)(println())
+
+    println("END OF SCENARIO")
+    println()
 
   }
 
@@ -357,7 +408,7 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
     val numberOfSlots    = SpanSlotAccumulatedLoad(-1, 0, users).span
     val allFlexibleLoads = users.flatMap(_.flexibleLoads)
     val windowSize       = Try(allFlexibleLoads.map(_.span).sum / allFlexibleLoads.size).getOrElse(1)
-    println(s"Num of slots = $numberOfSlots, SlotsWindowSize = $windowSize")
+    enableLog(verbose)(println(s"Num of slots = $numberOfSlots, SlotsWindowSize = $windowSize"))
     val schedulerPreferredSlots =
       UserAllocator.allocate(users = users, numberOfSlots = numberOfSlots, windowSize = windowSize)
 
@@ -367,13 +418,14 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
     val res = users.zip(schedulerPreferredSlots).map {
       case (user, schedulingPreferredSlotsForUser) =>
         val resultWithoutPreferredSlots =
-          SchedulerAlgorithm.reschedule(user, metricTransformation = metricTransformation, referenceAverage = referenceAverage)
+          SchedulerAlgorithm
+            .reschedule(user, metricTransformation = metricTransformation, referenceAverage = referenceAverage)
 
         val resultWithPreferredSlots = SchedulerAlgorithm.reschedule(user,
-                                                              schedulingPreferredSlotsForUser,
-                                                              metricTransformation = metricTransformation,
-                                                              referenceAverage = referenceAverage,
-                                                              verbose = verbose)
+                                                                     schedulingPreferredSlotsForUser,
+                                                                     metricTransformation = metricTransformation,
+                                                                     referenceAverage = referenceAverage,
+                                                                     verbose = verbose)
 
         (resultWithoutPreferredSlots, resultWithPreferredSlots)
     }
