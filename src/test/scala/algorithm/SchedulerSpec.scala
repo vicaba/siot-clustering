@@ -46,11 +46,11 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
         //TODO: This is because all flexible loads need to be removed, otherwise flexible loads that are OFF distort the Scheduler
         //TODO: Also, we should find a manner to expand flexible loads that have an OFF power greater than 0.0, it will distort metrics otherwise
-        val workingFlexibleLoads = splitResult
+        val onFlexibleLoads = splitResult
         //val workingFlexibleLoads = splitResult.filter(_._2.nonEmpty)
 
-        val flexibleLoadsToRemove = workingFlexibleLoads.map(_._1)
-        val flexibleLoadsToAdd    = workingFlexibleLoads.flatMap(_._2)
+        val flexibleLoadsToRemove = onFlexibleLoads.map(_._1)
+        val flexibleLoadsToAdd    = onFlexibleLoads.flatMap(_._2)
 
         accLoad --= flexibleLoadsToRemove
         accLoad ++= flexibleLoadsToAdd

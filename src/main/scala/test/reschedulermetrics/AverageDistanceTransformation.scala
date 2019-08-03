@@ -20,16 +20,6 @@ object AverageDistanceTransformation extends MetricTransformation {
     val distance = Math.pow(Math.abs(referenceAverage - actualAverage), 2)
 
     distance
-    /*var distance = 0.0
-    val p = 1
-
-    val flexLoad = movement.fl
-
-    for (i <- flexLoad.positionInT until (flexLoad.positionInT + flexLoad.span)) {
-      distance += Math.pow(Math.abs(referenceAverage - movement.acc.amplitudePerSlot(i)), p) * (1 - bias)
-    }
-
-    Math.pow(distance, 1 / p) * (1 - bias)*/
   }
 
   private def computeBiasedAverageAtLoadPosition(accumulatedLoad: SpanSlotAccumulatedLoad,
