@@ -3,15 +3,16 @@ package test
 import scala.annotation.tailrec
 import scala.collection.mutable.ListBuffer
 
-case class SplitResult[E](index: Int, seq: Seq[E])
-
-case class SplitResults[E](sourceSeq: Seq[E], consecutiveValue: E, results: Seq[SplitResult[E]])
-
 trait SequenceSplitStrategy[E] {
 
   def apply(seq: Seq[E]): SplitResults[E]
 
 }
+
+case class SplitResult[E](index: Int, seq: Seq[E])
+
+case class SplitResults[E](sourceSeq: Seq[E], consecutiveValue: E, results: Seq[SplitResult[E]])
+
 
 object SequenceSplitByConsecutiveElements {
 
