@@ -1,8 +1,9 @@
-package types.immutable
+package types.clusterer.immutable
 
-import types.DataTypeMetadata.{DataType, SyntheticDataType}
-import types.mutable.Cluster
-import types.{DataTypeMetadata, PointLike, PointLikeCompanion, Type}
+import types.clusterer.DataTypeMetadata.{DataType, SyntheticDataType}
+import types.clusterer.{DataTypeMetadata, PointLike, PointLikeCompanion}
+import types.clusterer.mutable.Cluster
+import types.clusterer.{DataTypeMetadata, PointLike, Type}
 
 case class Point(
     override val id: Int,

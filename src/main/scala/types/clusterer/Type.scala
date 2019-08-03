@@ -1,27 +1,29 @@
-package types
+package types.clusterer
 
-import types.DataTypeMetadata.{DataType, SyntheticDataType}
-import types.immutable.Point
-import types.mutable.Cluster
+import types.clusterer
+import types.clusterer.immutable.Point
+import types.clusterer.mutable.Cluster
+import breeze.linalg._
+import types.clusterer.DataTypeMetadata._
 
 import scala.annotation.tailrec
 
 object Type {
 
-  def centroidOf[T <: Type](points: Seq[T]): types.DataTypeMetadata.SyntheticDataType = {
+  def centroidOf[T <: Type](points: Seq[T]): DataTypeMetadata.SyntheticDataType = {
     val sum = sumVectors(points.map(_.syntheticValue).toList, points.head.dataTypeMetadata.EmptySyntheticData())
     sum / points.length.toDouble
   }
 
   /**
-    * Converts a cluster or a point into a cluster. If _type is a [[types.mutable.Cluster]], _type is returned. If _type is a [[types.immutable.Point]],
-    * a [[types.mutable.Cluster]] that contains the _type is returned
+    * Converts a cluster or a point into a cluster. If _type is a [[types.clusterer.mutable.Cluster]], _type is returned. If _type is a [[types.clusterer.immutable.Point]],
+    * a [[types.clusterer.mutable.Cluster]] that contains the _type is returned
     *
     * @param _type The type to convert from
     * @return the Cluster
     */
-  def toCluster(_type: Type): mutable.Cluster = _type match {
-    case c: mutable.Cluster => c
+  def toCluster(_type: Type): types.clusterer.mutable.Cluster = _type match {
+    case c: types.clusterer.mutable.Cluster => c
     case p: Point           => mutable.Cluster(p.id, p.id.toString, Set(p), 0, None)(p.dataTypeMetadata)
   }
 
@@ -32,8 +34,8 @@ object Type {
     * @param parent the parent of the object
     * @return the deepCopy of _type
     */
-  private def deepCopy(_type: Type, parent: Option[mutable.Cluster]): Type = _type match {
-    case c: mutable.Cluster =>
+  private def deepCopy(_type: Type, parent: Option[types.clusterer.mutable.Cluster]): Type = _type match {
+    case c: types.clusterer.mutable.Cluster =>
       if (parent.isDefined) {
         c.topLevel = parent
         c.points.foreach(deepCopy(_, Some(c)))
@@ -56,7 +58,7 @@ object Type {
   def deepCopy(_type: Type): Type = {
 
     _type match {
-      case c: mutable.Cluster => deepCopy(c)
+      case c: types.clusterer.mutable.Cluster => deepCopy(c)
       case p: Point           => deepCopy(p)
     }
 
@@ -87,7 +89,7 @@ object Type {
   }
 
   /**
-    * Calculates the sum of the given [[types.DataTypeMetadata.DataType]] (sum of matrixes)
+    * Calculates the sum of the given [[clusterer.DataTypeMetadata.DataType]] (sum of matrixes)
     *
     * @param remaining the remaining data to sum
     * @param accum the accumulated sum
@@ -100,7 +102,7 @@ object Type {
   }
 
   /**
-    * Calculates the sum of the given [[types.DataTypeMetadata.SyntheticDataType]] (sum of matrixes)
+    * Calculates the sum of the given [[clusterer.DataTypeMetadata.SyntheticDataType]] (sum of matrixes)
     *
     * @param remaining the remaining data to sum
     * @param accum the accumulated sum
@@ -132,13 +134,13 @@ trait Type {
   def size: Int
 
   /**
-    * See [[types.Type#sumPoints(scala.collection.immutable.List, breeze.linalg.DenseMatrix)]].
+    * See [[Type#sumPoints(scala.collection.immutable.List, breeze.linalg.DenseMatrix)]].
     */
   final def sumPoints(remaining: List[DataType], accum: DataType): DataType =
     Type.sumPoints(remaining, accum)
 
   /**
-    * See [[types.Type#sumVectors(scala.collection.immutable.List, breeze.linalg.DenseVector)]].
+    * See [[Type#sumVectors(scala.collection.immutable.List, breeze.linalg.DenseVector)]].
     */
   final def sumVectors(remaining: List[SyntheticDataType], accum: SyntheticDataType): SyntheticDataType =
     Type.sumVectors(remaining, accum)

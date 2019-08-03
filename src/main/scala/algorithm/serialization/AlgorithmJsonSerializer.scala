@@ -2,7 +2,7 @@ package algorithm.serialization
 
 import algorithm.EuclideanAlgorithm._
 import play.api.libs.json._
-import types.serialization.ClusterJsonSerializer._
+import types.clusterer.serialization.ClusterJsonSerializer._
 import EuclideanClustererSettingsJsonSerializer._
 import ReschedulerSettingsJsonSerializer._
 

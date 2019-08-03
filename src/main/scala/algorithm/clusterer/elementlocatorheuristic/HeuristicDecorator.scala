@@ -1,7 +1,7 @@
 package algorithm.clusterer.elementlocatorheuristic
 
-import types.DataTypeMetadata.SyntheticDataType
-import types.mutable.Cluster
+import types.clusterer.DataTypeMetadata.SyntheticDataType
+import types.clusterer.mutable.Cluster
 
 /**
   * Heuristic decorator that prunes some elements before returning the results of applying a heuristic

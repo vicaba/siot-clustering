@@ -1,7 +1,7 @@
 package algorithm.clusterer.elementlocatorheuristic
 
-import types.DataTypeMetadata.SyntheticDataType
-import types.mutable.Cluster
+import types.clusterer.DataTypeMetadata.SyntheticDataType
+import types.clusterer.mutable.Cluster
 
 trait ElementLocatorHeuristic
   extends ((Cluster, SyntheticDataType, IndexedSeq[Cluster]) => IndexedSeq[(Double, Cluster)]) {

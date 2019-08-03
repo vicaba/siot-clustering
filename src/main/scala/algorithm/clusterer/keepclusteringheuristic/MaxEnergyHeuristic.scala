@@ -1,8 +1,8 @@
 package algorithm.clusterer.keepclusteringheuristic
 
 import breeze.linalg.sum
-import types.Type
-import types.mutable.Cluster
+import types.clusterer.Type
+import types.clusterer.mutable.Cluster
 
 object MaxEnergyHeuristic extends KeepClusteringHeuristic {
 

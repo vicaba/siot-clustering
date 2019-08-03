@@ -1,6 +1,6 @@
 package algorithm.clusterer.keepclusteringheuristic
 
-import types.mutable.Cluster
+import types.clusterer.mutable.Cluster
 
 class MaxElementsHeuristic(val maxElements: Integer) extends KeepClusteringHeuristic {
 

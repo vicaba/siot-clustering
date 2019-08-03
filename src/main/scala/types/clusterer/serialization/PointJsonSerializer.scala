@@ -1,7 +1,7 @@
-package types.serialization
+package types.clusterer.serialization
 
 import play.api.libs.json.{JsValue, Writes}
-import types.immutable.Point
+import types.clusterer.immutable.Point
 object PointJsonSerializer {
 
   val syntheticPointWrites: Writes[Point] =

@@ -2,7 +2,7 @@ package algorithm.scheduler
 
 import metrics.Metric
 import com.typesafe.scalalogging.Logger
-import types.mutable.Cluster
+import types.clusterer.mutable.Cluster
 
 object ClusterRescheduler {
 

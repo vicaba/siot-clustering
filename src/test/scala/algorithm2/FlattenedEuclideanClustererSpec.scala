@@ -2,9 +2,10 @@ package algorithm2
 
 import breeze.linalg.{DenseMatrix, DenseVector}
 import org.scalatest.{FeatureSpec, GivenWhenThen}
-import types.{DataTypeMetadata2Columns, DataTypeMetadata}
+import types.clusterer.DataTypeMetadata2Columns
 import org.scalatest.Matchers._
-import types.immutable.Point
+import types.clusterer.{DataTypeMetadata, DataTypeMetadata2Columns}
+import types.clusterer.immutable.Point
 import types.ops.MirrorImage._
 
 class FlattenedEuclideanClustererSpec extends FeatureSpec with GivenWhenThen {

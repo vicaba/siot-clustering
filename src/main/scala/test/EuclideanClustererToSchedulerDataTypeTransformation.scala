@@ -1,6 +1,6 @@
 package test
 
-import types.immutable.Point
+import types.clusterer.immutable.Point
 import reader.SyntheticProfilesReaderForScheduler._
 
 object EuclideanClustererToSchedulerDataTypeTransformation {

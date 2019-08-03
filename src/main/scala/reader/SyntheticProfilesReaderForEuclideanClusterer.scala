@@ -1,8 +1,8 @@
 package reader
 
 import breeze.linalg.{DenseMatrix, DenseVector}
-import types.TypesX_48
-import types.immutable.Point
+import types.clusterer.TypesX_48
+import types.clusterer.immutable.Point
 
 object SyntheticProfilesReaderForEuclideanClusterer extends TemplateForSyntheticProfilesReader {
 

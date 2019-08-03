@@ -2,7 +2,7 @@ package algorithm.clusterer
 
 import algorithm.ClustererSettings
 import metrics.Metric
-import types.immutable.Point
+import types.clusterer.immutable.Point
 
 /**
   * Settings for the euclidean clusterer

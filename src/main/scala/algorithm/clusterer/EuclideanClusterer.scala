@@ -7,11 +7,11 @@ import algorithm.clusterer.elementlocatorheuristic.{ElementLocatorHeuristic, Heu
 import algorithm.util.ClusteringOrder
 import eventmanager.EventManager
 import metrics.Metric
-import types.DataTypeMetadata.SyntheticDataType
-import types.Type
-import types.immutable.Point
+import types.clusterer.DataTypeMetadata.SyntheticDataType
+import types.clusterer.Type
+import types.clusterer.immutable.Point
 import types.ops.MirrorImage
-import types.mutable.Cluster
+import types.clusterer.mutable.Cluster
 
 import scala.annotation.tailrec
 import scala.collection.immutable.LinearSeq

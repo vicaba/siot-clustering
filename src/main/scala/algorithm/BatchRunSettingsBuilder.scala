@@ -1,7 +1,7 @@
 package algorithm
 
 import metrics.Metric
-import types.immutable.Point
+import types.clusterer.immutable.Point
 
 /**
   * This class builds permutations of Clusterer and Rescheduler settings given a List containing the number of clusters

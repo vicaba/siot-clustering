@@ -3,8 +3,8 @@ package algorithm
 import algorithm.clusterer.{EuclideanClusterer, EuclideanClustererSettings}
 import algorithm.scheduler.{ClusterRescheduler, ReschedulerSettings}
 import com.typesafe.scalalogging.Logger
-import types.Type
-import types.mutable.Cluster
+import types.clusterer.Type
+import types.clusterer.mutable.Cluster
 
 object EuclideanAlgorithm {
 

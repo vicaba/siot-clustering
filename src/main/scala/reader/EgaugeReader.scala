@@ -4,8 +4,8 @@ import java.io.FileInputStream
 
 import breeze.linalg.{DenseMatrix, DenseVector}
 import play.api.libs.json.{JsValue, Json}
-import types.Types67_24
-import types.immutable.Point
+import types.clusterer.Types67_24
+import types.clusterer.immutable.Point
 
 import scala.util.Try
 

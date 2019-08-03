@@ -2,7 +2,7 @@ package algorithm.serialization
 
 import algorithm.clusterer.{EuclideanClusterer, EuclideanClustererSettings}
 import play.api.libs.json.{Json, OWrites}
-import types.serialization.PointJsonSerializer
+import types.clusterer.serialization.PointJsonSerializer
 import metrics.serialization.MetricJsonSerializer._
 
 object EuclideanClustererSettingsJsonSerializer {

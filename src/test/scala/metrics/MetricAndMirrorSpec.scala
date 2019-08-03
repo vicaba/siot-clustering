@@ -2,9 +2,9 @@ package metrics
 
 import breeze.linalg.{DenseMatrix, DenseVector}
 import org.scalatest.{FeatureSpec, GivenWhenThen}
-import types.{DataTypeMetadata, DataTypeMetadata2Columns}
+import types.clusterer.DataTypeMetadata2Columns
 import org.scalatest.Matchers._
-import types.immutable.Point
+import types.clusterer.immutable.Point
 import types.ops.MirrorImage
 import types.ops.MirrorImage._
 

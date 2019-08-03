@@ -1,5 +1,4 @@
-package types
-
+package types.clusterer
 
 trait PointLike extends Type {
 

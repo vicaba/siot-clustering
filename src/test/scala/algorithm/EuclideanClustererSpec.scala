@@ -7,8 +7,9 @@ import metrics.{Metric, Par}
 import org.scalatest.Matchers._
 import org.scalatest.{FeatureSpec, GivenWhenThen}
 import types._
-import types.mutable.Cluster
-import types.immutable.Point
+import types.clusterer.{DataTypeMetadata, DataTypeMetadata4Columns}
+import types.clusterer.mutable.Cluster
+import types.clusterer.immutable.Point
 
 class EuclideanClustererSpec extends FeatureSpec with GivenWhenThen {
 

@@ -1,11 +1,12 @@
-package types.mutable
+package types.clusterer.mutable
 
 import breeze.linalg._
 import metrics.DenseVectorReprOps
-import types.DataTypeMetadata.{DataType, SyntheticDataType}
-import types.immutable.Point
+import types.clusterer.{ClusterLike, DataTypeMetadata, Type}
+import types.clusterer.DataTypeMetadata.{DataType, SyntheticDataType}
+import types.clusterer.immutable.Point
 import types.ops.SetOps._
-import types.{ClusterLike, DataTypeMetadata, Type}
+import types.clusterer.{DataTypeMetadata, Type}
 
 import scala.annotation.tailrec
 import scala.collection

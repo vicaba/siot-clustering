@@ -1,7 +1,7 @@
 package metrics
 
 import breeze.numerics.abs
-import types.immutable.Point
+import types.clusterer.immutable.Point
 object PointOrdering extends Ordering[Point] {
 
   override def compare(x: Point, y: Point): Int =

@@ -1,7 +1,7 @@
-package types.serialization
+package types.clusterer.serialization
 
 import play.api.libs.json._
-import types.DataTypeMetadata._
+import types.clusterer.DataTypeMetadata._
 
 object TypesJsonSerializer {
 

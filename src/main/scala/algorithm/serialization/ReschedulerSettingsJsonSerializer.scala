@@ -1,7 +1,7 @@
 package algorithm.serialization
 
 import play.api.libs.json._
-import types.serialization.TypesJsonSerializer._
+import types.clusterer.serialization.TypesJsonSerializer._
 import metrics.serialization.MetricJsonSerializer._
 
 object ReschedulerSettingsJsonSerializer {

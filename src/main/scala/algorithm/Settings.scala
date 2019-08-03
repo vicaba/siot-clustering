@@ -1,7 +1,7 @@
 package algorithm
 
 import metrics.Metric
-import types.immutable.Point
+import types.clusterer.immutable.Point
 trait Settings {
 
   val numberOfClusters: Int
