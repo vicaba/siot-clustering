@@ -58,7 +58,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
       When("Scheduling loads")
 
-      val scheduledLoads = Scheduler.apply(unscheduledLoads, new BiasedAverageDistanceTransformation)
+      val scheduledLoads = Scheduler.apply(Load.deepCopy(unscheduledLoads).toList, new BiasedAverageDistanceTransformation)
 
       Then("ScheduledLoads PAR is lower than UnscheduledLoads PAR.")
 

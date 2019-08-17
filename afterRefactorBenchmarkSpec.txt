@@ -20,21 +20,6 @@ Vector(4.0, 4.0, 4.0)
 
 END OF SCENARIO
 
-START OF SCENARIO
-Scenario name: With a gap, 2 users with 1 flexible load each to the middle
---------------------------------------------------------------------------
-IN total PAR = 1.9090909090909092
-Average load per user = 3.6666666666666665
-User 100 | Prefered slots -> 1
-	Initial | PAR = 1.9090909090909092
-	Output without priority | PAR = 1.090909090909091
-	Output with priority | PAR = 1.090909090909091
-
-User 200 | Prefered slots -> 1
-	Initial | PAR = 1.9090909090909092
-	Output without priority | PAR = 1.090909090909091
-	Output with priority | PAR = 1.090909090909091
-
 
 
 
@@ -68,6 +53,21 @@ Vector(12.0, 12.0, 6.0)
 END OF SCENARIO
 
 
+
+START OF SCENARIO
+Scenario name: With a gap, 2 users with 1 flexible load each to the middle
+--------------------------------------------------------------------------
+IN total PAR = 1.9090909090909092
+Average load per user = 3.6666666666666665
+User 100 | Prefered slots -> 1
+	Initial | PAR = 1.9090909090909092
+	Output without priority | PAR = 1.090909090909091
+	Output with priority | PAR = 1.090909090909091
+
+User 200 | Prefered slots -> 1
+	Initial | PAR = 1.9090909090909092
+	Output without priority | PAR = 1.090909090909091
+	Output with priority | PAR = 1.090909090909091
 
 OUT total (without priority) PAR = 1.090909090909091
 Vector(8.0, 6.0, 8.0)

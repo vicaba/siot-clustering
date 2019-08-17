@@ -69,8 +69,8 @@ object SchedulerAlgorithm {
     }
 
     // TODO: Notice that we are returning a copy of the AccumulatedLoad, with a new mutable Set of Loads.
-    bestMovement.acc
-
+    accumulatedLoad -/+= flexibleLoad.positionInT_=(bestMovement.fl.positionInT)
+    accumulatedLoad
   }
 
   def isLoadOnPreferredSlots(load: Load, preferedSlots: List[Int]): Boolean = {

@@ -57,7 +57,7 @@ object SpanSlotFlexibleLoad {
 }
 
 class SpanSlotFlexibleLoad(override val id: Int,
-  private var _positionInT: Int,
+                           private var _positionInT: Int,
                            private val _amplitudePerSlot: Vector[Double],
                            override val label: String = "")
     extends SingleLoad {
@@ -185,7 +185,7 @@ case class SpanSlotAccumulatedLoad private (override val id: Int,
     extends AccumulatedLoad {
 
   def copy(loads: Set[Load] = this._loads.toSet): SpanSlotAccumulatedLoad =
-    SpanSlotAccumulatedLoad(id, positionInT, mutableSetOf(loads))
+    SpanSlotAccumulatedLoad(id, positionInT, mutableSetOf(Load.deepCopy(loads)))
 
   def loads: Set[Load] = _loads.toSet
 
@@ -250,6 +250,20 @@ object SpanSlotAccumulatedLoad {
 
 object Load {
 
+  //def deepCopy(loads: Traversable[Load]): Traversable[Load] = loads.map(deepCopy)
+
+  def deepCopy[L <: Load](loads: Traversable[L]): Traversable[L] = loads.map(deepCopyOne)
+
+  def deepCopyOne[L <: Load](load: L): L = {
+    load match {
+      case l: SpanSlotAccumulatedLoad => l.copy()
+      case l: SpanSlotFixedLoad             => l.copy()
+      case l: SpanSlotFlexibleLoad          => l.copy()
+      case l: SpanSlotFlexibleLoadSuperTask => ???
+      case l: SpanSlotFlexibleLoadSubTask   => ???
+    }
+  }.asInstanceOf[L]
+
   def toSpanSlotFixedLoad(s: Seq[Double]): SpanSlotFixedLoad = {
     SpanSlotFixedLoad(0, 0, s.toVector)
   }
@@ -270,7 +284,9 @@ object Load {
         .map(Load.expandSpanSlotLoadToVector(_, Load.span(loads)))
     )
 
-  def amplitudePerSlotEnforceSpan(loads: Traversable[Load], span: Int, restValue: Double = Double.NaN): Vector[Double] = {
+  def amplitudePerSlotEnforceSpan(loads: Traversable[Load],
+                                  span: Int,
+                                  restValue: Double = Double.NaN): Vector[Double] = {
     val sum = SeqOps.sum(
       loads.toList
         .map(Load.expandSpanSlotLoadToVector(_, span))
@@ -284,8 +300,9 @@ object Load {
       }
     }
 
-    val sumWithRestPositionsAtRestValue = sum.zip(restPositions).map { case (s, r) =>
-      if (r) restValue else s
+    val sumWithRestPositionsAtRestValue = sum.zip(restPositions).map {
+      case (s, r) =>
+        if (r) restValue else s
     }
 
     sumWithRestPositionsAtRestValue
