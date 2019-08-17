@@ -8,7 +8,9 @@ import types.ops.SetOps._
 import scala.collection.mutable
 import scala.language.higherKinds
 import collection.CollecctionHelper._
+import test.Load.span
 
+import scala.collection.mutable.ListBuffer
 import scala.util.Try
 
 sealed trait Load {
@@ -56,11 +58,16 @@ object SpanSlotFlexibleLoad {
 
 class SpanSlotFlexibleLoad(override val id: Int,
                            override val positionInT: Int,
-                           override val amplitudePerSlot: Vector[Double],
+                           private val _amplitudePerSlot: Vector[Double],
                            override val label: String = "")
     extends SingleLoad {
-  override val span: Int           = amplitudePerSlot.size
+
+  override val span: Int = amplitudePerSlot.size
+
+  override def amplitudePerSlot: Vector[Double] = _amplitudePerSlot
+
   override def totalEnergy: Double = amplitudePerSlot.foldLeft(0.0)((accum, a) => accum + a)
+
   def copy(id: Int = this.id,
            positionInT: Int = this.positionInT,
            amplitudePerSlot: Vector[Double] = this.amplitudePerSlot,
@@ -69,49 +76,92 @@ class SpanSlotFlexibleLoad(override val id: Int,
 
 }
 
-object SpanSlotFlexibleLoadAggregate {
+object SpanSlotFlexibleLoadTask {
 
-  def buildMemory(original: SpanSlotFlexibleLoad,
-                  offValue: Double,
-                  aggregatees: Seq[SpanSlotFlexibleLoad]): SpanSlotFlexibleLoadAggregateMemory =
-    new SpanSlotFlexibleLoadAggregateMemory(
-      OriginalSpanSlotFlexibleLoadData(original),
-      offValue,
-      aggregatees.map(agregatee => new AggregateeData(agregatee.id, agregatee.label)))
-
-  object OriginalSpanSlotFlexibleLoadData {
-    def apply(load: SpanSlotFlexibleLoad): OriginalSpanSlotFlexibleLoadData =
-      new OriginalSpanSlotFlexibleLoadData(load.id, load.positionInT, load.amplitudePerSlot, load.label)
+  def buildFromSuperTask(spanSlotFlexibleLoadSuperTask: SpanSlotFlexibleLoadSuperTask): SpanSlotFlexibleLoad = {
+    Load.amplitudePerSlot(spanSlotFlexibleLoadSuperTask.agregatees)
+    SpanSlotFlexibleLoad(
+      spanSlotFlexibleLoadSuperTask.id,
+      spanSlotFlexibleLoadSuperTask.positionInT,
+      spanSlotFlexibleLoadSuperTask.amplitudePerSlot,
+      spanSlotFlexibleLoadSuperTask.label
+    )
   }
 
-  class OriginalSpanSlotFlexibleLoadData(val id: Int,
-                                         val positionInT: Int,
-                                         val amplitudePerSlot: Vector[Double],
-                                         val label: String = "")
+  def splitIntoSubTasks(spanSlotFlexibleLoad: SpanSlotFlexibleLoad,
+                        splitStrategy: SequenceSplitStrategy[Double]): SpanSlotFlexibleLoadSuperTask = {
 
-  private class AggregateeData(val id: Int, val label: String)
+    val splitResults = splitStrategy(spanSlotFlexibleLoad.amplitudePerSlot)
 
-  class SpanSlotFlexibleLoadAggregateMemory(
-      val originalData: SpanSlotFlexibleLoadAggregate.OriginalSpanSlotFlexibleLoadData,
-      val offValue: Double,
-      private val aggregatees: Seq[AggregateeData]) {
-    assert(!aggregatees.exists(_.label != originalData.label),
-           "At least one of the aggregatees does not have the same label as the original flexible load")
-/*    def merge(allPossibleAggregatees: Seq[SpanSlotFlexibleLoad]): (SpanSlotFlexibleLoad, Seq[SpanSlotFlexibleLoad]) = {
-      allPossibleAggregatees.filter(_.label == originalData.label)
-      val newAggregatees = for {
-        agg     <- allPossibleAggregatees.filter(_.label == originalData.label)
-        aggData <- aggregatees
-        if agg.id == aggData.id
-      } yield agg
+    lazy val superTask: SpanSlotFlexibleLoadSuperTask = SpanSlotFlexibleLoadSuperTask(
+      1,
+      1, {
+        splitResults.results.zipWithIndex.map {
+          case (result, idx) =>
+            SpanSlotFlexibleLoadSubTask(superTask,
+                                        idx,
+                                        result.index,
+                                        result.seq.toVector,
+                                        "subTask-" + spanSlotFlexibleLoad.label)
+        }.toList
+      },
+      spanSlotFlexibleLoad.span,
+      splitResults.consecutiveValue,
+      spanSlotFlexibleLoad.label
+    )
+    superTask
 
-      val maxPosIntT = new
-
-      for (i <- )
-
-    }*/
   }
 
+}
+
+object SpanSlotFlexibleLoadSuperTask {
+  def apply(id: Int,
+            positionInT: Int,
+            agregatees: List[SpanSlotFlexibleLoadSubTask],
+            span: Int,
+            restingValue: Double,
+            label: String): SpanSlotFlexibleLoadSuperTask =
+    new SpanSlotFlexibleLoadSuperTask(id, positionInT, agregatees, span, restingValue, label)
+}
+
+case class SpanSlotFlexibleLoadSuperTask(override val id: Int,
+                                         override val positionInT: Int,
+                                         agregatees: List[SpanSlotFlexibleLoadSubTask],
+                                         override val span: Int,
+                                         restValue: Double,
+                                         override val label: String = "")
+    extends SpanSlotFlexibleLoad(id, positionInT, Load.amplitudePerSlotEnforceSpan(agregatees, span, restValue), label) {
+
+  override def amplitudePerSlot: Vector[Double] = Load.amplitudePerSlotEnforceSpan(agregatees, span, restValue)
+
+  def toSpanSlotFlexibleLoad: SpanSlotFlexibleLoad = SpanSlotFlexibleLoadTask.buildFromSuperTask(this)
+
+}
+
+object SpanSlotFlexibleLoadSubTask {
+  def apply(parentFlexibleLoad: => SpanSlotFlexibleLoad,
+            id: Int,
+            positionInT: Int,
+            amplitudePerSlot: Vector[Double],
+            label: String): SpanSlotFlexibleLoadSubTask =
+    new SpanSlotFlexibleLoadSubTask(parentFlexibleLoad, id, positionInT, amplitudePerSlot, label)
+}
+
+class SpanSlotFlexibleLoadSubTask private (_parentFlexibleLoad: => SpanSlotFlexibleLoad,
+                                           override val id: Int,
+                                           override val positionInT: Int,
+                                           override val amplitudePerSlot: Vector[Double],
+                                           override val label: String = "")
+    extends SpanSlotFlexibleLoad(id, positionInT, amplitudePerSlot, label) {
+
+  def parentFlexibleLoad: SpanSlotFlexibleLoad = _parentFlexibleLoad
+
+  override def equals(obj: Any): Boolean = obj match {
+    case task: SpanSlotFlexibleLoadSubTask =>
+      task.parentFlexibleLoad.id == this.parentFlexibleLoad.id && super.equals(obj)
+    case _ => super.equals(obj)
+  }
 }
 
 /**
@@ -144,23 +194,12 @@ case class SpanSlotAccumulatedLoad private (override val id: Int,
   // Todo: changed
   override def span: Int = Load.span(loads)
 
-  override def amplitudePerSlot: Vector[Double] =
-    SeqOps.sum(
-      loads.toList
-        .map(expandSpanSlotLoadToVector(_, span))
-    )
+  override def amplitudePerSlot: Vector[Double] = Load.amplitudePerSlot(loads)
 
   def totalEnergy: Double =
     loads.toList.map(_.totalEnergy).foldLeft(0.0)((accum, l) => accum + l)
 
   override def toString: String = s"Acc($positionInT, $totalEnergy -> ${_loads})"
-
-  private def expandSpanSlotLoadToVector(load: Load, vectorSize: Int): Vector[Double] =
-    (
-      (for (_ <- 0 until load.positionInT) yield 0.0) ++
-        load.amplitudePerSlot ++
-        (for (_ <- (load.positionInT + load.span) until vectorSize) yield 0.0)
-    ).toVector
 
   def +=(y: Load): SpanSlotAccumulatedLoad = {
     this._loads += y
@@ -208,7 +247,43 @@ object Load {
     SpanSlotFixedLoad(0, 0, s.toVector)
   }
 
-  def span(loads: Traversable[Load]): Int = Try(loads.map(l => l.span + l.positionInT).max - loads.map(_.positionInT).min).getOrElse(0)
+  def span(loads: Traversable[Load]): Int =
+    Try(loads.map(l => l.span + l.positionInT).max - loads.map(_.positionInT).min).getOrElse(0)
+
+  def expandSpanSlotLoadToVector(load: Load, vectorSize: Int): Vector[Double] =
+    (
+      (for (_ <- 0 until load.positionInT) yield 0.0) ++
+        load.amplitudePerSlot ++
+        (for (_ <- (load.positionInT + load.span) until vectorSize) yield 0.0)
+    ).toVector
+
+  def amplitudePerSlot(loads: Traversable[Load]): Vector[Double] =
+    SeqOps.sum(
+      loads.toList
+        .map(Load.expandSpanSlotLoadToVector(_, Load.span(loads)))
+    )
+
+  def amplitudePerSlotEnforceSpan(loads: Traversable[Load], span: Int, restValue: Double = Double.NaN): Vector[Double] = {
+    val sum = SeqOps.sum(
+      loads.toList
+        .map(Load.expandSpanSlotLoadToVector(_, span))
+    )
+
+    val restPositions = ListBuffer.fill(span)(true)
+
+    loads.foreach { l =>
+      for (idx <- l.positionInT until (l.positionInT + l.span)) {
+        restPositions(idx) = false
+      }
+    }
+
+    val sumWithRestPositionsAtRestValue = sum.zip(restPositions).map { case (s, r) =>
+      if (r) restValue else s
+    }
+
+    sumWithRestPositionsAtRestValue
+
+  }
 
   class LoadOrdering extends Ordering[Load] {
     override def compare(x: Load, y: Load): Int = implicitly[Ordering[Double]].compare(x.totalEnergy, y.totalEnergy)

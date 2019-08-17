@@ -4,7 +4,6 @@ import org.scalatest.{FeatureSpec, FlatSpec, GivenWhenThen}
 
 import scala.collection.immutable.{Vector => scalaVector}
 import org.scalatest.Matchers._
-import org.scalatest.Matchers._
 import types.clusterer.immutable.Point
 
 import scala.io.Source
