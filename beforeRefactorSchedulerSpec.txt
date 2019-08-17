@@ -1,0 +1,9 @@
+Given Synthetically generated loads as UnscheduledLoads
+
+When Scheduling loads
+
+Then ScheduledLoads PAR is lower than UnscheduledLoads PAR.
+
+PAR for unscheduled loads: 3.582574846221939.
+
+PAR for scheduled loads: 3.4111491930907683.
