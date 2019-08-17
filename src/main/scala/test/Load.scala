@@ -57,10 +57,17 @@ object SpanSlotFlexibleLoad {
 }
 
 class SpanSlotFlexibleLoad(override val id: Int,
-                           override val positionInT: Int,
+  private var _positionInT: Int,
                            private val _amplitudePerSlot: Vector[Double],
                            override val label: String = "")
     extends SingleLoad {
+
+  override def positionInT: Int = _positionInT
+
+  def positionInT_=(pos: Int): SpanSlotFlexibleLoad = {
+    _positionInT = pos
+    this
+  }
 
   override val span: Int = amplitudePerSlot.size
 
@@ -126,12 +133,12 @@ object SpanSlotFlexibleLoadSuperTask {
 }
 
 case class SpanSlotFlexibleLoadSuperTask(override val id: Int,
-                                         override val positionInT: Int,
+                                         var _positionInT: Int,
                                          agregatees: List[SpanSlotFlexibleLoadSubTask],
                                          override val span: Int,
                                          restValue: Double,
                                          override val label: String = "")
-    extends SpanSlotFlexibleLoad(id, positionInT, Load.amplitudePerSlotEnforceSpan(agregatees, span, restValue), label) {
+    extends SpanSlotFlexibleLoad(id, _positionInT, Load.amplitudePerSlotEnforceSpan(agregatees, span, restValue), label) {
 
   override def amplitudePerSlot: Vector[Double] = Load.amplitudePerSlotEnforceSpan(agregatees, span, restValue)
 
@@ -150,10 +157,10 @@ object SpanSlotFlexibleLoadSubTask {
 
 class SpanSlotFlexibleLoadSubTask private (_parentFlexibleLoad: => SpanSlotFlexibleLoad,
                                            override val id: Int,
-                                           override val positionInT: Int,
+                                           var _positionInT: Int,
                                            override val amplitudePerSlot: Vector[Double],
                                            override val label: String = "")
-    extends SpanSlotFlexibleLoad(id, positionInT, amplitudePerSlot, label) {
+    extends SpanSlotFlexibleLoad(id, _positionInT, amplitudePerSlot, label) {
 
   def parentFlexibleLoad: SpanSlotFlexibleLoad = _parentFlexibleLoad
 

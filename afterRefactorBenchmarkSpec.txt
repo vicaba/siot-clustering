@@ -20,6 +20,21 @@ Vector(4.0, 4.0, 4.0)
 
 END OF SCENARIO
 
+START OF SCENARIO
+Scenario name: With a gap, 2 users with 1 flexible load each to the middle
+--------------------------------------------------------------------------
+IN total PAR = 1.9090909090909092
+Average load per user = 3.6666666666666665
+User 100 | Prefered slots -> 1
+	Initial | PAR = 1.9090909090909092
+	Output without priority | PAR = 1.090909090909091
+	Output with priority | PAR = 1.090909090909091
+
+User 200 | Prefered slots -> 1
+	Initial | PAR = 1.9090909090909092
+	Output without priority | PAR = 1.090909090909091
+	Output with priority | PAR = 1.090909090909091
+
 
 
 
@@ -53,21 +68,6 @@ Vector(12.0, 12.0, 6.0)
 END OF SCENARIO
 
 
-
-START OF SCENARIO
-Scenario name: With a gap, 2 users with 1 flexible load each to the middle
---------------------------------------------------------------------------
-IN total PAR = 1.9090909090909092
-Average load per user = 3.6666666666666665
-User 100 | Prefered slots -> 1
-	Initial | PAR = 1.9090909090909092
-	Output without priority | PAR = 1.090909090909091
-	Output with priority | PAR = 1.090909090909091
-
-User 200 | Prefered slots -> 1
-	Initial | PAR = 1.9090909090909092
-	Output without priority | PAR = 1.090909090909091
-	Output with priority | PAR = 1.090909090909091
 
 OUT total (without priority) PAR = 1.090909090909091
 Vector(8.0, 6.0, 8.0)
@@ -105,8 +105,24 @@ Scenario name: 6 slots with some low loads in between, 3 users
 --------------------------------------------------------------
 IN total PAR = 1.9
 Average load per user = 3.3333333333333335
+User 100 | Prefered slots -> 0, 1
+	Initial | PAR = 2.1176470588235294
+	Output without priority | PAR = 1.4117647058823528
+	Output with priority | PAR = 2.1176470588235294
+
+User 200 | Prefered slots -> 1, 2
+	Initial | PAR = 2.4000000000000004
+	Output without priority | PAR = 1.8000000000000003
+	Output with priority | PAR = 1.8000000000000003
+
+User 300 | Prefered slots -> 4, 5
+	Initial | PAR = 1.5652173913043477
+	Output without priority | PAR = 1.5652173913043477
+	Output with priority | PAR = 1.826086956521739
+
 OUT total (without priority) PAR = 1.3
 Vector(12.0, 13.0, 10.0, 12.0, 9.0, 4.0)
 OUT total (with priority) PAR = 1.2
 Vector(10.0, 12.0, 10.0, 10.0, 10.0, 8.0)
+
 END OF SCENARIO
