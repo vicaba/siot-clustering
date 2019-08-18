@@ -29,13 +29,15 @@ trait Load {
     * Indicates the slot time when this load starts
     */
   def positionInT: Int
-  def totalEnergy: Double
-  def span: Int
   def amplitudePerSlot: Vector[Double]
+  def totalEnergy: Double = amplitudePerSlot.foldLeft(0.0)((accum, l) => accum + l)
+  def span: Int = amplitudePerSlot.size
   def peak: Double = amplitudePerSlot.max
 }
 
 trait SingleLoad extends Load
+
+trait FlexibleLoadT extends SingleLoad
 
 object Load {
 
@@ -45,11 +47,11 @@ object Load {
 
   def deepCopyOne[L <: Load](load: L): L = {
     load match {
-      case l: AccumulatedLoad => l.copy()
+      case l: AccumulatedLoad       => l.copy()
       case l: FixedLoad             => l.copy()
-      case l: FlexibleLoad          => l.copy()
-      case l: FlexibleLoadSuperTask => ???
-      case l: FlexibleLoadSubTask   => ???
+      case l: FlexibleLoad          => l.exactCopy()
+      case l: FlexibleLoadSuperTask => l.copy()
+      case l: FlexibleLoadSubTask   => l.exactCopy()
     }
   }.asInstanceOf[L]
 
@@ -68,35 +70,37 @@ object Load {
     ).toVector
 
   def amplitudePerSlot(loads: Traversable[Load]): Vector[Double] =
-    SeqOps.sum(
-      loads.toList
-        .map(Load.expandSpanSlotLoadToVector(_, Load.span(loads)))
-    )
+    if (loads.isEmpty) Vector.empty[Double]
+    else
+      SeqOps.sum(
+        loads.toList
+          .map(Load.expandSpanSlotLoadToVector(_, Load.span(loads)))
+      )
 
-  def amplitudePerSlotEnforceSpan(loads: Traversable[Load],
-                                  span: Int,
-                                  restValue: Double = Double.NaN): Vector[Double] = {
-    val sum = SeqOps.sum(
-      loads.toList
-        .map(Load.expandSpanSlotLoadToVector(_, span))
-    )
+  def amplitudePerSlotEnforceSpan(loads: Traversable[Load], span: Int, restValue: Double = Double.NaN): Vector[Double] =
+    if (loads.isEmpty) Vector.empty[Double]
+    else {
+      val sum = SeqOps.sum(
+        loads.toList
+          .map(Load.expandSpanSlotLoadToVector(_, span))
+      )
 
-    val restPositions = ListBuffer.fill(span)(true)
+      val restPositions = ListBuffer.fill(span)(true)
 
-    loads.foreach { l =>
-      for (idx <- l.positionInT until (l.positionInT + l.span)) {
-        restPositions(idx) = false
+      loads.foreach { l =>
+        for (idx <- l.positionInT until (l.positionInT + l.span)) {
+          restPositions(idx) = false
+        }
       }
+
+      val sumWithRestPositionsAtRestValue = sum.zip(restPositions).map {
+        case (s, r) =>
+          if (r) restValue else s
+      }
+
+      sumWithRestPositionsAtRestValue
+
     }
-
-    val sumWithRestPositionsAtRestValue = sum.zip(restPositions).map {
-      case (s, r) =>
-        if (r) restValue else s
-    }
-
-    sumWithRestPositionsAtRestValue
-
-  }
 
   class LoadOrdering extends Ordering[Load] {
     override def compare(x: Load, y: Load): Int = implicitly[Ordering[Double]].compare(x.totalEnergy, y.totalEnergy)

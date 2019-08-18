@@ -37,7 +37,7 @@ case class AccumulatedLoad private (override val id: Int,
 
   override def amplitudePerSlot: Vector[Double] = Load.amplitudePerSlot(loads)
 
-  def totalEnergy: Double =
+  override def totalEnergy: Double =
     loads.toList.map(_.totalEnergy).foldLeft(0.0)((accum, l) => accum + l)
 
   override def toString: String = s"Acc($positionInT, $totalEnergy -> ${_loads})"

@@ -11,7 +11,7 @@ class FlexibleLoad(override val id: Int,
                    private var _positionInT: Int,
                    private val _amplitudePerSlot: Vector[Double],
                    override val label: String = "")
-    extends SingleLoad {
+    extends FlexibleLoadT {
 
   override def positionInT: Int = _positionInT
 
@@ -20,11 +20,9 @@ class FlexibleLoad(override val id: Int,
     this
   }
 
-  override val span: Int = amplitudePerSlot.size
-
   override def amplitudePerSlot: Vector[Double] = _amplitudePerSlot
 
-  override def totalEnergy: Double = amplitudePerSlot.foldLeft(0.0)((accum, a) => accum + a)
+  def exactCopy(): FlexibleLoad = FlexibleLoad(this.id, this.positionInT, this.amplitudePerSlot, this.label)
 
   def copy(id: Int = this.id,
            positionInT: Int = this.positionInT,

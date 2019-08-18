@@ -5,7 +5,7 @@ import metrics.Metric
 import org.scalatest.{FeatureSpec, GivenWhenThen}
 import org.scalatest.Matchers._
 import reader.SyntheticProfilesReaderForScheduler
-import test.load.{Load, AccumulatedLoad, FlexibleLoad}
+import test.load.{AccumulatedLoad, FlexibleLoad, FlexibleLoadTask, Load}
 import test.SequenceSplitByConsecutiveElements
 import test.reschedulermetrics.BiasedAverageDistanceTransformation
 
@@ -34,24 +34,18 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
       unscheduledLoads.foreach { accLoad =>
         val splitResult = accLoad.flexibleLoads.map { fLoad =>
-          val splitResults =
-            SequenceSplitByConsecutiveElements
-              .withConsecutiveValueAsTheHighestCount(fLoad.amplitudePerSlot)
-          val splitFlexibleLoad = splitResults.results.zipWithIndex
-            .map {
-              case (s, idx) =>
-                FlexibleLoad(idx, s.index, s.seq.toVector, fLoad.label)
-            }
-          (fLoad, splitFlexibleLoad)
+
+          (fLoad, FlexibleLoadTask.splitIntoSubTasks(fLoad, SequenceSplitByConsecutiveElements
+          .withConsecutiveValueAsTheHighestCount))
+
         }
 
         //TODO: This is because all flexible loads need to be removed, otherwise flexible loads that are OFF distort the Scheduler
         //TODO: Also, we should find a manner to expand flexible loads that have an OFF power greater than 0.0, it will distort metrics otherwise
-        val onFlexibleLoads = splitResult
         //val workingFlexibleLoads = splitResult.filter(_._2.nonEmpty)
 
-        val flexibleLoadsToRemove = onFlexibleLoads.map(_._1)
-        val flexibleLoadsToAdd    = onFlexibleLoads.flatMap(_._2)
+        val flexibleLoadsToRemove = splitResult.map(_._1)
+        val flexibleLoadsToAdd    = splitResult.flatMap { fLoadTask => List(fLoadTask._2) ++ fLoadTask._2.agregatees}
 
         accLoad --= flexibleLoadsToRemove
         accLoad ++= flexibleLoadsToAdd

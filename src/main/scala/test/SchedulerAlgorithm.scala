@@ -30,6 +30,16 @@ object SchedulerAlgorithm {
       acc.copy()
   }
 
+  /**
+  * Mutates accumulatedLoad and flexibleLoad
+    * @param accumulatedLoad
+    * @param flexibleLoad
+    * @param preferredSlots
+    * @param metricTransformation
+    * @param referenceAverage
+    * @param verbose
+    * @return
+    */
   // It deals with loads in sequence
   def rescheduleFlexibleLoad(accumulatedLoad: AccumulatedLoad,
                              flexibleLoad: FlexibleLoad,
@@ -69,7 +79,6 @@ object SchedulerAlgorithm {
       }
     }
 
-    // TODO: Notice that we are returning a copy of the AccumulatedLoad, with a new mutable Set of Loads.
     accumulatedLoad -/+= flexibleLoad.positionInT_=(bestMovement.fl.positionInT)
     accumulatedLoad
   }
