@@ -4,6 +4,7 @@ import org.scalatest._
 import collection.CollecctionHelper._
 import metrics.Metric
 import org.scalatest.Matchers._
+import test.load.{AccumulatedLoad, FixedLoad, FlexibleLoad}
 import test.reschedulermetrics.NoTransformation
 
 class SchedulerAlgorithmSpec extends FeatureSpec with GivenWhenThen {
@@ -16,9 +17,9 @@ class SchedulerAlgorithmSpec extends FeatureSpec with GivenWhenThen {
 
       val rawFlexibleLoad = Vector[Double](1, 1, 1, 1)
 
-      val flexibleLoad = SpanSlotFlexibleLoad(1, 0, rawFlexibleLoad)
+      val flexibleLoad = FlexibleLoad(1, 0, rawFlexibleLoad)
 
-      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, 0, flexibleLoad)
+      val spanSlotAccumulatedLoad = AccumulatedLoad(0, 0, flexibleLoad)
 
       When("the Rescheduler is called")
 
@@ -39,11 +40,11 @@ class SchedulerAlgorithmSpec extends FeatureSpec with GivenWhenThen {
       )
 
       val flexibleLoads = List(
-        SpanSlotFlexibleLoad(1, 0, rawFlexibleLoads(0)),
-        SpanSlotFlexibleLoad(2, 4, rawFlexibleLoads(1))
+        FlexibleLoad(1, 0, rawFlexibleLoads(0)),
+        FlexibleLoad(2, 4, rawFlexibleLoads(1))
       )
 
-      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, 0, flexibleLoads)
+      val spanSlotAccumulatedLoad = AccumulatedLoad(0, 0, flexibleLoads)
 
       When("the Rescheduler is called")
 
@@ -65,9 +66,9 @@ class SchedulerAlgorithmSpec extends FeatureSpec with GivenWhenThen {
 
       val rawFlexibleLoad = Vector[Double](1, 1, 1, 1)
 
-      val flexibleLoad = SpanSlotFlexibleLoad(1, 0, rawFlexibleLoad)
+      val flexibleLoad = FlexibleLoad(1, 0, rawFlexibleLoad)
 
-      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, 0, flexibleLoad)
+      val spanSlotAccumulatedLoad = AccumulatedLoad(0, 0, flexibleLoad)
 
       When("the Rescheduler is called")
 
@@ -83,11 +84,11 @@ class SchedulerAlgorithmSpec extends FeatureSpec with GivenWhenThen {
       Given("an SpanSlotAccumulatedLoad with two loads")
 
       val loads = List(
-        SpanSlotFlexibleLoad(1, 0, Vector[Double](1, 1)),
-        SpanSlotFixedLoad(0, 0, Vector[Double](2, 1, 1, 2))
+        FlexibleLoad(1, 0, Vector[Double](1, 1)),
+        FixedLoad(0, 0, Vector[Double](2, 1, 1, 2))
       )
 
-      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, 0, loads)
+      val spanSlotAccumulatedLoad = AccumulatedLoad(0, 0, loads)
 
       When("the Rescheduler is called")
 
@@ -109,12 +110,12 @@ class SchedulerAlgorithmSpec extends FeatureSpec with GivenWhenThen {
       )
 
       val loads = List(
-        SpanSlotFlexibleLoad(1, 0, rawFlexibleLoads(0)),
-        SpanSlotFlexibleLoad(2, 4, rawFlexibleLoads(1)),
-        SpanSlotFixedLoad(3, 0, Vector[Double](1, 1, 1, 1, 1, 1, 1, 1))
+        FlexibleLoad(1, 0, rawFlexibleLoads(0)),
+        FlexibleLoad(2, 4, rawFlexibleLoads(1)),
+        FixedLoad(3, 0, Vector[Double](1, 1, 1, 1, 1, 1, 1, 1))
       )
 
-      val spanSlotAccumulatedLoad = SpanSlotAccumulatedLoad(0, 0, loads)
+      val spanSlotAccumulatedLoad = AccumulatedLoad(0, 0, loads)
 
       When("the Rescheduler is called")
 

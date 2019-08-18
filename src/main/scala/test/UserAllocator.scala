@@ -1,5 +1,6 @@
 package test
 
+import test.load.{AccumulatedLoad, FlexibleLoad}
 import test.reschedulermetrics.NoTransformation
 
 object UserAllocator {
@@ -13,7 +14,7 @@ object UserAllocator {
    * @param windowSize
    * @return A list in the same order as users with schedulerPreferredTimeSlots per each user as an inner List[Int]
    */
-  def allocate(users: List[SpanSlotAccumulatedLoad], numberOfSlots: Int, windowSize: Int): List[List[Int]] = {
+  def allocate(users: List[AccumulatedLoad], numberOfSlots: Int, windowSize: Int): List[List[Int]] = {
 
     val sortedUsers = users.sortBy(_.flexibleLoads.toList.map(_.totalEnergy).sum).reverse
 
@@ -25,7 +26,7 @@ object UserAllocator {
         totalEnergyFromFlexibleLoads / windowSize
       }).toVector
 
-      SpanSlotFlexibleLoad(user.id, 0, flexibleLoadVector)
+      FlexibleLoad(user.id, 0, flexibleLoadVector)
 
     }
 
@@ -33,7 +34,7 @@ object UserAllocator {
 
     val lowestPositionInT = sortedUsers.flatMap(_.loads).map(_.positionInT).min
     val accumulatedLoads =
-      SpanSlotAccumulatedLoad.keepLoadOrder(0, lowestPositionInT, fixedLoads ::: usersAsFlexibleLoads)
+      AccumulatedLoad.keepLoadOrder(0, lowestPositionInT, fixedLoads ::: usersAsFlexibleLoads)
 
     val allocationResult = SchedulerAlgorithm.reschedule(accumulatedLoads, metricTransformation = NoTransformation)
 

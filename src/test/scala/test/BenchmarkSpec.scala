@@ -1,8 +1,8 @@
 package test
 
 import org.scalatest._
-import Load._
 import metrics.Metric
+import test.load.{Load, AccumulatedLoad, FixedLoad, FlexibleLoad}
 import test.reschedulermetrics.{BiasedAverageDistanceTransformation, MetricTransformation}
 
 import scala.util.Try
@@ -24,24 +24,24 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
     "Benchmark between the input PAR and the output PAR of the two alternatives (with and without prefered slots per user)") {
     scenario("3 slots with 3 users and a flexible load each") {
       val scenarioName = "3 slots with 3 users and a flexible load each"
-      val users: List[SpanSlotAccumulatedLoad] = List(
-        SpanSlotAccumulatedLoad(100,
+      val users: List[AccumulatedLoad] = List(
+        AccumulatedLoad(100,
                                 0,
                                 List(
-                                  SpanSlotFixedLoad(101, 0, Vector(2, 4, 1)),
-                                  SpanSlotFlexibleLoad(151, 0, Vector(3))
+                                  FixedLoad(101, 0, Vector(2, 4, 1)),
+                                  FlexibleLoad(151, 0, Vector(3))
                                 )),
-        SpanSlotAccumulatedLoad(200,
+        AccumulatedLoad(200,
                                 0,
                                 List(
-                                  SpanSlotFixedLoad(201, 0, Vector(2, 4, 1)),
-                                  SpanSlotFlexibleLoad(251, 0, Vector(3))
+                                  FixedLoad(201, 0, Vector(2, 4, 1)),
+                                  FlexibleLoad(251, 0, Vector(3))
                                 )),
-        SpanSlotAccumulatedLoad(300,
+        AccumulatedLoad(300,
                                 0,
                                 List(
-                                  SpanSlotFixedLoad(301, 0, Vector(2, 4, 1)),
-                                  SpanSlotFlexibleLoad(351, 0, Vector(3))
+                                  FixedLoad(301, 0, Vector(2, 4, 1)),
+                                  FlexibleLoad(351, 0, Vector(3))
                                 ))
       )
 
@@ -66,18 +66,18 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
     scenario("All users have the same loads") {
       val scenarioName = "All users have the same loads"
 
-      val users: List[SpanSlotAccumulatedLoad] = List(
-        SpanSlotAccumulatedLoad(100,
+      val users: List[AccumulatedLoad] = List(
+        AccumulatedLoad(100,
                                 0,
                                 List(
-                                  SpanSlotFixedLoad(101, 0, Vector(1, 1, 1)),
-                                  SpanSlotFlexibleLoad(151, 0, Vector(1, 1, 1))
+                                  FixedLoad(101, 0, Vector(1, 1, 1)),
+                                  FlexibleLoad(151, 0, Vector(1, 1, 1))
                                 )),
-        SpanSlotAccumulatedLoad(200,
+        AccumulatedLoad(200,
                                 0,
                                 List(
-                                  SpanSlotFixedLoad(201, 0, Vector(1, 1, 1)),
-                                  SpanSlotFlexibleLoad(251, 0, Vector(1, 1, 1))
+                                  FixedLoad(201, 0, Vector(1, 1, 1)),
+                                  FlexibleLoad(251, 0, Vector(1, 1, 1))
                                 ))
       )
 
@@ -99,18 +99,18 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
 
     scenario("With a gap, 2 users with 1 flexible load each to the middle") {
       val scenarioName = "With a gap, 2 users with 1 flexible load each to the middle"
-      val users: List[SpanSlotAccumulatedLoad] = List(
-        SpanSlotAccumulatedLoad(100,
+      val users: List[AccumulatedLoad] = List(
+        AccumulatedLoad(100,
                                 0,
                                 List(
-                                  SpanSlotFixedLoad(101, 0, Vector(4, 0, 4)),
-                                  SpanSlotFlexibleLoad(151, 0, Vector(3))
+                                  FixedLoad(101, 0, Vector(4, 0, 4)),
+                                  FlexibleLoad(151, 0, Vector(3))
                                 )),
-        SpanSlotAccumulatedLoad(200,
+        AccumulatedLoad(200,
                                 0,
                                 List(
-                                  SpanSlotFixedLoad(201, 0, Vector(4, 0, 4)),
-                                  SpanSlotFlexibleLoad(251, 0, Vector(3))
+                                  FixedLoad(201, 0, Vector(4, 0, 4)),
+                                  FlexibleLoad(251, 0, Vector(3))
                                 ))
       )
 
@@ -134,18 +134,18 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
       val scenarioName =
         "With a gap, 2 users with 1 flexible load, the highest to the middle the other to one of the sides"
 
-      val users: List[SpanSlotAccumulatedLoad] = List(
-        SpanSlotAccumulatedLoad(500,
+      val users: List[AccumulatedLoad] = List(
+        AccumulatedLoad(500,
                                 0,
                                 List(
-                                  SpanSlotFixedLoad(101, 0, Vector(4, 0, 4)),
-                                  SpanSlotFlexibleLoad(151, 0, Vector(11))
+                                  FixedLoad(101, 0, Vector(4, 0, 4)),
+                                  FlexibleLoad(151, 0, Vector(11))
                                 )),
-        SpanSlotAccumulatedLoad(600,
+        AccumulatedLoad(600,
                                 0,
                                 List(
-                                  SpanSlotFixedLoad(201, 0, Vector(4, 0, 4)),
-                                  SpanSlotFlexibleLoad(251, 0, Vector(12))
+                                  FixedLoad(201, 0, Vector(4, 0, 4)),
+                                  FlexibleLoad(251, 0, Vector(12))
                                 ))
       )
 
@@ -169,24 +169,24 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
     scenario("6 slots with some low loads in between, 3 users") {
       val scenarioName = "6 slots with some low loads in between, 3 users"
 
-      val users: List[SpanSlotAccumulatedLoad] = List(
-        SpanSlotAccumulatedLoad(100,
+      val users: List[AccumulatedLoad] = List(
+        AccumulatedLoad(100,
                                 0,
                                 List(
-                                  SpanSlotFixedLoad(101, 0, Vector(3, 3, 3, 0, 1, 2)),
-                                  SpanSlotFlexibleLoad(151, 0, Vector(2, 3))
+                                  FixedLoad(101, 0, Vector(3, 3, 3, 0, 1, 2)),
+                                  FlexibleLoad(151, 0, Vector(2, 3))
                                 )),
-        SpanSlotAccumulatedLoad(200,
+        AccumulatedLoad(200,
                                 0,
                                 List(
-                                  SpanSlotFixedLoad(201, 0, Vector(3, 1, 0, 5, 2, 1)),
-                                  SpanSlotFlexibleLoad(251, 0, Vector(5, 3))
+                                  FixedLoad(201, 0, Vector(3, 1, 0, 5, 2, 1)),
+                                  FlexibleLoad(251, 0, Vector(5, 3))
                                 )),
-        SpanSlotAccumulatedLoad(300,
+        AccumulatedLoad(300,
                                 0,
                                 List(
-                                  SpanSlotFixedLoad(301, 0, Vector(2, 0, 4, 5, 3, 1)),
-                                  SpanSlotFlexibleLoad(351, 0, Vector(4, 4))
+                                  FixedLoad(301, 0, Vector(2, 0, 4, 5, 3, 1)),
+                                  FlexibleLoad(351, 0, Vector(4, 4))
                                 ))
       )
 
@@ -222,7 +222,7 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
   }
 
   def executeScenario(
-      users: List[SpanSlotAccumulatedLoad],
+      users: List[AccumulatedLoad],
       expectedTotalLoad: List[Vector[Double]],
       metricTransformation: MetricTransformation,
       enableTestVerbose: Boolean,
@@ -237,8 +237,8 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
 
     generateLoadsLog(users, benchmarkResult, enablePrintLoads, enableTestVerbose, scenarioName, enableGenerateTables)
 
-    val accumulatedLoadWithoutPriority = SpanSlotAccumulatedLoad(-1, 0, benchmarkResult.resultsWithoutPriority)
-    val accumulatedLoadWithPriority    = SpanSlotAccumulatedLoad(-1, 0, benchmarkResult.resultsWithPriority)
+    val accumulatedLoadWithoutPriority = AccumulatedLoad(-1, 0, benchmarkResult.resultsWithoutPriority)
+    val accumulatedLoadWithPriority    = AccumulatedLoad(-1, 0, benchmarkResult.resultsWithPriority)
 
     computePar(accumulatedLoadWithPriority) should be <= computePar(accumulatedLoadWithoutPriority)
 
@@ -250,7 +250,7 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
     }
   }
 
-  def generateLoadsLog(users: List[SpanSlotAccumulatedLoad],
+  def generateLoadsLog(users: List[AccumulatedLoad],
                        benchmarkResult: BenchmarkResult,
                        enablePrintLoads: Boolean,
                        enableTestVerbose: Boolean,
@@ -271,7 +271,7 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
     enableLog(enableTestVerbose) {
       println(s"IN total PAR = $initialPar")
       println(
-        s"Average load per user = ${users.map(_.totalEnergy).sum / SpanSlotAccumulatedLoad(-1, 0, users).span / users.size}")
+        s"Average load per user = ${users.map(_.totalEnergy).sum / AccumulatedLoad(-1, 0, users).span / users.size}")
     }
 
     for (i <- users.indices) {
@@ -318,8 +318,8 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
       enableLog(enableGenerateTables | enablePrintLoads)(println())
     }
 
-    val accumulatedLoadWithoutPriority = SpanSlotAccumulatedLoad(-1, 0, resultsWithoutPriority)
-    val accumulatedLoadWithPriority    = SpanSlotAccumulatedLoad(-1, 0, resultsWithPriority)
+    val accumulatedLoadWithoutPriority = AccumulatedLoad(-1, 0, resultsWithoutPriority)
+    val accumulatedLoadWithPriority    = AccumulatedLoad(-1, 0, resultsWithPriority)
 
     val outputParWithoutPriority = computePar(resultsWithoutPriority)
     enableLog(enableTestVerbose) {
@@ -333,7 +333,7 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
       println(accumulatedLoadWithPriority.amplitudePerSlot.toString())
     }
 
-    val initialAccumulated = SpanSlotAccumulatedLoad(-1, 0, users)
+    val initialAccumulated = AccumulatedLoad(-1, 0, users)
     enableLog(enableGenerateTables) {
 
       val initialTotalTable = new TableList(
@@ -406,17 +406,17 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
     sb.toString
   }
 
-  case class BenchmarkResult(resultsWithoutPriority: List[SpanSlotAccumulatedLoad],
-                             resultsWithPriority: List[SpanSlotAccumulatedLoad],
+  case class BenchmarkResult(resultsWithoutPriority: List[AccumulatedLoad],
+                             resultsWithPriority: List[AccumulatedLoad],
                              usersPreferredSlots: List[List[Int]])
 
   def executeBenchmark(
-      users: List[SpanSlotAccumulatedLoad],
+      users: List[AccumulatedLoad],
       metricTransformation: MetricTransformation,
       verbose: Boolean = false
   ): BenchmarkResult = {
 
-    val numberOfSlots    = SpanSlotAccumulatedLoad(-1, 0, users).span
+    val numberOfSlots    = AccumulatedLoad(-1, 0, users).span
     val allFlexibleLoads = users.flatMap(_.flexibleLoads)
     val windowSize       = Try(allFlexibleLoads.map(_.span).sum / allFlexibleLoads.size).getOrElse(1)
     enableLog(verbose)(println(s"Num of slots = $numberOfSlots, SlotsWindowSize = $windowSize"))
@@ -445,6 +445,6 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
 
   }
 
-  def computePar(loads: Iterable[Load]): Double = Metric.par(SpanSlotAccumulatedLoad(-1, 0, loads))
-  def computePar(load: Load): Double            = Metric.par(SpanSlotAccumulatedLoad(-1, 0, load))
+  def computePar(loads: Iterable[Load]): Double = Metric.par(AccumulatedLoad(-1, 0, loads))
+  def computePar(load: Load): Double            = Metric.par(AccumulatedLoad(-1, 0, load))
 }

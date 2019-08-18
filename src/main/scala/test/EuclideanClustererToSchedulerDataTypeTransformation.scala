@@ -2,10 +2,11 @@ package test
 
 import types.clusterer.immutable.Point
 import reader.SyntheticProfilesReaderForScheduler._
+import test.load.AccumulatedLoad
 
 object EuclideanClustererToSchedulerDataTypeTransformation {
 
-  def apply(spanSlotAccumulatedLoadId: Int, points: Set[Point]): SpanSlotAccumulatedLoad = {
+  def apply(spanSlotAccumulatedLoadId: Int, points: Set[Point]): AccumulatedLoad = {
 
     val builder = ApplianceLoadBuilder
 
@@ -18,7 +19,7 @@ object EuclideanClustererToSchedulerDataTypeTransformation {
             builder(pIdx * maxDataPerPoint + loadIdx, dv.toScalaVector(), label)
         }
     }
-    SpanSlotAccumulatedLoad(spanSlotAccumulatedLoadId, 0, allLoads)
+    AccumulatedLoad(spanSlotAccumulatedLoadId, 0, allLoads)
   }
 
 }

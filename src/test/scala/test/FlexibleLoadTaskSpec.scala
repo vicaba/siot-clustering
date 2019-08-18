@@ -3,8 +3,9 @@ package test
 import algebra.SeqOps
 import org.scalatest.{FlatSpec, GivenWhenThen}
 import org.scalatest.Matchers._
+import test.load.{FlexibleLoad, FlexibleLoadTask}
 
-class SpanSlotFlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
+class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
 
   val subTask1 = Vector(2.0, 3.0, 4.0, 2.0)
 
@@ -12,7 +13,7 @@ class SpanSlotFlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
 
   val lowValue = 1.0
 
-  val spanSlotFlexibleLoad = SpanSlotFlexibleLoad(
+  val spanSlotFlexibleLoad = FlexibleLoad(
     0,
     0,
     Vector.fill(3)(lowValue) ++ subTask1 ++ Vector.fill(4)(lowValue) ++ subTask2 ++ Vector(lowValue))
@@ -25,7 +26,7 @@ class SpanSlotFlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
 
     When("transforming it into SpanSlotFlexibleLoadSuperTask (with subtasks)")
 
-    val spanSlotFlexibleLoadSuperTask = SpanSlotFlexibleLoadTask.splitIntoSubTasks(
+    val spanSlotFlexibleLoadSuperTask = FlexibleLoadTask.splitIntoSubTasks(
       fLoad,
       SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount)
 
@@ -49,7 +50,7 @@ class SpanSlotFlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
 
     Given("a SpanSlotFlexibleLoadSuperTask")
 
-    val spanSlotFlexibleLoadSuperTask = SpanSlotFlexibleLoadTask.splitIntoSubTasks(
+    val spanSlotFlexibleLoadSuperTask = FlexibleLoadTask.splitIntoSubTasks(
       spanSlotFlexibleLoad,
       SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount)
 

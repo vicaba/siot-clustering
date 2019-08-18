@@ -1,5 +1,6 @@
 package test.reschedulermetrics
-import test.{Load, Movement, SpanSlotAccumulatedLoad}
+import test.load.{Load, AccumulatedLoad}
+import test._
 
 class BiasedAverageDistanceTransformation(val bias: Double = 0.50) extends MetricTransformation {
 
@@ -37,7 +38,7 @@ class BiasedAverageDistanceTransformation(val bias: Double = 0.50) extends Metri
       numberOfOverlappedSlots.toDouble / load.span.toDouble
     }
 
-  private def computeAverageAtLoadPosition(accumulatedLoad: SpanSlotAccumulatedLoad, load: Load): Double =
+  private def computeAverageAtLoadPosition(accumulatedLoad: AccumulatedLoad, load: Load): Double =
     accumulatedLoad.amplitudePerSlot.slice(load.positionInT, load.positionInT + load.span).sum / load.span
 
 }

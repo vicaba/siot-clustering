@@ -5,7 +5,8 @@ import metrics.Metric
 import org.scalatest.{FeatureSpec, GivenWhenThen}
 import org.scalatest.Matchers._
 import reader.SyntheticProfilesReaderForScheduler
-import test.{Load, SpanSlotAccumulatedLoad, SpanSlotFlexibleLoad, SequenceSplitByConsecutiveElements}
+import test.load.{Load, AccumulatedLoad, FlexibleLoad}
+import test.SequenceSplitByConsecutiveElements
 import test.reschedulermetrics.BiasedAverageDistanceTransformation
 
 class SchedulerSpec extends FeatureSpec with GivenWhenThen {
@@ -39,7 +40,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
           val splitFlexibleLoad = splitResults.results.zipWithIndex
             .map {
               case (s, idx) =>
-                SpanSlotFlexibleLoad(idx, s.index, s.seq.toVector, fLoad.label)
+                FlexibleLoad(idx, s.index, s.seq.toVector, fLoad.label)
             }
           (fLoad, splitFlexibleLoad)
         }
@@ -74,7 +75,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
   }
 
-  def computePar(loads: Iterable[Load]): Double = Metric.par(SpanSlotAccumulatedLoad(-1, 0, loads))
-  def computePar(load: Load): Double            = Metric.par(SpanSlotAccumulatedLoad(-1, 0, load))
+  def computePar(loads: Iterable[Load]): Double = Metric.par(AccumulatedLoad(-1, 0, loads))
+  def computePar(load: Load): Double            = Metric.par(AccumulatedLoad(-1, 0, load))
 
 }

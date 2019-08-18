@@ -1,6 +1,7 @@
 package reader
 
-import test.{SingleLoad, SpanSlotAccumulatedLoad, SpanSlotFixedLoad, SpanSlotFlexibleLoad}
+import test.load.{SingleLoad, AccumulatedLoad, FixedLoad, FlexibleLoad}
+import test._
 
 import scala.util.Try
 
@@ -8,7 +9,7 @@ object SyntheticProfilesReaderForScheduler extends TemplateForSyntheticProfilesR
 
   override type SingleLoadOutputType = SingleLoad
 
-  override type AccumulatedLoadOutputType = SpanSlotAccumulatedLoad
+  override type AccumulatedLoadOutputType = AccumulatedLoad
 
   def applyDefault(mainFolder: String,
                    subFolders: Iterable[String],
@@ -52,7 +53,7 @@ object SyntheticProfilesReaderForScheduler extends TemplateForSyntheticProfilesR
       .zip(ids)
       .map {
         case (subFolder, id) =>
-          val l = SpanSlotAccumulatedLoad(id,
+          val l = AccumulatedLoad(id,
                                           0,
                                           readSyntheticLoads(
                                             applianceFileAndBuilder(subFolder),
@@ -69,16 +70,16 @@ object SyntheticProfilesReaderForScheduler extends TemplateForSyntheticProfilesR
     import Appliances._
     override def apply(id: Int, values: Vector[Double], label: String): SingleLoad =
       Try(label match {
-        case DishWasher     => SpanSlotFlexibleLoad(id, 0, values, label)
-        case TumbleDryer    => SpanSlotFlexibleLoad(id, 0, values, label)
-        case WashingMachine => SpanSlotFlexibleLoad(id, 0, values, label)
-        case WasherDryer    => SpanSlotFlexibleLoad(id, 0, values, label)
+        case DishWasher     => FlexibleLoad(id, 0, values, label)
+        case TumbleDryer    => FlexibleLoad(id, 0, values, label)
+        case WashingMachine => FlexibleLoad(id, 0, values, label)
+        case WasherDryer    => FlexibleLoad(id, 0, values, label)
       }).getOrElse(FixedLoadBuilder(id, values, label))
   }
 
   object FixedLoadBuilder extends LoadBuilder {
     override def apply(id: Int, values: Vector[Double], label: String): SingleLoad =
-      SpanSlotFixedLoad(id, 0, values, label)
+      FixedLoad(id, 0, values, label)
   }
 
 }

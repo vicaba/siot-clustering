@@ -1,20 +1,21 @@
 package test
 
+import test.load.{Load, AccumulatedLoad, FlexibleLoad}
 import test.reschedulermetrics.{BiasedAverageDistanceTransformation, BiasedPeakTransformation, MetricTransformation, NoTransformation}
 
 import scala.annotation.tailrec
 
 object SchedulerAlgorithm {
 
-  def reschedule(acc: SpanSlotAccumulatedLoad,
+  def reschedule(acc: AccumulatedLoad,
                  preferredSlots: List[Int] = Nil,
                  metricTransformation: MetricTransformation,
                  referenceAverage: Double = 0.0,
-                 verbose: Boolean = false): SpanSlotAccumulatedLoad = {
+                 verbose: Boolean = false): AccumulatedLoad = {
 
     @tailrec
-    def _reschedule(_acc: SpanSlotAccumulatedLoad,
-                    _remainingFlexibleLoads: List[SpanSlotFlexibleLoad]): SpanSlotAccumulatedLoad =
+    def _reschedule(_acc: AccumulatedLoad,
+                    _remainingFlexibleLoads: List[FlexibleLoad]): AccumulatedLoad =
       _remainingFlexibleLoads match {
         case x :: xs =>
           _reschedule(rescheduleFlexibleLoad(_acc, x, preferredSlots, metricTransformation, referenceAverage, verbose), xs)
@@ -30,15 +31,15 @@ object SchedulerAlgorithm {
   }
 
   // It deals with loads in sequence
-  def rescheduleFlexibleLoad(accumulatedLoad: SpanSlotAccumulatedLoad,
-                             flexibleLoad: SpanSlotFlexibleLoad,
+  def rescheduleFlexibleLoad(accumulatedLoad: AccumulatedLoad,
+                             flexibleLoad: FlexibleLoad,
                              preferredSlots: List[Int] = Nil,
                              metricTransformation: MetricTransformation,
                              referenceAverage: Double = 0.0,
-                             verbose: Boolean = false): SpanSlotAccumulatedLoad = {
+                             verbose: Boolean = false): AccumulatedLoad = {
 
     // Used to perform mutable operations
-    val temporaryX: SpanSlotAccumulatedLoad = accumulatedLoad.copy()
+    val temporaryX: AccumulatedLoad = accumulatedLoad.copy()
 
     var bestMovement: Movement = new Movement(accumulatedLoad += flexibleLoad, flexibleLoad, preferredSlots)
     if (verbose) println(s"Trying load ${flexibleLoad.id}, load vector = ${flexibleLoad.amplitudePerSlot.toString()}")

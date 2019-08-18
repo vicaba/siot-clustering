@@ -1,5 +1,6 @@
 package test.reschedulermetrics
-import test.{Load, Movement, SpanSlotAccumulatedLoad}
+import test.load.{Load, AccumulatedLoad}
+import test._
 
 object AverageDistanceTransformation extends MetricTransformation {
   override def apply(referenceAverage: Double,
@@ -22,7 +23,7 @@ object AverageDistanceTransformation extends MetricTransformation {
     distance
   }
 
-  private def computeBiasedAverageAtLoadPosition(accumulatedLoad: SpanSlotAccumulatedLoad,
+  private def computeBiasedAverageAtLoadPosition(accumulatedLoad: AccumulatedLoad,
                                                  load: Load,
                                                  preferredSlots: List[Int],
                                                  bias: Double): Double = {

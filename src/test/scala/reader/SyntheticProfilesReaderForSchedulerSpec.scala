@@ -2,7 +2,7 @@ package reader
 
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers._
-import test.{SpanSlotAccumulatedLoad, SequenceSplitByConsecutiveElements}
+import test.SequenceSplitByConsecutiveElements
 
 import scala.io.Source
 import scala.util.Try
