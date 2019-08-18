@@ -67,12 +67,13 @@ class FlexibleLoadSuperTask(override val id: Int,
            span: Int = this.span,
            restValue: Double = this.restValue,
            label: String = this.label): FlexibleLoadSuperTask = {
-    new FlexibleLoadSuperTask(id,
+    lazy val newSuperTask: FlexibleLoadSuperTask = new FlexibleLoadSuperTask(id,
                               positionInT,
-                              agregatees.map(_.copyWithNewSuperTask(_superTask = this)),
+                              agregatees.map(_.copyWithNewSuperTask(_superTask = newSuperTask)),
                               span,
                               restValue,
                               label)
+    newSuperTask
   }
 
 }

@@ -70,4 +70,24 @@ class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
 
   }
 
+  "Super task and subtasks" should "be copied down the hierarchy" in {
+
+    Given("a supertask with two subtasks")
+
+    val fLoad = spanSlotFlexibleLoad
+
+    val superTask = FlexibleLoadTask.splitIntoSubTasks(
+      fLoad,
+      SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount)
+
+    When("copy is performed on the super task")
+
+    val superTaskCopy = superTask.copy()
+
+    Then("object hash codes should be different")
+
+    println("hola")
+
+  }
+
 }
