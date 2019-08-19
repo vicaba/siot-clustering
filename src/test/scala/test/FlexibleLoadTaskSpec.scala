@@ -26,23 +26,23 @@ class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
 
     When("transforming it into SpanSlotFlexibleLoadSuperTask (with subtasks)")
 
-    val spanSlotFlexibleLoadSuperTask = FlexibleLoadTask.splitIntoSubTasks(
+    val flexibleLoadSuperTask = FlexibleLoadTask.splitIntoSubTasks(
       fLoad,
       SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount)
 
     Then("it should contain 2 subtasks")
 
-    spanSlotFlexibleLoadSuperTask.agregatees.length shouldBe 2
+    flexibleLoadSuperTask.agregatees.length shouldBe 2
 
     And("they should preserve the values of the SpanSlotFlexibleLoad")
 
-    spanSlotFlexibleLoadSuperTask.agregatees.map(_.amplitudePerSlot) should contain allOf (Vector(2.0, 3.0, 4.0, 2.0), Vector(
+    flexibleLoadSuperTask.agregatees.map(_.amplitudePerSlot) should contain allOf (Vector(2.0, 3.0, 4.0, 2.0), Vector(
       2.0,
       2.0))
 
     And("it should be possible to rebuilt the original SpanSlotFlexibleLoad from the SpanSlotFlexibleLoadSuperTask")
 
-    spanSlotFlexibleLoadSuperTask.toSpanSlotFlexibleLoad.amplitudePerSlot shouldBe fLoad.amplitudePerSlot
+    flexibleLoadSuperTask.toSpanSlotFlexibleLoad.amplitudePerSlot shouldBe fLoad.amplitudePerSlot
 
   }
 
@@ -85,8 +85,6 @@ class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
     val superTaskCopy = superTask.copy()
 
     Then("object hash codes should be different")
-
-    println("hola")
 
   }
 

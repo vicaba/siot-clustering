@@ -78,7 +78,7 @@ object Load {
       )
 
   def amplitudePerSlotEnforceSpan(loads: Traversable[Load], span: Int, restValue: Double = Double.NaN): Vector[Double] =
-    if (loads.isEmpty) Vector.empty[Double]
+    if (loads.isEmpty) Vector.fill(span)(restValue)
     else {
       val sum = SeqOps.sum(
         loads.toList

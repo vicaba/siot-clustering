@@ -1,5 +1,6 @@
 package algorithm
 
+import algebra.SeqOps
 import algorithm.scheduler.Scheduler
 import metrics.Metric
 import org.scalatest.{FeatureSpec, GivenWhenThen}
@@ -32,6 +33,8 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
                       windowSize = 30)
         .toList
 
+      val unscheduledLoadsAmplitudePerSlot = SeqOps.sum(unscheduledLoads.map(_.amplitudePerSlot))
+
       unscheduledLoads.foreach { accLoad =>
         val splitResult = accLoad.flexibleLoads.map { fLoad =>
 
@@ -51,11 +54,15 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
         accLoad ++= flexibleLoadsToAdd
       }
 
+      val unscheduledLoadsAmplitudePerSlot2 = SeqOps.sum(unscheduledLoads.map(_.amplitudePerSlot))
+
       When("Scheduling loads")
 
       val scheduledLoads = Scheduler.apply(Load.deepCopy(unscheduledLoads).toList, new BiasedAverageDistanceTransformation)
 
       Then("ScheduledLoads PAR is lower than UnscheduledLoads PAR.")
+
+      unscheduledLoadsAmplitudePerSlot2 shouldBe unscheduledLoadsAmplitudePerSlot
 
       val unscheduledLoadsPar = computePar(unscheduledLoads)
       val scheduledLoadsPar   = computePar(scheduledLoads)
