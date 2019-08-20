@@ -114,7 +114,13 @@ class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
 
     }
 
+
+
     accLoadOriginal.amplitudePerSlot shouldBe accLoad.amplitudePerSlot
+
+    Then("accLoadOriginal total energy should be equal to accLoad total energy")
+
+    accLoadOriginal.totalEnergy shouldBe accLoad.totalEnergy
 
 
   }

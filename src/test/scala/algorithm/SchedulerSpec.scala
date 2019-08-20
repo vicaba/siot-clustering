@@ -33,35 +33,21 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
                       windowSize = 30)
         .toList
 
-      val unscheduledLoadsAmplitudePerSlot = SeqOps.sum(unscheduledLoads.map(_.amplitudePerSlot))
-
       unscheduledLoads.foreach { accLoad =>
         val splitResult = accLoad.flexibleLoads.map { fLoad =>
 
-          val res = (fLoad, FlexibleLoadTask.splitIntoSubTasks(fLoad, SequenceSplitByConsecutiveElements
+          (fLoad, FlexibleLoadTask.splitIntoSubTasks(fLoad, SequenceSplitByConsecutiveElements
           .withConsecutiveValueAsTheHighestCount))
 
-          res
-
         }
-
-        //TODO: This is because all flexible loads need to be removed, otherwise flexible loads that are OFF distort the Scheduler
-        //TODO: Also, we should find a manner to expand flexible loads that have an OFF power greater than 0.0, it will distort metrics otherwise
-        //val workingFlexibleLoads = splitResult.filter(_._2.nonEmpty)
 
         val flexibleLoadsToRemove = splitResult.map(_._1)
         val flexibleLoadsToAdd    = splitResult.flatMap { fLoadTask => List(fLoadTask._2.setComputeAmplitudePerSlotWithRestValueOnly(true)) ++ fLoadTask._2.aggregatees}
 
-        val accLoadAmplitudePerSlot1 = accLoad.amplitudePerSlot
-
         accLoad --= flexibleLoadsToRemove
         accLoad ++= flexibleLoadsToAdd
 
-        val accLoadAmplitudePerSlot2 = accLoad.amplitudePerSlot
-
       }
-
-      val unscheduledLoadsAmplitudePerSlot2 = SeqOps.sum(unscheduledLoads.map(_.amplitudePerSlot))
 
       When("Scheduling loads")
 
@@ -69,7 +55,6 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
       Then("ScheduledLoads PAR is lower than UnscheduledLoads PAR.")
 
-      unscheduledLoadsAmplitudePerSlot2 shouldBe unscheduledLoadsAmplitudePerSlot
 
       val unscheduledLoadsPar = computePar(unscheduledLoads)
       val scheduledLoadsPar   = computePar(scheduledLoads)
@@ -78,6 +63,10 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
       info(s"PAR for unscheduled loads: $unscheduledLoadsPar.")
       info(s"PAR for scheduled loads: $scheduledLoadsPar.")
+
+      And("scheduledLoads total energy is equal to unscheduledLoads total energy")
+
+      scheduledLoads.map(_.totalEnergy).sum shouldBe unscheduledLoads.map(_.totalEnergy).sum
 
     }
 
