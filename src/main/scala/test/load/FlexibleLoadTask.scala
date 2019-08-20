@@ -5,7 +5,7 @@ import test.{SequenceSplitStrategy, load}
 object FlexibleLoadTask {
 
   def buildFromSuperTask(spanSlotFlexibleLoadSuperTask: FlexibleLoadSuperTask): FlexibleLoad = {
-    Load.amplitudePerSlot(spanSlotFlexibleLoadSuperTask.agregatees)
+    Load.amplitudePerSlot(spanSlotFlexibleLoadSuperTask.aggregatees)
     FlexibleLoad(
       spanSlotFlexibleLoadSuperTask.id,
       spanSlotFlexibleLoadSuperTask.positionInT,
@@ -49,13 +49,26 @@ object FlexibleLoadSuperTask {
 
 class FlexibleLoadSuperTask(override val id: Int,
                             override val positionInT: Int,
-                            val agregatees: List[FlexibleLoadSubTask],
+                            val aggregatees: List[FlexibleLoadSubTask],
                             override val span: Int,
                             val restValue: Double,
                             override val label: String = "")
     extends Load {
 
-  override def amplitudePerSlot: Vector[Double] = Load.amplitudePerSlotEnforceSpan(agregatees, span, restValue)
+  private var _computeAmplitudePerSlotWithRestValueOnly: Boolean = false
+
+  def setComputeAmplitudePerSlotWithRestValueOnly(opt: Boolean): FlexibleLoadSuperTask = {
+    this._computeAmplitudePerSlotWithRestValueOnly = opt
+    this
+  }
+
+  def computeAmplitudePerSlotWithRestValueOnly: Boolean = this._computeAmplitudePerSlotWithRestValueOnly
+
+  override def amplitudePerSlot: Vector[Double] = if (computeAmplitudePerSlotWithRestValueOnly) {
+    Load.amplitudePerSlotEnforceSpan(aggregatees.map(_.copyWithAmplitudePerSlotToZero()), span, restValue)
+  } else {
+    Load.amplitudePerSlotEnforceSpan(aggregatees, span, restValue)
+  }
 
   def toSpanSlotFlexibleLoad: FlexibleLoad = FlexibleLoadTask.buildFromSuperTask(this)
 
@@ -63,7 +76,7 @@ class FlexibleLoadSuperTask(override val id: Int,
 
   def copy(id: Int = this.id,
            positionInT: Int = this.positionInT,
-           agregatees: List[FlexibleLoadSubTask] = this.agregatees,
+           agregatees: List[FlexibleLoadSubTask] = this.aggregatees,
            span: Int = this.span,
            restValue: Double = this.restValue,
            label: String = this.label): FlexibleLoadSuperTask = {
@@ -104,6 +117,10 @@ class FlexibleLoadSubTask private (_superTask: => FlexibleLoadSuperTask,
 
   override def exactCopy(): FlexibleLoadSubTask =
     new FlexibleLoadSubTask(this._superTask, this.id, this.positionInT, this.amplitudePerSlot, this.label)
+
+  def copyWithAmplitudePerSlotToZero(): FlexibleLoadSubTask = {
+    new FlexibleLoadSubTask(this._superTask, this.id, this.positionInT, Vector.fill(this.amplitudePerSlot.size)(0.0), this.label)
+  }
 
   def copyWithNewSuperTask(_superTask: => FlexibleLoadSuperTask = this.superTask): FlexibleLoadSubTask = {
     new FlexibleLoadSubTask(_superTask, this.id, this.positionInT, this.amplitudePerSlot, this.label)

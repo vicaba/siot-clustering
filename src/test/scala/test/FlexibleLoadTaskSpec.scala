@@ -3,7 +3,7 @@ package test
 import algebra.SeqOps
 import org.scalatest.{FlatSpec, GivenWhenThen}
 import org.scalatest.Matchers._
-import test.load.{FlexibleLoad, FlexibleLoadTask}
+import test.load.{AccumulatedLoad, FlexibleLoad, FlexibleLoadTask, Load}
 
 class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
 
@@ -32,11 +32,11 @@ class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
 
     Then("it should contain 2 subtasks")
 
-    flexibleLoadSuperTask.agregatees.length shouldBe 2
+    flexibleLoadSuperTask.aggregatees.length shouldBe 2
 
     And("they should preserve the values of the SpanSlotFlexibleLoad")
 
-    flexibleLoadSuperTask.agregatees.map(_.amplitudePerSlot) should contain allOf (Vector(2.0, 3.0, 4.0, 2.0), Vector(
+    flexibleLoadSuperTask.aggregatees.map(_.amplitudePerSlot) should contain allOf (Vector(2.0, 3.0, 4.0, 2.0), Vector(
       2.0,
       2.0))
 
@@ -56,7 +56,7 @@ class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
 
     When("getting its subtasks")
 
-    val subtasks = spanSlotFlexibleLoadSuperTask.agregatees
+    val subtasks = spanSlotFlexibleLoadSuperTask.aggregatees
 
     And("rescheduling them at positionInT == 0")
 
@@ -70,7 +70,7 @@ class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
 
   }
 
-  "Super task and subtasks" should "be copied down the hierarchy" in {
+  "SuperTask and SubTasks" should "be copied down the hierarchy" in {
 
     Given("a supertask with two subtasks")
 
@@ -85,6 +85,37 @@ class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
     val superTaskCopy = superTask.copy()
 
     Then("object hash codes should be different")
+
+  }
+
+  "AccumulatedLoad" should "be able to split into SubTasks and SuperTask and keep the same amplitudePerSlot" in {
+
+    Given("an AccumulatedLoad with one FlexibleLoad")
+
+    val accLoad = AccumulatedLoad(0,0, List(spanSlotFlexibleLoad))
+
+    val accLoadOriginal = Load.deepCopyOne(accLoad)
+
+    When("getting the flexibleLoad and splitting it into subtasks")
+
+    accLoad.flexibleLoads.foreach{ fl =>
+
+
+      val res = (fl, FlexibleLoadTask.splitIntoSubTasks(fl, SequenceSplitByConsecutiveElements
+        .withConsecutiveValueAsTheHighestCount))
+
+      val flexibleLoadsToRemove = List(res._1)
+      val flexibleLoadsToAdd    = List(res._2.setComputeAmplitudePerSlotWithRestValueOnly(true)) ++ res._2.aggregatees
+
+      val accLoadAmplitudePerSlot1 = accLoad.amplitudePerSlot
+
+      accLoad --= flexibleLoadsToRemove
+      accLoad ++= flexibleLoadsToAdd
+
+    }
+
+    accLoadOriginal.amplitudePerSlot shouldBe accLoad.amplitudePerSlot
+
 
   }
 

@@ -38,8 +38,10 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
       unscheduledLoads.foreach { accLoad =>
         val splitResult = accLoad.flexibleLoads.map { fLoad =>
 
-          (fLoad, FlexibleLoadTask.splitIntoSubTasks(fLoad, SequenceSplitByConsecutiveElements
+          val res = (fLoad, FlexibleLoadTask.splitIntoSubTasks(fLoad, SequenceSplitByConsecutiveElements
           .withConsecutiveValueAsTheHighestCount))
+
+          res
 
         }
 
@@ -48,10 +50,15 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
         //val workingFlexibleLoads = splitResult.filter(_._2.nonEmpty)
 
         val flexibleLoadsToRemove = splitResult.map(_._1)
-        val flexibleLoadsToAdd    = splitResult.flatMap { fLoadTask => List(fLoadTask._2) ++ fLoadTask._2.agregatees}
+        val flexibleLoadsToAdd    = splitResult.flatMap { fLoadTask => List(fLoadTask._2.setComputeAmplitudePerSlotWithRestValueOnly(true)) ++ fLoadTask._2.aggregatees}
+
+        val accLoadAmplitudePerSlot1 = accLoad.amplitudePerSlot
 
         accLoad --= flexibleLoadsToRemove
         accLoad ++= flexibleLoadsToAdd
+
+        val accLoadAmplitudePerSlot2 = accLoad.amplitudePerSlot
+
       }
 
       val unscheduledLoadsAmplitudePerSlot2 = SeqOps.sum(unscheduledLoads.map(_.amplitudePerSlot))
