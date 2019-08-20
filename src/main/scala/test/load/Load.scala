@@ -41,7 +41,10 @@ trait FlexibleLoadT extends SingleLoad
 
 object Load {
 
-  //def deepCopy(loads: Traversable[Load]): Traversable[Load] = loads.map(deepCopy)
+  object OnAccumulatedLoad {
+    def splitFlexibleLoadsIntoTasksAndMutateAccumulatedLoad(accLoad: AccumulatedLoad) = ???
+  }
+
 
   def deepCopy[L <: Load](loads: Traversable[L]): Traversable[L] = loads.map(deepCopyOne)
 

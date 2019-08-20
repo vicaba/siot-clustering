@@ -13,18 +13,18 @@ class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
 
   val lowValue = 1.0
 
-  val spanSlotFlexibleLoad = FlexibleLoad(
+  val flexibleLoad = FlexibleLoad(
     0,
     0,
     Vector.fill(3)(lowValue) ++ subTask1 ++ Vector.fill(4)(lowValue) ++ subTask2 ++ Vector(lowValue))
 
   "A SpanSlotFlexibleLoad" should "be correctly split and rebuilt" in {
 
-    Given("a SpanSlotFlexibleLoad with multiple tasks")
+    Given("a FlexibleLoad with multiple tasks")
 
-    val fLoad = spanSlotFlexibleLoad
+    val fLoad = flexibleLoad
 
-    When("transforming it into SpanSlotFlexibleLoadSuperTask (with subtasks)")
+    When("transforming it into FlexibleLoadSuperTask (with subtasks)")
 
     val flexibleLoadSuperTask = FlexibleLoadTask.splitIntoSubTasks(
       fLoad,
@@ -40,18 +40,18 @@ class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
       2.0,
       2.0))
 
-    And("it should be possible to rebuilt the original SpanSlotFlexibleLoad from the SpanSlotFlexibleLoadSuperTask")
+    And("it should be possible to rebuild the original FlexibleLoad from the FlexibleLoadSuperTask")
 
     flexibleLoadSuperTask.toSpanSlotFlexibleLoad.amplitudePerSlot shouldBe fLoad.amplitudePerSlot
 
   }
 
-  "Subtasks pertaining to a SpanSlotFlexibleLoadSuperTask, when rescheduled, changes" should "be reflected on the SpanSlotFlexibleLoadSuperTask" in {
+  "Subtasks pertaining to a FlexibleLoadSuperTask, when rescheduled, changes" should "be reflected on the FlexibleLoadSuperTask" in {
 
     Given("a SpanSlotFlexibleLoadSuperTask")
 
     val spanSlotFlexibleLoadSuperTask = FlexibleLoadTask.splitIntoSubTasks(
-      spanSlotFlexibleLoad,
+      flexibleLoad,
       SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount)
 
     When("getting its subtasks")
@@ -74,7 +74,7 @@ class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
 
     Given("a supertask with two subtasks")
 
-    val fLoad = spanSlotFlexibleLoad
+    val fLoad = flexibleLoad
 
     val superTask = FlexibleLoadTask.splitIntoSubTasks(
       fLoad,
@@ -92,7 +92,7 @@ class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
 
     Given("an AccumulatedLoad with one FlexibleLoad")
 
-    val accLoad = AccumulatedLoad(0,0, List(spanSlotFlexibleLoad))
+    val accLoad = AccumulatedLoad(0,0, List(flexibleLoad))
 
     val accLoadOriginal = Load.deepCopyOne(accLoad)
 
@@ -107,21 +107,18 @@ class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
       val flexibleLoadsToRemove = List(res._1)
       val flexibleLoadsToAdd    = List(res._2.setComputeAmplitudePerSlotWithRestValueOnly(true)) ++ res._2.aggregatees
 
-      val accLoadAmplitudePerSlot1 = accLoad.amplitudePerSlot
-
       accLoad --= flexibleLoadsToRemove
       accLoad ++= flexibleLoadsToAdd
 
     }
 
-
+    Then("accLoadOriginal amplitude per slot should be equal to accLoad total energy")
 
     accLoadOriginal.amplitudePerSlot shouldBe accLoad.amplitudePerSlot
 
-    Then("accLoadOriginal total energy should be equal to accLoad total energy")
+    And("accLoadOriginal total energy should be equal to accLoad total energy")
 
     accLoadOriginal.totalEnergy shouldBe accLoad.totalEnergy
-
 
   }
 

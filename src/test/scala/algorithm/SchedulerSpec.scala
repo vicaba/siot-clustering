@@ -6,7 +6,7 @@ import metrics.Metric
 import org.scalatest.{FeatureSpec, GivenWhenThen}
 import org.scalatest.Matchers._
 import reader.SyntheticProfilesReaderForScheduler
-import test.load.{AccumulatedLoad, FlexibleLoad, FlexibleLoadTask, Load}
+import test.load.{AccumulatedLoad, FixedLoad, FlexibleLoad, FlexibleLoadTask, Load}
 import test.SequenceSplitByConsecutiveElements
 import test.reschedulermetrics.BiasedAverageDistanceTransformation
 
@@ -17,6 +17,33 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
   val LightingOutputFileName   = "lighting_output.csv"
 
   feature("Scheduler. PAR is minimized after rescheduling") {
+
+    scenario("With test data, both unscheduledLoads and scheduledLoads keep the same total energy") {
+
+      Given("3 slots with 3 users and a flexible load each")
+
+      val users: List[AccumulatedLoad] = List(
+        AccumulatedLoad(100,
+          0,
+          List(
+            FixedLoad(101, 0, Vector(2, 4, 1)),
+            FlexibleLoad(151, 0, Vector(3, 1, 1))
+          )),
+        AccumulatedLoad(200,
+          0,
+          List(
+            FixedLoad(201, 0, Vector(2, 4, 1)),
+            FlexibleLoad(251, 0, Vector(3, 1, 1))
+          )),
+        AccumulatedLoad(300,
+          0,
+          List(
+            FixedLoad(301, 0, Vector(2, 4, 1)),
+            FlexibleLoad(351, 0, Vector(3, 1, 1))
+          ))
+      )
+
+    }
 
     scenario("With synthetic data, PAR is minimized after rescheduling") {
 
