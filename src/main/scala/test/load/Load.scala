@@ -62,17 +62,20 @@ object Load {
 
   }
 
-  def deepCopy[L <: Load](loads: Traversable[L]): Traversable[L] = loads.map(deepCopyOne)
+  def deepCopy[L <: Load](loads: Traversable[L]): Traversable[L] = loads.filter(!_.isInstanceOf[FlexibleLoadSubTask]).flatMap(deepCopyOne)
 
-  def deepCopyOne[L <: Load](load: L): L = {
+  def deepCopyOne[L <: Load](load: L): List[L] = {
     load match {
-      case l: AccumulatedLoad       => l.copy()
-      case l: FixedLoad             => l.copy()
-      case l: FlexibleLoad          => l.exactCopy()
-      case l: FlexibleLoadSuperTask => l.copy()
-      case l: FlexibleLoadSubTask   => l.exactCopy()
+      case l: AccumulatedLoad       => List(l.copy())
+      case l: FixedLoad             => List(l.copy())
+      case l: FlexibleLoad          => List(l.exactCopy())
+      case l: FlexibleLoadSuperTask => {
+        val cpy = l.copy()
+        List(cpy) ++ cpy.aggregatees
+      }
+      case l: FlexibleLoadSubTask   => List(l.exactCopy())
     }
-  }.asInstanceOf[L]
+  }.asInstanceOf[List[L]]
 
   def toSpanSlotFixedLoad(s: Seq[Double]): FixedLoad = {
     FixedLoad(0, 0, s.toVector)

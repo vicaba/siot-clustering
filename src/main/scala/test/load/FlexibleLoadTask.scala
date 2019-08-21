@@ -52,10 +52,9 @@ class FlexibleLoadSuperTask(override val id: Int,
                             private var _aggregatees: List[FlexibleLoadSubTask],
                             override val span: Int,
                             val restValue: Double,
-                            override val label: String = "")
+                            override val label: String = "",
+                            private var _computeAmplitudePerSlotWithRestValueOnly: Boolean = false)
     extends Load {
-
-  private var _computeAmplitudePerSlotWithRestValueOnly: Boolean = false
 
   def setComputeAmplitudePerSlotWithRestValueOnly(opt: Boolean): FlexibleLoadSuperTask = {
     this._computeAmplitudePerSlotWithRestValueOnly = opt
@@ -88,7 +87,7 @@ class FlexibleLoadSuperTask(override val id: Int,
            span: Int = this.span,
            restValue: Double = this.restValue,
            label: String = this.label): FlexibleLoadSuperTask = {
-    val newSuperTask: FlexibleLoadSuperTask = new FlexibleLoadSuperTask(id, positionInT, null, span, restValue, label)
+    val newSuperTask: FlexibleLoadSuperTask = new FlexibleLoadSuperTask(id, positionInT, null, span, restValue, label, computeAmplitudePerSlotWithRestValueOnly)
     newSuperTask.aggregatees_=(agregatees.map(_.copyWithNewSuperTask(newSuperTask)))
     newSuperTask
   }

@@ -93,7 +93,7 @@ class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
 
     val accLoad = AccumulatedLoad(0, 0, List(flexibleLoad))
 
-    val accLoadOriginal = Load.deepCopyOne(accLoad)
+    val accLoadOriginal = accLoad.copy()
 
     When("getting the flexibleLoad and splitting it into subtasks")
 
@@ -117,7 +117,7 @@ class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
 
     val accLoad = AccumulatedLoad(0, 0, List(flexibleLoad))
 
-    val accLoadOriginal = Load.deepCopyOne(accLoad)
+    val accLoadOriginal = accLoad.copy()
 
     When("getting the flexibleLoad and splitting it into subtasks")
 

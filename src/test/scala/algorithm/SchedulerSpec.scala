@@ -27,19 +27,19 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
                         0,
                         List(
                           FixedLoad(101, 0, Vector(2, 4, 1)),
-                          FlexibleLoad(151, 0, Vector(3, 1, 1))
+                          FlexibleLoad(151, 0, Vector(3, 0, 0))
                         )),
         AccumulatedLoad(200,
                         0,
                         List(
                           FixedLoad(201, 0, Vector(2, 4, 1)),
-                          FlexibleLoad(251, 0, Vector(3, 1, 1))
+                          FlexibleLoad(251, 0, Vector(3, 0, 0))
                         )),
         AccumulatedLoad(300,
                         0,
                         List(
                           FixedLoad(301, 0, Vector(2, 4, 1)),
-                          FlexibleLoad(351, 0, Vector(3, 1, 1))
+                          FlexibleLoad(351, 0, Vector(3, 0, 0))
                         ))
       )
 

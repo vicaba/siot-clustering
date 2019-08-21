@@ -12,7 +12,7 @@ import scala.collection.mutable
   * @param positionInT
   * @param _loads this parameters is mutable.
   */
-case class AccumulatedLoad private (override val id: Int,
+class AccumulatedLoad private (override val id: Int,
                                     override val positionInT: Int,
                                     private val _loads: mutable.Set[Load],
                                     override val label: String = "")

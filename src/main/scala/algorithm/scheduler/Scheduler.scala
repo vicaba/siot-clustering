@@ -26,7 +26,7 @@ object Scheduler {
 
     val referenceAverage = clusters.map(_.totalEnergy).sum / numberOfSlots / clusters.size
 
-    clusters.zip(schedulerPreferredSlots).map {
+    val res = clusters.zip(schedulerPreferredSlots).map {
       case (user, schedulingPreferredSlotsForUser) =>
         SchedulerAlgorithm.reschedule(
           user,
@@ -35,6 +35,8 @@ object Scheduler {
           referenceAverage = referenceAverage, verbose = false
         )
     }
+
+    res
 
   }
 
