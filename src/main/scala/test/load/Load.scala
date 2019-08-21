@@ -4,7 +4,7 @@ import algebra.SeqOps
 import breeze.linalg.DenseVector
 import collection.CollecctionHelper._
 import metrics.DenseVectorReprOps
-import test.{SequenceSplitStrategy, load}
+import test.{SequenceSplitByConsecutiveElements, SequenceSplitStrategy, load}
 import types.ops.SetOps._
 
 import scala.collection.mutable
@@ -31,8 +31,8 @@ trait Load {
   def positionInT: Int
   def amplitudePerSlot: Vector[Double]
   def totalEnergy: Double = amplitudePerSlot.foldLeft(0.0)((accum, l) => accum + l)
-  def span: Int = amplitudePerSlot.size
-  def peak: Double = amplitudePerSlot.max
+  def span: Int           = amplitudePerSlot.size
+  def peak: Double        = amplitudePerSlot.max
 }
 
 trait SingleLoad extends Load
@@ -41,10 +41,26 @@ trait FlexibleLoadT extends SingleLoad
 
 object Load {
 
-  object OnAccumulatedLoad {
-    def splitFlexibleLoadsIntoTasksAndMutateAccumulatedLoad(accLoad: AccumulatedLoad) = ???
-  }
+  object MutateAccumulatedLoad {
 
+    def splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
+        accLoad: AccumulatedLoad,
+        splitStrategy: SequenceSplitStrategy[Double]): AccumulatedLoad = {
+
+      accLoad.flexibleLoads.foreach { fl =>
+        val res = (fl, FlexibleLoadTask.splitIntoSubTasks(fl, splitStrategy))
+
+        val flexibleLoadsToRemove = List(res._1)
+        val flexibleLoadsToAdd    = List(res._2.setComputeAmplitudePerSlotWithRestValueOnly(true)) ++ res._2.aggregatees
+
+        accLoad --= flexibleLoadsToRemove
+        accLoad ++= flexibleLoadsToAdd
+
+      }
+      accLoad
+    }
+
+  }
 
   def deepCopy[L <: Load](loads: Traversable[L]): Traversable[L] = loads.map(deepCopyOne)
 
@@ -90,6 +106,7 @@ object Load {
 
       val restPositions = ListBuffer.fill(span)(true)
 
+      // TODO: PROBLEM HERE WITH INDICES?
       loads.foreach { l =>
         for (idx <- l.positionInT until (l.positionInT + l.span)) {
           restPositions(idx) = false

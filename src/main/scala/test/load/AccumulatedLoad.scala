@@ -40,7 +40,7 @@ case class AccumulatedLoad private (override val id: Int,
   override def totalEnergy: Double =
     loads.toList.map(_.totalEnergy).foldLeft(0.0)((accum, l) => accum + l)
 
-  override def toString: String = s"Acc($positionInT, $totalEnergy -> ${_loads})"
+  override def toString: String = s"Acc($amplitudePerSlot)"
 
   def +=(y: Load): AccumulatedLoad = {
     this._loads += y
