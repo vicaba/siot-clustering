@@ -132,7 +132,9 @@ object Load {
   val loadOrderingByPositionInTime: Ordering[Load] =
     (x: Load, y: Load) => implicitly[Ordering[Int]].compare(x.positionInT, y.positionInT)
 
-  implicit val loadOrderingByAmplitude: Ordering[Load] =
+
+
+  val loadOrderingByAmplitude: Ordering[Load] =
     (x: Load, y: Load) => implicitly[Ordering[Double]].compare(x.totalEnergy, y.totalEnergy)
 
   implicit def toVector[X <: Load]: DenseVectorReprOps[X] = new DenseVectorReprOps[X] {

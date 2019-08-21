@@ -58,7 +58,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
       val unscheduledLoadsPar = computePar(unscheduledLoads)
       val scheduledLoadsPar   = computePar(scheduledLoads)
 
-      //scheduledLoadsPar should be < unscheduledLoadsPar
+      scheduledLoadsPar should be < unscheduledLoadsPar
 
       info(s"PAR for unscheduled loads: $unscheduledLoadsPar.")
       info(s"PAR for scheduled loads: $scheduledLoadsPar.")
@@ -69,7 +69,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
     }
 
-    /*scenario("With synthetic data, PAR is minimized after rescheduling") {
+    scenario("With synthetic data, PAR is minimized after rescheduling") {
 
       Given("Synthetically generated loads as UnscheduledLoads")
 
@@ -108,7 +108,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
       scheduledLoads.map(_.totalEnergy).sum shouldBe unscheduledLoads.map(_.totalEnergy).sum
 
-    }*/
+    }
 
   }
 

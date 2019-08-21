@@ -1,9 +1,10 @@
 package test
 
-import test.load.{AccumulatedLoad, FlexibleLoad}
+import test.load.{AccumulatedLoad, FlexibleLoad, Load}
 import test.reschedulermetrics.NoTransformation
 
 object UserAllocator {
+
 
   /**
    * Allocates users along the complete timespan. The algorithm "transforms" each user as a flexible load of windowSize and
@@ -16,7 +17,18 @@ object UserAllocator {
    */
   def allocate(users: List[AccumulatedLoad], numberOfSlots: Int, windowSize: Int): List[List[Int]] = {
 
-    val sortedUsers = users.sortBy(_.flexibleLoads.toList.map(_.totalEnergy).sum).reverse
+    val loadListOrderingByAmplitude: Ordering[List[Load]] =
+      (x: List[Load], y: List[Load]) => implicitly[Ordering[Double]].compare(x.map(_.totalEnergy).sum, y.map(_.totalEnergy).sum)
+
+    loadListOrderingByAmplitude.on[AccumulatedLoad](_.flexibleLoads.toList)
+
+    //users.sorted
+
+
+    // TODO: Test this by comparing results of BenchmarkSpec and SchedulerSpec
+    val sortedUsers = users.sorted(loadListOrderingByAmplitude.on[AccumulatedLoad](_.flexibleLoads.toList)).reverse
+
+    //val sortedUsers = users.sortBy(_.flexibleLoads.toList.map(_.totalEnergy).sum).reverse
 
     val usersAsFlexibleLoads = for (user <- sortedUsers) yield {
 
