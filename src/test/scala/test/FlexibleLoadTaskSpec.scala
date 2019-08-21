@@ -131,7 +131,7 @@ class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
 
     And("moving a subtask")
 
-    accLoad.flexibleLoads.head.positionInT = 13
+    accLoad.flexibleLoads.head.positionInT = 10
 
     accLoad.totalEnergy shouldBe accLoadOriginal.totalEnergy
 

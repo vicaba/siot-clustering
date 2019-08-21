@@ -248,6 +248,8 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
       case x :: y :: Nil => List(accumulatedLoadWithPriority.amplitudePerSlot) should contain oneOf (x, y)
       case x :: y :: xs  => List(accumulatedLoadWithPriority.amplitudePerSlot) should contain oneOf (x, y, xs: _*)
     }
+
+    benchmarkResult.resultsWithPriority.map(_.totalEnergy).sum shouldBe users.map(_.totalEnergy).sum
   }
 
   def generateLoadsLog(users: List[AccumulatedLoad],

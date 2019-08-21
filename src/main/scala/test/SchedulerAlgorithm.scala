@@ -26,8 +26,11 @@ object SchedulerAlgorithm {
 
     if (remainingLoadsAfterRemovingFlexibleLoads.nonEmpty)
       _reschedule(acc.copy(loads = remainingLoadsAfterRemovingFlexibleLoads), acc.flexibleLoads.toList)
-    else
-      acc.copy()
+    else {
+      val cpy = acc.copy()
+      println("cpy")
+      cpy
+    }
   }
 
   /**
