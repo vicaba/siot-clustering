@@ -1,40 +1,53 @@
 package test
 
 import test.load.{Load, AccumulatedLoad, FlexibleLoad}
-import test.reschedulermetrics.{BiasedAverageDistanceTransformation, BiasedPeakTransformation, MetricTransformation, NoTransformation}
+import test.reschedulermetrics.{
+  BiasedAverageDistanceTransformation,
+  BiasedPeakTransformation,
+  MetricTransformation,
+  NoTransformation
+}
 
 import scala.annotation.tailrec
 
 object SchedulerAlgorithm {
 
+  val DefaultOrdering: Ordering[Load] = Load.loadOrderingByAmplitude.reverse
+
+  val DefaultOrderings: List[Ordering[Load]] = List(
+    Load.loadOrderingByAmplitude,
+    Load.loadOrderingByAmplitude.reverse,
+    Load.loadOrderingByPositionInTime,
+    Load.loadOrderingByPositionInTime.reverse
+  )
+
   def reschedule(acc: AccumulatedLoad,
                  preferredSlots: List[Int] = Nil,
                  metricTransformation: MetricTransformation,
                  referenceAverage: Double = 0.0,
+                 ordering: Ordering[Load] = DefaultOrdering,
                  verbose: Boolean = false): AccumulatedLoad = {
 
     @tailrec
-    def _reschedule(_acc: AccumulatedLoad,
-                    _remainingFlexibleLoads: List[FlexibleLoad]): AccumulatedLoad =
+    def _reschedule(_acc: AccumulatedLoad, _remainingFlexibleLoads: List[FlexibleLoad]): AccumulatedLoad =
       _remainingFlexibleLoads match {
         case x :: xs =>
-          _reschedule(rescheduleFlexibleLoad(_acc, x, preferredSlots, metricTransformation, referenceAverage, verbose), xs)
+          _reschedule(rescheduleFlexibleLoad(_acc, x, preferredSlots, metricTransformation, referenceAverage, verbose),
+                      xs)
         case Nil => _acc
       }
 
     val remainingLoadsAfterRemovingFlexibleLoads = acc.loads -- acc.flexibleLoads
 
     if (remainingLoadsAfterRemovingFlexibleLoads.nonEmpty)
-      _reschedule(acc.copy(loads = remainingLoadsAfterRemovingFlexibleLoads), acc.flexibleLoads.toList)
-    else {
-      val cpy = acc.copy()
-      println("cpy")
-      cpy
-    }
+      _reschedule(acc.copy(loads = remainingLoadsAfterRemovingFlexibleLoads), acc.flexibleLoads.toList.sorted(ordering))
+    else
+      acc.copy()
+
   }
 
   /**
-  * Mutates accumulatedLoad and flexibleLoad
+    * Mutates accumulatedLoad and flexibleLoad
     * @param accumulatedLoad
     * @param flexibleLoad
     * @param preferredSlots
@@ -68,12 +81,12 @@ object SchedulerAlgorithm {
         metricTransformation(referenceAverage, bestMovement, temporaryMovement, preferredSlots)
 
       val temporaryMetric = metricResult.temporaryMovementMetric
-      val bestMetric = metricResult.bestMovementMetric
+      val bestMetric      = metricResult.bestMovementMetric
 
       if (verbose) println(s"\t\tbestMetric = $bestMetric, peak = ${bestMovement.acc.peak}")
       if (verbose) print(s"\t\ttempMetric = $temporaryMetric, peak = ${temporaryMovement.acc.peak}")
 
-       if (temporaryMetric < bestMetric) {
+      if (temporaryMetric < bestMetric) {
         if (verbose) println(" - Is best")
 
         bestMovement = new Movement(temporaryMovement.acc.copy(), temporaryMovement.fl, preferredSlots)

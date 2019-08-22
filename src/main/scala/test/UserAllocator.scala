@@ -5,30 +5,30 @@ import test.reschedulermetrics.NoTransformation
 
 object UserAllocator {
 
+  val DefaultOrderings: List[Ordering[AccumulatedLoad]] = List(
+    Load.loadListOrderingByAmplitude,
+    Load.loadListOrderingByAmplitude.reverse,
+    Load.loadListOrderingByMaxPositionInT,
+    Load.loadListOrderingByMaxPositionInT.reverse
+  ).map(_.on[AccumulatedLoad](_.flexibleLoads.toList))
 
   /**
-   * Allocates users along the complete timespan. The algorithm "transforms" each user as a flexible load of windowSize and
-   * consumption per slot flexibleLoad.totalEnergy / windowSize. Then it uses the rescheduler to assign each user to the best timeslots.+
-   *
-   * @param users
-   * @param numberOfSlots
-   * @param windowSize
-   * @return A list in the same order as users with schedulerPreferredTimeSlots per each user as an inner List[Int]
-   */
-  def allocate(users: List[AccumulatedLoad], numberOfSlots: Int, windowSize: Int): List[List[Int]] = {
-
-    val loadListOrderingByAmplitude: Ordering[List[Load]] =
-      (x: List[Load], y: List[Load]) => implicitly[Ordering[Double]].compare(x.map(_.totalEnergy).sum, y.map(_.totalEnergy).sum)
-
-    loadListOrderingByAmplitude.on[AccumulatedLoad](_.flexibleLoads.toList)
-
-    //users.sorted
-
+    * Allocates users along the complete timespan. The algorithm "transforms" each user as a flexible load of windowSize and
+    * consumption per slot flexibleLoad.totalEnergy / windowSize. Then it uses the rescheduler to assign each user to the best timeslots.+
+    *
+    * @param users
+    * @param numberOfSlots
+    * @param windowSize
+    * @return A list in the same order as users with schedulerPreferredTimeSlots per each user as an inner List[Int]
+    */
+  def allocate(users: List[AccumulatedLoad],
+               numberOfSlots: Int,
+               windowSize: Int,
+               userOrdering: Ordering[AccumulatedLoad] =
+                 Load.loadListOrderingByAmplitude.on[AccumulatedLoad](_.flexibleLoads.toList).reverse): List[List[Int]] = {
 
     // TODO: Test this by comparing results of BenchmarkSpec and SchedulerSpec
-    val sortedUsers = users.sorted(loadListOrderingByAmplitude.on[AccumulatedLoad](_.flexibleLoads.toList)).reverse
-
-    //val sortedUsers = users.sortBy(_.flexibleLoads.toList.map(_.totalEnergy).sum).reverse
+    val sortedUsers = users.sorted(userOrdering)
 
     val usersAsFlexibleLoads = for (user <- sortedUsers) yield {
 

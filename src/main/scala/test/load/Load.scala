@@ -62,18 +62,19 @@ object Load {
 
   }
 
-  def deepCopy[L <: Load](loads: Traversable[L]): Traversable[L] = loads.filter(!_.isInstanceOf[FlexibleLoadSubTask]).flatMap(deepCopyOne)
+  def deepCopy[L <: Load](loads: Traversable[L]): Traversable[L] =
+    loads.filter(!_.isInstanceOf[FlexibleLoadSubTask]).flatMap(deepCopyOne)
 
   def deepCopyOne[L <: Load](load: L): List[L] = {
     load match {
-      case l: AccumulatedLoad       => List(l.copy())
-      case l: FixedLoad             => List(l.copy())
-      case l: FlexibleLoad          => List(l.exactCopy())
+      case l: AccumulatedLoad => List(l.copy())
+      case l: FixedLoad       => List(l.copy())
+      case l: FlexibleLoad    => List(l.exactCopy())
       case l: FlexibleLoadSuperTask => {
         val cpy = l.copy()
         List(cpy) ++ cpy.aggregatees
       }
-      case l: FlexibleLoadSubTask   => List(l.exactCopy())
+      case l: FlexibleLoadSubTask => List(l.exactCopy())
     }
   }.asInstanceOf[List[L]]
 
@@ -132,10 +133,16 @@ object Load {
   val loadOrderingByPositionInTime: Ordering[Load] =
     (x: Load, y: Load) => implicitly[Ordering[Int]].compare(x.positionInT, y.positionInT)
 
-
-
   val loadOrderingByAmplitude: Ordering[Load] =
     (x: Load, y: Load) => implicitly[Ordering[Double]].compare(x.totalEnergy, y.totalEnergy)
+
+  val loadListOrderingByMaxPositionInT: Ordering[List[Load]] =
+    (x: List[Load], y: List[Load]) =>
+      implicitly[Ordering[Int]].compare(x.map(_.positionInT).max, y.map(_.positionInT).max)
+
+  val loadListOrderingByAmplitude: Ordering[List[Load]] =
+    (x: List[Load], y: List[Load]) =>
+      implicitly[Ordering[Double]].compare(x.map(_.totalEnergy).sum, y.map(_.totalEnergy).sum)
 
   implicit def toVector[X <: Load]: DenseVectorReprOps[X] = new DenseVectorReprOps[X] {
 

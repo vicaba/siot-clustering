@@ -1,6 +1,7 @@
 package algorithm.scheduler
 
-import test.load.AccumulatedLoad
+import metrics.Metric
+import test.load.{AccumulatedLoad, Load}
 import test.{SchedulerAlgorithm, UserAllocator}
 import test.reschedulermetrics.MetricTransformation
 
@@ -8,36 +9,44 @@ import scala.util.Try
 
 object Scheduler {
 
-  def apply(acc: AccumulatedLoad,
-            preferredSlots: List[Int] = Nil,
-            metricTransformation: MetricTransformation,
-            referenceAverage: Double = 0.0,
-            verbose: Boolean = false): AccumulatedLoad =
-    test.SchedulerAlgorithm.reschedule(acc, preferredSlots, metricTransformation, referenceAverage, verbose)
-
   def apply(clusters: List[AccumulatedLoad],
-            metricTransformation: MetricTransformation): List[AccumulatedLoad] = {
+            metricTransformation: MetricTransformation,
+            userOrderings: List[Ordering[AccumulatedLoad]] = UserAllocator.DefaultOrderings,
+            schedulerAlgorithmOrderings: List[Ordering[Load]] = SchedulerAlgorithm.DefaultOrderings)
+    : List[AccumulatedLoad] = {
 
-    val numberOfSlots    = AccumulatedLoad(-1, 0, clusters).span
-    val allFlexibleLoads = clusters.flatMap(_.flexibleLoads)
-    val windowSize       = Try(allFlexibleLoads.map(_.span).sum / allFlexibleLoads.size).getOrElse(1)
-    val schedulerPreferredSlots =
-      UserAllocator.allocate(users = clusters, numberOfSlots = numberOfSlots, windowSize = windowSize)
+    (for {
+      userOrdering               <- userOrderings
+      schedulerAlgorithmOrdering <- schedulerAlgorithmOrderings
+    } yield {
 
-    val referenceAverage = clusters.map(_.totalEnergy).sum / numberOfSlots / clusters.size
+      val _clusters: List[AccumulatedLoad] = Load.deepCopy(clusters).toList
 
-    val res = clusters.zip(schedulerPreferredSlots).map {
-      case (user, schedulingPreferredSlotsForUser) =>
-        SchedulerAlgorithm.reschedule(
-          user,
-          schedulingPreferredSlotsForUser,
-          metricTransformation = metricTransformation,
-          referenceAverage = referenceAverage, verbose = false
-        )
-    }
+      val numberOfSlots    = AccumulatedLoad(-1, 0, _clusters).span
+      val allFlexibleLoads = _clusters.flatMap(_.flexibleLoads)
+      val windowSize       = Try(allFlexibleLoads.map(_.span).sum / allFlexibleLoads.size).getOrElse(1)
+      val schedulerPreferredSlots =
+        UserAllocator.allocate(users = _clusters, numberOfSlots = numberOfSlots, windowSize = windowSize, userOrdering)
 
-    res
+      val referenceAverage = _clusters.map(_.totalEnergy).sum / numberOfSlots / clusters.size
 
+      val res = _clusters.zip(schedulerPreferredSlots).map {
+        case (user, schedulingPreferredSlotsForUser) =>
+          SchedulerAlgorithm.reschedule(
+            user,
+            schedulingPreferredSlotsForUser,
+            metricTransformation = metricTransformation,
+            referenceAverage = referenceAverage,
+            schedulerAlgorithmOrdering,
+            verbose = false
+          )
+      }
+      res
+
+    }) minBy (computePar)
   }
+
+  def computePar(loads: Iterable[Load]): Double = Metric.par(AccumulatedLoad(-1, 0, loads))
+  def computePar(load: Load): Double            = Metric.par(AccumulatedLoad(-1, 0, load))
 
 }
