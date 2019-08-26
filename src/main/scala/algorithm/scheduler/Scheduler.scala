@@ -4,6 +4,7 @@ import metrics.Metric
 import test.load.{AccumulatedLoad, Load}
 import test.{SchedulerAlgorithm, UserAllocator}
 import test.reschedulermetrics.MetricTransformation
+import Load._
 
 import scala.util.Try
 
@@ -43,10 +44,7 @@ object Scheduler {
       }
       res
 
-    }) minBy (computePar)
+    }) minBy (Metric.par(_))
   }
-
-  def computePar(loads: Iterable[Load]): Double = Metric.par(AccumulatedLoad(-1, 0, loads))
-  def computePar(load: Load): Double            = Metric.par(AccumulatedLoad(-1, 0, load))
 
 }

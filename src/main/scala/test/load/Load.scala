@@ -152,4 +152,12 @@ object Load {
 
   }
 
+  implicit def toVectorTraversable[X <: Load, S[X] <: Traversable[X]]: DenseVectorReprOps[S[X]] = new DenseVectorReprOps[S[X]] {
+
+    override def apply(t: S[X]): DenseVector[Double] = DenseVector(Load.amplitudePerSlot(t): _*)
+
+    override def zero(t: S[X]): DenseVector[Double] = DenseVector((for (_ <- 1 to Load.span(t)) yield 0.0): _*)
+
+  }
+
 }

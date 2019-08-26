@@ -1,9 +1,24 @@
+Given 3 slots with 3 users and a flexible load each
+
+When Scheduling loads
+
+Then ScheduledLoads PAR is lower than UnscheduledLoads PAR.
+
+PAR for unscheduled loads: 1.5.
+
+PAR for scheduled loads: 1.2.
+
+And scheduledLoads total energy is equal to unscheduledLoads total energy
+
+
 Given Synthetically generated loads as UnscheduledLoads
 
 When Scheduling loads
 
 Then ScheduledLoads PAR is lower than UnscheduledLoads PAR.
 
-PAR for unscheduled loads: 3.582574846221939.
+PAR for unscheduled loads: 3.5753681021081083.
 
-PAR for scheduled loads: 3.4111491930907683.
+PAR for scheduled loads: 3.4044334926591753.
+
+And scheduledLoads total energy is equal to unscheduledLoads total energy

@@ -3,6 +3,7 @@ package test
 import org.scalatest._
 import metrics.Metric
 import test.load.{Load, AccumulatedLoad, FixedLoad, FlexibleLoad}
+import test.load.Load._
 import test.reschedulermetrics.{BiasedAverageDistanceTransformation, MetricTransformation}
 
 import scala.util.Try
@@ -240,7 +241,7 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
     val accumulatedLoadWithoutPriority = AccumulatedLoad(-1, 0, benchmarkResult.resultsWithoutPriority)
     val accumulatedLoadWithPriority    = AccumulatedLoad(-1, 0, benchmarkResult.resultsWithPriority)
 
-    computePar(accumulatedLoadWithPriority) should be <= computePar(accumulatedLoadWithoutPriority)
+    Metric.par(accumulatedLoadWithPriority) should be <= Metric.par(accumulatedLoadWithoutPriority)
 
     expectedTotalLoad match {
       case Nil           =>
@@ -263,7 +264,7 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
     val resultsWithPriority    = benchmarkResult.resultsWithPriority
     val usersPreferredSlots    = benchmarkResult.usersPreferredSlots
 
-    val initialPar = computePar(users)
+    val initialPar = Metric.par(users)
 
     val outScenarioName = "Scenario name: " + scenarioName
     println("START OF SCENARIO")
@@ -280,16 +281,16 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
       val user                   = users(i)
       val userPreferredSlots     = usersPreferredSlots(i)
       val resultWithoutPriority  = resultsWithoutPriority(i)
-      val userParWithoutPriority = computePar(resultWithoutPriority)
+      val userParWithoutPriority = Metric.par(resultWithoutPriority)
       val resultWithPriority     = resultsWithPriority(i)
-      val userParWithPriority    = computePar(resultWithPriority)
+      val userParWithPriority    = Metric.par(resultWithPriority)
 
       val fromSlot = user.positionInT
       val toSlot   = user.positionInT + user.span - 1
 
       enableLog(enablePrintLoads) {
         println(s"User ${user.id} | Prefered slots -> ${preferredSlotsToString(userPreferredSlots)}")
-        println(s"\tInitial | PAR = ${computePar(user)}")
+        println(s"\tInitial | PAR = ${Metric.par(user)}")
       }
       enableLog(enableGenerateTables) {
         val userInitialTable = new TableList("load_id" :: (fromSlot to toSlot).map(_.toString).toList)
@@ -323,13 +324,13 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
     val accumulatedLoadWithoutPriority = AccumulatedLoad(-1, 0, resultsWithoutPriority)
     val accumulatedLoadWithPriority    = AccumulatedLoad(-1, 0, resultsWithPriority)
 
-    val outputParWithoutPriority = computePar(resultsWithoutPriority)
+    val outputParWithoutPriority = Metric.par(resultsWithoutPriority)
     enableLog(enableTestVerbose) {
       println(s"OUT total (without priority) PAR = $outputParWithoutPriority")
       println(accumulatedLoadWithoutPriority.amplitudePerSlot.toString())
     }
 
-    val outputParWithPriority = computePar(resultsWithPriority)
+    val outputParWithPriority = Metric.par(resultsWithPriority)
     enableLog(enableTestVerbose) {
       println(s"OUT total (with priority) PAR = $outputParWithPriority")
       println(accumulatedLoadWithPriority.amplitudePerSlot.toString())
@@ -447,6 +448,4 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
 
   }
 
-  def computePar(loads: Iterable[Load]): Double = Metric.par(AccumulatedLoad(-1, 0, loads))
-  def computePar(load: Load): Double            = Metric.par(AccumulatedLoad(-1, 0, load))
 }

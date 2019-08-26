@@ -1,12 +1,12 @@
 package algorithm
 
-import algebra.SeqOps
 import algorithm.scheduler.Scheduler
 import metrics.Metric
 import org.scalatest.{FeatureSpec, GivenWhenThen}
 import org.scalatest.Matchers._
 import reader.SyntheticProfilesReaderForScheduler
 import test.load.{AccumulatedLoad, FixedLoad, FlexibleLoad, FlexibleLoadTask, Load}
+import test.load.Load._
 import test.SequenceSplitByConsecutiveElements
 import test.reschedulermetrics.BiasedAverageDistanceTransformation
 
@@ -55,8 +55,8 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
       Then("ScheduledLoads PAR is lower than UnscheduledLoads PAR.")
 
-      val unscheduledLoadsPar = computePar(unscheduledLoads)
-      val scheduledLoadsPar   = computePar(scheduledLoads)
+      val unscheduledLoadsPar = Metric.par(unscheduledLoads)
+      val scheduledLoadsPar   = Metric.par(scheduledLoads)
 
       scheduledLoadsPar should be < unscheduledLoadsPar
 
@@ -96,8 +96,8 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
       Then("ScheduledLoads PAR is lower than UnscheduledLoads PAR.")
 
-      val unscheduledLoadsPar = computePar(unscheduledLoads)
-      val scheduledLoadsPar   = computePar(scheduledLoads)
+      val unscheduledLoadsPar = Metric.par(unscheduledLoads)
+      val scheduledLoadsPar   = Metric.par(scheduledLoads)
 
       scheduledLoadsPar should be < unscheduledLoadsPar
 
@@ -111,8 +111,5 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
     }
 
   }
-
-  def computePar(loads: Iterable[Load]): Double = Metric.par(AccumulatedLoad(-1, 0, loads))
-  def computePar(load: Load): Double            = Metric.par(AccumulatedLoad(-1, 0, load))
 
 }
