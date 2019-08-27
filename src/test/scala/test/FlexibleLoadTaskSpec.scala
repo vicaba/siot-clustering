@@ -85,6 +85,8 @@ class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
 
     Then("object hash codes should be different")
 
+    fail("This test does not have any assertion. Check periodically")
+
   }
 
   "AccumulatedLoad" should "be able to split into SubTasks and SuperTask and keep the same amplitudePerSlot" in {
@@ -137,20 +139,14 @@ class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
 
   }
 
-  "A FlexibleLoadSuperTask with overlapped subtasks" should "return that two subtasks are overlapped" in {
+  "A FlexibleLoadSuperTask with overlapped FlexibleLoadSubTasks" should "return that two subtasks are overlapped" in {
 
     Given("an AccumulatedLoad with one FlexibleLoad (with at least two subtasks) split into subtasks")
 
     val accLoad = AccumulatedLoad(0, 0, List(flexibleLoad))
 
-    val accLoadOriginal = accLoad.copy()
-
     Load.MutateAccumulatedLoad.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
       accLoad,
-      SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount)
-
-    Load.MutateAccumulatedLoad.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
-      accLoadOriginal,
       SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount)
 
     And("one subtask is overlapped with the other")
@@ -168,20 +164,14 @@ class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
 
   }
 
-  "A FlexibleLoadSuperTask with no overlapped subtasks" should "return that two subtasks are not overlapped" in {
+  "A FlexibleLoadSuperTask with no overlapped FlexibleLoadSubTasks" should "return that two subtasks are not overlapped" in {
 
     Given("an AccumulatedLoad with one FlexibleLoad (with at least two subtasks) split into subtasks")
 
     val accLoad = AccumulatedLoad(0, 0, List(flexibleLoad))
 
-    val accLoadOriginal = accLoad.copy()
-
     Load.MutateAccumulatedLoad.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
       accLoad,
-      SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount)
-
-    Load.MutateAccumulatedLoad.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
-      accLoadOriginal,
       SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount)
 
     When("checking if they are overlapped")
