@@ -1,12 +1,7 @@
 package test
 
-import test.load.{Load, AccumulatedLoad, FlexibleLoad}
-import test.reschedulermetrics.{
-  BiasedAverageDistanceTransformation,
-  BiasedPeakTransformation,
-  MetricTransformation,
-  NoTransformation
-}
+import test.load.{AccumulatedLoad, FlexibleLoad, FlexibleLoadSubTask, Load}
+import test.reschedulermetrics.{BiasedAverageDistanceTransformation, BiasedPeakTransformation, MetricTransformation, NoTransformation}
 
 import scala.annotation.tailrec
 
@@ -73,26 +68,40 @@ object SchedulerAlgorithm {
     for (i <- accumulatedLoad.positionInT until ((accumulatedLoad.span - flexibleLoad.span) + 1)) {
       if (verbose) println(s"\tAt position $i")
 
-      val flexibleLoadMovement = flexibleLoad.copy(positionInT = i)
-      val temporaryMovement =
-        new Movement(temporaryX -/+= flexibleLoadMovement, flexibleLoadMovement, preferredSlots)
 
-      val metricResult =
-        metricTransformation(referenceAverage, bestMovement, temporaryMovement, preferredSlots)
+      def move(flexibleLoadMovement: FlexibleLoad): Unit = {
+        val temporaryMovement =
+          new Movement(temporaryX -/+= flexibleLoadMovement, flexibleLoadMovement, preferredSlots)
 
-      val temporaryMetric = metricResult.temporaryMovementMetric
-      val bestMetric      = metricResult.bestMovementMetric
+        val metricResult =
+          metricTransformation(referenceAverage, bestMovement, temporaryMovement, preferredSlots)
 
-      if (verbose) println(s"\t\tbestMetric = $bestMetric, peak = ${bestMovement.acc.peak}")
-      if (verbose) print(s"\t\ttempMetric = $temporaryMetric, peak = ${temporaryMovement.acc.peak}")
+        val temporaryMetric = metricResult.temporaryMovementMetric
+        val bestMetric      = metricResult.bestMovementMetric
 
-      if (temporaryMetric < bestMetric) {
-        if (verbose) println(" - Is best")
+        if (verbose) println(s"\t\tbestMetric = $bestMetric, peak = ${bestMovement.acc.peak}")
+        if (verbose) print(s"\t\ttempMetric = $temporaryMetric, peak = ${temporaryMovement.acc.peak}")
 
-        bestMovement = new Movement(temporaryMovement.acc.copy(), temporaryMovement.fl, preferredSlots)
-      } else {
-        if (verbose) println(" - Not best")
+        if (temporaryMetric < bestMetric) {
+          if (verbose) println(" - Is best")
+
+          bestMovement = new Movement(temporaryMovement.acc.copy(), temporaryMovement.fl, preferredSlots)
+        } else {
+          if (verbose) println(" - Not best")
+        }
+
       }
+
+      val _flexibleLoadMovement = flexibleLoad.copy(positionInT = i)
+
+      _flexibleLoadMovement match {
+        case flst: FlexibleLoadSubTask if !flst.superTask.areAggregateesOverlapped =>
+          move(flst)
+        case _: FlexibleLoadSubTask => Unit
+        case fl: FlexibleLoad =>
+          move(fl)
+      }
+
     }
 
     accumulatedLoad -/+= flexibleLoad.positionInT_=(bestMovement.fl.positionInT)

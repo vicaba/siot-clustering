@@ -129,6 +129,17 @@ class FlexibleLoadSubTask private (private var _superTask: FlexibleLoadSuperTask
   override def exactCopy(): FlexibleLoadSubTask =
     new FlexibleLoadSubTask(this._superTask, this.id, this.positionInT, this.amplitudePerSlot, this.label)
 
+  //TODO: Change that
+  override def copy(id: Int = this.id,
+    positionInT: Int = this.positionInT,
+    amplitudePerSlot: Vector[Double] = this.amplitudePerSlot,
+    label: String = this.label): FlexibleLoad =
+    new FlexibleLoadSubTask(this._superTask,
+      id,
+      positionInT,
+      amplitudePerSlot,
+      label)
+
   def copyWithAmplitudePerSlotToZero(): FlexibleLoadSubTask = {
     new FlexibleLoadSubTask(this._superTask,
                             this.id,
