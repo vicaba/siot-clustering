@@ -100,6 +100,7 @@ object Load {
           .map(Load.expandSpanSlotLoadToVector(_, Load.span(loads)))
       )
 
+  // TODO: Assumes that start positionInT starts at 0
   def amplitudePerSlotEnforceSpan(loads: Traversable[Load], span: Int, restValue: Double = Double.NaN): Vector[Double] =
     if (loads.isEmpty) Vector.fill(span)(restValue)
     else {
@@ -110,7 +111,6 @@ object Load {
 
       val restPositions = ListBuffer.fill(span)(true)
 
-      // TODO: PROBLEM HERE WITH INDICES?
       loads.foreach { l =>
         for (idx <- l.positionInT until (l.positionInT + l.span)) {
           restPositions(idx) = false
@@ -125,6 +125,19 @@ object Load {
       sumWithRestPositionsAtRestValue
 
     }
+
+  def areLoadsOverlapped(loads: Traversable[Load]): Boolean = {
+    val span = Load.span(loads)
+    val minPositionIntT = loads.map(_.positionInT).min
+    val restPositions = ListBuffer.fill(span)(false)
+    loads.foreach { l =>
+      for (idx <- (l.positionInT - minPositionIntT) until (l.positionInT + l.span - minPositionIntT)) {
+        if (restPositions(idx)) return true
+        restPositions(idx) = true
+      }
+    }
+    false
+  }
 
   class LoadOrdering extends Ordering[Load] {
     override def compare(x: Load, y: Load): Int = implicitly[Ordering[Double]].compare(x.totalEnergy, y.totalEnergy)

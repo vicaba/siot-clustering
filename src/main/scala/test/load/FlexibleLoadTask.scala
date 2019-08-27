@@ -56,6 +56,8 @@ class FlexibleLoadSuperTask(override val id: Int,
                             private var _computeAmplitudePerSlotWithRestValueOnly: Boolean = false)
     extends Load {
 
+  def areAggregateesOverlapped: Boolean = Load.areLoadsOverlapped(_aggregatees)
+
   def setComputeAmplitudePerSlotWithRestValueOnly(opt: Boolean): FlexibleLoadSuperTask = {
     this._computeAmplitudePerSlotWithRestValueOnly = opt
     this
@@ -70,6 +72,7 @@ class FlexibleLoadSuperTask(override val id: Int,
 
   def computeAmplitudePerSlotWithRestValueOnly: Boolean = this._computeAmplitudePerSlotWithRestValueOnly
 
+  //TODO: Assumes that start positionInT starts at 0. See Load.amplitudePerSlotEnforceSpan
   override def amplitudePerSlot: Vector[Double] =
     if (computeAmplitudePerSlotWithRestValueOnly) {
       Load.amplitudePerSlotEnforceSpan(aggregatees.map(_.copyWithAmplitudePerSlotToZero()), span, restValue)

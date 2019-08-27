@@ -111,7 +111,7 @@ class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
 
   }
 
-  "print test" should "print" in {
+  "Moving a subtask" should "not modify total energy" in {
 
     Given("an AccumulatedLoad with one FlexibleLoad")
 
@@ -129,17 +129,68 @@ class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
       accLoadOriginal,
       SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount)
 
-    And("moving a subtask")
+    And("moving a subtask does not modify totalEnergy")
 
     accLoad.flexibleLoads.head.positionInT = 10
 
     accLoad.totalEnergy shouldBe accLoadOriginal.totalEnergy
 
-    println(accLoadOriginal.amplitudePerSlot)
+  }
 
-    println(accLoad.amplitudePerSlot)
+  "A FlexibleLoadSuperTask with overlapped subtasks" should "return that two subtasks are overlapped" in {
 
-    println("")
+    Given("an AccumulatedLoad with one FlexibleLoad (with at least two subtasks) split into subtasks")
+
+    val accLoad = AccumulatedLoad(0, 0, List(flexibleLoad))
+
+    val accLoadOriginal = accLoad.copy()
+
+    Load.MutateAccumulatedLoad.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
+      accLoad,
+      SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount)
+
+    Load.MutateAccumulatedLoad.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
+      accLoadOriginal,
+      SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount)
+
+    And("one subtask is overlapped with the other")
+
+    accLoad.flexibleLoads.head.positionInT = 0
+    accLoad.flexibleLoads.last.positionInT = 0
+
+    When("checking if they are overlapped")
+
+    val res = accLoad.flexibleLoads.head.asInstanceOf[FlexibleLoadSubTask].superTask.areAggregateesOverlapped
+
+    Then("it should return true")
+
+    res shouldBe true
+
+  }
+
+  "A FlexibleLoadSuperTask with no overlapped subtasks" should "return that two subtasks are not overlapped" in {
+
+    Given("an AccumulatedLoad with one FlexibleLoad (with at least two subtasks) split into subtasks")
+
+    val accLoad = AccumulatedLoad(0, 0, List(flexibleLoad))
+
+    val accLoadOriginal = accLoad.copy()
+
+    Load.MutateAccumulatedLoad.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
+      accLoad,
+      SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount)
+
+    Load.MutateAccumulatedLoad.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
+      accLoadOriginal,
+      SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount)
+
+    When("checking if they are overlapped")
+
+    val res = accLoad.flexibleLoads.head.asInstanceOf[FlexibleLoadSubTask].superTask.areAggregateesOverlapped
+
+    Then("it should return true")
+
+    res shouldBe false
 
   }
 
