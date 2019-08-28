@@ -27,7 +27,8 @@ object SchedulerAlgorithm {
       _remainingFlexibleLoads match {
         case (x :: xs, y :: ys) =>
           val newAcc = (_acc._1 += x, _acc._2 += y)
-          rescheduleFlexibleLoad((_acc._1 += x, _acc._2 += y), (x, y), preferredSlots, metricTransformation, referenceAverage, verbose)
+          rescheduleFlexibleLoad(newAcc, (x, y), preferredSlots, metricTransformation, referenceAverage, verbose)
+          y.positionInT = x.positionInT
           _reschedule(newAcc, (xs, ys))
         case (Nil, Nil) => _acc._1
       }
@@ -49,9 +50,10 @@ object SchedulerAlgorithm {
 
     val remainingLoadsAfterRemovingFlexibleLoads = acc.loads -- acc.flexibleLoads
 
-    if (remainingLoadsAfterRemovingFlexibleLoads.nonEmpty)
-      _reschedule(acc.copy(loads = remainingLoadsAfterRemovingFlexibleLoads), acc.flexibleLoads.toList.sorted(ordering))
-    else
+    if (remainingLoadsAfterRemovingFlexibleLoads.nonEmpty) {
+      val (best, temporary) = prepareAccumulatedLoadForAlgorithm()
+      _reschedule((best.acc, temporary.acc), (best.flexibleLoads, temporary.flexibleLoads))
+    } else
       acc.copy()
 
   }
