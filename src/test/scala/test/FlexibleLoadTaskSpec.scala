@@ -26,7 +26,7 @@ class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
 
     val flexibleLoadSuperTask =
       FlexibleLoadTask.splitIntoSubTasks(fLoad,
-                                         SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount)
+                                         SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage)
 
     Then("it should contain 2 subtasks")
 
@@ -50,7 +50,7 @@ class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
 
     val spanSlotFlexibleLoadSuperTask =
       FlexibleLoadTask.splitIntoSubTasks(flexibleLoad,
-                                         SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount)
+                                         SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage)
 
     When("getting its subtasks")
 
@@ -77,7 +77,7 @@ class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
 
     val superTask =
       FlexibleLoadTask.splitIntoSubTasks(fLoad,
-                                         SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount)
+                                         SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage)
 
     When("copy is performed on the super task")
 
@@ -101,7 +101,7 @@ class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
 
     Load.MutateAccumulatedLoad.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
       accLoad,
-      SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount)
+      SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage)
 
     Then("accLoadOriginal amplitude per slot should be equal to accLoad total energy")
 
@@ -125,11 +125,11 @@ class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
 
     Load.MutateAccumulatedLoad.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
       accLoad,
-      SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount)
+      SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage)
 
     Load.MutateAccumulatedLoad.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
       accLoadOriginal,
-      SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount)
+      SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage)
 
     And("moving a subtask does not modify totalEnergy")
 
@@ -147,7 +147,7 @@ class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
 
     Load.MutateAccumulatedLoad.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
       accLoad,
-      SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount)
+      SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage)
 
     And("one subtask is overlapped with the other")
 
@@ -172,7 +172,7 @@ class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
 
     Load.MutateAccumulatedLoad.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
       accLoad,
-      SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount)
+      SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage)
 
     When("checking if they are overlapped")
 

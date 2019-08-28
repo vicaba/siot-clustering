@@ -41,7 +41,9 @@ object SchedulerAlgorithm {
 
       def splitFlexibleLoads(_acc: AccumulatedLoad): AccumulatedLoadWithSeparatedFlexibleLoads = {
         val remainingLoadsAfterRemovingFlexibleLoads = _acc.loads -- _acc.flexibleLoads
-        AccumulatedLoadWithSeparatedFlexibleLoads(_acc.copy(loads = remainingLoadsAfterRemovingFlexibleLoads), _acc.flexibleLoads.toList.sorted(ordering))
+        val copy0 = _acc.copy()
+        val copy = _acc.copy(loads = remainingLoadsAfterRemovingFlexibleLoads, copyFlexibleLoadSubtasks = false)
+        AccumulatedLoadWithSeparatedFlexibleLoads(copy, _acc.flexibleLoads.toList.sorted(ordering))
       }
 
       (splitFlexibleLoads(bestAccumulatedLoad), splitFlexibleLoads(temporaryAccumulatedLoad))
@@ -126,8 +128,10 @@ object SchedulerAlgorithm {
       moveTemporaryFlexibleLoadPositionInT(to = i)
 
       temporaryFlexibleLoad match {
-        case flst: FlexibleLoadSubTask if !flst.superTask.areAggregateesOverlapped => move()
-        case _: FlexibleLoadSubTask => Unit
+        case flst: FlexibleLoadSubTask if !flst.superTask.areAggregateesOverlapped =>
+          move()
+        case _: FlexibleLoadSubTask =>
+          Unit
         case _: FlexibleLoad => move()
       }
 

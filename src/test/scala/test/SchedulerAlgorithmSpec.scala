@@ -147,11 +147,11 @@ class SchedulerAlgorithmSpec extends FeatureSpec with GivenWhenThen {
 
         Load.MutateAccumulatedLoad.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
           accLoad,
-          SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount)
+          SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage)
 
         Load.MutateAccumulatedLoad.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
           accLoadOriginal,
-          SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount)
+          SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage)
 
         And("one subtask is overlapped with the other")
 

@@ -18,8 +18,8 @@ class AccumulatedLoad private (override val id: Int,
                                     override val label: String = "")
     extends Load {
 
-  def copy(loads: Set[Load] = this._loads.toSet): AccumulatedLoad =
-    AccumulatedLoad(id, positionInT, mutableSetOf(Load.deepCopy(loads)))
+  def copy(loads: Set[Load] = this.loads, copyFlexibleLoadSubtasks: Boolean = true): AccumulatedLoad =
+    AccumulatedLoad(id, positionInT, mutableSetOf(Load.deepCopy(loads, copyFlexibleLoadSubtasks)))
 
   def loads: Set[Load] = _loads.toSet
 

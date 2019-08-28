@@ -45,7 +45,7 @@ object Load {
 
     def splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
         accLoad: AccumulatedLoad,
-        splitStrategy: SequenceSplitStrategy[Double]): AccumulatedLoad = {
+        splitStrategy: SequenceSplitStrategy): AccumulatedLoad = {
 
       accLoad.flexibleLoads.foreach { fl =>
         val res = (fl, FlexibleLoadTask.splitIntoSubTasks(fl, splitStrategy))
@@ -62,17 +62,17 @@ object Load {
 
   }
 
-  def deepCopy[L <: Load](loads: Traversable[L]): Traversable[L] =
-    loads.filter(!_.isInstanceOf[FlexibleLoadSubTask]).flatMap(deepCopyOne)
+  def deepCopy[L <: Load](loads: Traversable[L], addFlexibleLoadSubTasks: Boolean = false): Traversable[L] =
+    loads.filter(!_.isInstanceOf[FlexibleLoadSubTask]).flatMap(deepCopyOne(_, addFlexibleLoadSubTasks))
 
-  def deepCopyOne[L <: Load](load: L): List[L] = {
+  def deepCopyOne[L <: Load](load: L, addFlexibleLoadSubTasks: Boolean = false): List[L] = {
     load match {
       case l: AccumulatedLoad => List(l.copy())
       case l: FixedLoad       => List(l.copy())
       case l: FlexibleLoad    => List(l.exactCopy())
       case l: FlexibleLoadSuperTask => {
         val cpy = l.copy()
-        List(cpy) ++ cpy.aggregatees
+        List(cpy) ++ (if (addFlexibleLoadSubTasks) cpy.aggregatees else Nil)
       }
       case l: FlexibleLoadSubTask => List(l.exactCopy())
     }

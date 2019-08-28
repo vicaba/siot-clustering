@@ -46,7 +46,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
       unscheduledLoads.foreach(
         Load.MutateAccumulatedLoad.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
           _,
-          SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount))
+          SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage))
 
       When("Scheduling loads")
 
@@ -71,7 +71,52 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
     }
 
-    /*scenario("With synthetic data, PAR is minimized after rescheduling") {
+    scenario("With test data, subtasks pertaining to the same flexibleload are not overlapped") {
+
+      Given("3 slots with 3 users and a flexible load each")
+
+      val unscheduledLoads: List[AccumulatedLoad] = List(
+        AccumulatedLoad(100,
+          0,
+          List(
+            FixedLoad(101, 0, Vector(2, 4, 4, 4, 4)),
+            FlexibleLoad(151, 0, Vector(1, 1, 0, 0, 0))
+          ))
+      )
+
+      unscheduledLoads.foreach(
+        Load.MutateAccumulatedLoad.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
+          _,
+          SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage))
+
+      When("Scheduling loads")
+
+      val copy = Load.deepCopy(unscheduledLoads).toList
+
+      val scheduledLoads =
+        Scheduler.apply(copy, new BiasedAverageDistanceTransformation)
+
+      Then("ScheduledLoads PAR is lower or equal than UnscheduledLoads PAR.")
+
+      val unscheduledLoadsPar = Metric.par(unscheduledLoads)
+      val scheduledLoadsPar   = Metric.par(scheduledLoads)
+
+      scheduledLoadsPar should be <= unscheduledLoadsPar
+
+      info(s"PAR for unscheduled loads: $unscheduledLoadsPar.")
+      info(s"PAR for scheduled loads: $scheduledLoadsPar.")
+
+      And("scheduledLoads total energy is equal to unscheduledLoads total energy")
+
+      scheduledLoads.map(_.totalEnergy).sum shouldBe unscheduledLoads.map(_.totalEnergy).sum
+
+      And("amplitudePerSlot should not be consecutive 4")
+
+      scheduledLoads.head.amplitudePerSlot shouldNot be (Vector.fill(scheduledLoads.head.amplitudePerSlot.size)(4))
+
+    }
+
+    scenario("With synthetic data, PAR is minimized after rescheduling") {
 
       Given("Synthetically generated loads as UnscheduledLoads")
 
@@ -89,7 +134,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
       unscheduledLoads.foreach(
         Load.MutateAccumulatedLoad.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
           _,
-          SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCount))
+          SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage))
 
       When("Scheduling loads")
 
@@ -110,7 +155,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
       scheduledLoads.map(_.totalEnergy).sum shouldBe unscheduledLoads.map(_.totalEnergy).sum
 
-    }*/
+    }
 
   }
 

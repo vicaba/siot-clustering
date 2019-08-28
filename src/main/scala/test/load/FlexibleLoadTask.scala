@@ -15,7 +15,7 @@ object FlexibleLoadTask {
   }
 
   def splitIntoSubTasks(flexibleLoad: FlexibleLoad,
-                        splitStrategy: SequenceSplitStrategy[Double]): FlexibleLoadSuperTask = {
+                        splitStrategy: SequenceSplitStrategy): FlexibleLoadSuperTask = {
 
     val splitResults = splitStrategy(flexibleLoad.amplitudePerSlot)
 
@@ -112,6 +112,8 @@ class FlexibleLoadSubTask private (private var _superTask: FlexibleLoadSuperTask
                                    override val amplitudePerSlot: Vector[Double],
                                    override val label: String = "")
     extends FlexibleLoad(id, _positionInT, amplitudePerSlot, label) {
+
+  override def positionInT: Int = super.positionInT
 
   def superTask_=(superTask: FlexibleLoadSuperTask): FlexibleLoadSubTask = {
     _superTask = superTask
