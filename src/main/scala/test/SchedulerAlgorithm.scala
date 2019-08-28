@@ -23,14 +23,29 @@ object SchedulerAlgorithm {
                  ordering: Ordering[Load] = DefaultOrdering,
                  verbose: Boolean = false): AccumulatedLoad = {
 
-    @tailrec
-    def _reschedule(_acc: AccumulatedLoad, _remainingFlexibleLoads: List[FlexibleLoad]): AccumulatedLoad =
+    def _reschedule(_acc: (AccumulatedLoad, AccumulatedLoad), _remainingFlexibleLoads: (List[FlexibleLoad], List[FlexibleLoad])): AccumulatedLoad =
       _remainingFlexibleLoads match {
-        case x :: xs =>
-          _reschedule(rescheduleFlexibleLoad(_acc, x, preferredSlots, metricTransformation, referenceAverage, verbose),
-                      xs)
-        case Nil => _acc
+        case (x :: xs, y :: ys) =>
+          val newAcc = (_acc._1 += x, _acc._2 += y)
+          rescheduleFlexibleLoad((_acc._1 += x, _acc._2 += y), (x, y), preferredSlots, metricTransformation, referenceAverage, verbose)
+          _reschedule(newAcc, (xs, ys))
+        case (Nil, Nil) => _acc._1
       }
+
+    case class AccumulatedLoadWithSeparatedFlexibleLoads(acc: AccumulatedLoad, flexibleLoads: List[FlexibleLoad])
+
+    def prepareAccumulatedLoadForAlgorithm(): (AccumulatedLoadWithSeparatedFlexibleLoads, AccumulatedLoadWithSeparatedFlexibleLoads) = {
+      val bestAccumulatedLoad = acc.copy()
+      val temporaryAccumulatedLoad = acc.copy()
+
+      def splitFlexibleLoads(_acc: AccumulatedLoad): AccumulatedLoadWithSeparatedFlexibleLoads = {
+        val remainingLoadsAfterRemovingFlexibleLoads = _acc.loads -- _acc.flexibleLoads
+        AccumulatedLoadWithSeparatedFlexibleLoads(_acc.copy(loads = remainingLoadsAfterRemovingFlexibleLoads), _acc.flexibleLoads.toList.sorted(ordering))
+      }
+
+      (splitFlexibleLoads(bestAccumulatedLoad), splitFlexibleLoads(temporaryAccumulatedLoad))
+
+    }
 
     val remainingLoadsAfterRemovingFlexibleLoads = acc.loads -- acc.flexibleLoads
 
@@ -52,26 +67,40 @@ object SchedulerAlgorithm {
     * @return
     */
   // It deals with loads in sequence
-  def rescheduleFlexibleLoad(accumulatedLoad: AccumulatedLoad,
-                             flexibleLoad: FlexibleLoad,
-                             preferredSlots: List[Int] = Nil,
-                             metricTransformation: MetricTransformation,
-                             referenceAverage: Double = 0.0,
-                             verbose: Boolean = false): AccumulatedLoad = {
+  def rescheduleFlexibleLoad(accumulatedLoad: (AccumulatedLoad, AccumulatedLoad),
+    flexibleLoad: (FlexibleLoad, FlexibleLoad),
+    preferredSlots: List[Int] = Nil,
+    metricTransformation: MetricTransformation,
+    referenceAverage: Double = 0.0,
+    verbose: Boolean = false): AccumulatedLoad = {
 
-    // Used to perform mutable operations
-    val temporaryX: AccumulatedLoad = accumulatedLoad.copy()
+    val bestAccumulatedLoad: AccumulatedLoad = accumulatedLoad._1
+    val bestFlexibleLoad: FlexibleLoad = flexibleLoad._1
 
-    var bestMovement: Movement = new Movement(accumulatedLoad += flexibleLoad, flexibleLoad, preferredSlots)
-    if (verbose) println(s"Trying load ${flexibleLoad.id}, load vector = ${flexibleLoad.amplitudePerSlot.toString()}")
+    val temporaryAccumulatedLoad: AccumulatedLoad = accumulatedLoad._2
+    val temporaryFlexibleLoad: FlexibleLoad = flexibleLoad._2
+
+    val bestMovement: Movement = new Movement(bestAccumulatedLoad, bestFlexibleLoad, preferredSlots)
+    val temporaryMovement = new Movement(temporaryAccumulatedLoad, temporaryFlexibleLoad, preferredSlots)
+
+    def moveTemporaryFlexibleLoadPositionInT(to: Int): Unit =
+      temporaryFlexibleLoad.positionInT = to
+
+    def updateBestMovement(withPositionInTForFlexibleLoad: Int): Unit =
+      bestMovement.fl.positionInT = withPositionInTForFlexibleLoad
+
+    def updateTemporaryMovement(withPositionInTForFlexibleLoad: Int): Unit =
+      temporaryMovement.fl.positionInT = withPositionInTForFlexibleLoad
+
+
+    if (verbose) println(s"Trying load ${bestFlexibleLoad.id}, load vector = ${bestFlexibleLoad.amplitudePerSlot.toString()}")
     //if (verbose) println(s"i -> ${accumulatedLoad.positionInT} until ${(accumulatedLoad.span - flexibleLoad.span) + 1}")
-    for (i <- accumulatedLoad.positionInT until ((accumulatedLoad.span - flexibleLoad.span) + 1)) {
+    for (i <- bestAccumulatedLoad.positionInT until ((bestAccumulatedLoad.span - bestFlexibleLoad.span) + 1)) {
       if (verbose) println(s"\tAt position $i")
 
 
-      def move(flexibleLoadMovement: FlexibleLoad): Unit = {
-        val temporaryMovement =
-          new Movement(temporaryX -/+= flexibleLoadMovement, flexibleLoadMovement, preferredSlots)
+      def move(): Unit = {
+        updateTemporaryMovement(withPositionInTForFlexibleLoad = i)
 
         val metricResult =
           metricTransformation(referenceAverage, bestMovement, temporaryMovement, preferredSlots)
@@ -85,27 +114,24 @@ object SchedulerAlgorithm {
         if (temporaryMetric < bestMetric) {
           if (verbose) println(" - Is best")
 
-          bestMovement = new Movement(temporaryMovement.acc.copy(), temporaryMovement.fl, preferredSlots)
+          updateBestMovement(withPositionInTForFlexibleLoad = temporaryFlexibleLoad.positionInT)
         } else {
           if (verbose) println(" - Not best")
         }
 
       }
 
-      val _flexibleLoadMovement = flexibleLoad.copy(positionInT = i)
+      moveTemporaryFlexibleLoadPositionInT(to = i)
 
-      _flexibleLoadMovement match {
-        case flst: FlexibleLoadSubTask if !flst.superTask.areAggregateesOverlapped =>
-          move(flst)
+      temporaryFlexibleLoad match {
+        case flst: FlexibleLoadSubTask if !flst.superTask.areAggregateesOverlapped => move()
         case _: FlexibleLoadSubTask => Unit
-        case fl: FlexibleLoad =>
-          move(fl)
+        case _: FlexibleLoad => move()
       }
 
     }
 
-    accumulatedLoad -/+= flexibleLoad.positionInT_=(bestMovement.fl.positionInT)
-    accumulatedLoad
+    bestAccumulatedLoad
   }
 
   def isLoadOnPreferredSlots(load: Load, preferedSlots: List[Int]): Boolean = {
