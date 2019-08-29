@@ -9,7 +9,8 @@ import crossfold.CrossFoldValidation.{MonteCarlo, Percentage}
 import metrics.Par
 import play.api.libs.json.Json
 import algorithm.serialization.AlgorithmJsonSerializer._
-import reader.{EgaugeReader, SyntheticProfilesReaderForEuclideanClusterer}
+import reader.{EgaugeReader, SyntheticProfilesReaderForEuclideanClusterer, SyntheticProfilesReaderForScheduler}
+import types.clusterer.immutable.Point
 
 object Main {
 
@@ -23,7 +24,21 @@ object Main {
       }
       .toVector*/
 
-    val points = EgaugeReader(Configuration.userProfilesFile)
+    val MainFolder               = "files/syn_loads_test/"
+    val AppliancesOutputFileName = "appliance_output.csv"
+    val LightingOutputFileName   = "lighting_output.csv"
+
+    val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 199) yield (i + "/", i)).toList
+
+    val points = SyntheticProfilesReaderForEuclideanClusterer
+      .applyDefault(MainFolder,
+        subFoldersAndIds.map(_._1),
+        AppliancesOutputFileName,
+        LightingOutputFileName,
+        subFoldersAndIds.map(_._2),
+        windowSize = 30)
+
+    //val points = EgaugeReader(Configuration.userProfilesFile)
 
 
     //TODO: Why defaulting to points.size + points.size/3?

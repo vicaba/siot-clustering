@@ -1,6 +1,8 @@
 package algorithm
 
 import metrics.Metric
+import test.{SchedulerAlgorithm, UserAllocator}
+import test.reschedulermetrics.BiasedAverageDistanceTransformation
 import types.clusterer.immutable.Point
 
 /**
@@ -29,7 +31,7 @@ class BatchRunSettingsBuilder(val points: Vector[Point],
                                               points,
                                               metric,
                                               timesToIterate(points, numberOfClusters)),
-         algorithm.scheduler.ReschedulerSettings(numberOfClusters, metric, 0.1, memory = 3))
+         algorithm.scheduler.ReschedulerSettings(numberOfClusters, metric, new BiasedAverageDistanceTransformation, UserAllocator.DefaultOrderings, SchedulerAlgorithm.DefaultOrderings)
       }
     }
   }
