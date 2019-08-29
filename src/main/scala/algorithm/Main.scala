@@ -33,7 +33,7 @@ object Main {
                                   List(Par.withParAggregate),
                                   (points, k) => points.size + points.size/3)
 
-    crossFoldValidation(batchRunSettingsBuilder)
+    crossFoldValidationClusterer(batchRunSettingsBuilder)
 
     val filePath = "w" match {
       case "w" => "/Users/vcaballero/Projects/jupyter-notebook/siot-eclustering-viz/files"
@@ -86,7 +86,7 @@ object Main {
 
   }
 
-  def crossFoldValidation(batchRunSettingsBuilder: BatchRunSettingsBuilder): Unit = {
+  def crossFoldValidationClusterer(batchRunSettingsBuilder: BatchRunSettingsBuilder): Unit = {
 
     val Max = BigDecimal(1.0)
     val monteCarlos = for (i <- BigDecimal(Configuration.CrossFold.SubsampleSize.from) to (Max, step = BigDecimal(0.1)))

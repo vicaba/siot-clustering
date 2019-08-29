@@ -2,17 +2,27 @@ package algorithm.scheduler
 
 import metrics.Metric
 import com.typesafe.scalalogging.Logger
+import test.EuclideanClustererToSchedulerDataTypeTransformation
+import test.load.AccumulatedLoad
 import types.clusterer.mutable.Cluster
 
 object ClusterRescheduler {
 
   val logger = Logger("Rescheduler")
 
-  def apply(clusters: List[Cluster], settings: ReschedulerSettings): List[(Cluster, List[Nothing])] = Nil
+  def apply(clusters: List[Cluster], settings: ReschedulerSettings): List[AccumulatedLoad] = {
 
-  def apply(cluster: Cluster, settings: ReschedulerSettings): (Cluster, List[Nothing]) = (null, null)
+    val clustersAsAccumulatedLoad = clusters.zipWithIndex.map { case (cluster, idx) =>
+      EuclideanClustererToSchedulerDataTypeTransformation.apply(idx, Cluster.flatten(cluster))
+    }
 
-  // TODO: Make sure that the change is mutable
-  def rescheduleOnePoint(cluster: Cluster, metric: Metric): Option[Nothing] = None
+    Scheduler.apply(clustersAsAccumulatedLoad,
+                    settings.metricTransformation,
+                    settings.userOrderings,
+                    settings.schedulerAlgorithmOrderings)
+  }
+
+  def apply(cluster: Cluster, settings: ReschedulerSettings): AccumulatedLoad = apply(List(cluster), settings).head
+
 
 }

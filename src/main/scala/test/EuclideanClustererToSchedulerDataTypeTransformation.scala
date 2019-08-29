@@ -3,6 +3,7 @@ package test
 import types.clusterer.immutable.Point
 import reader.SyntheticProfilesReaderForScheduler._
 import test.load.AccumulatedLoad
+import types.clusterer.mutable.Cluster
 
 object EuclideanClustererToSchedulerDataTypeTransformation {
 
