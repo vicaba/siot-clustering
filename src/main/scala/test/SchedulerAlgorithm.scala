@@ -41,7 +41,6 @@ object SchedulerAlgorithm {
 
       def splitFlexibleLoads(_acc: AccumulatedLoad): AccumulatedLoadWithSeparatedFlexibleLoads = {
         val remainingLoadsAfterRemovingFlexibleLoads = _acc.loads -- _acc.flexibleLoads
-        val copy0 = _acc.copy()
         val copy = _acc.copy(loads = remainingLoadsAfterRemovingFlexibleLoads, copyFlexibleLoadSubtasks = false)
         AccumulatedLoadWithSeparatedFlexibleLoads(copy, _acc.flexibleLoads.toList.sorted(ordering))
       }

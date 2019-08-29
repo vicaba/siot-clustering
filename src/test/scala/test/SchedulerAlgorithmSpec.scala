@@ -11,7 +11,6 @@ class SchedulerAlgorithmSpec extends FeatureSpec with GivenWhenThen {
 
   feature("Rescheduler.rescheduleFlexibleLoad") {
 
-    /*
     scenario("Rescheduler with only one flexible load") {
 
       Given("an SpanSlotAccumulatedLoad with only one flexible load")
@@ -24,11 +23,16 @@ class SchedulerAlgorithmSpec extends FeatureSpec with GivenWhenThen {
 
       When("the Rescheduler is called")
 
-      val result = SchedulerAlgorithm.rescheduleFlexibleLoad(spanSlotAccumulatedLoad, flexibleLoad, metricTransformation = NoTransformation)
+      val result = SchedulerAlgorithm.rescheduleFlexibleLoad(
+        (spanSlotAccumulatedLoad.copy(copyFlexibleLoadSubtasks = false),
+         spanSlotAccumulatedLoad.copy(copyFlexibleLoadSubtasks = false)),
+        (flexibleLoad, flexibleLoad),
+        metricTransformation = NoTransformation
+      )
 
       Then("nothing should have happened")
 
-      spanSlotAccumulatedLoad.amplitudePerSlot should equal(flexibleLoad.amplitudePerSlot)
+      result.amplitudePerSlot should equal(flexibleLoad.amplitudePerSlot)
     }
 
     scenario("Rescheduler with two flexible loads") {
@@ -49,19 +53,24 @@ class SchedulerAlgorithmSpec extends FeatureSpec with GivenWhenThen {
 
       When("the Rescheduler is called")
 
-      val result = SchedulerAlgorithm.rescheduleFlexibleLoad(spanSlotAccumulatedLoad, flexibleLoads(1), metricTransformation = NoTransformation)
+      val result = SchedulerAlgorithm.rescheduleFlexibleLoad(
+        (spanSlotAccumulatedLoad.copy(copyFlexibleLoadSubtasks = false),
+         spanSlotAccumulatedLoad.copy(copyFlexibleLoadSubtasks = false)),
+        (flexibleLoads(1), flexibleLoads(1)),
+        metricTransformation = NoTransformation
+      )
 
       Then("nothing should have happened")
 
       Metric.par(result) should be <= Metric.par(spanSlotAccumulatedLoad)
 
-    }*/
+    }
 
   }
 
   feature("Rescheduler.reschedule") {
 
-/*    scenario("Rescheduler with one flexible load") {
+    scenario("Rescheduler with one flexible load") {
 
       Given("an SpanSlotAccumulatedLoad with only one flexible load")
 
@@ -77,7 +86,7 @@ class SchedulerAlgorithmSpec extends FeatureSpec with GivenWhenThen {
 
       Then("nothing should have happened")
 
-      spanSlotAccumulatedLoad.amplitudePerSlot should equal(flexibleLoad.amplitudePerSlot)
+      result.amplitudePerSlot should equal(flexibleLoad.amplitudePerSlot)
     }
 
     scenario("Rescheduler with one fixed load and one flexible load") {
@@ -126,44 +135,46 @@ class SchedulerAlgorithmSpec extends FeatureSpec with GivenWhenThen {
 
       Metric.par(result) shouldEqual Metric.par(spanSlotAccumulatedLoad)
 
-    }*/
+    }
 
     scenario("a") {
 
-        Given("an AccumulatedLoad with one FlexibleLoad (with at least two subtasks) split into subtasks")
+      Given("an AccumulatedLoad with one FlexibleLoad (with at least two subtasks) split into subtasks")
 
-        val subTask1 = Vector(2.0, 3.0, 4.0, 2.0)
+      val subTask1 = Vector(2.0, 3.0, 4.0, 2.0)
 
-        val subTask2 = Vector(2.0, 2.0)
+      val subTask2 = Vector(2.0, 2.0)
 
-        val lowValue = 1.0
+      val lowValue = 1.0
 
-        val flexibleLoad =
-          FlexibleLoad(0, 0, Vector.fill(3)(lowValue) ++ subTask1 ++ Vector.fill(4)(lowValue) ++ subTask2 ++ Vector(lowValue))
+      val flexibleLoad =
+        FlexibleLoad(0,
+                     0,
+                     Vector.fill(3)(lowValue) ++ subTask1 ++ Vector.fill(4)(lowValue) ++ subTask2 ++ Vector(lowValue))
 
-        val accLoad = AccumulatedLoad(0, 0, List(flexibleLoad))
+      val accLoad = AccumulatedLoad(0, 0, List(flexibleLoad))
 
-        val accLoadOriginal = accLoad.copy()
+      val accLoadOriginal = accLoad.copy()
 
-        Load.MutateAccumulatedLoad.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
-          accLoad,
-          SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage)
+      Load.MutateAccumulatedLoad.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
+        accLoad,
+        SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage)
 
-        Load.MutateAccumulatedLoad.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
-          accLoadOriginal,
-          SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage)
+      Load.MutateAccumulatedLoad.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
+        accLoadOriginal,
+        SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage)
 
-        And("one subtask is overlapped with the other")
+      And("one subtask is overlapped with the other")
 
-        accLoad.flexibleLoads.head.positionInT = 0
-        accLoad.flexibleLoads.last.positionInT = 0
+      accLoad.flexibleLoads.head.positionInT = 0
+      accLoad.flexibleLoads.last.positionInT = 0
 
-        When("checking if they are overlapped")
+      When("checking if they are overlapped")
 
-        val res = SchedulerAlgorithm.reschedule(accLoad, metricTransformation = NoTransformation)
+      val res = SchedulerAlgorithm.reschedule(accLoad, metricTransformation = NoTransformation)
 
-        Then("it should return true")
+      Then("it should return true")
 
-      }
     }
+  }
 }

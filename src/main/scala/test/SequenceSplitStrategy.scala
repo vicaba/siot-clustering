@@ -32,7 +32,7 @@ object SequenceSplitByConsecutiveElements {
         }
         .toList.sortWith { case (x, y) => x._2 > y._2}
 
-      consecutiveValues.filter(_._2 == consecutiveValues.maxBy(_._2)._2).collectFirst {case (elem, _) if elem < average => elem}.getOrElse(consecutiveValues.head._1)
+      consecutiveValues.filter(_._2 == consecutiveValues.maxBy(_._2)._2).collectFirst {case (elem, _) if elem < average => elem}.getOrElse(consecutiveValues.minBy(_._1)._1)
     }
     SequenceSplitByConsecutiveElements(consecutiveValue)
   }
