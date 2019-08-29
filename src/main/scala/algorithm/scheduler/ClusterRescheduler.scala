@@ -2,7 +2,7 @@ package algorithm.scheduler
 
 import metrics.Metric
 import com.typesafe.scalalogging.Logger
-import test.EuclideanClustererToSchedulerDataTypeTransformation
+import test.ClusterAndAccumulatedLoadTransformer
 import test.load.AccumulatedLoad
 import types.clusterer.mutable.Cluster
 
@@ -12,9 +12,7 @@ object ClusterRescheduler {
 
   def apply(clusters: List[Cluster], settings: ReschedulerSettings): List[AccumulatedLoad] = {
 
-    val clustersAsAccumulatedLoad = clusters.zipWithIndex.map { case (cluster, idx) =>
-      EuclideanClustererToSchedulerDataTypeTransformation.apply(idx, Cluster.flatten(cluster))
-    }
+    val clustersAsAccumulatedLoad = ClusterAndAccumulatedLoadTransformer.apply(clusters).toList
 
     Scheduler.apply(clustersAsAccumulatedLoad,
                     settings.metricTransformation,
@@ -23,6 +21,5 @@ object ClusterRescheduler {
   }
 
   def apply(cluster: Cluster, settings: ReschedulerSettings): AccumulatedLoad = apply(List(cluster), settings).head
-
 
 }

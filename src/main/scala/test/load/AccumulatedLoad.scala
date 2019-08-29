@@ -71,13 +71,13 @@ class AccumulatedLoad private (override val id: Int,
 
 object AccumulatedLoad {
 
-  def apply(id: Int, positionInT: Int, load: Load): AccumulatedLoad =
-    new AccumulatedLoad(id, positionInT, new scala.collection.mutable.HashSet[Load]() += load)
+  def apply(id: Int, positionInT: Int, load: Load, label: String = ""): AccumulatedLoad =
+    new AccumulatedLoad(id, positionInT, new scala.collection.mutable.HashSet[Load]() += load, label)
 
-  def apply(id: Int, positionInT: Int, loads: Traversable[Load]): AccumulatedLoad =
-    new AccumulatedLoad(id, positionInT, mutableSetOf(loads))
+  def apply(id: Int, positionInT: Int, loads: Traversable[Load], label: String = ""): AccumulatedLoad =
+    new AccumulatedLoad(id, positionInT, mutableSetOf(loads), label)
 
-  def keepLoadOrder(id: Int, positionInT: Int, loads: Traversable[Load]): AccumulatedLoad =
-    new AccumulatedLoad(id, positionInT, orderedMutableSetOf(loads))
+  def keepLoadOrder(id: Int, positionInT: Int, loads: Traversable[Load], label: String = ""): AccumulatedLoad =
+    new AccumulatedLoad(id, positionInT, orderedMutableSetOf(loads), label)
 
 }
