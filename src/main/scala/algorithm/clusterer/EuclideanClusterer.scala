@@ -45,7 +45,7 @@ object EuclideanClusterer {
       if (iterations > 0 && freeClusters.nonEmpty) {
 
         val head = freeClusters.head
-        val c = Cluster(head.id + 1, UUID.randomUUID().toString, Set(head), head.hierarchyLevel + 1, None)(
+        val c = Cluster(-head.id, UUID.randomUUID().toString, Set(head), head.hierarchyLevel + 1, None)(
           head.dataTypeMetadata)
         val tail = freeClusters.tail
 
