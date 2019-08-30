@@ -96,7 +96,7 @@ class ClusterAndAccumulatedLoadTransformerSpec extends FeatureSpec with GivenWhe
 
       And("there should not be any cluster that did not exist before (different id)")
 
-      groupedClustersById.forall { case (count, _) => count > 1 } shouldBe true
+      groupedClustersById.forall { case (_, clusters) => clusters.size > 1 } shouldBe true
 
       And("both should have the same PAR")
 
