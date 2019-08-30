@@ -23,7 +23,7 @@ object Scheduler {
 
       val _clusters: List[AccumulatedLoad] = Load.deepCopy(clusters).toList
 
-      val numberOfSlots    = AccumulatedLoad(-1, 0, _clusters).span
+      val numberOfSlots    = AccumulatedLoad(-1, 0, _clusters, "").span
       val allFlexibleLoads = _clusters.flatMap(_.flexibleLoads)
       val windowSize       = Try(allFlexibleLoads.map(_.span).sum / allFlexibleLoads.size).getOrElse(1)
       val schedulerPreferredSlots =

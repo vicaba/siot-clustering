@@ -10,6 +10,9 @@ class BiasedPeakTransformation(bias: Double = 0.2) extends MetricTransformation 
                      preferredSlots: List[Int]): MetricTransformationResult =
     MetricTransformationResult(biasedPeak(bestMovement, preferredSlots), biasedPeak(temporaryMovement, preferredSlots))
 
+
+  override def toString(): String = "BiasedPeakTransformation"
+
   private def biasedPeak(m: Movement, preferredSlots: List[Int]): Double = {
 
     val mPeak   = m.acc.peak

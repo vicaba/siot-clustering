@@ -12,6 +12,8 @@ object AverageDistanceTransformation extends MetricTransformation {
       computeAverageDistanceMetric2(referenceAverage, temporaryMovement, preferredSlots)
     )
 
+  override def toString(): String = "AverageDistanceTransformation"
+
   private def computeAverageDistanceMetric2(referenceAverage: Double,
                                             movement: Movement,
                                             preferredSlots: List[Int],

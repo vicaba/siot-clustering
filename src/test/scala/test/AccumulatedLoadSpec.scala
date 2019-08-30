@@ -22,7 +22,7 @@ class AccumulatedLoadSpec extends FeatureSpec with GivenWhenThen {
 
       When("a SpanSlotAccumulatedLoad is created")
 
-      val spanSlotAccumulatedLoad = AccumulatedLoad(0, 0, fixedLoad)
+      val spanSlotAccumulatedLoad = AccumulatedLoad(0, 0, fixedLoad, "")
 
       Then("amplitudePerSlot should contain a vector equal to the fixed load")
 
@@ -73,7 +73,7 @@ class AccumulatedLoadSpec extends FeatureSpec with GivenWhenThen {
 
       When("a SpanSlotAccumulatedLoad is created")
 
-      val spanSlotAccumulatedLoad = AccumulatedLoad(0, 0, flexibleLoad)
+      val spanSlotAccumulatedLoad = AccumulatedLoad(0, 0, flexibleLoad, "")
 
       Then("amplitudePerSlot should contain a vector with multiple elements")
 

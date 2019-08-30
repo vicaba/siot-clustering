@@ -19,7 +19,7 @@ class SchedulerAlgorithmSpec extends FeatureSpec with GivenWhenThen {
 
       val flexibleLoad = FlexibleLoad(1, 0, rawFlexibleLoad)
 
-      val spanSlotAccumulatedLoad = AccumulatedLoad(0, 0, flexibleLoad)
+      val spanSlotAccumulatedLoad = AccumulatedLoad(0, 0, flexibleLoad, "")
 
       When("the Rescheduler is called")
 
@@ -78,7 +78,7 @@ class SchedulerAlgorithmSpec extends FeatureSpec with GivenWhenThen {
 
       val flexibleLoad = FlexibleLoad(1, 0, rawFlexibleLoad)
 
-      val spanSlotAccumulatedLoad = AccumulatedLoad(0, 0, flexibleLoad)
+      val spanSlotAccumulatedLoad = AccumulatedLoad(0, 0, flexibleLoad, "")
 
       When("the Rescheduler is called")
 

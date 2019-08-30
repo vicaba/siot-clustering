@@ -46,7 +46,7 @@ object UserAllocator {
 
     val lowestPositionInT = sortedUsers.flatMap(_.loads).map(_.positionInT).min
     val accumulatedLoads =
-      AccumulatedLoad.keepLoadOrder(0, lowestPositionInT, fixedLoads ::: usersAsFlexibleLoads)
+      AccumulatedLoad.keepLoadOrder(0, lowestPositionInT, fixedLoads ::: usersAsFlexibleLoads, "")
 
     val allocationResult = SchedulerAlgorithm.reschedule(accumulatedLoads, metricTransformation = NoTransformation)
 

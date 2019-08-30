@@ -4,7 +4,7 @@ import algorithm.EuclideanAlgorithm._
 import play.api.libs.json._
 import types.clusterer.serialization.ClusterJsonSerializer._
 import EuclideanClustererSettingsJsonSerializer._
-import ReschedulerSettingsJsonSerializer._
+import SchedulerSettingsJsonSerializer._
 
 object AlgorithmJsonSerializer {
 

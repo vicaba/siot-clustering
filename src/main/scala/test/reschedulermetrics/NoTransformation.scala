@@ -8,4 +8,6 @@ object NoTransformation extends MetricTransformation {
                      temporaryMovement: Movement,
                      preferredSlots: List[Int]): MetricTransformationResult =
     MetricTransformationResult(bestMovement.acc.peak, temporaryMovement.acc.peak)
+
+  override def toString(): String = "NoTransformation"
 }

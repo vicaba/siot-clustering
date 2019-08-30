@@ -59,7 +59,7 @@ object SyntheticProfilesReaderForScheduler extends TemplateForSyntheticProfilesR
                                             applianceFileAndBuilder(subFolder),
                                             lightingFileAndBuilder(subFolder),
                                             windowSize
-                                          ))
+                                          ), "")
           l
 
       }

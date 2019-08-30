@@ -19,7 +19,7 @@ class AccumulatedLoad private (override val id: Int,
     extends Load {
 
   def copy(loads: Set[Load] = this.loads, copyFlexibleLoadSubtasks: Boolean = true): AccumulatedLoad =
-    AccumulatedLoad(id, positionInT, mutableSetOf(Load.deepCopy(loads, copyFlexibleLoadSubtasks)))
+    AccumulatedLoad(id, positionInT, mutableSetOf(Load.deepCopy(loads, copyFlexibleLoadSubtasks)), label)
 
   def loads: Set[Load] = _loads.toSet
 
@@ -71,13 +71,13 @@ class AccumulatedLoad private (override val id: Int,
 
 object AccumulatedLoad {
 
-  def apply(id: Int, positionInT: Int, load: Load, label: String = ""): AccumulatedLoad =
+  def apply(id: Int, positionInT: Int, load: Load, label: String): AccumulatedLoad =
     new AccumulatedLoad(id, positionInT, new scala.collection.mutable.HashSet[Load]() += load, label)
 
   def apply(id: Int, positionInT: Int, loads: Traversable[Load], label: String = ""): AccumulatedLoad =
     new AccumulatedLoad(id, positionInT, mutableSetOf(loads), label)
 
-  def keepLoadOrder(id: Int, positionInT: Int, loads: Traversable[Load], label: String = ""): AccumulatedLoad =
+  def keepLoadOrder(id: Int, positionInT: Int, loads: Traversable[Load], label: String): AccumulatedLoad =
     new AccumulatedLoad(id, positionInT, orderedMutableSetOf(loads), label)
 
 }
