@@ -22,9 +22,9 @@ object EuclideanAlgorithm {
 
   case class ClustererAndReschedulerOutput(clustererOutput: ClustererOutput, reschedulerOutput: ReschedulerOutput)
 
-  def clusterer(settings: ClustererSettingsT): List[Cluster] = EuclideanClusterer.apply(settings)
+  private def clusterer(settings: ClustererSettingsT): List[Cluster] = EuclideanClusterer.apply(settings)
 
-  def rescheduler(clusters: List[Cluster], settings: ReschedulerSettingsT): List[AccumulatedLoad] =
+  private def rescheduler(clusters: List[Cluster], settings: ReschedulerSettingsT): List[AccumulatedLoad] =
     ClusterRescheduler.apply(clusters, settings)
 
   def apply(clustererSettings: ClustererSettingsT): ClustererOutput = {

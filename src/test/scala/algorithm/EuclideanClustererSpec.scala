@@ -17,51 +17,9 @@ class EuclideanClustererSpec extends FeatureSpec with GivenWhenThen {
 
   val metric = Par.withParAggregate
 
-  feature("cluster.Algorithm") {
-    /*scenario("Assigns load profiles minimizing the distance function with perfectly compatible points") {
+  feature("clusterer.EuclideanClusterer") {
 
-      Given("4 points that are perfectly compatible")
-      val points = List(
-        DenseMatrix((0.0, 3.0, 3.0, 0.0), (0.0, 4.0, 4.0, 0.0))
-        , DenseMatrix((5.0, 0.0, 5.0, 0.0), (5.0, 0.0, 5.0, 0.0))
-        , DenseMatrix((3.0, 0.0, 0.0, 3.0), (4.0, 0.0, 0.0, 4.0))
-        , DenseMatrix((0.0, 5.0, 0.0, 5.0), (0.0, 5.0, 0.0, 5.0))
-      ).zipWithIndex.map { case (m, idx) =>
-        Point(idx, m, None)
-      }.toVector
-
-      When("asked to assign each point to a cluster, given 2 clusters")
-      val result = Algorithm.run(2, points, Metric.par, 1)
-
-      Then("the two clusters have a PAR of 0")
-      result.foreach { cluster =>
-        metric(cluster) shouldBe metric.Lowest
-      }
-    }*/
-
-    /*    scenario("Manual test") {
-
-      val cluster1Points = Set(
-        Point(1, DenseMatrix((5.0, 5.0, 0.0, 0.0)), Some(1)),
-        Point(2, DenseMatrix((0.0, 0.0, 5.0, 6.0)), Some(1))
-      )
-
-      val cluster1 = Cluster(1, "1", cluster1Points)
-
-      val cluster2Points = Set(
-        Point(3, DenseMatrix((7.0, 7.0, 0.0, 0.0)), Some(2)),
-        Point(4, DenseMatrix((0.0, 0.0, 8.0, 8.0)), Some(2))
-      )
-
-      val cluster2 = Cluster(2, "2", cluster2Points)
-
-      info(s"metric c1: ${metric(cluster1)}")
-      info(s"metric c2: ${metric(cluster2)}")
-      info(s"metric c1+c2: ${metric.aggregateOf(List(cluster1, cluster2))}")
-
-    }*/
-
-    scenario("Assigns load profiles minimizing the distance function") {
+    scenario("Does not remove any points from the original dataset") {
 
       Given("10 compatible points")
       val points = List(
@@ -81,18 +39,21 @@ class EuclideanClustererSpec extends FeatureSpec with GivenWhenThen {
       }.toVector
 
       When("asked to assign each point to a cluster, given 2 clusters")
-      val runSettings = EuclideanClustererSettings(1, points, Par.withAverageAggregate, improveIterations = 100)
+      val runSettings = EuclideanClustererSettings(3, points, Par.withAverageAggregate, improveIterations = 100)
       val result      = EuclideanClusterer(runSettings)
 
-      Then("the two clusters have a PAR of 1")
+      Then("both metrics before and after clustering are the same")
+
       val metricBefore = metric(Cluster.Empty ++ points.map(Point.toCluster))
+      val metricAfter = metric(result)
 
-      result.foreach { cluster => info(cluster.toString)
-      }
+      metricAfter shouldBe metricBefore
 
-      result.foreach { cluster =>
-        //cluster.points.size should be <= 2
-      }
+      And("the number of points should be the same before and after lustering")
+
+      Cluster.flatten(result).size shouldBe points.size
+
+
 
     }
 

@@ -13,13 +13,27 @@ object ClusterAndAccumulatedLoadTransformer {
 
     val builder = ApplianceLoadBuilder
 
+    var applianceCounter: Int = -1
+
     clusters.map(Cluster.flatten).zip(clusters).map {
       case (pointsInCluster, cluster) =>
         val loads = pointsInCluster.flatMap { pointInCluster =>
-          pointInCluster.data(breeze.linalg.*, ::).iterator.zip(pointInCluster.dataLabels.toIterator).map {
-            case (dv, label) =>
-              builder(pointInCluster.id, dv.toScalaVector(), "-p" + pointInCluster.id + "-" + label)
+
+          val dataIterator  = pointInCluster.data(breeze.linalg.*, ::).iterator.toList
+          val labelIterator = pointInCluster.dataLabels.toIterator.toList
+
+          def buildAppliance(dv: DenseVector[Double], label: String = "") = {
+            applianceCounter = applianceCounter + 1
+            builder(applianceCounter, dv.toScalaVector(), "-p" + pointInCluster.id + "-" + label)
           }
+
+          if (labelIterator.nonEmpty) dataIterator.zip(labelIterator).map {
+            case (dv, label) =>
+              buildAppliance(dv, label)
+          } else
+            dataIterator.map { dv =>
+              buildAppliance(dv)
+            }
         }
         AccumulatedLoad(cluster.id, 0, loads, label = cluster.name)
     }
@@ -31,10 +45,10 @@ object ClusterAndAccumulatedLoadTransformer {
 
     accumulatedLoads.map { accumulatedLoad =>
       val cluster = Cluster(accumulatedLoad.id, accumulatedLoad.label, Set.empty[Point], 1, None)(dataTypeMetadata)
-      val points = accumulatedLoad.loads.groupBy(l => pointRegex.findFirstMatchIn(l.label).get.group(1)).map {
+      val points = accumulatedLoad.loads.toList.groupBy(l => pointRegex.findFirstMatchIn(l.label).get.group(1)).map {
         case ((key, loads)) =>
-          val vectorList = loads.map(l => DenseVector(l.amplitudePerSlot: _*)).toList
-          val labelList  = loads.map(_.label).toList
+          val vectorList = loads.map(l => DenseVector(l.amplitudePerSlot: _*))
+          val labelList  = loads.map(_.label)
           val data       = DenseMatrix(vectorList: _*)
           Point(key.toInt, data, labelList, Some(cluster))(dataTypeMetadata)
       }

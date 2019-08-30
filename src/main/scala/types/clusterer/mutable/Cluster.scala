@@ -167,14 +167,14 @@ object Cluster {
     override def zero(t: Cluster): DenseVector[Double] = t.dataTypeMetadata.EmptySyntheticData()
   }
 
-  implicit val listToVector: DenseVectorReprOps[List[Cluster]] = new DenseVectorReprOps[List[Cluster]] {
+  implicit def toVectorTraversable[S[X] <: Traversable[X]]: DenseVectorReprOps[S[Cluster]] = new DenseVectorReprOps[S[Cluster]] {
 
-    private def lift(t: List[Cluster]): Cluster =
+    private def lift(t: S[Cluster]): Cluster =
       Cluster(-1, "lifted", t, t.headOption.map(_.id).getOrElse(-1), None)(t.head.dataTypeMetadata)
 
-    override def apply(t: List[Cluster]): DenseVector[Double] = toVector.apply(lift(t))
+    override def apply(t: S[Cluster]): DenseVector[Double] = toVector.apply(lift(t))
 
-    override def zero(t: List[Cluster]): DenseVector[Double] = toVector.zero(t.head)
+    override def zero(t: S[Cluster]): DenseVector[Double] = toVector.zero(t.head)
 
   }
 
