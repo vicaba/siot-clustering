@@ -104,10 +104,6 @@ class ClusterAndAccumulatedLoadTransformerSpec extends FeatureSpec with GivenWhe
 
       clusters2Metric shouldBe accumulatedLoadsMetric
 
-      And("clusters before and after should contain the same number of points")
-
-      clusters.zip(clusters2)
-
     }
 
   }
