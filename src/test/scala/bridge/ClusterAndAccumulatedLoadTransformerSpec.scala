@@ -44,7 +44,7 @@ class ClusterAndAccumulatedLoadTransformerSpec extends FeatureSpec with GivenWhe
       val (group1, group2) = points.splitAt(points.size)
 
       val c1 = Cluster(-1, "-1", group1, 0, None)
-      val c2 = Cluster(-2, "-1", group2, 0, None)
+      val c2 = Cluster(-4, "-1", group2, 0, None)
 
       val clusters = List(c1, c2)
 
