@@ -1,16 +1,15 @@
 package types.clusterer.immutable
 
 import types.clusterer.DataTypeMetadata.{DataType, SyntheticDataType}
-import types.clusterer.{DataTypeMetadata, PointLike, PointLikeCompanion}
 import types.clusterer.mutable.Cluster
-import types.clusterer.{DataTypeMetadata, PointLike, Type}
+import types.clusterer.{DataTypeMetadata, Type, PointCompanion}
 
 case class Point(
     override val id: Int,
     override val data: DataType,
     dataLabels: List[String] = Nil,
-    override val assignedToCluster: Option[Cluster] = None)(implicit override val dataTypeMetadata: DataTypeMetadata)
-    extends PointLike {
+  assignedToCluster: Option[Cluster] = None)(implicit override val dataTypeMetadata: DataTypeMetadata)
+    extends Type {
 
   override type ThisType = Point
 
@@ -45,6 +44,4 @@ case class Point(
 
 }
 
-object Point extends PointLikeCompanion[Point, Cluster] {
-  override def toCluster(point: Point): Cluster = Type.toCluster(point)
-}
+object Point extends PointCompanion

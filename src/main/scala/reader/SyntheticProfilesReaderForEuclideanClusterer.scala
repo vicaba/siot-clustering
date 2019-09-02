@@ -1,10 +1,12 @@
 package reader
 
 import breeze.linalg.{DenseMatrix, DenseVector}
-import types.clusterer.TypesX_48
+import types.clusterer.{DataTypeMetadata, TypesX_48}
 import types.clusterer.immutable.Point
 
 object SyntheticProfilesReaderForEuclideanClusterer extends TemplateForSyntheticProfilesReader {
+
+  val TotalMinutesPerLoad: Int = 1440
 
   override type SingleLoadOutputType      = (String, DenseVector[Double])
   override type AccumulatedLoadOutputType = Point
@@ -64,7 +66,7 @@ object SyntheticProfilesReaderForEuclideanClusterer extends TemplateForSynthetic
           )
           val dataLabels = r.map(_._1).toList
           val data       = DenseMatrix(r.map(_._2): _*)
-          Point(id, data, dataLabels, None)(TypesX_48)
+          Point(id, data, dataLabels, None)(DataTypeMetadata.generateDataTypeMetadata(forColumns = TotalMinutesPerLoad / windowSize))
 
       }
       .toVector

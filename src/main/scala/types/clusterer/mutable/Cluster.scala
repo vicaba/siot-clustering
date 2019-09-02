@@ -169,8 +169,6 @@ object Cluster {
 
   implicit def toVectorTraversable[S[X] <: Traversable[X]]: DenseVectorReprOps[S[Cluster]] = new DenseVectorReprOps[S[Cluster]] {
 
-
-
     private def lift(t: S[Cluster]): Cluster =
       Cluster(-1, "lifted", t, t.headOption.map(_.id).getOrElse(-1), None)(t.head.dataTypeMetadata)
 

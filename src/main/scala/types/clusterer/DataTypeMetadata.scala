@@ -37,6 +37,16 @@ object DataTypeMetadata {
 
   def synthesizeValues(values: DataType): SyntheticDataType = sum(values, Axis._0).inner
 
+  def generateDataTypeMetadata(forColumns: Int): DataTypeMetadata = forColumns match {
+    case 2 => DataTypeMetadata2Columns
+    case 4 => DataTypeMetadata4Columns
+    case 24 => DataTypeMetadata24Columns
+    case 48 => TypesX_48
+    case x => new DataTypeMetadata {
+      override val Columns: Int = x
+    }
+  }
+
 }
 
 object DataTypeMetadata2Columns extends DataTypeMetadata {
