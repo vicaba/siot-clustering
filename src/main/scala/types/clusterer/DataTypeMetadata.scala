@@ -17,6 +17,8 @@ trait DataTypeMetadata {
 
   def EmptyData(): DataType = DenseMatrix.zeros[Double](Rows, Columns)
 
+  def EmptyData(withRows: Int): DataType = DenseMatrix.zeros[Double](withRows, Columns)
+
   def EmptySyntheticData(): SyntheticDataType = sum(EmptyData(), Axis._0).inner
 
   def synthesizeValues(values: DataType): SyntheticDataType = sum(values, Axis._0).inner
@@ -62,6 +64,7 @@ object DataTypeMetadata24Columns extends DataTypeMetadata {
 }
 
 object Types67_24 extends DataTypeMetadata {
+  override val Rows = 67
   override val Columns: Int = 24
 }
 

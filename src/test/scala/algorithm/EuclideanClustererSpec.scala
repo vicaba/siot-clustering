@@ -53,8 +53,6 @@ class EuclideanClustererSpec extends FeatureSpec with GivenWhenThen {
 
       Cluster.flatten(result).size shouldBe points.size
 
-
-
     }
 
   }

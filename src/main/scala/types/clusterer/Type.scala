@@ -11,7 +11,7 @@ import scala.annotation.tailrec
 object Type {
 
   def centroidOf[T <: Type](points: Seq[T]): DataTypeMetadata.SyntheticDataType = {
-    val sum = sumVectors(points.map(_.syntheticValue).toList, points.head.dataTypeMetadata.EmptySyntheticData())
+    val sum = sumVectors(points.map(_.centroid).toList, points.head.dataTypeMetadata.EmptySyntheticData())
     sum / points.length.toDouble
   }
 

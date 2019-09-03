@@ -9,6 +9,14 @@ object MaxEnergyHeuristic extends KeepClusteringHeuristic {
   override def apply(currentCluster: Cluster, elementToAdd: Cluster): Boolean = {
 
     val maxEnergyAllowed   = sum(currentCluster.centroid) * (currentCluster.points.size + 1)
+    val centroid = sum(Type.centroidOf(List(currentCluster, elementToAdd)))
+    val centroid2 = sum(Type.centroidOf(List(currentCluster)))
+      val centroid3 = currentCluster.centroid
+
+    val cCopy = Type.deepCopy(currentCluster)
+    cCopy += elementToAdd
+
+    val cCopyCentroid = sum(cCopy.centroid)
     val potentialMaxEnergy = sum(Type.centroidOf(List(currentCluster, elementToAdd))) * (currentCluster.points.size + 1)
     val res                = potentialMaxEnergy <= maxEnergyAllowed
     res

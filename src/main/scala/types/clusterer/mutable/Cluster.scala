@@ -70,7 +70,7 @@ case class Cluster private[types] (override val id: Int,
     this
   }
 
-  def -=(point: Point): Cluster = {
+  def -=(point: Type): Cluster = {
     this._points -= typeTransform(point)
     this
   }
@@ -127,7 +127,7 @@ case class Cluster private[types] (override val id: Int,
 
     val values = this._points.toList.map(_.data)
 
-    sumPoints(values, dataTypeMetadata.EmptyData())
+    sumPoints(values, dataTypeMetadata.EmptyData(withRows = values.head.rows))
 
   }
 
