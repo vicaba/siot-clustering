@@ -46,7 +46,7 @@ object Main {
       List(Par.withParAggregate),
       (_, _) => 1)
 
-    batchRun(testBatchRunSettingsBuilder)
+    batchRunCluster(testBatchRunSettingsBuilder)
 
 /*    val batchRunSettingsBuilder =
       new BatchRunSettingsBuilder(points,
