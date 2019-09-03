@@ -24,31 +24,37 @@ object Main {
       }
       .toVector*/
 
-    val MainFolder               = "files/syn_loads_test/"
+    val MainFolder               = "files/syn_loads/"
     val AppliancesOutputFileName = "appliance_output.csv"
     val LightingOutputFileName   = "lighting_output.csv"
 
     val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 199) yield (i + "/", i)).toList
 
-    val points = SyntheticProfilesReaderForEuclideanClusterer
+/*    val points = SyntheticProfilesReaderForEuclideanClusterer
       .applyDefault(MainFolder,
         subFoldersAndIds.map(_._1),
         AppliancesOutputFileName,
         LightingOutputFileName,
         subFoldersAndIds.map(_._2),
-        windowSize = 30)
+        windowSize = 30)*/
 
-    //val points = EgaugeReader(Configuration.userProfilesFile)
+    val points = EgaugeReader(Configuration.userProfilesFile)
 
+    val testBatchRunSettingsBuilder =
+      new BatchRunSettingsBuilder(points,
+      List(4),
+      List(Par.withParAggregate),
+      (_, _) => 1)
 
-    //TODO: Why defaulting to points.size + points.size/3?
-    val batchRunSettingsBuilder =
+    batchRun(testBatchRunSettingsBuilder)
+
+/*    val batchRunSettingsBuilder =
       new BatchRunSettingsBuilder(points,
                                   (Configuration.BatchRun.KRange.from to Configuration.BatchRun.KRange.to).toList,
                                   List(Par.withParAggregate),
                                   (points, k) => points.size + points.size/3)
 
-    crossFoldValidationClusterer(batchRunSettingsBuilder)
+    crossFoldValidationClusterer(batchRunSettingsBuilder)*/
 
     val filePath = "w" match {
       case "w" => "/Users/vcaballero/Projects/jupyter-notebook/siot-eclustering-viz/files"

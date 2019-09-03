@@ -31,7 +31,7 @@ class BatchRunSettingsBuilder(val points: Vector[Point],
                                               points,
                                               metric,
                                               timesToIterate(points, numberOfClusters)),
-         algorithm.scheduler.ReschedulerSettings(numberOfClusters, metric, new BiasedAverageDistanceTransformation, UserAllocator.DefaultOrderings, SchedulerAlgorithm.DefaultOrderings))
+         algorithm.scheduler.ReschedulerSettings(numberOfClusters, metric, new BiasedAverageDistanceTransformation, UserAllocator.DefaultOrderings.take(1), SchedulerAlgorithm.DefaultOrderings.take(1)))
       }
     }
   }

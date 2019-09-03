@@ -42,9 +42,6 @@ object EuclideanAlgorithm {
   def apply(clustererSettings: ClustererSettingsT,
             reschedulerSettings: ReschedulerSettingsT): ClustererAndReschedulerOutput = {
 
-    logger.info(s"Running Clusterer. NumberOfClusters: {}. Points: {}",
-                clustererSettings.numberOfClusters,
-                clustererSettings.points.size)
     val clustererOutput = apply(clustererSettings)
 
     logger.info("Running Rescheduler.")
