@@ -18,6 +18,10 @@ trait PointCompanion {
     case _list => Some(_list.tail.foldLeft(_list.head) { case (accum, vector) => accum + vector })
   }
 
+  def flatten(ps: TraversableOnce[Point]): Set[Point] = ps.toSet
+
+  def flatten(p: Point): Set[Point] = Set(p)
+
   implicit def pointToVector(p: Point): SyntheticDataType = toVector.apply(p)
 
   implicit val toVector: DenseVectorReprOps[Point] = new DenseVectorReprOps[Point] {

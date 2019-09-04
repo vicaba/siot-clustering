@@ -38,9 +38,11 @@ case class Point(
 
   def toCluster: Cluster = Point.toCluster(this)
 
-  override def centroid: SyntheticDataType = syntheticValue / dataTypeMetadata.Rows.toDouble
+  override def centroid: SyntheticDataType = syntheticValue / data.rows.toDouble
 
   override def deepCopy(): ThisType = this.copy()
+
+  override def flatten(): Set[Point] = Set(this)
 
 }
 

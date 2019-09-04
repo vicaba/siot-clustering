@@ -11,9 +11,14 @@ import scala.annotation.tailrec
 object Type {
 
   def centroidOf[T <: Type](points: Seq[T]): DataTypeMetadata.SyntheticDataType = {
-    val sum = sumVectors(points.map(_.centroid).toList, points.head.dataTypeMetadata.EmptySyntheticData())
-    sum / points.length.toDouble
+    val flattened = points.flatMap(_.flatten()).map(_.centroid).toList
+    val sum = sumVectors(flattened, points.head.dataTypeMetadata.EmptySyntheticData())
+    sum / flattened.length.toDouble
   }
+
+  def flatten(points: TraversableOnce[Type]): Set[Point] = points.flatMap { p =>
+    p.flatten()
+  }.toSet
 
   /**
     * Converts a cluster or a point into a cluster. If _type is a [[types.clusterer.mutable.Cluster]], _type is returned. If _type is a [[types.clusterer.immutable.Point]],
@@ -132,6 +137,8 @@ trait Type {
   def dataTypeMetadata: DataTypeMetadata
 
   def size: Int
+
+  def flatten(): Set[Point]
 
   /**
     * See [[Type#sumPoints(scala.collection.immutable.List, breeze.linalg.DenseMatrix)]].

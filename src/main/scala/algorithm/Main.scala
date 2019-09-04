@@ -40,21 +40,21 @@ object Main {
 
     val points = EgaugeReader(Configuration.userProfilesFile)
 
-    val testBatchRunSettingsBuilder =
+/*    val testBatchRunSettingsBuilder =
       new BatchRunSettingsBuilder(points,
       List(4),
       List(Par.withParAggregate),
       (_, _) => 1)
 
-    batchRunCluster(testBatchRunSettingsBuilder)
+    batchRunCluster(testBatchRunSettingsBuilder)*/
 
-/*    val batchRunSettingsBuilder =
+    val batchRunSettingsBuilder =
       new BatchRunSettingsBuilder(points,
                                   (Configuration.BatchRun.KRange.from to Configuration.BatchRun.KRange.to).toList,
                                   List(Par.withParAggregate),
                                   (points, k) => points.size + points.size/3)
 
-    crossFoldValidationClusterer(batchRunSettingsBuilder)*/
+    crossFoldValidationClusterer(batchRunSettingsBuilder)
 
     val filePath = "w" match {
       case "w" => "/Users/vcaballero/Projects/jupyter-notebook/siot-eclustering-viz/files"

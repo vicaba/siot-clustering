@@ -9,13 +9,29 @@ import types.clusterer.mutable.Cluster
 
 class TypeSpec extends FlatSpec {
 
-  val points = List(
+/*  val points = List(
     DenseMatrix((0.0, 3.0, 3.0, 0.0), (0.0, 4.0, 4.0, 0.0)),
     DenseMatrix((5.0, 0.0, 5.0, 0.0), (5.0, 0.0, 5.0, 0.0)),
     DenseMatrix((3.0, 0.0, 0.0, 3.0), (4.0, 0.0, 0.0, 4.0))
   ).zipWithIndex.map {
     case (m, idx) =>
       Point(idx, m, Nil, None)(DataTypeMetadata.generateDataTypeMetadata(4))
+  }.toVector*/
+
+  val points = List(
+    DenseMatrix((0.0, 3.0, 3.0, 0.0), (0.0, 4.0, 4.0, 0.0)),
+    DenseMatrix((5.0, 0.0, 5.0, 0.0), (5.0, 0.0, 5.0, 0.0)),
+    DenseMatrix((3.0, 0.0, 0.0, 3.0), (4.0, 0.0, 0.0, 4.0)),
+    DenseMatrix((0.0, 5.0, 0.0, 5.0), (0.0, 5.0, 0.0, 5.0)),
+    DenseMatrix((1.0, 5.0, 5.0, 5.0), (0.0, 2.0, 3.0, 5.0)),
+    DenseMatrix((8.0, 1.0, 0.0, 0.0), (0.0, 1.0, 0.0, 1.0)),
+    DenseMatrix((1.0, 0.0, 2.0, 0.0)),
+    DenseMatrix((4.0, 3.0, 1.0, 7.0)),
+    DenseMatrix((10.0, 10.0, 10.0, 10.0), (1.0, 1.0, 1.0, 1.0), (17.0, 0.0, 1.0, 6.0)),
+    DenseMatrix((0.0, 12.0, 12.0, 12.0))
+  ).zipWithIndex.map {
+    case (m, idx) =>
+      Point(idx, m, Nil, None)(DataTypeMetadata.generateDataTypeMetadata(forColumns = 4))
   }.toVector
 
   val runSettings = EuclideanClustererSettings(1, points, Par.withAverageAggregate, improveIterations = 100)
@@ -29,6 +45,5 @@ class TypeSpec extends FlatSpec {
   val centroid1 = sum(Type.centroidOf(List(resultMinus, p)))
 
   assert(centroid0 == centroid1)
-
 
 }

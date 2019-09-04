@@ -108,7 +108,7 @@ case class Cluster private[types] (override val id: Int,
   def centroid: SyntheticDataType =
     _points.foldLeft(dataTypeMetadata.EmptySyntheticData()) {
       case (accum, p) =>
-        accum + p.syntheticValue
+        accum + p.centroid
     } / _points.size.toDouble
 
   /**
@@ -130,6 +130,8 @@ case class Cluster private[types] (override val id: Int,
     sumPoints(values, dataTypeMetadata.EmptyData(withRows = values.head.rows))
 
   }
+
+  override def flatten(): Set[Point] = Cluster.flatten(this)
 
   override def size: Int = _points.foldLeft(0)(_ + _.size)
 
