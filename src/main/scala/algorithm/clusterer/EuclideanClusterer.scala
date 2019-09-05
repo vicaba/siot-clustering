@@ -279,7 +279,7 @@ object EuclideanClusterer {
   def apply(settings: EuclideanClustererSettings): List[Cluster] = {
 
     def randomCluster(numberOfClusters: Int, points: Seq[Cluster]): LinearSeq[Cluster] =
-      points.grouped(numberOfClusters).zipWithIndex.map { case (points, idx) =>
+      points.grouped(points.size / numberOfClusters).zipWithIndex.map { case (points, idx) =>
 
         Cluster(-idx, UUID.randomUUID().toString, points.toSet, 1, None)(
           points.head.dataTypeMetadata)
