@@ -68,18 +68,22 @@ object SyntheticProfilesReaderForScheduler extends TemplateForSyntheticProfilesR
 
   object ApplianceLoadBuilder extends LoadBuilder {
     import Appliances._
-    override def apply(id: Int, values: Vector[Double], label: String): SingleLoad =
+    override def apply(id: Int, values: Vector[Double], label: String, replaceWithLabel: Option[String] = None): SingleLoad = {
+
+      val loadLabel = replaceWithLabel.getOrElse(label)
+
       Try(label match {
-        case DishWasher     => FlexibleLoad(id, 0, values, label)
-        case TumbleDryer    => FlexibleLoad(id, 0, values, label)
-        case WashingMachine => FlexibleLoad(id, 0, values, label)
-        case WasherDryer    => FlexibleLoad(id, 0, values, label)
-      }).getOrElse(FixedLoadBuilder(id, values, label))
+        case DishWasher     => FlexibleLoad(id, 0, values, loadLabel)
+        case TumbleDryer    => FlexibleLoad(id, 0, values, loadLabel)
+        case WashingMachine => FlexibleLoad(id, 0, values, loadLabel)
+        case WasherDryer    => FlexibleLoad(id, 0, values, loadLabel)
+      }).getOrElse(FixedLoadBuilder(id, values, label, replaceWithLabel))
+    }
   }
 
   object FixedLoadBuilder extends LoadBuilder {
-    override def apply(id: Int, values: Vector[Double], label: String): SingleLoad =
-      FixedLoad(id, 0, values, label)
+    override def apply(id: Int, values: Vector[Double], label: String, replaceWithLabel: Option[String] = None): SingleLoad =
+      FixedLoad(id, 0, values, replaceWithLabel.getOrElse(label))
   }
 
 }

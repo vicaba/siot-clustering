@@ -12,7 +12,7 @@ object SyntheticProfilesReaderForEuclideanClusterer extends TemplateForSynthetic
   override type AccumulatedLoadOutputType = Point
 
   object DefaultLoadBuilder extends LoadBuilder {
-    override def apply(id: Int, values: Vector[Double], label: String): (String, DenseVector[Double]) =
+    override def apply(id: Int, values: Vector[Double], label: String, replaceWithLabel: Option[String] = None): (String, DenseVector[Double]) =
       (label, DenseVector(values: _*))
   }
 

@@ -24,7 +24,7 @@ object ClusterAndAccumulatedLoadTransformer {
 
           def buildAppliance(dv: DenseVector[Double], label: String = "") = {
             applianceCounter = applianceCounter + 1
-            builder(applianceCounter, dv.toScalaVector(), label). //, "-p" + pointInCluster.id + "-" + label)
+            builder(applianceCounter, dv.toScalaVector(), label, replaceWithLabel = Some("-p" + pointInCluster.id + "-" + label))
           }
 
           if (labelIterator.nonEmpty) dataIterator.zip(labelIterator).map {

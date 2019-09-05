@@ -46,8 +46,8 @@ trait TemplateForSyntheticProfilesReader {
 
   }
 
-  trait LoadBuilder extends ((Int, Vector[Double], String) => SingleLoadOutputType) {
-    def apply(id: Int, values: Vector[Double], label: String): SingleLoadOutputType
+  trait LoadBuilder extends ((Int, Vector[Double], String, Option[String]) => SingleLoadOutputType) {
+    def apply(id: Int, values: Vector[Double], label: String, replaceWithLabel: Option[String] = None): SingleLoadOutputType
   }
 
   case class LoadFileAndLoadBuilder(file: String, loadBuilder: LoadBuilder)
