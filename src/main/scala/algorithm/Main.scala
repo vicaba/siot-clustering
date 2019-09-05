@@ -30,15 +30,15 @@ object Main {
 
     val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 199) yield (i + "/", i)).toList
 
-/*    val points = SyntheticProfilesReaderForEuclideanClusterer
+    val points = SyntheticProfilesReaderForEuclideanClusterer
       .applyDefault(MainFolder,
         subFoldersAndIds.map(_._1),
         AppliancesOutputFileName,
         LightingOutputFileName,
         subFoldersAndIds.map(_._2),
-        windowSize = 30)*/
+        windowSize = 30)
 
-    val points = EgaugeReader(Configuration.userProfilesFile)
+    //val points = EgaugeReader(Configuration.userProfilesFile)
 
 /*    val testBatchRunSettingsBuilder =
       new BatchRunSettingsBuilder(points,
@@ -54,7 +54,7 @@ object Main {
                                   List(Par.withParAggregate),
                                   (points, k) => points.size + points.size/3)
 
-    crossFoldValidationClusterer(batchRunSettingsBuilder)
+    crossFoldValidation(batchRunSettingsBuilder)
 
     val filePath = "w" match {
       case "w" => "/Users/vcaballero/Projects/jupyter-notebook/siot-eclustering-viz/files"
@@ -101,6 +101,26 @@ object Main {
 
     Some(new PrintWriter(Configuration.summaryBatchRunFile)).foreach { p =>
       val jsonList = ResultsJsonSerializer.Summary.clustererOutputListAsJson(stepsList)
+      p.write(Json.prettyPrint(Json.toJson(jsonList)).toString())
+      p.close()
+    }
+
+  }
+
+  def crossFoldValidation(batchRunSettingsBuilder: BatchRunSettingsBuilder): Unit = {
+
+    val Max = BigDecimal(1.0)
+    val monteCarlos = List(MonteCarlo(1, Percentage.of(Max)))
+      /*for (i <- BigDecimal(Configuration.CrossFold.SubsampleSize.from) to (Max, step = BigDecimal(0.1)))
+      yield {
+        val subsampleSize = Percentage.of(i / Max)
+        val splits = 1
+        MonteCarlo(splits, subsampleSize)
+      }*/
+    val stepsList = CrossFoldValidation.batchRun(monteCarlos.toList, batchRunSettingsBuilder)
+
+    Some(new PrintWriter(Configuration.summaryBatchRunFile)).foreach { p =>
+      val jsonList = ResultsJsonSerializer.Summary.crossfoldBatchRunAsJson(stepsList)
       p.write(Json.prettyPrint(Json.toJson(jsonList)).toString())
       p.close()
     }
