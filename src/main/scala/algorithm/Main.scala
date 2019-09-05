@@ -24,11 +24,11 @@ object Main {
       }
       .toVector*/
 
-    val MainFolder               = "files/syn_loads/"
+    val MainFolder               = "files/syn_loads_test/"
     val AppliancesOutputFileName = "appliance_output.csv"
     val LightingOutputFileName   = "lighting_output.csv"
 
-    val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 9) yield (i + "/", i)).toList
+    val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 3) yield (i + "/", i)).toList
 
     val points = SyntheticProfilesReaderForEuclideanClusterer
       .applyDefault(MainFolder,
