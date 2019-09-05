@@ -51,12 +51,11 @@ object UserAllocator {
     val allocationResult = SchedulerAlgorithm.reschedule(accumulatedLoads, metricTransformation = NoTransformation)
 
     // Reorder per "users" input
-    // TODO: This can be optimized
-    val orderedAllocationResult = for {
-      userId             <- users.map(_.id)
-      userAsFlexibleLoad <- allocationResult.flexibleLoads
-      if userId == userAsFlexibleLoad.id
-    } yield userAsFlexibleLoad
+    val order = users.map(_.id)
+    val allocationResultFlexibleLoads = allocationResult.flexibleLoads.toList
+    val allocationResultAsMap = allocationResultFlexibleLoads.map(_.id).zip(allocationResultFlexibleLoads).toMap
+    val orderedAllocationResult = order.map(allocationResultAsMap)
+
 
     orderedAllocationResult.map { userAsFlexibleLoad =>
       (for (i <- userAsFlexibleLoad.positionInT until (userAsFlexibleLoad.positionInT + windowSize)) yield i).toList

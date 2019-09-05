@@ -23,7 +23,7 @@ object ResultsJsonSerializer {
 
     def stepToString(step: StepKey): String = step match {
       case ClustererKey => "s1"
-      case ClustererKey => "s2"
+      case ReschedulerKey => "s2"
     }
 
     def peakKey(step: StepKey): String = stepToString(step) + ". peak"

@@ -28,7 +28,7 @@ object Main {
     val AppliancesOutputFileName = "appliance_output.csv"
     val LightingOutputFileName   = "lighting_output.csv"
 
-    val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 199) yield (i + "/", i)).toList
+    val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 9) yield (i + "/", i)).toList
 
     val points = SyntheticProfilesReaderForEuclideanClusterer
       .applyDefault(MainFolder,

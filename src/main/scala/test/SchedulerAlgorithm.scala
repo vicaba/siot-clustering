@@ -129,8 +129,8 @@ object SchedulerAlgorithm {
       temporaryFlexibleLoad match {
         case flst: FlexibleLoadSubTask if !flst.superTask.areAggregateesOverlapped =>
           move()
-        case _: FlexibleLoadSubTask =>
-          Unit
+        case _: FlexibleLoadSubTask =>  Unit // If the subtask collides with another subtask,
+        // do nothing, "i" will increment the next loop
         case _: FlexibleLoad => move()
       }
 

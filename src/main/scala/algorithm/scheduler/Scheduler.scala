@@ -39,7 +39,7 @@ object Scheduler {
             metricTransformation = metricTransformation,
             referenceAverage = referenceAverage,
             schedulerAlgorithmOrdering,
-            verbose = true
+            verbose = false
           )
       }
       res
