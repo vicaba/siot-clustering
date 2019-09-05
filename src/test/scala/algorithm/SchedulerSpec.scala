@@ -18,7 +18,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
   feature("Scheduler. PAR is minimized after rescheduling") {
 
-    scenario("With test data, both unscheduledLoads and scheduledLoads keep the same total energy") {
+/*    scenario("With test data, both unscheduledLoads and scheduledLoads keep the same total energy") {
 
       Given("3 slots with 3 users and a flexible load each")
 
@@ -114,7 +114,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
       scheduledLoads.head.amplitudePerSlot shouldNot be (Vector.fill(scheduledLoads.head.amplitudePerSlot.size)(4))
 
-    }
+    }*/
 
     scenario("With synthetic data, PAR is minimized after rescheduling") {
 

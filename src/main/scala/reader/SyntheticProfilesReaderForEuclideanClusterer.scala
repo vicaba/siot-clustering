@@ -67,7 +67,6 @@ object SyntheticProfilesReaderForEuclideanClusterer extends TemplateForSynthetic
           val dataLabels = r.map(_._1).toList
           val data       = DenseMatrix(r.map(_._2): _*)
           Point(id, data, dataLabels, None)(DataTypeMetadata.generateDataTypeMetadata(forColumns = TotalMinutesPerLoad / windowSize))
-
       }
       .toVector
   }
