@@ -37,7 +37,7 @@ class AlgorithmSpec extends FeatureSpec with GivenWhenThen {
 
   Then("PAR should be lower")
 
-  Metric.par(stepsList.head.clustererOutput.clusters.head) should be < Metric.par(stepsList.head.reschedulerOutput.clusters.head)
+  Metric.par(stepsList.head.clustererOutput.clusters.head) should be > Metric.par(stepsList.head.reschedulerOutput.clusters.head)
 
 
 
