@@ -139,7 +139,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
       When("Scheduling loads")
 
       val scheduledLoads =
-        Scheduler.apply(Load.deepCopy(unscheduledLoads).toList, new BiasedAverageDistanceTransformation)
+        Scheduler.apply(Load.deepCopy(unscheduledLoads.reverse).toList, new BiasedAverageDistanceTransformation)
 
       Then("ScheduledLoads PAR is lower than UnscheduledLoads PAR.")
 
@@ -157,7 +157,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
     }
 
-    /*scenario("With synthetic data grouped in one accumulated load, PAR is minimized after rescheduling") {
+    scenario("With synthetic data grouped in one accumulated load, PAR is minimized after rescheduling") {
 
       Given("Synthetically generated loads as UnscheduledLoads")
 
@@ -202,7 +202,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
       scheduledLoads.map(_.totalEnergy).sum shouldBe unscheduledLoads.map(_.totalEnergy).sum
 
-    }*/
+    }
 
   }
 

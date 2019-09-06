@@ -18,6 +18,7 @@ object ClusterRescheduler {
       _,
       SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage))
 
+
     Scheduler.apply(clustersAsAccumulatedLoad,
                     settings.metricTransformation,
                     settings.userOrderings,

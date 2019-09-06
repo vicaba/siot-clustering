@@ -31,7 +31,7 @@ class AlgorithmSpec extends FeatureSpec with GivenWhenThen {
 
       val testBatchRunSettingsBuilder =
         new BatchRunSettingsBuilder(points,
-          List(1),
+          List(2),
           List(Par.withParAggregate),
           (_, _) => 1)
 
