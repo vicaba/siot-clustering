@@ -16,28 +16,44 @@ object Scheduler {
     schedulerAlgorithmOrdering: Ordering[Load] = SchedulerAlgorithm.DefaultOrderings.head)
   : List[AccumulatedLoad] = {
 
-    val _clusters: List[AccumulatedLoad] = Load.deepCopy(clusters).toList
-
-    val numberOfSlots = AccumulatedLoad(-1, 0, _clusters, "").span
-    val allFlexibleLoads = _clusters.flatMap(_.flexibleLoads)
-    val windowSize = Try(allFlexibleLoads.map(_.span).sum / allFlexibleLoads.size).getOrElse(1)
-    val schedulerPreferredSlots =
-      UserAllocator.allocate(users = _clusters, numberOfSlots = numberOfSlots, windowSize = windowSize, userOrdering)
-
-    val referenceAverage = _clusters.map(_.totalEnergy).sum / numberOfSlots / clusters.size
-
-    val res = _clusters.zip(schedulerPreferredSlots).map {
-      case (user, schedulingPreferredSlotsForUser) =>
+    if (clusters.size == 1) {
+      clusters.map {
         SchedulerAlgorithm.reschedule(
-          user,
-          schedulingPreferredSlotsForUser,
+          _,
+          Nil,
           metricTransformation = metricTransformation,
-          referenceAverage = referenceAverage,
+          referenceAverage = 0.0,
           schedulerAlgorithmOrdering,
           verbose = false
         )
+      }
+
+    } else {
+
+      val _clusters: List[AccumulatedLoad] = Load.deepCopy(clusters).toList
+
+      val numberOfSlots = AccumulatedLoad(-1, 0, _clusters, "").span
+      val allFlexibleLoads = _clusters.flatMap(_.flexibleLoads)
+      val windowSize = Try(allFlexibleLoads.map(_.span).sum / allFlexibleLoads.size).getOrElse(1)
+      val schedulerPreferredSlots =
+        UserAllocator.allocate(users = _clusters, numberOfSlots = numberOfSlots, windowSize = windowSize, userOrdering)
+
+      val referenceAverage = _clusters.map(_.totalEnergy).sum / numberOfSlots / clusters.size
+
+      val res = _clusters.zip(schedulerPreferredSlots).map {
+        case (user, schedulingPreferredSlotsForUser) =>
+          SchedulerAlgorithm.reschedule(
+            user,
+            schedulingPreferredSlotsForUser,
+            metricTransformation = metricTransformation,
+            referenceAverage = referenceAverage,
+            schedulerAlgorithmOrdering,
+            verbose = false
+          )
+      }
+      res
+
     }
-    res
 
   }
 

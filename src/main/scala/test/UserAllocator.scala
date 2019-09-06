@@ -27,39 +27,38 @@ object UserAllocator {
                userOrdering: Ordering[AccumulatedLoad] =
                  Load.loadListOrderingByAmplitude.on[AccumulatedLoad](_.flexibleLoads.toList).reverse): List[List[Int]] = {
 
-    // TODO: Test this by comparing results of BenchmarkSpec and SchedulerSpec
-    val sortedUsers = users.sorted(userOrdering)
+      // TODO: Test this by comparing results of BenchmarkSpec and SchedulerSpec
+      val sortedUsers = users.sorted(userOrdering)
 
-    val usersAsFlexibleLoads = for (user <- sortedUsers) yield {
+      val usersAsFlexibleLoads = for (user <- sortedUsers) yield {
 
-      val totalEnergyFromFlexibleLoads: Double = user.flexibleLoads.foldLeft(0.0)(_ + _.amplitudePerSlot.sum)
+        val totalEnergyFromFlexibleLoads: Double = user.flexibleLoads.foldLeft(0.0)(_ + _.amplitudePerSlot.sum)
 
-      val flexibleLoadVector: Vector[Double] = (for (_ <- 0 until windowSize) yield {
-        totalEnergyFromFlexibleLoads / windowSize
-      }).toVector
+        val flexibleLoadVector: Vector[Double] = (for (_ <- 0 until windowSize) yield {
+          totalEnergyFromFlexibleLoads / windowSize
+        }).toVector
 
-      FlexibleLoad(user.id, 0, flexibleLoadVector)
+        FlexibleLoad(user.id, 0, flexibleLoadVector)
 
-    }
+      }
 
-    val fixedLoads = sortedUsers.flatMap(_.fixedLoads)
+      val fixedLoads = sortedUsers.flatMap(_.fixedLoads)
 
-    val lowestPositionInT = sortedUsers.flatMap(_.loads).map(_.positionInT).min
-    val accumulatedLoads =
-      AccumulatedLoad.keepLoadOrder(0, lowestPositionInT, fixedLoads ::: usersAsFlexibleLoads, "")
+      val lowestPositionInT = sortedUsers.flatMap(_.loads).map(_.positionInT).min
+      val accumulatedLoads =
+        AccumulatedLoad.keepLoadOrder(0, lowestPositionInT, fixedLoads ::: usersAsFlexibleLoads, "")
 
-    val allocationResult = SchedulerAlgorithm.reschedule(accumulatedLoads, metricTransformation = NoTransformation)
+      val allocationResult = SchedulerAlgorithm.reschedule(accumulatedLoads, metricTransformation = NoTransformation)
 
-    // Reorder per "users" input
-    val order = users.map(_.id)
-    val allocationResultFlexibleLoads = allocationResult.flexibleLoads.toList
-    val allocationResultAsMap = allocationResultFlexibleLoads.map(_.id).zip(allocationResultFlexibleLoads).toMap
-    val orderedAllocationResult = order.map(allocationResultAsMap)
+      // Reorder per "users" input
+      val order = users.map(_.id)
+      val allocationResultFlexibleLoads = allocationResult.flexibleLoads.toList
+      val allocationResultAsMap = allocationResultFlexibleLoads.map(_.id).zip(allocationResultFlexibleLoads).toMap
+      val orderedAllocationResult = order.map(allocationResultAsMap)
 
 
-    orderedAllocationResult.map { userAsFlexibleLoad =>
-      (for (i <- userAsFlexibleLoad.positionInT until (userAsFlexibleLoad.positionInT + windowSize)) yield i).toList
-    }
-
+      orderedAllocationResult.map { userAsFlexibleLoad =>
+        (for (i <- userAsFlexibleLoad.positionInT until (userAsFlexibleLoad.positionInT + windowSize)) yield i).toList
+      }
   }
 }

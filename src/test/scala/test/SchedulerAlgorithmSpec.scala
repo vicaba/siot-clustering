@@ -1,17 +1,19 @@
 package test
 
+import algorithm.scheduler.Scheduler
 import org.scalatest._
 import collection.CollecctionHelper._
 import metrics.Metric
 import org.scalatest.Matchers._
+import reader.{SyntheticProfilesReaderForEuclideanClusterer, SyntheticProfilesReaderForScheduler}
 import test.load.{AccumulatedLoad, FixedLoad, FlexibleLoad, FlexibleLoadSubTask, Load}
-import test.reschedulermetrics.NoTransformation
+import test.reschedulermetrics.{BiasedAverageDistanceTransformation, NoTransformation}
 
 class SchedulerAlgorithmSpec extends FeatureSpec with GivenWhenThen {
 
   feature("Rescheduler.rescheduleFlexibleLoad") {
 
-    scenario("Rescheduler with only one flexible load") {
+    /*scenario("Rescheduler with only one flexible load") {
 
       Given("an SpanSlotAccumulatedLoad with only one flexible load")
 
@@ -25,7 +27,7 @@ class SchedulerAlgorithmSpec extends FeatureSpec with GivenWhenThen {
 
       val result = SchedulerAlgorithm.rescheduleFlexibleLoad(
         (spanSlotAccumulatedLoad.copy(copyFlexibleLoadSubtasks = false),
-         spanSlotAccumulatedLoad.copy(copyFlexibleLoadSubtasks = false)),
+          spanSlotAccumulatedLoad.copy(copyFlexibleLoadSubtasks = false)),
         (flexibleLoad, flexibleLoad),
         metricTransformation = NoTransformation
       )
@@ -55,7 +57,7 @@ class SchedulerAlgorithmSpec extends FeatureSpec with GivenWhenThen {
 
       val result = SchedulerAlgorithm.rescheduleFlexibleLoad(
         (spanSlotAccumulatedLoad.copy(copyFlexibleLoadSubtasks = false),
-         spanSlotAccumulatedLoad.copy(copyFlexibleLoadSubtasks = false)),
+          spanSlotAccumulatedLoad.copy(copyFlexibleLoadSubtasks = false)),
         (flexibleLoads(1), flexibleLoads(1)),
         metricTransformation = NoTransformation
       )
@@ -135,45 +137,54 @@ class SchedulerAlgorithmSpec extends FeatureSpec with GivenWhenThen {
 
       Metric.par(result) shouldEqual Metric.par(spanSlotAccumulatedLoad)
 
-    }
+    }*/
 
-    scenario("a") {
+    scenario("given two points clustered in one single cluster") {
 
-      Given("an AccumulatedLoad with one FlexibleLoad (with at least two subtasks) split into subtasks")
+      Given("Some points")
 
-      val subTask1 = Vector(2.0, 3.0, 4.0, 2.0)
+      val MainFolder = "files/syn_loads_test/"
+      val AppliancesOutputFileName = "appliance_output.csv"
+      val LightingOutputFileName = "lighting_output.csv"
+      val subFoldersAndIds: List[(String, Int)] = (for (i <- 2 to 3) yield (i + "/", i)).toList
 
-      val subTask2 = Vector(2.0, 2.0)
+      val _unscheduledLoads = SyntheticProfilesReaderForScheduler
+        .applyDefault(MainFolder,
+          subFoldersAndIds.map(_._1),
+          AppliancesOutputFileName,
+          LightingOutputFileName,
+          subFoldersAndIds.map(_._2),
+          windowSize = 30)
 
-      val lowValue = 1.0
+      val unscheduledLoads = List(
+        AccumulatedLoad(-1, 0, _unscheduledLoads.foldLeft(Set.empty[Load]) { case (acc, loads) =>
+          acc ++ loads.loads
+        })
+      )
 
-      val flexibleLoad =
-        FlexibleLoad(0,
-                     0,
-                     Vector.fill(3)(lowValue) ++ subTask1 ++ Vector.fill(4)(lowValue) ++ subTask2 ++ Vector(lowValue))
+      unscheduledLoads.foreach(
+        Load.MutateAccumulatedLoad.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
+          _,
+          SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage))
 
-      val accLoad = AccumulatedLoad(0, 0, List(flexibleLoad))
+      When("Scheduling loads using SchedulerAlgorithm")
 
-      val accLoadOriginal = accLoad.copy()
+      val scheduledLoad =
+        SchedulerAlgorithm.reschedule(Load.deepCopy(unscheduledLoads).toList.head, metricTransformation = new BiasedAverageDistanceTransformation)
 
-      Load.MutateAccumulatedLoad.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
-        accLoad,
-        SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage)
+      Then("ScheduledLoads PAR is lower than UnscheduledLoads PAR.")
 
-      Load.MutateAccumulatedLoad.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
-        accLoadOriginal,
-        SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage)
+      val unscheduledLoadsPar = Metric.par(unscheduledLoads)
+      val scheduledLoadsPar = Metric.par(scheduledLoad)
 
-      And("one subtask is overlapped with the other")
+      scheduledLoadsPar should be < unscheduledLoadsPar
 
-      accLoad.flexibleLoads.head.positionInT = 0
-      accLoad.flexibleLoads.last.positionInT = 0
+      info(s"PAR for unscheduled loads: $unscheduledLoadsPar.")
+      info(s"PAR for scheduled loads: $scheduledLoadsPar.")
 
-      When("checking if they are overlapped")
+      And("scheduledLoads total energy is equal to unscheduledLoads total energy")
 
-      val res = SchedulerAlgorithm.reschedule(accLoad, metricTransformation = NoTransformation)
-
-      Then("it should return true")
+      scheduledLoad.totalEnergy shouldBe unscheduledLoads.map(_.totalEnergy).sum
 
     }
   }

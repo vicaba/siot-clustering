@@ -114,7 +114,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
       scheduledLoads.head.amplitudePerSlot shouldNot be (Vector.fill(scheduledLoads.head.amplitudePerSlot.size)(4))
 
-    }*/
+    }
 
     scenario("With synthetic data, PAR is minimized after rescheduling") {
 
@@ -155,7 +155,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
       scheduledLoads.map(_.totalEnergy).sum shouldBe unscheduledLoads.map(_.totalEnergy).sum
 
-    }
+    }*/
 
     scenario("With synthetic data grouped in one accumulated load, PAR is minimized after rescheduling") {
 
