@@ -157,6 +157,53 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
     }
 
+    /*scenario("With synthetic data grouped in one accumulated load, PAR is minimized after rescheduling") {
+
+      Given("Synthetically generated loads as UnscheduledLoads")
+
+      val subFoldersAndIds: List[(String, Int)] = (for (i <- 2 to 3) yield (i + "/", i)).toList
+
+      val _unscheduledLoads = SyntheticProfilesReaderForScheduler
+        .applyDefault(MainFolder,
+          subFoldersAndIds.map(_._1),
+          AppliancesOutputFileName,
+          LightingOutputFileName,
+          subFoldersAndIds.map(_._2),
+          windowSize = 30)
+        .toList
+
+      val unscheduledLoads = List(
+        AccumulatedLoad(-1, 0, _unscheduledLoads.foldLeft(Set.empty[Load]) { case (acc, loads) =>
+            acc ++ loads.loads
+        })
+      )
+
+      unscheduledLoads.foreach(
+        Load.MutateAccumulatedLoad.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
+          _,
+          SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage))
+
+      When("Scheduling loads")
+
+      val scheduledLoads =
+        Scheduler.apply(Load.deepCopy(unscheduledLoads).toList, new BiasedAverageDistanceTransformation)
+
+      Then("ScheduledLoads PAR is lower than UnscheduledLoads PAR.")
+
+      val unscheduledLoadsPar = Metric.par(unscheduledLoads)
+      val scheduledLoadsPar = Metric.par(scheduledLoads)
+
+      scheduledLoadsPar should be < unscheduledLoadsPar
+
+      info(s"PAR for unscheduled loads: $unscheduledLoadsPar.")
+      info(s"PAR for scheduled loads: $scheduledLoadsPar.")
+
+      And("scheduledLoads total energy is equal to unscheduledLoads total energy")
+
+      scheduledLoads.map(_.totalEnergy).sum shouldBe unscheduledLoads.map(_.totalEnergy).sum
+
+    }*/
+
   }
 
 }

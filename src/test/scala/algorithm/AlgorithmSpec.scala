@@ -8,37 +8,42 @@ import reader.SyntheticProfilesReaderForEuclideanClusterer
 
 class AlgorithmSpec extends FeatureSpec with GivenWhenThen {
 
-  Given("Some points")
+  feature("complete algorithm process works as expected") {
 
-  val MainFolder               = "files/syn_loads_test/"
-  val AppliancesOutputFileName = "appliance_output.csv"
-  val LightingOutputFileName   = "lighting_output.csv"
-  val subFoldersAndIds: List[(String, Int)] = (for (i <- 2 to 3) yield (i + "/", i)).toList
+    scenario("given two points clustered in one single cluster") {
 
-  val points = SyntheticProfilesReaderForEuclideanClusterer
-    .applyDefault(MainFolder,
-      subFoldersAndIds.map(_._1),
-      AppliancesOutputFileName,
-      LightingOutputFileName,
-      subFoldersAndIds.map(_._2),
-      windowSize = 30)
+      Given("Some points")
 
-  And("Algorithm settings")
+      val MainFolder = "files/syn_loads_test/"
+      val AppliancesOutputFileName = "appliance_output.csv"
+      val LightingOutputFileName = "lighting_output.csv"
+      val subFoldersAndIds: List[(String, Int)] = (for (i <- 2 to 3) yield (i + "/", i)).toList
 
-  val testBatchRunSettingsBuilder =
-    new BatchRunSettingsBuilder(points,
-      List(1),
-      List(Par.withParAggregate),
-      (_, _) => 1)
+      val points = SyntheticProfilesReaderForEuclideanClusterer
+        .applyDefault(MainFolder,
+          subFoldersAndIds.map(_._1),
+          AppliancesOutputFileName,
+          LightingOutputFileName,
+          subFoldersAndIds.map(_._2),
+          windowSize = 30)
 
-  When("clustered and rescheduled")
+      And("Algorithm settings")
 
-  val stepsList = GenBatchRun(testBatchRunSettingsBuilder.build)
+      val testBatchRunSettingsBuilder =
+        new BatchRunSettingsBuilder(points,
+          List(1),
+          List(Par.withParAggregate),
+          (_, _) => 1)
 
-  Then("PAR should be lower")
+      When("clustered and rescheduled")
 
-  Metric.par(stepsList.head.clustererOutput.clusters.head) should be > Metric.par(stepsList.head.reschedulerOutput.clusters.head)
+      val stepsList = GenBatchRun(testBatchRunSettingsBuilder.build)
 
+      Then("PAR should be lower")
+
+      Metric.par(stepsList.head.clustererOutput.clusters.head) should be > Metric.par(stepsList.head.reschedulerOutput.clusters.head)
+    }
+  }
 
 
 }

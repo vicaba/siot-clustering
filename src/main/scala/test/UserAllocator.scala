@@ -6,10 +6,10 @@ import test.reschedulermetrics.NoTransformation
 object UserAllocator {
 
   val DefaultOrderings: List[Ordering[AccumulatedLoad]] = List(
-    Load.loadListOrderingByAmplitude,
     Load.loadListOrderingByAmplitude.reverse,
+    Load.loadListOrderingByAmplitude,
+    Load.loadListOrderingByMaxPositionInT.reverse,
     Load.loadListOrderingByMaxPositionInT,
-    Load.loadListOrderingByMaxPositionInT.reverse
   ).map(_.on[AccumulatedLoad](_.flexibleLoads.toList))
 
   /**

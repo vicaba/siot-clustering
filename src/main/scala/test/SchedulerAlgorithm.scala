@@ -10,10 +10,10 @@ object SchedulerAlgorithm {
   val DefaultOrdering: Ordering[Load] = Load.loadOrderingByAmplitude.reverse
 
   val DefaultOrderings: List[Ordering[Load]] = List(
-    Load.loadOrderingByAmplitude,
     Load.loadOrderingByAmplitude.reverse,
+    Load.loadOrderingByAmplitude,
+    Load.loadOrderingByPositionInTime.reverse,
     Load.loadOrderingByPositionInTime,
-    Load.loadOrderingByPositionInTime.reverse
   )
 
   def reschedule(acc: AccumulatedLoad,
