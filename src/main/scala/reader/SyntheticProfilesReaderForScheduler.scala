@@ -1,6 +1,7 @@
 package reader
 
-import test.load.{SingleLoad, AccumulatedLoad, FixedLoad, FlexibleLoad}
+import reader.SyntheticProfilesReaderForScheduler.LoadId
+import test.load.{AccumulatedLoad, FixedLoad, FlexibleLoad, SingleLoad}
 import test._
 
 import scala.util.Try
@@ -12,11 +13,11 @@ object SyntheticProfilesReaderForScheduler extends TemplateForSyntheticProfilesR
   override type AccumulatedLoadOutputType = AccumulatedLoad
 
   def applyDefault(mainFolder: String,
-                   subFolders: Iterable[String],
-                   applianceOutputFileName: String,
-                   lightingOutputFileName: String,
-                   ids: Iterable[Int],
-                   windowSize: Int): Vector[AccumulatedLoadOutputType] = {
+    subFolders: Iterable[String],
+    applianceOutputFileName: String,
+    lightingOutputFileName: String,
+    ids: Iterable[Int],
+    windowSize: Int): Vector[AccumulatedLoadOutputType] = {
 
     apply(
       mainFolder,
@@ -42,41 +43,53 @@ object SyntheticProfilesReaderForScheduler extends TemplateForSyntheticProfilesR
     * @return
     */
   def apply(mainFolder: String,
-            subFolders: Iterable[String],
-            applianceFileAndBuilder: String => this.LoadFileAndLoadBuilder,
-            lightingFileAndBuilder: String => this.LoadFileAndLoadBuilder,
-            ids: Iterable[Int],
-            windowSize: Int): Vector[AccumulatedLoadOutputType] = {
+    subFolders: Iterable[String],
+    applianceFileAndBuilder: String => this.LoadFileAndLoadBuilder,
+    lightingFileAndBuilder: String => this.LoadFileAndLoadBuilder,
+    ids: Iterable[Int],
+    windowSize: Int): Vector[AccumulatedLoadOutputType] = {
     assert(subFolders.size == ids.size, "the number of subFolders is not equal to the number of ids")
 
-    subFolders
+    val readFs = subFolders
       .zip(ids)
       .map {
-        case (subFolder, id) =>
-          val l = AccumulatedLoad(id,
-                                          0,
-                                          readSyntheticLoads(
-                                            applianceFileAndBuilder(subFolder),
-                                            lightingFileAndBuilder(subFolder),
-                                            windowSize
-                                          ), "")
-          l
+        case (subFolder, _) =>
+          val readF: SyntheticProfilesReaderForScheduler.LoadId => (AccumulatedLoad, LoadId) = (idC) => {
+            val (loads, lastUsedIdC) = readSyntheticLoads(
+              applianceFileAndBuilder(subFolder),
+              lightingFileAndBuilder(subFolder),
+              windowSize, idC
+            )
+            val idCForAccumulatedLoad = lastUsedIdC + 1
 
+            (AccumulatedLoad(idCForAccumulatedLoad, 0, loads, ""), idCForAccumulatedLoad)
+          }
+          readF
       }
-      .toVector
+
+    val (firstAccumulatedLoad, lastUsedLoadId) = readFs.head(0)
+
+    val readAccumulatedLoads = readFs.tail.foldLeft((List(firstAccumulatedLoad), lastUsedLoadId)) { case ((accumulatedLoads, accLastUsedLoadId), readF) =>
+      val (_accLoad, _lastUsedLoadId) = readF(accLastUsedLoadId + 1)
+      (_accLoad :: accumulatedLoads, _lastUsedLoadId)
+
+    }
+    readAccumulatedLoads._1.toVector
   }
 
   object ApplianceLoadBuilder extends LoadBuilder {
+
     import Appliances._
+
     override def apply(id: Int, values: Vector[Double], label: String, replaceWithLabel: Option[String] = None): SingleLoad = {
 
       val loadLabel = replaceWithLabel.getOrElse(label)
 
       Try(label match {
-        case DishWasher     => FlexibleLoad(id, 0, values, loadLabel)
-        case TumbleDryer    => FlexibleLoad(id, 0, values, loadLabel)
+        case DishWasher => FlexibleLoad(id, 0, values, loadLabel)
+        case TumbleDryer => FlexibleLoad(id, 0, values, loadLabel)
         case WashingMachine => FlexibleLoad(id, 0, values, loadLabel)
-        case WasherDryer    => FlexibleLoad(id, 0, values, loadLabel)
+        case WasherDryer => FlexibleLoad(id, 0, values, loadLabel)
       }).getOrElse(FixedLoadBuilder(id, values, label, replaceWithLabel))
     }
   }

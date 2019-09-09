@@ -10,6 +10,8 @@ trait TemplateForSyntheticProfilesReader {
 
   type AccumulatedLoadOutputType
 
+  type LoadId = Int
+
   object Appliances {
     val FridgeFreezer    = "FRIDGE_FREEZER"
     val Fridge           = "FRIDGE"
@@ -82,11 +84,19 @@ trait TemplateForSyntheticProfilesReader {
     ids: Iterable[Int],
     windowSize: Int): Vector[AccumulatedLoadOutputType]
 
+  /**
+    *
+    * @param applianceFileAndBuilder
+    * @param lightingFileAndBuilder
+    * @param windowSize
+    * @param idC the last used id for a load
+    * @return
+    */
   def readSyntheticLoads(applianceFileAndBuilder: LoadFileAndLoadBuilder,
     lightingFileAndBuilder: LoadFileAndLoadBuilder,
-    windowSize: Int): Vector[SingleLoadOutputType] = {
+    windowSize: Int, idC: LoadId): (Vector[SingleLoadOutputType], LoadId) = {
 
-    def readCsv(fileAndBuilder: LoadFileAndLoadBuilder)(id: Int): (Int, Vector[SingleLoadOutputType]) = {
+    def readCsv(fileAndBuilder: LoadFileAndLoadBuilder)(id: LoadId): (Vector[SingleLoadOutputType], LoadId) = {
 
       val file = fileAndBuilder.file
       val loadBuilder = fileAndBuilder.loadBuilder
@@ -106,19 +116,19 @@ trait TemplateForSyntheticProfilesReader {
           val values = items.tail.map(_.toDouble).grouped(windowSize).map(_.sum).toVector
           loadBuilder.apply(idC, values, label)
         }).toVector
-      }.map((idC, _))
+      }.map((_, idC))
         .getOrElse {
           source.close()
-          (idC, Vector.empty)
+          (Vector.empty, idC)
         }
     }
 
-    def rec(fs: List[Int => (Int, Vector[SingleLoadOutputType])], accId: Int, accLoads: Vector[SingleLoadOutputType]): Vector[SingleLoadOutputType] =
+    def rec(fs: List[Int => (Vector[SingleLoadOutputType], LoadId)], accId: LoadId, accLoads: Vector[SingleLoadOutputType]): (Vector[SingleLoadOutputType], LoadId) =
       fs match {
         case x :: xs =>
-          val (idC, loads) = x(accId)
+          val (loads, idC) = x(accId)
           rec(xs, idC, loads ++: accLoads)
-        case Nil => accLoads
+        case Nil => (accLoads, accId)
       }
 
     rec(
@@ -126,7 +136,7 @@ trait TemplateForSyntheticProfilesReader {
         readCsv(applianceFileAndBuilder),
         readCsv(lightingFileAndBuilder)
       ),
-      accId = 0,
+      accId = idC,
       Vector.empty[SingleLoadOutputType]
     )
 

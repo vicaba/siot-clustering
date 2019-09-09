@@ -59,13 +59,12 @@ object SyntheticProfilesReaderForEuclideanClusterer extends TemplateForSynthetic
       .zip(ids)
       .map {
         case (subFolder, id) =>
-          val r: Seq[(String, DenseVector[Double])] = readSyntheticLoads(
+          val (read, _) = readSyntheticLoads(
             applianceFileAndBuilder(subFolder),
             lightingFileAndBuilder(subFolder),
-            windowSize
-          )
-          val dataLabels = r.map(_._1).toList
-          val data       = DenseMatrix(r.map(_._2): _*)
+            windowSize, 0)
+          val dataLabels = read.map(_._1).toList
+          val data       = DenseMatrix(read.map(_._2): _*)
           Point(id, data, dataLabels, None)(DataTypeMetadata.generateDataTypeMetadata(forColumns = TotalMinutesPerLoad / windowSize))
       }
       .toVector
