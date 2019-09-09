@@ -1,5 +1,6 @@
 package test.load
 
+import test.load.Load.LoadId
 import test.{SequenceSplitStrategy, load}
 
 object FlexibleLoadTask {
@@ -15,12 +16,14 @@ object FlexibleLoadTask {
   }
 
   def splitIntoSubTasks(flexibleLoad: FlexibleLoad,
-                        splitStrategy: SequenceSplitStrategy): FlexibleLoadSuperTask = {
+    splitStrategy: SequenceSplitStrategy, loadIdCounter: Option[LoadId] = None): (FlexibleLoadSuperTask, LoadId) = {
+
+    var loadId = loadIdCounter.getOrElse(0)
 
     val splitResults = splitStrategy(flexibleLoad.amplitudePerSlot)
 
     val superTask: FlexibleLoadSuperTask = load.FlexibleLoadSuperTask(
-      0,
+      loadId,
       0,
       null,
       flexibleLoad.span,
@@ -28,10 +31,14 @@ object FlexibleLoadTask {
       flexibleLoad.label
     )
 
-    superTask.aggregatees = splitResults.results.zipWithIndex.map {
-      case (result, idx) =>
-        FlexibleLoadSubTask(superTask, idx, result.index, result.seq.toVector, "subTask-" + flexibleLoad.label)
+    loadId = loadId + 1
+
+    superTask.aggregatees = splitResults.results.map { result =>
+      loadId = loadId + 1
+      FlexibleLoadSubTask(superTask, loadId, result.index, result.seq.toVector, "subTask-" + flexibleLoad.label)
     }.toList
+
+    (superTask, loadId)
 
   }
 
@@ -39,22 +46,22 @@ object FlexibleLoadTask {
 
 object FlexibleLoadSuperTask {
   def apply(id: Int,
-            positionInT: Int,
-            agregatees: List[FlexibleLoadSubTask],
-            span: Int,
-            restingValue: Double,
-            label: String): FlexibleLoadSuperTask =
+    positionInT: Int,
+    agregatees: List[FlexibleLoadSubTask],
+    span: Int,
+    restingValue: Double,
+    label: String): FlexibleLoadSuperTask =
     new FlexibleLoadSuperTask(id, positionInT, agregatees, span, restingValue, label)
 }
 
 class FlexibleLoadSuperTask(override val id: Int,
-                            override val positionInT: Int,
-                            private var _aggregatees: List[FlexibleLoadSubTask],
-                            override val span: Int,
-                            val restValue: Double,
-                            override val label: String = "",
-                            private var _computeAmplitudePerSlotWithRestValueOnly: Boolean = false)
-    extends Load {
+  override val positionInT: Int,
+  private var _aggregatees: List[FlexibleLoadSubTask],
+  override val span: Int,
+  val restValue: Double,
+  override val label: String = "",
+  private var _computeAmplitudePerSlotWithRestValueOnly: Boolean = false)
+  extends Load {
 
   def areAggregateesOverlapped: Boolean = Load.areLoadsOverlapped(_aggregatees)
 
@@ -85,33 +92,35 @@ class FlexibleLoadSuperTask(override val id: Int,
   override def totalEnergy: Double = amplitudePerSlot.foldLeft(0.0)((accum, a) => accum + a)
 
   def copy(id: Int = this.id,
-           positionInT: Int = this.positionInT,
-           agregatees: List[FlexibleLoadSubTask] = this.aggregatees,
-           span: Int = this.span,
-           restValue: Double = this.restValue,
-           label: String = this.label): FlexibleLoadSuperTask = {
+    positionInT: Int = this.positionInT,
+    agregatees: List[FlexibleLoadSubTask] = this.aggregatees,
+    span: Int = this.span,
+    restValue: Double = this.restValue,
+    label: String = this.label): FlexibleLoadSuperTask = {
     val newSuperTask: FlexibleLoadSuperTask = new FlexibleLoadSuperTask(id, positionInT, null, span, restValue, label, computeAmplitudePerSlotWithRestValueOnly)
     newSuperTask.aggregatees_=(agregatees.map(_.copyWithNewSuperTask(newSuperTask)))
     newSuperTask
   }
 
+  override def toString: String = s"FlexibleLoadSuperTask($id)"
+
 }
 
 object FlexibleLoadSubTask {
   def apply(superTask: FlexibleLoadSuperTask,
-            id: Int,
-            positionInT: Int,
-            amplitudePerSlot: Vector[Double],
-            label: String): FlexibleLoadSubTask =
+    id: Int,
+    positionInT: Int,
+    amplitudePerSlot: Vector[Double],
+    label: String): FlexibleLoadSubTask =
     new FlexibleLoadSubTask(superTask, id, positionInT, amplitudePerSlot, label)
 }
 
-class FlexibleLoadSubTask private (private var _superTask: FlexibleLoadSuperTask,
-                                   override val id: Int,
-                                   private val _positionInT: Int,
-                                   override val amplitudePerSlot: Vector[Double],
-                                   override val label: String = "")
-    extends FlexibleLoad(id, _positionInT, amplitudePerSlot, label) {
+class FlexibleLoadSubTask private(private var _superTask: FlexibleLoadSuperTask,
+  override val id: Int,
+  private val _positionInT: Int,
+  override val amplitudePerSlot: Vector[Double],
+  override val label: String = "")
+  extends FlexibleLoad(id, _positionInT, amplitudePerSlot, label) {
 
   override def positionInT: Int = super.positionInT
 
@@ -144,13 +153,16 @@ class FlexibleLoadSubTask private (private var _superTask: FlexibleLoadSuperTask
 
   def copyWithAmplitudePerSlotToZero(): FlexibleLoadSubTask = {
     new FlexibleLoadSubTask(this._superTask,
-                            this.id,
-                            this.positionInT,
-                            Vector.fill(this.amplitudePerSlot.size)(0.0),
-                            this.label)
+      this.id,
+      this.positionInT,
+      Vector.fill(this.amplitudePerSlot.size)(0.0),
+      this.label)
   }
 
   def copyWithNewSuperTask(_superTask: FlexibleLoadSuperTask = this.superTask): FlexibleLoadSubTask = {
     new FlexibleLoadSubTask(_superTask, this.id, this.positionInT, this.amplitudePerSlot, this.label)
   }
+
+  override def toString: String = s"FlexibleLoadSubTask($id)"
+
 }

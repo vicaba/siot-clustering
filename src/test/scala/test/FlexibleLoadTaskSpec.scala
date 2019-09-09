@@ -24,7 +24,7 @@ class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
 
     When("transforming it into FlexibleLoadSuperTask (with subtasks)")
 
-    val flexibleLoadSuperTask =
+    val (flexibleLoadSuperTask, _) =
       FlexibleLoadTask.splitIntoSubTasks(fLoad,
                                          SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage)
 
@@ -48,7 +48,7 @@ class FlexibleLoadTaskSpec extends FlatSpec with GivenWhenThen {
 
     Given("a SpanSlotFlexibleLoadSuperTask")
 
-    val spanSlotFlexibleLoadSuperTask =
+    val (spanSlotFlexibleLoadSuperTask, _) =
       FlexibleLoadTask.splitIntoSubTasks(flexibleLoad,
                                          SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage)
 

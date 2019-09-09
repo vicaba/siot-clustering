@@ -1,8 +1,8 @@
 package reader
 
-import reader.SyntheticProfilesReaderForScheduler.LoadId
 import test.load.{AccumulatedLoad, FixedLoad, FlexibleLoad, SingleLoad}
 import test._
+import test.load.Load.LoadId
 
 import scala.util.Try
 
@@ -54,7 +54,7 @@ object SyntheticProfilesReaderForScheduler extends TemplateForSyntheticProfilesR
       .zip(ids)
       .map {
         case (subFolder, _) =>
-          val readF: SyntheticProfilesReaderForScheduler.LoadId => (AccumulatedLoad, LoadId) = (idC) => {
+          val readF: LoadId => (AccumulatedLoad, LoadId) = (idC) => {
             val (loads, lastUsedIdC) = readSyntheticLoads(
               applianceFileAndBuilder(subFolder),
               lightingFileAndBuilder(subFolder),

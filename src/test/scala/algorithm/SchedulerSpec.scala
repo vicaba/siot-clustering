@@ -18,7 +18,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
   feature("Scheduler. PAR is minimized after rescheduling") {
 
-/*    scenario("With test data, both unscheduledLoads and scheduledLoads keep the same total energy") {
+    scenario("With test data, both unscheduledLoads and scheduledLoads keep the same total energy") {
 
       Given("3 slots with 3 users and a flexible load each")
 
@@ -155,7 +155,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
       scheduledLoads.map(_.totalEnergy).sum shouldBe unscheduledLoads.map(_.totalEnergy).sum
 
-    }*/
+    }
 
     scenario("With synthetic data grouped in one accumulated load, PAR is minimized after rescheduling") {
 

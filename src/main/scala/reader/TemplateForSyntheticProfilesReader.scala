@@ -6,11 +6,11 @@ import scala.util.Try
 
 trait TemplateForSyntheticProfilesReader {
 
+  import test.load.Load.LoadId
+
   type SingleLoadOutputType
 
   type AccumulatedLoadOutputType
-
-  type LoadId = Int
 
   object Appliances {
     val FridgeFreezer    = "FRIDGE_FREEZER"

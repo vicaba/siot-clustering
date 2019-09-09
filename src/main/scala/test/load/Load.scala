@@ -19,7 +19,9 @@ trait Load {
   val label = ""
 
   override def equals(obj: Any): Boolean = obj match {
-    case s: Load => this.getClass == s.getClass && s.id == this.id && s.label == this.label
+    case s: Load =>
+      val res = this.getClass == s.getClass && s.id == this.id && s.label == this.label
+      if(res) true else false
     case _       => false
   }
 
@@ -41,21 +43,25 @@ trait FlexibleLoadT extends SingleLoad
 
 object Load {
 
+  type LoadId = Int
+
   object MutateAccumulatedLoad {
 
     def splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
         accLoad: AccumulatedLoad,
-        splitStrategy: SequenceSplitStrategy): AccumulatedLoad = {
+        splitStrategy: SequenceSplitStrategy, idC: Option[Int] = None): AccumulatedLoad = {
+
+      var _idC = idC.getOrElse(0)
 
       accLoad.flexibleLoads.foreach { fl =>
-        val res = (fl, FlexibleLoadTask.splitIntoSubTasks(fl, splitStrategy))
+        val (loadTask, lastUsedLoadId) = FlexibleLoadTask.splitIntoSubTasks(fl, splitStrategy, Some(_idC))
+        _idC = lastUsedLoadId + 1
 
-        val flexibleLoadsToRemove = List(res._1)
-        val flexibleLoadsToAdd    = List(res._2.setComputeAmplitudePerSlotWithRestValueOnly(true)) ++ res._2.aggregatees
+        val flexibleLoadsToRemove = List(fl)
+        val flexibleLoadsToAdd    = List(loadTask.setComputeAmplitudePerSlotWithRestValueOnly(true)) ++ loadTask.aggregatees
 
         accLoad --= flexibleLoadsToRemove
         accLoad ++= flexibleLoadsToAdd
-
       }
       accLoad
     }
