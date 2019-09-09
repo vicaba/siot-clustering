@@ -162,7 +162,7 @@ object EuclideanClusterer {
 
     if (clusters.isEmpty) return Nil
     if (stopAtKClusters == 1)
-      return List(Cluster(1, "1", new mutable.HashSet[Cluster]() ++= clusters, 1, None)(clusters.head.dataTypeMetadata))
+      return List(Cluster(-1, "-1", new mutable.HashSet[Cluster]() ++= clusters, 1, None)(clusters.head.dataTypeMetadata))
 
     val points = clusters.flatMap(_.points)
     val centroid = Type.centroidOf(points)
