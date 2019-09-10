@@ -3,7 +3,7 @@ package test
 import breeze.linalg.{DenseMatrix, DenseVector}
 import types.clusterer.immutable.Point
 import reader.SyntheticProfilesReaderForScheduler._
-import test.load.AccumulatedLoad
+import test.load.{AccumulatedLoad, FlexibleLoadSubTask, FlexibleLoadSuperTask}
 import types.clusterer.DataTypeMetadata
 import types.clusterer.mutable.Cluster
 
@@ -45,7 +45,8 @@ object ClusterAndAccumulatedLoadTransformer {
 
     accumulatedLoads.map { accumulatedLoad =>
       val cluster = Cluster(accumulatedLoad.id, accumulatedLoad.label, Set.empty[Point], 1, None)(dataTypeMetadata)
-      val points = accumulatedLoad.loads.toList.groupBy(l => pointRegex.findFirstMatchIn(l.label).get.group(1)).map {
+      accumulatedLoad.loads.filter(_.isInstanceOf[FlexibleLoadSuperTask]).foreach(_.asInstanceOf[FlexibleLoadSuperTask].setComputeAmplitudePerSlotWithRestValueOnly(false))
+      val points = accumulatedLoad.loads.filter(!_.isInstanceOf[FlexibleLoadSubTask]).toList.groupBy(l => pointRegex.findFirstMatchIn(l.label).get.group(1)).map {
         case ((key, loads)) =>
           val vectorList = loads.map(l => DenseVector(l.amplitudePerSlot: _*))
           val labelList  = loads.map(_.label)
