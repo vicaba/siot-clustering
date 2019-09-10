@@ -27,6 +27,8 @@ trait Load {
 
   override def hashCode(): Int = this.id
 
+  override def toString: String = s"Load($id, $positionInT, $amplitudePerSlot)"
+
   /**
     * Indicates the slot time when this load starts
     */

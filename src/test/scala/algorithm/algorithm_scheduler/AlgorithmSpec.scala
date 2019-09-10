@@ -22,7 +22,7 @@ class AlgorithmSpec extends FlatSpec with GivenWhenThen {
     1,
     DenseMatrix(
     (4.0, 4.0, 4.0, 3.0, 3.0),
-    (1.0, 1.0, 4.0, 3.0, 3.0)
+    (1.0, 1.0, 0.0, 0.0, 0.0)
   ),
     List(SyntheticProfilesReaderForScheduler.Appliances.EInst,SyntheticProfilesReaderForScheduler.Appliances.DishWasher)
   )(DataTypeMetadata.generateDataTypeMetadata(forColumns = 5))
@@ -40,7 +40,6 @@ class AlgorithmSpec extends FlatSpec with GivenWhenThen {
   val stepsList = GenBatchRun(testBatchRunSettingsBuilder.build)
 
   val scheduledLoads = stepsList.head.reschedulerOutput.clusters
-
 
   Then("ScheduledLoads PAR is lower or equal than UnscheduledLoads PAR.")
 
