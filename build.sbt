@@ -29,17 +29,15 @@ val helloTask = TaskKey[Unit]("hello", "Print hello")
 helloTask := println("hello world")
 
 libraryDependencies ++= Seq(
-  akkaActor,
-  akkaStream,
   breeze,
   apacheCommonsCsv,
   playJson,
   typesafeConfig,
   typesafeScalaLogging,
   logback,
-  scalaFx,
   scalactic,
-  scalaTest
+  scalaTest,
+  scalameter
 )
 
 parallelExecution in Test := false

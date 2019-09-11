@@ -42,6 +42,7 @@ object SchedulerAlgorithm {
       def splitFlexibleLoads(_acc: AccumulatedLoad): AccumulatedLoadWithSeparatedFlexibleLoads = {
         val remainingLoadsAfterRemovingFlexibleLoads = _acc.loads -- _acc.flexibleLoads
         val copy = _acc.copy(copyFlexibleLoadSubtasks = false)
+        // Those operations are done to mantain the references, so copy has the references of _acc
         copy --= _acc.loads
         copy ++= remainingLoadsAfterRemovingFlexibleLoads
 
