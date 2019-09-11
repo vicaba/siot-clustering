@@ -10,7 +10,7 @@ class AlgorithmSpec extends FeatureSpec with GivenWhenThen {
 
   feature("complete algorithm process works as expected") {
 
-    scenario("given two points clustered in one single cluster") {
+/*    scenario("given two points clustered in one single cluster") {
 
       Given("Some points")
 
@@ -31,7 +31,7 @@ class AlgorithmSpec extends FeatureSpec with GivenWhenThen {
 
       val testBatchRunSettingsBuilder =
         new BatchRunSettingsBuilder(points,
-          List(1),
+          List(2),
           List(Par.withParAggregate),
           (_, _) => 1)
 
@@ -42,7 +42,56 @@ class AlgorithmSpec extends FeatureSpec with GivenWhenThen {
       Then("PAR should be lower")
 
       Metric.par(stepsList.head.clustererOutput.clusters.head) should be > Metric.par(stepsList.head.reschedulerOutput.clusters.head)
+    }*/
+
+    scenario("given six points clustered in multiple clusters") {
+
+      def execute(numberOfClusters: Int): Unit = {
+
+        Given("Some points")
+
+        val MainFolder = "files/syn_loads/"
+        val AppliancesOutputFileName = "appliance_output.csv"
+        val LightingOutputFileName = "lighting_output.csv"
+        val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 5) yield (i + "/", i)).toList
+
+        val points = SyntheticProfilesReaderForEuclideanClusterer
+          .applyDefault(MainFolder,
+            subFoldersAndIds.map(_._1),
+            AppliancesOutputFileName,
+            LightingOutputFileName,
+            subFoldersAndIds.map(_._2),
+            windowSize = 30)
+
+        And("Algorithm settings")
+
+        val testBatchRunSettingsBuilder =
+          new BatchRunSettingsBuilder(points,
+            List(numberOfClusters),
+            List(Par.withParAggregate),
+            (_, _) => 1)
+
+        When("clustered and rescheduled")
+
+        val stepsList = GenBatchRun(testBatchRunSettingsBuilder.build)
+
+        Then("PAR should be lower")
+
+        val unscheduledLoadsPar = Metric.par(stepsList.head.clustererOutput.clusters)
+        val scheduledLoadsPar = Metric.par(stepsList.head.reschedulerOutput.clusters)
+
+        info(s"PAR for unscheduled loads: $unscheduledLoadsPar.")
+        info(s"PAR for scheduled loads: $scheduledLoadsPar.")
+
+        scheduledLoadsPar should be < unscheduledLoadsPar
+
+      }
+
+      for (i <- 1 to 6) {
+        execute(i)
+      }
     }
+
   }
 
 

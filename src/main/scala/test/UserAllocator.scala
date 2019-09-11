@@ -12,6 +12,8 @@ object UserAllocator {
     Load.loadListOrderingByMaxPositionInT,
   ).map(_.on[AccumulatedLoad](_.flexibleLoads.toList))
 
+  val DefaultOrdering = Load.loadListOrderingByAmplitude.reverse.on[AccumulatedLoad](_.flexibleLoads.toList)
+
   /**
     * Allocates users along the complete timespan. The algorithm "transforms" each user as a flexible load of windowSize and
     * consumption per slot flexibleLoad.totalEnergy / windowSize. Then it uses the rescheduler to assign each user to the best timeslots.+
