@@ -19,9 +19,7 @@ trait Load {
   val label = ""
 
   override def equals(obj: Any): Boolean = obj match {
-    case s: Load =>
-      val res = this.getClass == s.getClass && s.id == this.id && s.label == this.label
-      if(res) true else false
+    case s: Load => this.getClass == s.getClass && s.id == this.id && s.label == this.label
     case _       => false
   }
 

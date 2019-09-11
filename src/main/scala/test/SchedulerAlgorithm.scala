@@ -36,12 +36,15 @@ object SchedulerAlgorithm {
     case class AccumulatedLoadWithSeparatedFlexibleLoads(acc: AccumulatedLoad, flexibleLoads: List[FlexibleLoad])
 
     def prepareAccumulatedLoadForAlgorithm(): (AccumulatedLoadWithSeparatedFlexibleLoads, AccumulatedLoadWithSeparatedFlexibleLoads) = {
-      val bestAccumulatedLoad = acc.copy()
-      val temporaryAccumulatedLoad = acc.copy()
+      val bestAccumulatedLoad = Load.deepCopy(List(acc)).head
+      val temporaryAccumulatedLoad = Load.deepCopy(List(acc)).head
 
       def splitFlexibleLoads(_acc: AccumulatedLoad): AccumulatedLoadWithSeparatedFlexibleLoads = {
         val remainingLoadsAfterRemovingFlexibleLoads = _acc.loads -- _acc.flexibleLoads
-        val copy = _acc.copy(loads = remainingLoadsAfterRemovingFlexibleLoads, copyFlexibleLoadSubtasks = false)
+        val copy = _acc.copy(copyFlexibleLoadSubtasks = false)
+        copy --= _acc.loads
+        copy ++= remainingLoadsAfterRemovingFlexibleLoads
+
         AccumulatedLoadWithSeparatedFlexibleLoads(copy, _acc.flexibleLoads.toList.sorted(ordering))
       }
 
