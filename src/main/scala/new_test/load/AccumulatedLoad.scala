@@ -3,9 +3,26 @@ package new_test.load
 import breeze.linalg.{DenseVector, sum}
 import new_test.load.Load.{GroupId, LoadId}
 import types.clusterer.DataTypeMetadata
-import types.ops.SetOps._
+import collection.CollecctionHelper._
 
 import scala.collection.mutable
+
+object AccumulatedLoad {
+
+  def apply(id: LoadId, group: GroupId, label: String, load: Load)
+    (implicit amplitudePerSlotMetadata: DataTypeMetadata): AccumulatedLoad =
+    new AccumulatedLoad(id, group, label, new scala.collection.mutable.HashSet[Load]() += load)
+
+  def apply(id: LoadId, group: GroupId, label: String, loads: Traversable[Load])
+    (implicit amplitudePerSlotMetadata: DataTypeMetadata): AccumulatedLoad =
+    new AccumulatedLoad(id, group, label, mutableSetOf(loads))
+
+  def keepLoadOrder(id: LoadId, group: GroupId, label: String, loads: Traversable[Load])
+    (implicit amplitudePerSlotMetadata: DataTypeMetadata): AccumulatedLoad =
+    new AccumulatedLoad(id, group, label, orderedMutableSetOf(loads))
+
+}
+
 
 class AccumulatedLoad
 (

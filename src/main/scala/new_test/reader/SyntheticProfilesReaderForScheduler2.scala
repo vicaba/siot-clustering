@@ -2,9 +2,10 @@ package new_test.reader
 
 import breeze.linalg.DenseVector
 import new_test.load.Load.LoadId
-import new_test.load.{AccumulatedLoad, FixedLoad, FlexibleLoad, SingleLoad}
+import new_test.load.{AccumulatedLoad, FixedLoad, FlexibleLoad, Load, SingleLoad}
 import reader.TemplateForSyntheticProfilesReader
 import types.clusterer.DataTypeMetadata
+import types.ops.SetOps._
 
 import scala.util.Try
 
@@ -63,7 +64,11 @@ object SyntheticProfilesReaderForScheduler2 extends TemplateForSyntheticProfiles
             )
             val idCForAccumulatedLoad = lastUsedIdC + 1
 
-            (AccumulatedLoad(idCForAccumulatedLoad, 0, loads, ""), idCForAccumulatedLoad)
+            (
+              AccumulatedLoad(idCForAccumulatedLoad, idCForAccumulatedLoad, "user" + idCForAccumulatedLoad, loads)
+              (DataTypeMetadata.generateDataTypeMetadata(loads.length)),
+              idCForAccumulatedLoad
+            )
           }
           readF
       }
@@ -87,7 +92,7 @@ object SyntheticProfilesReaderForScheduler2 extends TemplateForSyntheticProfiles
       val loadLabel = replaceWithLabel.getOrElse(label)
 
       def createFlexibleLoad(): FlexibleLoad =
-        FlexibleLoad(id, 0, loadLabel, DenseVector(values:_*))(DataTypeMetadata.generateDataTypeMetadata(forColumns = values.length))
+        FlexibleLoad(id, 0, loadLabel, DenseVector(values: _*))(DataTypeMetadata.generateDataTypeMetadata(forColumns = values.length))
 
       Try(label match {
         case DishWasher => createFlexibleLoad()
@@ -100,7 +105,7 @@ object SyntheticProfilesReaderForScheduler2 extends TemplateForSyntheticProfiles
 
   object FixedLoadBuilder extends LoadBuilder {
     override def apply(id: Int, values: Vector[Double], label: String, replaceWithLabel: Option[String] = None): SingleLoad =
-      FixedLoad(id, 0, replaceWithLabel.getOrElse(label), DenseVector(values:_*))(DataTypeMetadata.generateDataTypeMetadata(forColumns = values.length))
+      FixedLoad(id, 0, replaceWithLabel.getOrElse(label), DenseVector(values: _*))(DataTypeMetadata.generateDataTypeMetadata(forColumns = values.length))
   }
 
 }

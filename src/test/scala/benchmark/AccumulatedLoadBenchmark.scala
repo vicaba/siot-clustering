@@ -1,30 +1,26 @@
 package benchmark
 
 import breeze.linalg.DenseVector
-import org.scalameter.Warmer
-import org.scalameter.withWarmer
-import org.scalameter.api._
-import org.scalameter.picklers.Implicits._
+import new_test.reader.SyntheticProfilesReaderForScheduler2
+import org.scalameter.{Quantity, Warmer, withWarmer}
 import org.scalatest.FlatSpec
-import org.scalatest.Matchers._
-import reader.{SyntheticProfilesReaderForEuclideanClusterer, SyntheticProfilesReaderForScheduler}
-import test.SequenceSplitByConsecutiveElements
-import test.load.{AccumulatedLoad, Load}
-import types.clusterer
-import types.clusterer.DataTypeMetadata.SyntheticDataType
-import types.clusterer.immutable.Point
+import new_test.load.{AccumulatedLoad, Load}
+import reader.SyntheticProfilesReaderForScheduler
+import types.clusterer.DataTypeMetadata
 
-import scala.annotation.tailrec
-import scala.collection.immutable
+import org.scalatest.Matchers._
 
 class AccumulatedLoadBenchmark extends FlatSpec {
+
+  def infoTime(model: String, time: Quantity[Double]): Unit =
+    info("Execution time of AccumulatedLoad.amplitudePerSlot in " + model + " load model: " + time.value + " " + time.units)
 
   val MainFolder = "files/syn_loads/"
   val AppliancesOutputFileName = "appliance_output.csv"
   val LightingOutputFileName = "lighting_output.csv"
-  val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 199) yield (i + "/", i)).toList
+  val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 20) yield (i + "/", i)).toList
 
-  val points: Seq[AccumulatedLoad] = SyntheticProfilesReaderForScheduler
+  val pointsInOldLoadModel: Seq[test.load.AccumulatedLoad] = SyntheticProfilesReaderForScheduler
     .applyDefault(MainFolder,
       subFoldersAndIds.map(_._1),
       AppliancesOutputFileName,
@@ -32,16 +28,29 @@ class AccumulatedLoadBenchmark extends FlatSpec {
       subFoldersAndIds.map(_._2),
       windowSize = 30)
 
-  val accLoad = AccumulatedLoad(-4, 0, points)
+  val accLoadInOldLoadModel = test.load.AccumulatedLoad(-4, 0, pointsInOldLoadModel)
 
-  Load.MutateAccumulatedLoad.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
-    accLoad,
-    SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage)
-
-  val executionTimeOfAmplitudePerSlot = withWarmer(new Warmer.Default) measure {
-    accLoad.amplitudePerSlot
+  val executionTimeOfAmplitudePerSlotInOldLoadModel = withWarmer(new Warmer.Default) measure {
+    accLoadInOldLoadModel.amplitudePerSlot
   }
 
-  info(executionTimeOfAmplitudePerSlot.value + " " + executionTimeOfAmplitudePerSlot.units)
+  val pointsWithNewLoadModel: Seq[new_test.load.AccumulatedLoad] = SyntheticProfilesReaderForScheduler2
+    .applyDefault(MainFolder,
+      subFoldersAndIds.map(_._1),
+      AppliancesOutputFileName,
+      LightingOutputFileName,
+      subFoldersAndIds.map(_._2),
+      windowSize = 30)
+
+  val accLoadInNewLoadModel = new_test.load.AccumulatedLoad(-4, 0, "", pointsWithNewLoadModel)(DataTypeMetadata.generateDataTypeMetadata(forColumns = 48))
+
+  val executionTimeOfAmplitudePerSlotInNewLoadModel = withWarmer(new Warmer.Default) measure {
+    accLoadInNewLoadModel.amplitudePerSlot
+  }
+
+  executionTimeOfAmplitudePerSlotInNewLoadModel.value should be < executionTimeOfAmplitudePerSlotInOldLoadModel.value
+
+  infoTime("old", executionTimeOfAmplitudePerSlotInOldLoadModel)
+  infoTime("new", executionTimeOfAmplitudePerSlotInNewLoadModel)
 
 }
