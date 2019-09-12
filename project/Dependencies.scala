@@ -26,6 +26,6 @@ object Dependencies {
 
   val scalaTest = "org.scalatest" %% "scalatest" % "3.0.5" % "test"
 
-  val scalameter = "com.storm-enroute" %% "scalameter-core" % "0.19" % "test"
+  val scalameter = "com.storm-enroute" %% "scalameter" % "0.19" % "test"
 
 }
