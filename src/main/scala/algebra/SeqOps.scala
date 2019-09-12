@@ -1,11 +1,21 @@
 package algebra
 
+import breeze.linalg.DenseVector
+import types.clusterer.Type
+
 import scala.collection.SeqLike
 import scala.collection.generic.CanBuildFrom
 
 object SeqOps {
 
-  def sum[X: Numeric, S[Y] <: Seq[Y] with SeqLike[Y, S[Y]]]
+  def sum(s: Seq[Seq[Double]]): Vector[Double] = {
+    val dvs: List[DenseVector[Double]] = s.toList.map { v =>
+      DenseVector(v:_ *)
+    }
+    Type.sumVectors(dvs.tail, dvs.head)
+  }.toScalaVector()
+
+/*  def sum[X: Numeric, S[Y] <: Seq[Y] with SeqLike[Y, S[Y]]]
   (s: Seq[S[X]])
   (implicit
   cbf1: CanBuildFrom[S[_], X, S[X]],
@@ -15,7 +25,7 @@ object SeqOps {
     val num = implicitly[Numeric[X]]
     import num._
     s.reduce(_.zip(_)(cbf2).map{ case (a, b) => a + b })
-  }
+  }*/
 
   def substract[X: Numeric, S[Y] <: Seq[Y] with SeqLike[Y, S[Y]]]
   (s: Seq[S[X]])

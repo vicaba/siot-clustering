@@ -16,7 +16,7 @@ import scala.collection.immutable
 
 class DenseVectorVsVectorBenchmark extends FlatSpec {
 
-  val HowMany = 500000
+  val HowMany = 100000
 
   @tailrec
   final def sumVectors(remaining: List[SyntheticDataType], accum: DenseVector[Double]): DenseVector[Double] =
