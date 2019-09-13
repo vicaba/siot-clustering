@@ -18,7 +18,7 @@ class AccumulatedLoadBenchmark extends FlatSpec {
   val MainFolder = "files/syn_loads/"
   val AppliancesOutputFileName = "appliance_output.csv"
   val LightingOutputFileName = "lighting_output.csv"
-  val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 20) yield (i + "/", i)).toList
+  val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 100) yield (i + "/", i)).toList
 
   val pointsInOldLoadModel: Seq[test.load.AccumulatedLoad] = SyntheticProfilesReaderForScheduler
     .applyDefault(MainFolder,

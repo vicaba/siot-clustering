@@ -20,6 +20,10 @@ class FixedLoad(
   override val label: String,
   override val amplitudePerSlot: DenseVector[Double]
 )(implicit override val amplitudePerSlotMetadata: DataTypeMetadata)
-  extends BaseLoad {
+  extends SingleLoad {
+
   ensureCorrectCreation()
+
+  override def startPositionInTime: Int = 0
+
 }

@@ -32,7 +32,7 @@ class AccumulatedLoad
   loads: mutable.Set[Load]
 )(implicit override val amplitudePerSlotMetadata: DataTypeMetadata) extends Load {
 
-  override def startPositionInTime: GroupId = loads.map(_.startPositionInTime).min
+  override def startPositionInTime: Int = loads.map(_.startPositionInTime).min
 
   override def amplitudePerSlot: DenseVector[Double] =
     if (loads.nonEmpty) sum(loads.map(_.amplitudePerSlot))

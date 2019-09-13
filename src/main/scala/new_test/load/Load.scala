@@ -35,9 +35,5 @@ trait Load {
 
 trait SingleLoad extends Load
 
-trait BaseLoad extends SingleLoad {
-  override def startPositionInTime: LoadId = 0
-}
-
 
 
