@@ -1,7 +1,14 @@
-val order = List(33, 22, 11, 55)
+import breeze.linalg._
 
-val works = List((33, "some text"), (55, "eeeee"), (22, "fdsfs"), (11, "fdsffds"))
+val cols = 4
+val startPosition = 2
+val span = 2
 
-val worksMap = works.toMap
+val baseVector = DenseVector.fill[Double](cols, 0.0)
+for ((baseVectorIndex, vectorIndex) <- ((startPosition until cols) zip (0 until span)) yield {
+}
 
-val newWorks = order zip order.map(worksMap)
+val ms = startPosition until cols
+val as = 0 until span
+
+var sms = for ( (m, a) <- (ms zip as)) yield m

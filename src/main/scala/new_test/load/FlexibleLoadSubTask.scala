@@ -27,18 +27,18 @@ class FlexibleLoadSubTask private(
 )(implicit override val amplitudePerSlotMetadata: DataTypeMetadata)
   extends FlexibleLoad(id, group, label, amplitudePerSlot) {
 
-  private[load] var __superTask: FlexibleLoadSuperTask = _superTask
+  private var __superTask: FlexibleLoadSuperTask = _superTask
 
   private var __startPositionInTime: Int = _startPositionInTime
 
-  def superTask_=(task: FlexibleLoadSuperTask): FlexibleLoadSubTask = {
+  private[load] def superTask_=(task: FlexibleLoadSuperTask): FlexibleLoadSubTask = {
     __superTask = task
     this
   }
 
   def superTask: FlexibleLoadSuperTask = __superTask
 
-  def startPositionInTime_=(pos: Int): FlexibleLoadSubTask = {
+  private[load] def startPositionInTime_=(pos: Int): FlexibleLoadSubTask = {
     __startPositionInTime = pos
     this
   }
