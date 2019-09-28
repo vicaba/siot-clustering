@@ -4,8 +4,6 @@ import breeze.linalg._
 import scheduler_model.load.Load._
 import types.clusterer.DataTypeMetadata
 
-import scala.collection.mutable.ListBuffer
-
 object Load {
 
   type LoadId = Int
@@ -28,6 +26,8 @@ trait Load {
   def amplitudePerSlot: DenseVector[Double]
 
   def startPositionInTime: Int
+
+  def peak: Double = max(amplitudePerSlot)
 
   def span: Int = amplitudePerSlot.length
 
@@ -62,7 +62,7 @@ object LoadOps {
     if (loads.isEmpty) DenseVector.fill(dataTypeMetadata.Columns)(amplitudeInOffStatus)
     else {
 
-      val aggregatedVector = sum(loads.map( l => expandToCols(l.startPositionInTime, l.amplitudePerSlot, dataTypeMetadata.Columns)))
+      val aggregatedVector = sum(loads.map(l => expandToCols(l.startPositionInTime, l.amplitudePerSlot, dataTypeMetadata.Columns)))
 
       val restPositions = Array.fill(dataTypeMetadata.Columns)(true)
 
@@ -73,7 +73,7 @@ object LoadOps {
       }
 
       restPositions.zipWithIndex.foreach { case (e, idx) =>
-          if (e) aggregatedVector(idx) = amplitudeInOffStatus
+        if (e) aggregatedVector(idx) = amplitudeInOffStatus
       }
 
       aggregatedVector
