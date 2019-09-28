@@ -1,10 +1,10 @@
 package benchmark
 
 import breeze.linalg.DenseVector
-import new_test.reader.SyntheticProfilesReaderForScheduler2
+import scheduler_model.reader.SyntheticProfilesReaderForScheduler2
 import org.scalameter.{Quantity, Warmer, withWarmer}
 import org.scalatest.FlatSpec
-import new_test.load.{AccumulatedLoad, Load}
+import scheduler_model.load.{AccumulatedLoad, Load}
 import reader.SyntheticProfilesReaderForScheduler
 import types.clusterer.DataTypeMetadata
 
@@ -34,7 +34,7 @@ class AccumulatedLoadBenchmark extends FlatSpec {
     accLoadInOldLoadModel.amplitudePerSlot
   }
 
-  val pointsWithNewLoadModel: Seq[new_test.load.AccumulatedLoad] = SyntheticProfilesReaderForScheduler2
+  val pointsWithNewLoadModel: Seq[scheduler_model.load.AccumulatedLoad] = SyntheticProfilesReaderForScheduler2
     .applyDefault(MainFolder,
       subFoldersAndIds.map(_._1),
       AppliancesOutputFileName,
@@ -42,7 +42,7 @@ class AccumulatedLoadBenchmark extends FlatSpec {
       subFoldersAndIds.map(_._2),
       windowSize = 30)
 
-  val accLoadInNewLoadModel = new_test.load.AccumulatedLoad(-4, 0, "", pointsWithNewLoadModel)(DataTypeMetadata.generateDataTypeMetadata(forColumns = 48))
+  val accLoadInNewLoadModel = scheduler_model.load.AccumulatedLoad(-4, 0, "", pointsWithNewLoadModel)(DataTypeMetadata.generateDataTypeMetadata(forColumns = 48))
 
   val executionTimeOfAmplitudePerSlotInNewLoadModel = withWarmer(new Warmer.Default) measure {
     accLoadInNewLoadModel.amplitudePerSlot

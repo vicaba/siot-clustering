@@ -1,8 +1,8 @@
-package new_test.reader
+package scheduler_model.reader
 
 import breeze.linalg.DenseVector
-import new_test.load.Load.LoadId
-import new_test.load.{AccumulatedLoad, FixedLoad, FlexibleLoad, Load, SingleLoad}
+import scheduler_model.load.Load.LoadId
+import scheduler_model.load.{AccumulatedLoad, FixedLoad, FlexibleLoad, Load, SingleLoad}
 import reader.TemplateForSyntheticProfilesReader
 import types.clusterer.DataTypeMetadata
 import types.ops.SetOps._

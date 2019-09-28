@@ -1,7 +1,7 @@
-package new_test.load
+package scheduler_model.load
 
 import breeze.linalg._
-import new_test.load.Load._
+import scheduler_model.load.Load._
 import types.clusterer.DataTypeMetadata
 
 import scala.collection.mutable.ListBuffer
@@ -34,7 +34,12 @@ trait Load {
   override def toString: String = s"${getClass.getCanonicalName}($id) "
 
   protected def ensureCorrectCreation(): Unit = {
-    assert(amplitudePerSlot.length == amplitudePerSlotMetadata.Columns)
+    val length = amplitudePerSlot.length
+    val columns = amplitudePerSlotMetadata.Columns
+    assert(
+      length == columns,
+      "amplitudePerSlot.length was " + length + ", while metadata.columns were " + columns
+    )
   }
 
 }
@@ -68,7 +73,7 @@ object LoadOps {
       }
 
       restPositions.zipWithIndex.foreach { case (e, idx) =>
-          if (!e) aggregatedVector(idx) = amplitudeInOffStatus
+          if (e) aggregatedVector(idx) = amplitudeInOffStatus
       }
 
       aggregatedVector

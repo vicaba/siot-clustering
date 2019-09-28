@@ -1,10 +1,22 @@
-package new_test.load
+package scheduler_model.load
 
 import breeze.linalg.DenseVector
-import new_test.load.Load.{GroupId, LoadId}
+import scheduler_model.load.Load.{GroupId, LoadId}
 import types.clusterer.DataTypeMetadata
 
 object FlexibleLoadSubTask {
+
+  def apply(
+    id: LoadId,
+    group: GroupId,
+    label: String,
+    startPositionInTime: LoadId,
+    amplitudePerSlot: DenseVector[Double],
+    superTask: FlexibleLoadSuperTask,
+    amplitudePerSlotMetadata: DataTypeMetadata
+  ): FlexibleLoadSubTask =
+    new FlexibleLoadSubTask(id, group, label, startPositionInTime, amplitudePerSlot, superTask)(amplitudePerSlotMetadata)
+
   def apply(
     id: LoadId,
     group: GroupId,
@@ -12,9 +24,12 @@ object FlexibleLoadSubTask {
     startPositionInTime: LoadId,
     amplitudePerSlot: DenseVector[Double],
     superTask: FlexibleLoadSuperTask
-  )(implicit amplitudePerSlotMetadata: DataTypeMetadata
   ): FlexibleLoadSubTask =
-    new FlexibleLoadSubTask(id, group, label, startPositionInTime, amplitudePerSlot, superTask)
+    new FlexibleLoadSubTask(id, group, label, startPositionInTime, amplitudePerSlot, superTask)(DataTypeMetadata.generateDataTypeMetadata(forColumns = amplitudePerSlot.length))
+
+  private[load] def copyWithAmplitudePerSlotToZero(f: FlexibleLoadSubTask): FlexibleLoadSubTask =
+    FlexibleLoadSubTask(f.id, f.group, f.label, f.startPositionInTime, DenseVector.fill(f.span, 0.0), f.superTask, f.amplitudePerSlotMetadata)
+
 }
 
 class FlexibleLoadSubTask private(

@@ -1,7 +1,7 @@
-package new_test.load
+package scheduler_model.load
 
 import breeze.linalg.DenseVector
-import new_test.load.Load.{GroupId, LoadId}
+import scheduler_model.load.Load.{GroupId, LoadId}
 import types.clusterer.DataTypeMetadata
 
 object FlexibleLoadSuperTask {
@@ -52,7 +52,12 @@ class FlexibleLoadSuperTask(
 
   def computeAmplitudePerSlotWithRestValueOnly: Boolean = __computeAmplitudePerSlotWithRestValueOnly
 
-  override def amplitudePerSlot: DenseVector[Double] = ???
+  override def amplitudePerSlot: DenseVector[Double] =
+    if (!computeAmplitudePerSlotWithRestValueOnly)
+      LoadOps.aggregatedAmplitudePerSlot(aggregatees, amplitudeInOffStatus, amplitudePerSlotMetadata)
+    else
+      LoadOps.aggregatedAmplitudePerSlot(aggregatees.map(FlexibleLoadSubTask.copyWithAmplitudePerSlotToZero), amplitudeInOffStatus, amplitudePerSlotMetadata)
+
 
 }
 

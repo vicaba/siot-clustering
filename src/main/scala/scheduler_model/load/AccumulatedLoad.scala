@@ -1,7 +1,7 @@
-package new_test.load
+package scheduler_model.load
 
 import breeze.linalg.{DenseVector, sum}
-import new_test.load.Load.{GroupId, LoadId}
+import scheduler_model.load.Load.{GroupId, LoadId}
 import types.clusterer.DataTypeMetadata
 import collection.CollecctionHelper._
 

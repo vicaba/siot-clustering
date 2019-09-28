@@ -1,20 +1,20 @@
-package new_test.load
+package scheduler_model.load
 
 import Load._
 import breeze.linalg.DenseVector
 import types.clusterer.DataTypeMetadata
 
-object FlexibleLoad {
+object FixedLoad {
   def apply
   (
     id: LoadId, group: GroupId, label: String, amplitudePerSlot: DenseVector[Double]
   )(
     implicit amplitudePerSlotMetadata: DataTypeMetadata
-  ): FlexibleLoad =
-    new FlexibleLoad(id, group, label, amplitudePerSlot)
+  ): FixedLoad =
+    new FixedLoad(id, group, label, amplitudePerSlot)
 }
 
-class FlexibleLoad(
+class FixedLoad(
   override val id: LoadId,
   override val group: GroupId,
   override val label: String,
