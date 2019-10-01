@@ -36,15 +36,13 @@ class FlexibleLoadSubTask private(
   override val id: LoadId,
   override val group: GroupId,
   override val label: String,
-  private val _startPositionInTime: Int,
+  override protected val _startPositionInTime: Int,
   override val amplitudePerSlot: DenseVector[Double],
   private val _superTask: FlexibleLoadSuperTask
 )(implicit override val amplitudePerSlotMetadata: DataTypeMetadata)
-  extends FlexibleLoad(id, group, label, amplitudePerSlot) {
+  extends FlexibleLoad(id, group, label, _startPositionInTime, amplitudePerSlot) {
 
   private var __superTask: FlexibleLoadSuperTask = _superTask
-
-  private var __startPositionInTime: Int = _startPositionInTime
 
   private[load] def superTask_=(task: FlexibleLoadSuperTask): FlexibleLoadSubTask = {
     __superTask = task
@@ -52,13 +50,6 @@ class FlexibleLoadSubTask private(
   }
 
   def superTask: FlexibleLoadSuperTask = __superTask
-
-  private[load] def startPositionInTime_=(pos: Int): FlexibleLoadSubTask = {
-    __startPositionInTime = pos
-    this
-  }
-
-  override def startPositionInTime: Int = __startPositionInTime
 
   private[load] def copyWithoutSuperTask(): FlexibleLoadSubTask =
     FlexibleLoadSubTask(

@@ -143,10 +143,4 @@ object SchedulerAlgorithm {
     bestAccumulatedLoad
   }
 
-  def isLoadOnPreferredSlots(load: Load, preferedSlots: List[Int]): Boolean = {
-    val flRange = for (i <- load.positionInT until (load.positionInT + load.span)) yield i
-
-    flRange.forall(preferedSlots.contains(_))
-  }
-
 }

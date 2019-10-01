@@ -4,8 +4,8 @@ import breeze.linalg.{DenseVector, sum}
 import scheduler_model.load.Load.{GroupId, LoadId}
 import types.clusterer.DataTypeMetadata
 import collection.CollecctionHelper._
+import scheduler_model.sequence_split.SequenceSplitStrategy
 import types.ops.SetOps._
-
 
 import scala.collection.mutable
 
@@ -23,6 +23,29 @@ object AccumulatedLoad {
     (implicit amplitudePerSlotMetadata: DataTypeMetadata): AccumulatedLoad =
     new AccumulatedLoad(id, group, label, orderedMutableSetOf(loads))
 
+  object Mutate {
+
+    def splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
+      accLoad: AccumulatedLoad,
+      splitStrategy: SequenceSplitStrategy, idC: Option[Int] = None): AccumulatedLoad = {
+
+      var _idC = idC.getOrElse(0)
+
+      accLoad.flexibleLoads.foreach { fl =>
+        val (loadTask, lastUsedLoadId) = FlexibleLoad.splitIntoSubTasks(fl, splitStrategy, Some(_idC))
+        _idC = lastUsedLoadId + 1
+
+        val flexibleLoadsToRemove = List(fl)
+        val flexibleLoadsToAdd    = List(loadTask.computeAmplitudePerSlotWithRestValueOnly = true) ++ loadTask.aggregatees
+
+        accLoad --= flexibleLoadsToRemove
+        accLoad ++= flexibleLoadsToAdd
+      }
+      accLoad
+    }
+
+  }
+
 }
 
 
@@ -35,7 +58,7 @@ class AccumulatedLoad
 )(implicit override val amplitudePerSlotMetadata: DataTypeMetadata) extends Load {
 
   def flexibleLoads: Set[FlexibleLoad] =
-    loads.filter(_.isInstanceOf[FlexibleLoad]).asInstanceOf[Set[FlexibleLoad]]
+    loads.filter(_.isInstanceOf[FlexibleLoad]).toSet.asInstanceOf[Set[FlexibleLoad]]
 
   override def startPositionInTime: Int = loads.map(_.startPositionInTime).min
 

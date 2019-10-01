@@ -1,13 +1,46 @@
 package scheduler_model.load
 
 import breeze.linalg._
+import metrics.DenseVectorReprOps
 import scheduler_model.load.Load._
 import types.clusterer.DataTypeMetadata
+
+import scala.util.Try
 
 object Load {
 
   type LoadId = Int
   type GroupId = Int
+
+  val loadOrderingByPositionInTime: Ordering[Load] =
+    (x: Load, y: Load) => implicitly[Ordering[Int]].compare(x.startPositionInTime, y.startPositionInTime)
+
+  val loadOrderingByAmplitude: Ordering[Load] =
+    (x: Load, y: Load) => implicitly[Ordering[Double]].compare(x.totalEnergy, y.totalEnergy)
+
+  val loadListOrderingByMaxPositionInT: Ordering[List[Load]] =
+    (x: List[Load], y: List[Load]) =>
+      implicitly[Ordering[Int]].compare(x.map(_.startPositionInTime).max, y.map(_.startPositionInTime).max)
+
+  val loadListOrderingByAmplitude: Ordering[List[Load]] =
+    (x: List[Load], y: List[Load]) =>
+      implicitly[Ordering[Double]].compare(x.map(_.totalEnergy).sum, y.map(_.totalEnergy).sum)
+
+  implicit def toVector[X <: Load]: DenseVectorReprOps[X] = new DenseVectorReprOps[X] {
+
+    override def apply(t: X): DenseVector[Double] = t.amplitudePerSlot
+
+    override def zero(t: X): DenseVector[Double] = DenseVector((for (_ <- 1 to t.span) yield 0.0): _*)
+
+  }
+
+  implicit def toVectorTraversable[X <: Load, S[X] <: Iterable[X]]: DenseVectorReprOps[S[X]] = new DenseVectorReprOps[S[X]] {
+
+    override def apply(t: S[X]): DenseVector[Double] = sum(t.map(_.amplitudePerSlot))
+
+    override def zero(t: S[X]): DenseVector[Double] = DenseVector((for (_ <- 1 to LoadOps.span(t)) yield 0.0): _*)
+
+  }
 
 }
 
@@ -29,7 +62,7 @@ trait Load {
 
   def span: Int = amplitudePerSlot.length
 
-  override def toString: String = s"${getClass.getCanonicalName}($id)"
+  def totalEnergy: Double = sum(amplitudePerSlot)
 
   override def equals(obj: Any): Boolean = obj match {
     case s: Load => this.getClass == s.getClass && s.id == this.id && s.group == this.group && s.label == this.label
@@ -85,10 +118,32 @@ object LoadOps {
 
     }
 
-  def copy(loads: Iterable[Load], addSuperTaskSubTasks: Boolean): Iterable[Load] =
+  def areLoadsOverlapped(loads: Iterable[Load]): Boolean = {
+    val span = LoadOps.span(loads)
+    val minPositionIntT = loads.map(_.startPositionInTime).min
+    val restPositions = Array.fill(span)(false)
+    loads.foreach { l =>
+      for (idx <- (l.startPositionInTime - minPositionIntT) until (l.startPositionInTime + l.span - minPositionIntT)) {
+        if (restPositions(idx)) return true
+        restPositions(idx) = true
+      }
+    }
+    false
+  }
+
+  def span(loads: Iterable[Load]): Int =
+    Try(loads.map(l => l.span + l.startPositionInTime).max - loads.map(_.startPositionInTime).min).getOrElse(0)
+
+  def copy(loads: Iterable[Load]): Iterable[Load] =
+    loads.flatMap(copyOne(_, addSuperTaskSubTasks = false))
+
+  private[scheduler_model] def copy(loads: Iterable[Load], addSuperTaskSubTasks: Boolean): Iterable[Load] =
     loads.flatMap(copyOne(_, addSuperTaskSubTasks))
 
-  def copy(load: AccumulatedLoad, addSuperTaskSubTasks: Boolean): AccumulatedLoad =
+  def copy(load: AccumulatedLoad): AccumulatedLoad =
+    load.copy(addSuperTaskSubTasks = false)
+
+  private[scheduler_model] def copy(load: AccumulatedLoad, addSuperTaskSubTasks: Boolean): AccumulatedLoad =
     load.copy(addSuperTaskSubTasks)
 
   def copy(load: FlexibleLoadSuperTask): FlexibleLoadSuperTask =

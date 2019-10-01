@@ -92,7 +92,7 @@ object SyntheticProfilesReaderForScheduler2 extends TemplateForSyntheticProfiles
       val loadLabel = replaceWithLabel.getOrElse(label)
 
       def createFlexibleLoad(): FlexibleLoad =
-        FlexibleLoad(id, 0, loadLabel, DenseVector(values: _*))(DataTypeMetadata.generateDataTypeMetadata(forColumns = values.length))
+        FlexibleLoad(id, 0, loadLabel, 0, DenseVector(values: _*))(DataTypeMetadata.generateDataTypeMetadata(forColumns = values.length))
 
       Try(label match {
         case DishWasher => createFlexibleLoad()

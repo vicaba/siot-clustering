@@ -4,6 +4,8 @@ import breeze.linalg.DenseVector
 import scheduler_model.load.Load.{GroupId, LoadId}
 import types.clusterer.DataTypeMetadata
 
+import scala.util.Try
+
 object FlexibleLoadSuperTask {
 
   def apply(
@@ -16,7 +18,7 @@ object FlexibleLoadSuperTask {
     (implicit amplitudePerSlotMetadata: DataTypeMetadata
     ): FlexibleLoadSuperTask = {
 
-    val superTask = new FlexibleLoadSuperTask(id, group, label, amplitudeInOffStatus, null, computeAmplitudePerSlotWithRestValueOnly)
+    val superTask = new FlexibleLoadSuperTask(id, group, label, amplitudeInOffStatus, Nil, computeAmplitudePerSlotWithRestValueOnly)
     superTask.aggregatees = aggregatees.map(_.superTask = superTask)
     superTask
   }
@@ -39,7 +41,7 @@ class FlexibleLoadSuperTask(
 
   ensureCorrectCreation()
 
-  override def startPositionInTime: GroupId = 0
+  override def startPositionInTime: Int = Try(aggregatees.map(_.startPositionInTime).min).getOrElse(0)
 
   private[load] def aggregatees_=(aggregatees: List[FlexibleLoadSubTask]): FlexibleLoadSuperTask = {
     __aggregatees = aggregatees
@@ -56,6 +58,8 @@ class FlexibleLoadSuperTask(
 
   def computeAmplitudePerSlotWithRestValueOnly: Boolean = __computeAmplitudePerSlotWithRestValueOnly
 
+  def areAggregateesOverlapped: Boolean = LoadOps.areLoadsOverlapped(aggregatees)
+
   override def amplitudePerSlot: DenseVector[Double] =
     if (!computeAmplitudePerSlotWithRestValueOnly)
       LoadOps.aggregatedAmplitudePerSlot(aggregatees, amplitudeInOffStatus, amplitudePerSlotMetadata)
@@ -69,7 +73,7 @@ class FlexibleLoadSuperTask(
       this.group,
       this.label,
       this.amplitudeInOffStatus,
-      null,
+      Nil,
       this.computeAmplitudePerSlotWithRestValueOnly
     )
     subTasksCopy.foreach(_.superTask = superTaskCopy)
