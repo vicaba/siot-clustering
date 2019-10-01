@@ -11,11 +11,15 @@ object FlexibleLoadSuperTask {
     group: GroupId,
     label: String,
     amplitudeInOffStatus: Double,
-    _aggregatees: List[FlexibleLoadSubTask],
-    _computeAmplitudePerSlotWithRestValueOnly: Boolean)
+    aggregatees: List[FlexibleLoadSubTask],
+    computeAmplitudePerSlotWithRestValueOnly: Boolean)
     (implicit amplitudePerSlotMetadata: DataTypeMetadata
-    ): FlexibleLoadSuperTask =
-    new FlexibleLoadSuperTask(id, group, label, amplitudeInOffStatus, _aggregatees, _computeAmplitudePerSlotWithRestValueOnly)
+    ): FlexibleLoadSuperTask = {
+
+    val superTask = new FlexibleLoadSuperTask(id, group, label, amplitudeInOffStatus, null, computeAmplitudePerSlotWithRestValueOnly)
+    superTask.aggregatees = aggregatees.map(_.superTask = superTask)
+    superTask
+  }
 
 }
 
@@ -57,6 +61,21 @@ class FlexibleLoadSuperTask(
       LoadOps.aggregatedAmplitudePerSlot(aggregatees, amplitudeInOffStatus, amplitudePerSlotMetadata)
     else
       LoadOps.aggregatedAmplitudePerSlot(aggregatees.map(FlexibleLoadSubTask.copyWithAmplitudePerSlotToZero), amplitudeInOffStatus, amplitudePerSlotMetadata)
+
+  private[load] def copyWithCopiedSubTasks(): FlexibleLoadSuperTask = {
+    val subTasksCopy = this.aggregatees.map(_.copyWithoutSuperTask())
+    val superTaskCopy = FlexibleLoadSuperTask(
+      this.id,
+      this.group,
+      this.label,
+      this.amplitudeInOffStatus,
+      null,
+      this.computeAmplitudePerSlotWithRestValueOnly
+    )
+    subTasksCopy.foreach(_.superTask = superTaskCopy)
+    superTaskCopy.aggregatees = subTasksCopy
+    superTaskCopy
+  }
 
 
 }

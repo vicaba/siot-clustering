@@ -19,13 +19,13 @@ class BiasedAverageDistanceTransformation(val bias: Double = 0.50) extends Metri
 
   private def computeAverageDistanceMetric(referenceAverage: Double,
     movement: Movement,
-    preferedSlots: List[Int],
+    preferredSlots: List[Int],
     bias: Double = 0.50): Double = {
     val accLoad      = movement.acc
     val flexibleLoad = movement.fl
 
     val currentAverage                = computeAverageAtLoadPosition(accLoad, flexibleLoad)
-    val slotsWithPriorityOverlapRatio = computeSlotsWithPriorityOverlapRatio(flexibleLoad, preferedSlots)
+    val slotsWithPriorityOverlapRatio = computeSlotsWithPriorityOverlapRatio(flexibleLoad, preferredSlots)
 
     val distance = Math.abs(referenceAverage - currentAverage)
     //println(s"average_ref = $referenceAverage, bias = $bias, slotsWithPriority = $slotsWithPriorityOverlapRatio")

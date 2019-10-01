@@ -60,4 +60,15 @@ class FlexibleLoadSubTask private(
 
   override def startPositionInTime: Int = __startPositionInTime
 
+  private[load] def copyWithoutSuperTask(): FlexibleLoadSubTask =
+    FlexibleLoadSubTask(
+      this.id,
+      this.group,
+      this.label,
+      this.startPositionInTime,
+      this.amplitudePerSlot,
+      null,
+      this.amplitudePerSlotMetadata
+    )
+
 }

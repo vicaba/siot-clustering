@@ -26,4 +26,6 @@ class FlexibleLoad(
 
   override def startPositionInTime: Int = 0
 
+  def copy(): FlexibleLoad = FlexibleLoad(id, group, label, amplitudePerSlot)
+
 }

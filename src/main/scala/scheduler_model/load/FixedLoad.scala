@@ -26,4 +26,6 @@ class FixedLoad(
 
   override def startPositionInTime: Int = 0
 
+  def copy(): FixedLoad = FixedLoad(id, group, label, amplitudePerSlot)
+
 }
