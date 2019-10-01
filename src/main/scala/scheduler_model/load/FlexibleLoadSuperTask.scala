@@ -62,7 +62,7 @@ class FlexibleLoadSuperTask(
     else
       LoadOps.aggregatedAmplitudePerSlot(aggregatees.map(FlexibleLoadSubTask.copyWithAmplitudePerSlotToZero), amplitudeInOffStatus, amplitudePerSlotMetadata)
 
-  private[load] def copyWithCopiedSubTasks(): FlexibleLoadSuperTask = {
+  private[load] def copyAndCopySubTasks(): FlexibleLoadSuperTask = {
     val subTasksCopy = this.aggregatees.map(_.copyWithoutSuperTask())
     val superTaskCopy = FlexibleLoadSuperTask(
       this.id,

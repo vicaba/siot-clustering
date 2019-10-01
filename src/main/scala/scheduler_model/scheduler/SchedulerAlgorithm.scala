@@ -1,4 +1,3 @@
-/*
 package scheduler_model.scheduler
 
 import scheduler_model.load._
@@ -10,7 +9,7 @@ object SchedulerAlgorithm {
     preferredSlots: List[Int] = Nil,
     metricTransformation: MetricTransformation,
     referenceAverage: Double = 0.0,
-    ordering: Ordering[Load] = DefaultOrdering,
+    ordering: Ordering[Load], //= DefaultOrdering,
     verbose: Boolean = false): AccumulatedLoad = {
 
     def _reschedule(_acc: (AccumulatedLoad, AccumulatedLoad), _remainingFlexibleLoads: (List[FlexibleLoad], List[FlexibleLoad])): AccumulatedLoad =
@@ -26,12 +25,14 @@ object SchedulerAlgorithm {
     case class AccumulatedLoadWithSeparatedFlexibleLoads(acc: AccumulatedLoad, flexibleLoads: List[FlexibleLoad])
 
     def prepareAccumulatedLoadForAlgorithm(): (AccumulatedLoadWithSeparatedFlexibleLoads, AccumulatedLoadWithSeparatedFlexibleLoads) = {
-      val bestAccumulatedLoad = Load.deepCopy(List(acc)).head
-      val temporaryAccumulatedLoad = Load.deepCopy(List(acc)).head
+      val bestAccumulatedLoad = LoadOps.copy(acc, addSuperTaskSubTasks = true)
+      val temporaryAccumulatedLoad = LoadOps.copy(acc, addSuperTaskSubTasks = true)
 
       def splitFlexibleLoads(_acc: AccumulatedLoad): AccumulatedLoadWithSeparatedFlexibleLoads = {
+        // Retrieve FlexibleLoads
         val remainingLoadsAfterRemovingFlexibleLoads = _acc.loads -- _acc.flexibleLoads
-        val copy = _acc.copy(copyFlexibleLoadSubtasks = false)
+        // TODO: Maybe we do not need a copy here
+        val copy = LoadOps.copy(_acc, addSuperTaskSubTasks = false)
         // Those operations are done to mantain the references, so copy has the references of _acc
         copy --= _acc.loads
         copy ++= remainingLoadsAfterRemovingFlexibleLoads
@@ -49,9 +50,8 @@ object SchedulerAlgorithm {
       val (best, temporary) = prepareAccumulatedLoadForAlgorithm()
       _reschedule((best.acc, temporary.acc), (best.flexibleLoads, temporary.flexibleLoads))
     } else
-      acc.copy()
+      LoadOps.copy(acc, addSuperTaskSubTasks = true)
 
   }
 
 }
-*/

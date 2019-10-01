@@ -4,6 +4,8 @@ import breeze.linalg.{DenseVector, sum}
 import scheduler_model.load.Load.{GroupId, LoadId}
 import types.clusterer.DataTypeMetadata
 import collection.CollecctionHelper._
+import types.ops.SetOps._
+
 
 import scala.collection.mutable
 
@@ -29,13 +31,69 @@ class AccumulatedLoad
   override val id: LoadId,
   override val group: GroupId,
   override val label: String,
-  loads: mutable.Set[Load]
+  val loads: mutable.Set[Load]
 )(implicit override val amplitudePerSlotMetadata: DataTypeMetadata) extends Load {
+
+  def flexibleLoads: Set[FlexibleLoad] =
+    loads.filter(_.isInstanceOf[FlexibleLoad]).asInstanceOf[Set[FlexibleLoad]]
 
   override def startPositionInTime: Int = loads.map(_.startPositionInTime).min
 
   override def amplitudePerSlot: DenseVector[Double] =
     if (loads.nonEmpty) sum(loads.map(_.amplitudePerSlot))
     else amplitudePerSlotMetadata.EmptySyntheticData()
+
+  /**
+    * Shorthand for .loads +=
+    * @param y
+    * @return
+    */
+  def +=(y: Load): AccumulatedLoad = {
+    this.loads += y
+    this
+  }
+
+  /**
+    * Shorthand for .loads -=
+    * @param y
+    * @return
+    */
+  def -=(y: Load): AccumulatedLoad = {
+    this.loads -= y
+    this
+  }
+
+  /**
+    * Shorthand for .loads ++=
+    * @param y
+    * @return
+    */
+  def ++=(y: Iterable[Load]): AccumulatedLoad = {
+    this.loads ++= y
+    this
+  }
+
+  /**
+    * Shorthand for .loads --=
+    * @param y
+    * @return
+    */
+  def --=(y: Iterable[Load]): AccumulatedLoad = {
+    this.loads --= y
+    this
+  }
+
+  /**
+    * Shorthand for .loads -/+=
+    * @param y
+    * @return
+    */
+  def -/+=(y: Load): AccumulatedLoad = {
+    this.loads -/+= y
+    this
+  }
+
+  private[load] def copy(addSuperTaskSubTasks: Boolean): AccumulatedLoad =
+    AccumulatedLoad(id, group, label, mutableSetOf(LoadOps.copy(loads, addSuperTaskSubTasks)))
 
 }

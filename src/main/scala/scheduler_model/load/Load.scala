@@ -13,8 +13,6 @@ object Load {
 
 trait Load {
 
-  this: Load =>
-
   val amplitudePerSlotMetadata: DataTypeMetadata
 
   def id: LoadId
@@ -31,7 +29,14 @@ trait Load {
 
   def span: Int = amplitudePerSlot.length
 
-  override def toString: String = s"${getClass.getCanonicalName}($id) "
+  override def toString: String = s"${getClass.getCanonicalName}($id)"
+
+  override def equals(obj: Any): Boolean = obj match {
+    case s: Load => this.getClass == s.getClass && s.id == this.id && s.group == this.group && s.label == this.label
+    case _ => false
+  }
+
+  override def hashCode(): Int = this.id
 
   protected def ensureCorrectCreation(): Unit = {
     val length = amplitudePerSlot.length
@@ -79,6 +84,26 @@ object LoadOps {
       aggregatedVector
 
     }
+
+  def copy(loads: Iterable[Load], addSuperTaskSubTasks: Boolean): Iterable[Load] =
+    loads.flatMap(copyOne(_, addSuperTaskSubTasks))
+
+  def copy(load: AccumulatedLoad, addSuperTaskSubTasks: Boolean): AccumulatedLoad =
+    load.copy(addSuperTaskSubTasks)
+
+  def copy(load: FlexibleLoadSuperTask): FlexibleLoadSuperTask =
+    load.copyAndCopySubTasks()
+
+  private def copyOne(l: Load, addSuperTaskSubTasks: Boolean): Iterable[Load] = l match {
+    case fixedLoad: FixedLoad => List(fixedLoad.copy())
+    case flexibleLoadSuperTask: FlexibleLoadSuperTask =>
+      val superTask = copy(flexibleLoadSuperTask)
+      val subTasks = superTask.aggregatees
+      if (addSuperTaskSubTasks) List(superTask) ++ subTasks else List(superTask)
+    case _: FlexibleLoadSubTask => Nil
+    case flexibleLoad: FlexibleLoad => List(flexibleLoad.copy())
+    case accumulatedLoad: AccumulatedLoad => List(accumulatedLoad.copy(addSuperTaskSubTasks))
+  }
 
 }
 

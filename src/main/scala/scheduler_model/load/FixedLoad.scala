@@ -12,6 +12,7 @@ object FixedLoad {
     implicit amplitudePerSlotMetadata: DataTypeMetadata
   ): FixedLoad =
     new FixedLoad(id, group, label, amplitudePerSlot)
+
 }
 
 class FixedLoad(
