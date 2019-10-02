@@ -5,10 +5,14 @@ import test.load.{AccumulatedLoad, Load}
 import test.{SchedulerAlgorithm, SequenceSplitByConsecutiveElements, UserAllocator}
 import test.reschedulermetrics.MetricTransformation
 import Load._
+import com.typesafe.scalalogging.Logger
 
 import scala.util.Try
 
 object Scheduler {
+
+  val logger = Logger("Scheduler")
+
 
   def apply(clusters: List[AccumulatedLoad],
     metricTransformation: MetricTransformation,
@@ -18,6 +22,7 @@ object Scheduler {
 
     if (clusters.size == 1) {
       clusters.map {
+        logger.info("Running Scheduler for a single user")
         SchedulerAlgorithm.reschedule(
           _,
           Nil,
@@ -32,6 +37,9 @@ object Scheduler {
 
       val _clusters: List[AccumulatedLoad] = Load.deepCopy(clusters).toList
 
+      logger.info("Running Scheduler for {} users")
+
+
       val numberOfSlots = AccumulatedLoad(-1, 0, _clusters, "").span
       val allFlexibleLoads = _clusters.flatMap(_.flexibleLoads)
       val windowSize = Try(allFlexibleLoads.map(_.span).sum / allFlexibleLoads.size).getOrElse(1)
@@ -42,6 +50,7 @@ object Scheduler {
 
       val res = _clusters.zip(schedulerPreferredSlots).map {
         case (user, schedulingPreferredSlotsForUser) =>
+          logger.info("Running Scheduler for user {} with {} points", user.id, user.loads.size)
           SchedulerAlgorithm.reschedule(
             user,
             schedulingPreferredSlotsForUser,

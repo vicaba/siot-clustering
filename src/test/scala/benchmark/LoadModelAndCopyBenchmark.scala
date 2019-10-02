@@ -13,7 +13,7 @@ class LoadModelAndCopyBenchmark extends FlatSpec {
   val MainFolder = "files/syn_loads_test/"
   val AppliancesOutputFileName = "appliance_output.csv"
   val LightingOutputFileName = "lighting_output.csv"
-  val subFoldersAndIds: List[(String, Int)] = (for (i <- 2 to 3) yield (i + "/", i)).toList
+  val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 4) yield (i + "/", i)).toList
 
   val _unscheduledLoadsOld = SyntheticProfilesReaderForScheduler
     .applyDefault(MainFolder,
@@ -73,11 +73,13 @@ class LoadModelAndCopyBenchmark extends FlatSpec {
 
   println("First")
 
-  test.load.Load.deepCopy(unscheduledLoads).toList.head
+  val cpyOld = test.load.Load.deepCopy(unscheduledLoads).toList.head
+  cpyOld.amplitudePerSlot
 
   println("Second")
 
-  LoadOps.copy(unscheduledLoad)
+  val cpyNew = LoadOps.copy(unscheduledLoad)
+  cpyNew.amplitudePerSlot
 
   println("End")
 
