@@ -23,10 +23,10 @@ class FixedLoad(
 )(implicit override val amplitudePerSlotMetadata: DataTypeMetadata)
   extends SingleLoad {
 
-  ensureCorrectCreation()
-
   override def startPositionInTime: Int = 0
 
   def copy(): FixedLoad = FixedLoad(id, group, label, amplitudePerSlot)
+
+  ensureCorrectCreation()
 
 }

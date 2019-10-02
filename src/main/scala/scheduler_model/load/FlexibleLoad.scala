@@ -57,8 +57,6 @@ class FlexibleLoad(
 )(implicit override val amplitudePerSlotMetadata: DataTypeMetadata)
   extends SingleLoad {
 
-  ensureCorrectCreation()
-
   protected var __startPositionInTime: Int = _startPositionInTime
 
   def startPositionInTime_=(pos: Int): FlexibleLoad = {
@@ -69,5 +67,7 @@ class FlexibleLoad(
   override def startPositionInTime: Int = __startPositionInTime
 
   def copy(): FlexibleLoad = FlexibleLoad(id, group, label, startPositionInTime, amplitudePerSlot)
+
+  ensureCorrectCreation()
 
 }

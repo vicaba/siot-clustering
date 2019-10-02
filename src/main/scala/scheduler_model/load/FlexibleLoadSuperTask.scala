@@ -39,9 +39,7 @@ class FlexibleLoadSuperTask(
 
   private var __computeAmplitudePerSlotWithRestValueOnly: Boolean = _computeAmplitudePerSlotWithRestValueOnly
 
-  ensureCorrectCreation()
-
-  override def startPositionInTime: Int = Try(aggregatees.map(_.startPositionInTime).min).getOrElse(0)
+  override def startPositionInTime: Int = 0
 
   private[load] def aggregatees_=(aggregatees: List[FlexibleLoadSubTask]): FlexibleLoadSuperTask = {
     __aggregatees = aggregatees
@@ -81,6 +79,7 @@ class FlexibleLoadSuperTask(
     superTaskCopy
   }
 
+  ensureCorrectCreation()
 
 }
 

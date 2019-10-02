@@ -86,7 +86,15 @@ trait SingleLoad extends Load
 
 object LoadOps {
 
+  /**
+    * Expands vector that start at startPosition to a vector from 0 to cols where vector is compressed in range [0, cols)
+    * @param startPosition
+    * @param vector
+    * @param cols
+    * @return
+    */
   def expandToCols(startPosition: Int, vector: DenseVector[Double], cols: Int): DenseVector[Double] = {
+    if(vector.length == cols) return vector
     val span = vector.length
     val baseVector = DenseVector.fill[Double](cols, 0.0)
     for ((baseVectorIndex, vectorIndex) <- (startPosition until cols) zip (0 until span))
@@ -96,11 +104,14 @@ object LoadOps {
     baseVector
   }
 
+  def expandToCols(load: Load, cols: Int): DenseVector[Double] =
+    expandToCols(load.startPositionInTime, load.amplitudePerSlot, cols)
+
   def aggregatedAmplitudePerSlot(loads: Iterable[Load], amplitudeInOffStatus: Double, dataTypeMetadata: DataTypeMetadata): DenseVector[Double] =
     if (loads.isEmpty) DenseVector.fill(dataTypeMetadata.Columns)(amplitudeInOffStatus)
     else {
 
-      val aggregatedVector = sum(loads.map(l => expandToCols(l.startPositionInTime, l.amplitudePerSlot, dataTypeMetadata.Columns)))
+      val aggregatedVector = sum(loads.map(l => expandToCols(l, dataTypeMetadata.Columns)))
 
       val restPositions = Array.fill(dataTypeMetadata.Columns)(true)
 
@@ -135,15 +146,15 @@ object LoadOps {
     Try(loads.map(l => l.span + l.startPositionInTime).max - loads.map(_.startPositionInTime).min).getOrElse(0)
 
   def copy(loads: Iterable[Load]): Iterable[Load] =
-    loads.flatMap(copyOne(_, addSuperTaskSubTasks = false))
+    loads.filter(!_.isInstanceOf[FlexibleLoadSubTask]).flatMap(copyOne(_, addSuperTaskSubTasks = false))
 
-  private[scheduler_model] def copy(loads: Iterable[Load], addSuperTaskSubTasks: Boolean): Iterable[Load] =
-    loads.flatMap(copyOne(_, addSuperTaskSubTasks))
+  def copy(loads: Iterable[Load], addSuperTaskSubTasks: Boolean): Iterable[Load] =
+    loads.filter(!_.isInstanceOf[FlexibleLoadSubTask]).flatMap(copyOne(_, addSuperTaskSubTasks))
 
   def copy(load: AccumulatedLoad): AccumulatedLoad =
     load.copy(addSuperTaskSubTasks = false)
 
-  private[scheduler_model] def copy(load: AccumulatedLoad, addSuperTaskSubTasks: Boolean): AccumulatedLoad =
+  def copy(load: AccumulatedLoad, addSuperTaskSubTasks: Boolean): AccumulatedLoad =
     load.copy(addSuperTaskSubTasks)
 
   def copy(load: FlexibleLoadSuperTask): FlexibleLoadSuperTask =

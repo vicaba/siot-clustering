@@ -63,7 +63,7 @@ class AccumulatedLoad
   override def startPositionInTime: Int = loads.map(_.startPositionInTime).min
 
   override def amplitudePerSlot: DenseVector[Double] =
-    if (loads.nonEmpty) sum(loads.map(_.amplitudePerSlot))
+    if (loads.nonEmpty) sum(loads.map(LoadOps.expandToCols(_, amplitudePerSlotMetadata.Columns)))
     else amplitudePerSlotMetadata.EmptySyntheticData()
 
   /**
