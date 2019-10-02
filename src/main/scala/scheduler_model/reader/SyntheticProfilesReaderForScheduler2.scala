@@ -91,7 +91,7 @@ object SyntheticProfilesReaderForScheduler2 extends TemplateForSyntheticProfiles
       val loadLabel = replaceWithLabel.getOrElse(label)
 
       def createFlexibleLoad(): FlexibleLoad =
-        FlexibleLoad(id, 0, loadLabel, 0, SparseVector(values.toArray))(DataTypeMetadata.generateDataTypeMetadata(forColumns = values.length))
+        FlexibleLoad(id, 0, loadLabel, 0, DenseVector[Double](values:_*))(DataTypeMetadata.generateDataTypeMetadata(forColumns = values.length))
 
       Try(label match {
         case DishWasher => createFlexibleLoad()
@@ -104,7 +104,7 @@ object SyntheticProfilesReaderForScheduler2 extends TemplateForSyntheticProfiles
 
   object FixedLoadBuilder extends LoadBuilder {
     override def apply(id: Int, values: scala.Vector[Double], label: String, replaceWithLabel: Option[String] = None): SingleLoad =
-      FixedLoad(id, 0, replaceWithLabel.getOrElse(label), SparseVector(values.toArray))(DataTypeMetadata.generateDataTypeMetadata(forColumns = values.length))
+      FixedLoad(id, 0, replaceWithLabel.getOrElse(label), DenseVector[Double](values:_*))(DataTypeMetadata.generateDataTypeMetadata(forColumns = values.length))
   }
 
 }

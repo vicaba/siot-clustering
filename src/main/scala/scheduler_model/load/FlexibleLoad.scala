@@ -24,7 +24,7 @@ object FlexibleLoad {
     val superTask: FlexibleLoadSuperTask = FlexibleLoadSuperTask(
       loadId,
       flexibleLoad.id,
-      "SuperTask(" + loadId + "), FlexibleL(id=" + flexibleLoad.id + ",group= " + flexibleLoad.group + ")",
+      flexibleLoad.label + " / SuperTask(" + loadId + "), FlexibleL(id=" + flexibleLoad.id + ",group= " + flexibleLoad.group + ")",
       splitResults.consecutiveValue,
       Nil,
       computeAmplitudePerSlotWithRestValueOnly = false
@@ -37,7 +37,7 @@ object FlexibleLoad {
       FlexibleLoadSubTask(
         loadId,
         superTask.id,
-        "SubTask(" + loadId + "), SuperTask(id=" + superTask.id + ",group=" + superTask.group + ")",
+        flexibleLoad.label + " / SubTask(" + loadId + "), SuperTask(id=" + superTask.id + ",group=" + superTask.group + ")",
         result.index,
         DenseVector[Double](result.seq.toVector: _*),
         superTask)

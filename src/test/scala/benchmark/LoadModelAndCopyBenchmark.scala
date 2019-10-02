@@ -64,6 +64,10 @@ class LoadModelAndCopyBenchmark extends FlatSpec {
     //LoadOps.copy(unscheduledLoad)
   //}
 
+  unscheduledLoad.loads.toArray.sortBy(_.id).zip(unscheduledLoads.head.loads.toArray.sortBy(_.id)).map { case (l1, l2) =>
+    assert(l1.amplitudePerSlot.toDenseVector.toScalaVector() == l2.amplitudePerSlot)
+  }
+
   //info("execution time of old model: " + oldModel.value + " " + oldModel.units)
   //info("execution time of new model: " + newModel.value + " " + newModel.units)
 

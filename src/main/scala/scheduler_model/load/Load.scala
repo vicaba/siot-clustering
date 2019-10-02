@@ -80,6 +80,8 @@ trait Load {
     )
   }
 
+  override def toString: String = s"Load($id, $startPositionInTime, $amplitudePerSlot)"
+
 }
 
 trait SingleLoad extends Load
