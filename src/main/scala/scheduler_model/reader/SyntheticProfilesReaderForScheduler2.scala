@@ -1,11 +1,10 @@
 package scheduler_model.reader
 
-import breeze.linalg.DenseVector
+import breeze.linalg._
 import scheduler_model.load.Load.LoadId
 import scheduler_model.load.{AccumulatedLoad, FixedLoad, FlexibleLoad, Load, SingleLoad}
 import reader.TemplateForSyntheticProfilesReader
 import types.clusterer.DataTypeMetadata
-import types.ops.SetOps._
 
 import scala.util.Try
 
@@ -19,7 +18,7 @@ object SyntheticProfilesReaderForScheduler2 extends TemplateForSyntheticProfiles
     applianceOutputFileName: String,
     lightingOutputFileName: String,
     ids: Iterable[Int],
-    windowSize: Int): Vector[AccumulatedLoadOutputType] = {
+    windowSize: Int): scala.Vector[AccumulatedLoadOutputType] = {
 
     apply(
       mainFolder,
@@ -49,7 +48,7 @@ object SyntheticProfilesReaderForScheduler2 extends TemplateForSyntheticProfiles
     applianceFileAndBuilder: String => this.LoadFileAndLoadBuilder,
     lightingFileAndBuilder: String => this.LoadFileAndLoadBuilder,
     ids: Iterable[Int],
-    windowSize: Int): Vector[AccumulatedLoadOutputType] = {
+    windowSize: Int): scala.Vector[AccumulatedLoadOutputType] = {
     assert(subFolders.size == ids.size, "the number of subFolders is not equal to the number of ids")
 
     val readFs = subFolders
@@ -87,12 +86,12 @@ object SyntheticProfilesReaderForScheduler2 extends TemplateForSyntheticProfiles
 
     import Appliances._
 
-    override def apply(id: Int, values: Vector[Double], label: String, replaceWithLabel: Option[String] = None): SingleLoad = {
+    override def apply(id: Int, values: scala.Vector[Double], label: String, replaceWithLabel: Option[String] = None): SingleLoad = {
 
       val loadLabel = replaceWithLabel.getOrElse(label)
 
       def createFlexibleLoad(): FlexibleLoad =
-        FlexibleLoad(id, 0, loadLabel, 0, DenseVector(values: _*))(DataTypeMetadata.generateDataTypeMetadata(forColumns = values.length))
+        FlexibleLoad(id, 0, loadLabel, 0, SparseVector(values.toArray))(DataTypeMetadata.generateDataTypeMetadata(forColumns = values.length))
 
       Try(label match {
         case DishWasher => createFlexibleLoad()
@@ -104,8 +103,8 @@ object SyntheticProfilesReaderForScheduler2 extends TemplateForSyntheticProfiles
   }
 
   object FixedLoadBuilder extends LoadBuilder {
-    override def apply(id: Int, values: Vector[Double], label: String, replaceWithLabel: Option[String] = None): SingleLoad =
-      FixedLoad(id, 0, replaceWithLabel.getOrElse(label), DenseVector(values: _*))(DataTypeMetadata.generateDataTypeMetadata(forColumns = values.length))
+    override def apply(id: Int, values: scala.Vector[Double], label: String, replaceWithLabel: Option[String] = None): SingleLoad =
+      FixedLoad(id, 0, replaceWithLabel.getOrElse(label), SparseVector(values.toArray))(DataTypeMetadata.generateDataTypeMetadata(forColumns = values.length))
   }
 
 }

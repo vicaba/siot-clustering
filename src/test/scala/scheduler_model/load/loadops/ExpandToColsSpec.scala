@@ -1,5 +1,6 @@
 package scheduler_model.load.loadops
 
+import breeze.linalg
 import breeze.linalg.DenseVector
 import scheduler_model.load.LoadOps
 import org.scalatest.{FlatSpec, GivenWhenThen}
@@ -20,7 +21,7 @@ class ExpandToColsSpec extends FlatSpec with GivenWhenThen {
 
     When(s"expanded to $colsToExpand columns from position $startPosition")
 
-    val expandedVector = LoadOps.expandToCols(startPosition = startPosition, vector = vector, cols = colsToExpand)
+    val expandedVector: linalg.Vector[Double] = LoadOps.expandToCols(startPosition = startPosition, vector = vector, cols = colsToExpand)
 
     Then("the expanded slots should have a value of 0.0")
 
@@ -31,7 +32,7 @@ class ExpandToColsSpec extends FlatSpec with GivenWhenThen {
 
     info(s"ExpandedDenseVector: $expandedVector")
 
-    assert(expectedExpandedVector == expandedVector.toScalaVector())
+    assert(expectedExpandedVector == expandedVector.toDenseVector.toScalaVector())
 
 
   }

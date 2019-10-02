@@ -1,6 +1,6 @@
 package scheduler_model.load
 
-import breeze.linalg.{DenseVector, sum}
+import breeze.linalg._
 import scheduler_model.load.Load.{GroupId, LoadId}
 import types.clusterer.DataTypeMetadata
 import collection.CollecctionHelper._
@@ -62,7 +62,7 @@ class AccumulatedLoad
 
   override def startPositionInTime: Int = loads.map(_.startPositionInTime).min
 
-  override def amplitudePerSlot: DenseVector[Double] =
+  override def amplitudePerSlot: Vector[Double] =
     if (loads.nonEmpty) sum(loads.map(LoadOps.expandToCols(_, amplitudePerSlotMetadata.Columns)))
     else amplitudePerSlotMetadata.EmptySyntheticData()
 

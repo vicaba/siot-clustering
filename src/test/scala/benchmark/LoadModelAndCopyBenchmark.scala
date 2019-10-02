@@ -23,7 +23,7 @@ class LoadModelAndCopyBenchmark extends FlatSpec {
       subFoldersAndIds.map(_._2),
       windowSize = 30)
 
-  val oldModel = withWarmer(new Warmer.Default) measure {
+  //val oldModel = withWarmer(new Warmer.Default) measure {
 
     val unscheduledLoads = List(
       test.load.AccumulatedLoad(-1, 0, _unscheduledLoadsOld.foldLeft(Set.empty[test.load.Load]) { case (acc, loads) =>
@@ -36,9 +36,9 @@ class LoadModelAndCopyBenchmark extends FlatSpec {
         _,
         test.SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage))
 
-    test.load.Load.deepCopy(unscheduledLoads).toList.head
+  //test.load.Load.deepCopy(unscheduledLoads).toList.head
 
-  }
+  //}
 
   val _unscheduledLoadsNew = SyntheticProfilesReaderForScheduler2
     .applyDefault(MainFolder,
@@ -48,7 +48,7 @@ class LoadModelAndCopyBenchmark extends FlatSpec {
       subFoldersAndIds.map(_._2),
       windowSize = 30)
 
-  val newModel = withWarmer(new Warmer.Default) measure {
+  //val newModel = withWarmer(new Warmer.Default) measure {
 
     val unscheduledLoad =
       scheduler_model.load.AccumulatedLoad(1, 1, "cluster", _unscheduledLoadsNew.foldLeft(Set.empty[scheduler_model.load.Load]) {
@@ -61,10 +61,20 @@ class LoadModelAndCopyBenchmark extends FlatSpec {
       scheduler_model.sequence_split.SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage)
 
 
-    LoadOps.copy(unscheduledLoad)
-  }
+    //LoadOps.copy(unscheduledLoad)
+  //}
 
-  info("execution time of old model: " + oldModel.value + " " + oldModel.units)
-  info("execution time of new model: " + newModel.value + " " + newModel.units)
+  //info("execution time of old model: " + oldModel.value + " " + oldModel.units)
+  //info("execution time of new model: " + newModel.value + " " + newModel.units)
+
+  println("First")
+
+  test.load.Load.deepCopy(unscheduledLoads).toList.head
+
+  println("Second")
+
+  LoadOps.copy(unscheduledLoad)
+
+  println("End")
 
 }

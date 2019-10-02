@@ -43,6 +43,6 @@ class BiasedAverageDistanceTransformation(val bias: Double = 0.50) extends Metri
     }
 
   private def computeAverageAtLoadPosition(accumulatedLoad: AccumulatedLoad, load: Load): Double =
-    sum(accumulatedLoad.amplitudePerSlot.slice(load.startPositionInTime, load.startPositionInTime + load.span)) / load.span.toDouble
+    sum(accumulatedLoad.amplitudePerSlot.toDenseVector.slice(load.startPositionInTime, load.startPositionInTime + load.span)) / load.span.toDouble
 
 }

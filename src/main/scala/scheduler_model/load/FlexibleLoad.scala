@@ -1,14 +1,14 @@
 package scheduler_model.load
 
 import Load._
-import breeze.linalg.DenseVector
+import breeze.linalg._
 import scheduler_model.sequence_split.SequenceSplitStrategy
 import types.clusterer.DataTypeMetadata
 
 object FlexibleLoad {
   def apply
   (
-    id: LoadId, group: GroupId, label: String, startPositionInTime: Int, amplitudePerSlot: DenseVector[Double]
+    id: LoadId, group: GroupId, label: String, startPositionInTime: Int, amplitudePerSlot: Vector[Double]
   )(
     implicit amplitudePerSlotMetadata: DataTypeMetadata
   ): FlexibleLoad =
@@ -19,7 +19,7 @@ object FlexibleLoad {
 
     var loadId = loadIdCounter.getOrElse(0)
 
-    val splitResults = splitStrategy(flexibleLoad.amplitudePerSlot.toScalaVector())
+    val splitResults = splitStrategy(flexibleLoad.amplitudePerSlot.toDenseVector.toScalaVector())
 
     val superTask: FlexibleLoadSuperTask = FlexibleLoadSuperTask(
       loadId,
@@ -53,7 +53,7 @@ class FlexibleLoad(
   override val group: GroupId,
   override val label: String,
   protected val _startPositionInTime: Int,
-  override val amplitudePerSlot: DenseVector[Double]
+  override val amplitudePerSlot: Vector[Double]
 )(implicit override val amplitudePerSlotMetadata: DataTypeMetadata)
   extends SingleLoad {
 

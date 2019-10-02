@@ -1,6 +1,6 @@
 package scheduler_model.load
 
-import breeze.linalg.DenseVector
+import breeze.linalg._
 import scheduler_model.load.Load.{GroupId, LoadId}
 import types.clusterer.DataTypeMetadata
 
@@ -58,7 +58,7 @@ class FlexibleLoadSuperTask(
 
   def areAggregateesOverlapped: Boolean = LoadOps.areLoadsOverlapped(aggregatees)
 
-  override def amplitudePerSlot: DenseVector[Double] =
+  override def amplitudePerSlot: Vector[Double] =
     if (!computeAmplitudePerSlotWithRestValueOnly)
       LoadOps.aggregatedAmplitudePerSlot(aggregatees, amplitudeInOffStatus, amplitudePerSlotMetadata)
     else

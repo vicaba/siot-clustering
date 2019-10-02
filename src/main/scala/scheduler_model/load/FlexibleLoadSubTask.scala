@@ -1,6 +1,6 @@
 package scheduler_model.load
 
-import breeze.linalg.DenseVector
+import breeze.linalg._
 import scheduler_model.load.Load.{GroupId, LoadId}
 import types.clusterer.DataTypeMetadata
 
@@ -11,7 +11,7 @@ object FlexibleLoadSubTask {
     group: GroupId,
     label: String,
     startPositionInTime: LoadId,
-    amplitudePerSlot: DenseVector[Double],
+    amplitudePerSlot: Vector[Double],
     superTask: FlexibleLoadSuperTask,
     amplitudePerSlotMetadata: DataTypeMetadata
   ): FlexibleLoadSubTask =
@@ -22,7 +22,7 @@ object FlexibleLoadSubTask {
     group: GroupId,
     label: String,
     startPositionInTime: LoadId,
-    amplitudePerSlot: DenseVector[Double],
+    amplitudePerSlot: Vector[Double],
     superTask: FlexibleLoadSuperTask
   ): FlexibleLoadSubTask =
     new FlexibleLoadSubTask(id, group, label, startPositionInTime, amplitudePerSlot, superTask)(DataTypeMetadata.generateDataTypeMetadata(forColumns = amplitudePerSlot.length))
@@ -37,7 +37,7 @@ class FlexibleLoadSubTask private(
   override val group: GroupId,
   override val label: String,
   override protected val _startPositionInTime: Int,
-  override val amplitudePerSlot: DenseVector[Double],
+  override val amplitudePerSlot: Vector[Double],
   private val _superTask: FlexibleLoadSuperTask
 )(implicit override val amplitudePerSlotMetadata: DataTypeMetadata)
   extends FlexibleLoad(id, group, label, _startPositionInTime, amplitudePerSlot) {

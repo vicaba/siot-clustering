@@ -1,6 +1,6 @@
 package scheduler_model.load.loadops
 
-import breeze.linalg.DenseVector
+import breeze.linalg._
 import org.scalatest.{FlatSpec, GivenWhenThen}
 import scheduler_model.load.{FixedLoad, FlexibleLoadSubTask, LoadOps}
 import types.clusterer.DataTypeMetadata
@@ -33,7 +33,7 @@ class AggregatedAmplitudePerSlotSpec extends FlatSpec with GivenWhenThen {
 
     When("aggregating their amplitudePerSlot")
 
-    val aggregatedVector: DenseVector[Double] =
+    val aggregatedVector: Vector[Double] =
       LoadOps.aggregatedAmplitudePerSlot(loads, 0.0, amplitudePerSlotMetadata)
 
     Then("the result should be the expected vector")

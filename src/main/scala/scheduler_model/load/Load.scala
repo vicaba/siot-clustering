@@ -28,7 +28,7 @@ object Load {
 
   implicit def toVector[X <: Load]: DenseVectorReprOps[X] = new DenseVectorReprOps[X] {
 
-    override def apply(t: X): DenseVector[Double] = t.amplitudePerSlot
+    override def apply(t: X): DenseVector[Double] = t.amplitudePerSlot.toDenseVector
 
     override def zero(t: X): DenseVector[Double] = DenseVector((for (_ <- 1 to t.span) yield 0.0): _*)
 
@@ -36,7 +36,7 @@ object Load {
 
   implicit def toVectorTraversable[X <: Load, S[X] <: Iterable[X]]: DenseVectorReprOps[S[X]] = new DenseVectorReprOps[S[X]] {
 
-    override def apply(t: S[X]): DenseVector[Double] = sum(t.map(_.amplitudePerSlot))
+    override def apply(t: S[X]): DenseVector[Double] = sum(t.map(_.amplitudePerSlot)).toDenseVector
 
     override def zero(t: S[X]): DenseVector[Double] = DenseVector((for (_ <- 1 to LoadOps.span(t)) yield 0.0): _*)
 
@@ -54,7 +54,7 @@ trait Load {
 
   val label: String
 
-  def amplitudePerSlot: DenseVector[Double]
+  def amplitudePerSlot: Vector[Double]
 
   def startPositionInTime: Int
 
@@ -93,7 +93,7 @@ object LoadOps {
     * @param cols
     * @return
     */
-  def expandToCols(startPosition: Int, vector: DenseVector[Double], cols: Int): DenseVector[Double] = {
+  def expandToCols(startPosition: Int, vector: Vector[Double], cols: Int): Vector[Double] = {
     if(vector.length == cols) return vector
     val span = vector.length
     val baseVector = DenseVector.fill[Double](cols, 0.0)
@@ -104,11 +104,11 @@ object LoadOps {
     baseVector
   }
 
-  def expandToCols(load: Load, cols: Int): DenseVector[Double] =
+  def expandToCols(load: Load, cols: Int): Vector[Double] =
     expandToCols(load.startPositionInTime, load.amplitudePerSlot, cols)
 
-  def aggregatedAmplitudePerSlot(loads: Iterable[Load], amplitudeInOffStatus: Double, dataTypeMetadata: DataTypeMetadata): DenseVector[Double] =
-    if (loads.isEmpty) DenseVector.fill(dataTypeMetadata.Columns)(amplitudeInOffStatus)
+  def aggregatedAmplitudePerSlot(loads: Iterable[Load], amplitudeInOffStatus: Double, dataTypeMetadata: DataTypeMetadata): Vector[Double] =
+    if (loads.isEmpty) DenseVector.fill(dataTypeMetadata.Columns)(amplitudeInOffStatus).toVector
     else {
 
       val aggregatedVector = sum(loads.map(l => expandToCols(l, dataTypeMetadata.Columns)))

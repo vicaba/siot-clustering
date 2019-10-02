@@ -96,7 +96,7 @@ class AccumulatedLoadBenchmark extends FlatSpec {
   }
 
   val executionTimeOfSliceInNewLoadModel = withWarmer(new Warmer.Default) measure {
-    sum(accLoadInNewLoadModel.amplitudePerSlot.slice(5, 10))
+    sum(accLoadInNewLoadModel.amplitudePerSlot.toDenseVector.slice(5, 10))
   }
 
   println("AmplitudePerSlot slice")
