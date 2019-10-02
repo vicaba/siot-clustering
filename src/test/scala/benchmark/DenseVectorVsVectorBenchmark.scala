@@ -28,9 +28,14 @@ class DenseVectorVsVectorBenchmark extends FlatSpec {
   def generate[E](howMany: Int, gen: () => E): List[E] =
     (for (_ <- 0 until howMany) yield gen()).toList
 
+  println("Start creating objects")
+
+
   val denseVectors: List[DenseVector[Double]] = generate(HowMany, () => DenseVector(List.fill(48)(4.0): _*))
   val scalaVectors: List[Vector[Double]] = generate(HowMany, () => Vector.fill(48)(4.0))
   val arrayVectors: Array[Array[Double]] = generate(HowMany, () => Array.fill(48)(4.0)).toArray
+
+  println("Objects created")
 
   def arraySum(arrays: Iterable[Array[Double]], cols: Int): Array[Double] = {
     var i = 0

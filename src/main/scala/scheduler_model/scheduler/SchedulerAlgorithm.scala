@@ -39,14 +39,9 @@ object SchedulerAlgorithm {
 
       def splitFlexibleLoads(_acc: AccumulatedLoad): AccumulatedLoadWithSeparatedFlexibleLoads = {
         // Retrieve FlexibleLoads
-        val remainingLoadsAfterRemovingFlexibleLoads = _acc.loads -- _acc.flexibleLoads
-        // TODO: Maybe we do not need a copy here
-        val copy = LoadOps.copy(_acc, addSuperTaskSubTasks = false)
-        // Those operations are done to mantain the references, so copy has the references of _acc
-        copy --= _acc.loads
-        copy ++= remainingLoadsAfterRemovingFlexibleLoads
-
-        AccumulatedLoadWithSeparatedFlexibleLoads(copy, _acc.flexibleLoads.toList.sorted(ordering))
+        val flexibleLoads = _acc.flexibleLoads
+        _acc.loads --= _acc.flexibleLoads
+        AccumulatedLoadWithSeparatedFlexibleLoads(_acc, flexibleLoads.toList.sorted(ordering))
       }
 
       (splitFlexibleLoads(bestAccumulatedLoad), splitFlexibleLoads(temporaryAccumulatedLoad))

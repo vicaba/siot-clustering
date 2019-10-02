@@ -68,6 +68,6 @@ class FlexibleLoad(
 
   def copy(): FlexibleLoad = FlexibleLoad(id, group, label, startPositionInTime, amplitudePerSlot)
 
-  ensureCorrectCreation()
+  //ensureCorrectCreation()
 
 }

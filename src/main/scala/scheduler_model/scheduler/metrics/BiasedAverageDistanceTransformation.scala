@@ -1,7 +1,5 @@
 package scheduler_model.scheduler.metrics
 
-import java.util.Calendar
-
 import breeze.linalg.sum
 import scheduler_model.load.{AccumulatedLoad, Load}
 import scheduler_model.scheduler.Movement
@@ -44,11 +42,7 @@ class BiasedAverageDistanceTransformation(val bias: Double = 0.50) extends Metri
       numberOfOverlappedSlots.toDouble / load.span.toDouble
     }
 
-  private def computeAverageAtLoadPosition(accumulatedLoad: AccumulatedLoad, load: Load): Double = {
-    println(s"Time Before: ${Calendar.getInstance().getTime()}")
-    val slice = accumulatedLoad.amplitudePerSlot.toDenseVector.slice(load.startPositionInTime, load.startPositionInTime + load.span)
-    println(s"Time After: ${Calendar.getInstance().getTime()}")
-    sum(slice) / load.span.toDouble
-  }
+  private def computeAverageAtLoadPosition(accumulatedLoad: AccumulatedLoad, load: Load): Double =
+    sum(accumulatedLoad.amplitudePerSlot.toDenseVector.slice(load.startPositionInTime, load.startPositionInTime + load.span)) / load.span.toDouble
 
 }

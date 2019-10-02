@@ -37,7 +37,7 @@ object Scheduler {
 
       val _clusters: List[AccumulatedLoad] = Load.deepCopy(clusters).toList
 
-      logger.info("Running Scheduler for {} users")
+      logger.info("Running Scheduler for {} users", _clusters.length)
 
 
       val numberOfSlots = AccumulatedLoad(-1, 0, _clusters, "").span

@@ -26,8 +26,7 @@ object UserAllocator {
   def allocate(users: List[AccumulatedLoad],
                numberOfSlots: Int,
                windowSize: Int,
-               userOrdering: Ordering[AccumulatedLoad] =
-                 Load.loadListOrderingByAmplitude.on[AccumulatedLoad](_.flexibleLoads.toList).reverse): List[List[Int]] = {
+               userOrdering: Ordering[AccumulatedLoad] = DefaultOrdering) = {
 
       // TODO: Test this by comparing results of BenchmarkSpec and SchedulerSpec
       val sortedUsers = users.sorted(userOrdering)
@@ -50,7 +49,7 @@ object UserAllocator {
       val accumulatedLoads =
         AccumulatedLoad.keepLoadOrder(0, lowestPositionInT, fixedLoads ::: usersAsFlexibleLoads, "")
 
-      val allocationResult = SchedulerAlgorithm.reschedule(accumulatedLoads, metricTransformation = NoTransformation)
+      val allocationResult = SchedulerAlgorithm.reschedule(accumulatedLoads, metricTransformation = NoTransformation, verbose = true)
 
       // Reorder per "users" input
       val order = users.map(_.id)

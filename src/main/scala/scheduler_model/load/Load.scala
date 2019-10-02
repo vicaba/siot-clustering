@@ -165,7 +165,7 @@ object LoadOps {
   private def copyOne(l: Load, addSuperTaskSubTasks: Boolean): Iterable[Load] = l match {
     case fixedLoad: FixedLoad => List(fixedLoad.copy())
     case flexibleLoadSuperTask: FlexibleLoadSuperTask =>
-      val superTask = copy(flexibleLoadSuperTask)
+      val superTask = flexibleLoadSuperTask.copyAndCopySubTasks()
       val subTasks = superTask.aggregatees
       if (addSuperTaskSubTasks) List(superTask) ++ subTasks else List(superTask)
     case _: FlexibleLoadSubTask => Nil

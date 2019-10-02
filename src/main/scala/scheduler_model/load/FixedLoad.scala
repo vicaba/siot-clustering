@@ -27,6 +27,6 @@ class FixedLoad(
 
   def copy(): FixedLoad = FixedLoad(id, group, label, amplitudePerSlot)
 
-  ensureCorrectCreation()
+  //ensureCorrectCreation()
 
 }
