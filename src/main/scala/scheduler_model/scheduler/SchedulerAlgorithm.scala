@@ -1,7 +1,7 @@
 package scheduler_model.scheduler
 
 import scheduler_model.load._
-import scheduler_model.scheduler.metrics.MetricTransformation
+import scheduler_model.scheduler.metric_transformer.MetricTransformation
 
 object SchedulerAlgorithm {
 

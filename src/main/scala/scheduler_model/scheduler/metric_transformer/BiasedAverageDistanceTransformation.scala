@@ -1,4 +1,4 @@
-package scheduler_model.scheduler.metrics
+package scheduler_model.scheduler.metric_transformer
 
 import breeze.linalg.sum
 import scheduler_model.load.{AccumulatedLoad, Load}

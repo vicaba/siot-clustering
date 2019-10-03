@@ -60,6 +60,9 @@ class AccumulatedLoad
   def flexibleLoads: Set[FlexibleLoad] =
     loads.filter(_.isInstanceOf[FlexibleLoad]).toSet.asInstanceOf[Set[FlexibleLoad]]
 
+  def fixedLoads: Set[FixedLoad] =
+    loads.filter(_.isInstanceOf[FixedLoad]).toSet.asInstanceOf[Set[FixedLoad]]
+
   override def startPositionInTime: Int = loads.map(_.startPositionInTime).min
 
   override def amplitudePerSlot: Vector[Double] =

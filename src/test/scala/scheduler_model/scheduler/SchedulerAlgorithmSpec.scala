@@ -1,14 +1,13 @@
-package scheduler_model
+package scheduler_model.scheduler
 
-import metrics.Metric
-import org.scalatest.{FeatureSpec, GivenWhenThen}
 import org.scalatest.Matchers._
-import reader.SyntheticProfilesReaderForScheduler2
+import org.scalatest.{FeatureSpec, GivenWhenThen}
 import scheduler_model.load.{AccumulatedLoad, Load, LoadOps}
-import scheduler_model.scheduler.SchedulerAlgorithm
-import scheduler_model.scheduler.metrics.BiasedAverageDistanceTransformation
+import scheduler_model.reader.SyntheticProfilesReaderForScheduler2
+import scheduler_model.scheduler.metric_transformer.BiasedAverageDistanceTransformation
 import scheduler_model.sequence_split.SequenceSplitByConsecutiveElements
 import types.clusterer.DataTypeMetadata
+import metrics.Metric
 
 class SchedulerAlgorithmSpec extends FeatureSpec with GivenWhenThen {
 

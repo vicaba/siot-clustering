@@ -1,4 +1,4 @@
-package scheduler_model.scheduler.metrics
+package scheduler_model.scheduler.metric_transformer
 
 import scheduler_model.scheduler.Movement
 
