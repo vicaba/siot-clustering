@@ -255,11 +255,9 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
     generateLoadsLog(users, benchmarkResult, enablePrintLoads, enableTestVerbose, scenarioName, enableGenerateTables)
 
     val accumulatedLoadWithoutPriority =
-      AccumulatedLoad(-1, -1, "accumulatedLoadWithoutPriority", benchmarkResult.resultsWithoutPriority)(
-        DataTypeMetadata.generateDataTypeMetadata(forColumns = 3))
+      AccumulatedLoad.AutoSpanFromLoads(-1, -1, "accumulatedLoadWithoutPriority", benchmarkResult.resultsWithoutPriority)
     val accumulatedLoadWithPriority =
-      AccumulatedLoad(-1, -1, "accumulatedLoadWithPriority", benchmarkResult.resultsWithPriority)(
-        DataTypeMetadata.generateDataTypeMetadata(forColumns = 3))
+      AccumulatedLoad.AutoSpanFromLoads(-1, -1, "accumulatedLoadWithPriority", benchmarkResult.resultsWithPriority)
 
     Metric.par(accumulatedLoadWithPriority) should be <= Metric.par(accumulatedLoadWithoutPriority)
 
@@ -342,11 +340,9 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
     }
 
     val accumulatedLoadWithoutPriority =
-      AccumulatedLoad(-1, -1, "accumulatedLoadWithoutPriority", resultsWithoutPriority)(
-        DataTypeMetadata.generateDataTypeMetadata(forColumns = 3))
+      AccumulatedLoad.AutoSpanFromLoads(-1, -1, "accumulatedLoadWithoutPriority", resultsWithoutPriority)
     val accumulatedLoadWithPriority    =
-      AccumulatedLoad(-1, -1, "accumulatedLoadWithPriority", resultsWithPriority)(
-        DataTypeMetadata.generateDataTypeMetadata(forColumns = 3))
+      AccumulatedLoad.AutoSpanFromLoads(-1, -1, "accumulatedLoadWithPriority", resultsWithPriority)
 
     val outputParWithoutPriority = Metric.par(resultsWithoutPriority)
     enableLog(enableTestVerbose) {
@@ -360,7 +356,7 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
       println(accumulatedLoadWithPriority.amplitudePerSlot.toString())
     }
 
-    val initialAccumulated = AccumulatedLoad(-1, -1, "-1", users)(users.head.amplitudePerSlotMetadata)
+    val initialAccumulated = AccumulatedLoad.AutoSpanFromLoads(-1, -1, "-1", users)
     enableLog(enableGenerateTables) {
 
       val initialTotalTable = new TableList(
