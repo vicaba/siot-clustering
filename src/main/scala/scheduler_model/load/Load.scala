@@ -46,7 +46,7 @@ object Load {
 
 trait Load {
 
-  val amplitudePerSlotMetadata: DataTypeMetadata
+  def amplitudePerSlotMetadata: DataTypeMetadata
 
   def id: LoadId
 

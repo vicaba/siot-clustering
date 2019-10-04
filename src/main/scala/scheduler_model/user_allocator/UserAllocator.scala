@@ -49,7 +49,7 @@ object UserAllocator {
         user.id,
         "User as FlexibleLoad",
         0,
-        DenseVector(flexibleLoadVector.toArray))(DataTypeMetadata.generateDataTypeMetadata(forColumns = flexibleLoadVector.size))
+        DenseVector(flexibleLoadVector.toArray))
     }
 
     val fixedLoads = sortedUsers.flatMap(_.fixedLoads)

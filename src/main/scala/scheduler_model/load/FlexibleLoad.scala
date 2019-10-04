@@ -9,8 +9,6 @@ object FlexibleLoad {
   def apply
   (
     id: LoadId, group: GroupId, label: String, startPositionInTime: Int, amplitudePerSlot: Vector[Double]
-  )(
-    implicit amplitudePerSlotMetadata: DataTypeMetadata
   ): FlexibleLoad =
     new FlexibleLoad(id, group, label, startPositionInTime, amplitudePerSlot)
 
@@ -54,10 +52,12 @@ class FlexibleLoad(
   override val label: String,
   protected val _startPositionInTime: Int,
   override val amplitudePerSlot: Vector[Double]
-)(implicit override val amplitudePerSlotMetadata: DataTypeMetadata)
+)
   extends SingleLoad {
 
   protected var __startPositionInTime: Int = _startPositionInTime
+
+  override val amplitudePerSlotMetadata: DataTypeMetadata = DataTypeMetadata.generateDataTypeMetadata(forColumns = amplitudePerSlot.length)
 
   def startPositionInTime_=(pos: Int): FlexibleLoad = {
     __startPositionInTime = pos
