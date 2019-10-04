@@ -16,11 +16,11 @@ object AccumulatedLoad {
       implicit amplitudePerSlotMetadata: DataTypeMetadata): AccumulatedLoad =
     new AccumulatedLoad(id, group, label, new scala.collection.mutable.HashSet[Load]() += load)
 
-  def apply(id: LoadId, group: GroupId, label: String, loads: Traversable[Load])(
+  def apply(id: LoadId, group: GroupId, label: String, loads: Iterable[Load])(
       implicit amplitudePerSlotMetadata: DataTypeMetadata): AccumulatedLoad =
     new AccumulatedLoad(id, group, label, mutableSetOf(loads))
 
-  def keepLoadOrder(id: LoadId, group: GroupId, label: String, loads: Traversable[Load])(
+  def keepLoadOrder(id: LoadId, group: GroupId, label: String, loads: Iterable[Load])(
       implicit amplitudePerSlotMetadata: DataTypeMetadata): AccumulatedLoad =
     new AccumulatedLoad(id, group, label, orderedMutableSetOf(loads))
 
@@ -30,11 +30,11 @@ object AccumulatedLoad {
       new AccumulatedLoad(id, group, label, new scala.collection.mutable.HashSet[Load]() += load)(
         DataTypeMetadata.generateDataTypeMetadata(forColumns = load.span))
 
-    def apply(id: LoadId, group: GroupId, label: String, loads: Traversable[Load]): AccumulatedLoad =
+    def apply(id: LoadId, group: GroupId, label: String, loads: Iterable[Load]): AccumulatedLoad =
       new AccumulatedLoad(id, group, label, mutableSetOf(loads))(
-        DataTypeMetadata.generateDataTypeMetadata(forColumns = loads.map(_.span).max))
+        DataTypeMetadata.generateDataTypeMetadata(forColumns = LoadOps.span(loads)))
 
-    def keepLoadOrder(id: LoadId, group: GroupId, label: String, loads: Traversable[Load]): AccumulatedLoad =
+    def keepLoadOrder(id: LoadId, group: GroupId, label: String, loads: Iterable[Load]): AccumulatedLoad =
       new AccumulatedLoad(id, group, label, orderedMutableSetOf(loads))(
         DataTypeMetadata.generateDataTypeMetadata(forColumns = loads.map(_.span).max))
 
