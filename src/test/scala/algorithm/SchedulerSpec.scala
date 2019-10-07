@@ -161,7 +161,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
 
       Given("Synthetically generated loads as UnscheduledLoads")
 
-      val subFoldersAndIds: List[(String, Int)] = (for (i <- 2 to 3) yield (i + "/", i)).toList
+      val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 3) yield (i + "/", i)).toList
 
       val _unscheduledLoads: Seq[AccumulatedLoad] = SyntheticProfilesReaderForScheduler
         .applyDefault(MainFolder,
