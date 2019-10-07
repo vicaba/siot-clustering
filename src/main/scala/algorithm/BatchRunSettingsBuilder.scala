@@ -1,8 +1,9 @@
 package algorithm
 
 import metrics.Metric
-import test.{SchedulerAlgorithm, UserAllocator}
-import test.reschedulermetrics.BiasedAverageDistanceTransformation
+import scheduler_model.scheduler.SchedulerAlgorithm
+import scheduler_model.scheduler.metric_transformer.BiasedAverageDistanceTransformation
+import scheduler_model.user_allocator.UserAllocator
 import types.clusterer.immutable.Point
 
 /**
@@ -25,8 +26,7 @@ class BatchRunSettingsBuilder(val points: Vector[Point],
     timesToIterate: (Vector[Point], Int) => Int = this.timesToIterate): BatchRunSettingsBuilder =
     new BatchRunSettingsBuilder(points, numbersOfClusters, metrics, timesToIterate)
 
-  def build: List[(clusterer.EuclideanClustererSettings, algorithm.scheduler.ReschedulerSettings)] = {
-    numbersOfClusters.flatMap { numberOfClusters =>
+  def build: List[(clusterer.EuclideanClustererSettings, algorithm.scheduler.ReschedulerSettings)] = numbersOfClusters.flatMap { numberOfClusters =>
       metrics.map { metric =>
         (
           clusterer.EuclideanClustererSettings(numberOfClusters,
@@ -43,5 +43,4 @@ class BatchRunSettingsBuilder(val points: Vector[Point],
         )
       }
     }
-  }
 }

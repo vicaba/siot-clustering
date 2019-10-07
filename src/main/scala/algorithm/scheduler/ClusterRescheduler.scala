@@ -2,8 +2,9 @@ package algorithm.scheduler
 
 import metrics.Metric
 import com.typesafe.scalalogging.Logger
-import test.{ClusterAndAccumulatedLoadTransformer, SequenceSplitByConsecutiveElements}
-import test.load.{AccumulatedLoad, Load}
+import scheduler_model.ClusterAndAccumulatedLoadTransformer
+import scheduler_model.load.{AccumulatedLoad, Load}
+import scheduler_model.sequence_split.SequenceSplitByConsecutiveElements
 import types.clusterer.mutable.Cluster
 
 object ClusterRescheduler {
@@ -14,7 +15,7 @@ object ClusterRescheduler {
 
     val clustersAsAccumulatedLoad = ClusterAndAccumulatedLoadTransformer.apply(clusters).toList
 
-    clustersAsAccumulatedLoad.foreach(Load.MutateAccumulatedLoad.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
+    clustersAsAccumulatedLoad.foreach(AccumulatedLoad.Mutate.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
       _,
       SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage))
 

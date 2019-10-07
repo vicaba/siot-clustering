@@ -2,7 +2,8 @@ package reader
 
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers._
-import test.SequenceSplitByConsecutiveElements
+import scheduler_model.reader.SyntheticProfilesReaderForScheduler2
+import scheduler_model.sequence_split.SequenceSplitByConsecutiveElements
 
 import scala.io.Source
 import scala.util.Try
@@ -30,7 +31,7 @@ class SyntheticProfilesReaderForSchedulerSpec extends FlatSpec {
   "The first SpanSlotAccumulatedLoad.amplitudePerSlot" should "be equal to the windowed first line of the file" in {
     val subFoldersAndIds: List[(String, Int)] = List((0 + "/", 0))
 
-    val res = SyntheticProfilesReaderForScheduler.applyDefault(MainFolder,
+    val res = SyntheticProfilesReaderForScheduler2.applyDefault(MainFolder,
                                       subFoldersAndIds.map(_._1),
                                       AppliancesOutputFileName,
                                       LightingOutputFileName,
@@ -39,22 +40,22 @@ class SyntheticProfilesReaderForSchedulerSpec extends FlatSpec {
 
     val rawRead: Vector[Double] = readRawHeadRow(MainFolder + "0/" + "totals.csv", windowSize = 60)
 
-    assert(rawRead == res.head.amplitudePerSlot,
+    assert(rawRead == res.head.amplitudePerSlot.toDenseVector.toScalaVector(),
            s"${rawRead} was not equal to ${res.head.amplitudePerSlot}")
   }
 
   "Partitioning the first SpanSlotAccumulatedLoad" should "split flexible loads" in {
     val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 1) yield (i + "/", i)).toList
 
-    val res = SyntheticProfilesReaderForScheduler.applyDefault(MainFolder,
+    val res = SyntheticProfilesReaderForScheduler2.applyDefault(MainFolder,
                                       subFoldersAndIds.map(_._1),
                                       AppliancesOutputFileName,
                                       LightingOutputFileName,
                                       subFoldersAndIds.map(_._2),
                                       windowSize = 30)
 
-    val flexibleLoad = res.head.flexibleLoads.filter(_.label == SyntheticProfilesReaderForScheduler.Appliances.WashingMachine).head
-    SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage(flexibleLoad.amplitudePerSlot).results should not be empty
+    val flexibleLoad = res.head.flexibleLoads.filter(_.label == SyntheticProfilesReaderForScheduler2.Appliances.WashingMachine).head
+    SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage(flexibleLoad.amplitudePerSlot.toDenseVector.toScalaVector()).results should not be empty
 
   }
 

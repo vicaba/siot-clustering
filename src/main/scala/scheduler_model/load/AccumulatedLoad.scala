@@ -4,7 +4,6 @@ import breeze.linalg._
 import scheduler_model.load.Load.{GroupId, LoadId}
 import types.clusterer.DataTypeMetadata
 import collection.CollecctionHelper._
-import scheduler_model.load.AccumulatedLoad
 import scheduler_model.sequence_split.SequenceSplitStrategy
 import types.ops.SetOps._
 

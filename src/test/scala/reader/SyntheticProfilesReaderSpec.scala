@@ -3,6 +3,7 @@ package reader
 import metrics.Metric
 import org.scalatest.{FlatSpec, GivenWhenThen}
 import org.scalatest.Matchers._
+import scheduler_model.reader.SyntheticProfilesReaderForScheduler2
 
 class SyntheticProfilesReaderSpec extends FlatSpec with GivenWhenThen {
 
@@ -14,7 +15,7 @@ class SyntheticProfilesReaderSpec extends FlatSpec with GivenWhenThen {
 
     val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 4) yield (i + "/", i)).toList
 
-    val schedulerModelEntities = SyntheticProfilesReaderForScheduler.applyDefault(MainFolder,
+    val schedulerModelEntities = SyntheticProfilesReaderForScheduler2.applyDefault(MainFolder,
       subFoldersAndIds.map(_._1),
       AppliancesOutputFileName,
       LightingOutputFileName,

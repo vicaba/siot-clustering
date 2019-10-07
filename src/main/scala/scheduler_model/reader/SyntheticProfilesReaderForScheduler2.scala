@@ -65,7 +65,7 @@ object SyntheticProfilesReaderForScheduler2 extends TemplateForSyntheticProfiles
 
             (
               AccumulatedLoad(idCForAccumulatedLoad, idCForAccumulatedLoad, "user" + idCForAccumulatedLoad, loads)
-              (DataTypeMetadata.generateDataTypeMetadata(loads.length)),
+              (DataTypeMetadata.generateDataTypeMetadata(24*60 / windowSize)),
               idCForAccumulatedLoad
             )
           }
@@ -93,12 +93,9 @@ object SyntheticProfilesReaderForScheduler2 extends TemplateForSyntheticProfiles
       def createFlexibleLoad(): FlexibleLoad =
         FlexibleLoad(id, 0, loadLabel, 0, DenseVector[Double](values:_*))
 
-      Try(label match {
-        case DishWasher => createFlexibleLoad()
-        case TumbleDryer => createFlexibleLoad()
-        case WashingMachine => createFlexibleLoad()
-        case WasherDryer => createFlexibleLoad()
-      }).getOrElse(FixedLoadBuilder(id, values, label, replaceWithLabel))
+      if (FlexibleLoads.contains(label)) createFlexibleLoad()
+      else FixedLoadBuilder(id, values, label, replaceWithLabel)
+
     }
   }
 

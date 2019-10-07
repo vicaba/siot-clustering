@@ -1,12 +1,14 @@
 package reader
 
+import scheduler_model.load.Load.LoadId
+
 import scala.io.Source
 import scala.util.Try
 
 
 trait TemplateForSyntheticProfilesReader {
 
-  import test.load.Load.LoadId
+  import Appliances._
 
   type SingleLoadOutputType
 
@@ -45,8 +47,14 @@ trait TemplateForSyntheticProfilesReader {
     val ElecShower       = "ELEC_SHOWER"
     val StorageHeater    = "STORAGE_HEATER"
     val ElecSpaceHeating = "ELEC_SPACE_HEATING"
-
   }
+
+  val FlexibleLoads: List[String] = List(
+    DishWasher,
+    TumbleDryer,
+    WashingMachine,
+    WasherDryer
+  )
 
   trait LoadBuilder extends ((Int, Vector[Double], String, Option[String]) => SingleLoadOutputType) {
     def apply(id: Int, values: Vector[Double], label: String, replaceWithLabel: Option[String] = None): SingleLoadOutputType

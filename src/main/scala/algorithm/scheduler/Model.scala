@@ -2,9 +2,10 @@ package algorithm.scheduler
 
 import algorithm.Settings
 import metrics.Metric
-import test.{SchedulerAlgorithm, UserAllocator}
-import test.load.{AccumulatedLoad, Load}
-import test.reschedulermetrics.MetricTransformation
+import scheduler_model.load.{AccumulatedLoad, Load}
+import scheduler_model.scheduler.SchedulerAlgorithm
+import scheduler_model.scheduler.metric_transformer.MetricTransformation
+import scheduler_model.user_allocator.UserAllocator
 
 case class ReschedulerSettings(override val numberOfClusters: Int,
                                override val metric: Metric,

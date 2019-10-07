@@ -1,11 +1,12 @@
 package algorithm.scheduler
 
 import metrics.Metric
-import test.load.{AccumulatedLoad, Load}
-import test.{SchedulerAlgorithm, SequenceSplitByConsecutiveElements, UserAllocator}
-import test.reschedulermetrics.MetricTransformation
+import scheduler_model.load._
 import Load._
 import com.typesafe.scalalogging.Logger
+import scheduler_model.scheduler.SchedulerAlgorithm
+import scheduler_model.scheduler.metric_transformer.MetricTransformation
+import scheduler_model.user_allocator.UserAllocator
 
 import scala.util.Try
 
@@ -16,18 +17,18 @@ object Scheduler {
 
   def apply(clusters: List[AccumulatedLoad],
     metricTransformation: MetricTransformation,
-    userOrdering: Ordering[AccumulatedLoad] = UserAllocator.DefaultOrderings.head,
-    schedulerAlgorithmOrdering: Ordering[Load] = SchedulerAlgorithm.DefaultOrderings.head)
+    userOrdering: Ordering[AccumulatedLoad] = UserAllocator.DefaultOrdering,
+    schedulerAlgorithmOrdering: Ordering[Load] = SchedulerAlgorithm.DefaultOrdering)
   : List[AccumulatedLoad] = {
 
     if (clusters.size == 1) {
-      clusters.map {
+      clusters.map { cluster =>
         logger.info("Running Scheduler for a single user")
         SchedulerAlgorithm.reschedule(
-          _,
+          cluster,
           Nil,
           metricTransformation = metricTransformation,
-          referenceAverage = 0.0,
+          referenceAverage = cluster.totalEnergy / cluster.span,
           schedulerAlgorithmOrdering,
           verbose = false
         )
@@ -35,12 +36,12 @@ object Scheduler {
 
     } else {
 
-      val _clusters: List[AccumulatedLoad] = Load.deepCopy(clusters).toList
+      val _clusters: List[AccumulatedLoad] = LoadOps.copy(clusters).toList.asInstanceOf[List[AccumulatedLoad]]
 
       logger.info("Running Scheduler for {} users", _clusters.length)
 
 
-      val numberOfSlots = AccumulatedLoad(-1, 0, _clusters, "").span
+      val numberOfSlots = LoadOps.span(_clusters)
       val allFlexibleLoads = _clusters.flatMap(_.flexibleLoads)
       val windowSize = Try(allFlexibleLoads.map(_.span).sum / allFlexibleLoads.size).getOrElse(1)
       val schedulerPreferredSlots =
