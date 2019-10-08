@@ -84,7 +84,7 @@ object SyntheticProfilesReaderForScheduler2 extends TemplateForSyntheticProfiles
 
   object ApplianceLoadBuilder extends LoadBuilder {
 
-    import Appliances._
+    import TemplateForSyntheticProfilesReader.FlexibleLoads
 
     override def apply(id: Int, values: scala.Vector[Double], label: String, replaceWithLabel: Option[String] = None): SingleLoad = {
 

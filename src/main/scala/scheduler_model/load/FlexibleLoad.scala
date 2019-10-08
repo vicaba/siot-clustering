@@ -20,9 +20,9 @@ object FlexibleLoad {
     val splitResults = splitStrategy(flexibleLoad.amplitudePerSlot.toDenseVector.toScalaVector())
 
     val superTask: FlexibleLoadSuperTask = FlexibleLoadSuperTask(
-      loadId,
       flexibleLoad.id,
-      flexibleLoad.label + " / SuperTask(" + loadId + "), FlexibleL(id=" + flexibleLoad.id + ",group= " + flexibleLoad.group + ")",
+      flexibleLoad.group,
+      flexibleLoad.label,
       splitResults.consecutiveValue,
       Nil,
       computeAmplitudePerSlotWithRestValueOnly = false

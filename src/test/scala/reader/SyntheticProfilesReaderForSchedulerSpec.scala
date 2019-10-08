@@ -54,7 +54,7 @@ class SyntheticProfilesReaderForSchedulerSpec extends FlatSpec {
                                       subFoldersAndIds.map(_._2),
                                       windowSize = 30)
 
-    val flexibleLoad = res.head.flexibleLoads.filter(_.label == SyntheticProfilesReaderForScheduler2.Appliances.WashingMachine).head
+    val flexibleLoad = res.head.flexibleLoads.filter(_.label == TemplateForSyntheticProfilesReader.Appliances.WashingMachine).head
     SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage(flexibleLoad.amplitudePerSlot.toDenseVector.toScalaVector()).results should not be empty
 
   }

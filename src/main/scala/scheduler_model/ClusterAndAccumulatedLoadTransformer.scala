@@ -1,64 +1,68 @@
 package scheduler_model
 
 import breeze.linalg._
-import scheduler_model.load.{AccumulatedLoad, FlexibleLoadSubTask, FlexibleLoadSuperTask}
-import scheduler_model.reader.SyntheticProfilesReaderForScheduler2.ApplianceLoadBuilder
+import _root_.reader.TemplateForSyntheticProfilesReader
+import scheduler_model.load.Load.{GroupId, LoadId}
+import scheduler_model.load._
 import types.clusterer.DataTypeMetadata
 import types.clusterer.immutable.Point
 import types.clusterer.mutable.Cluster
 
 object ClusterAndAccumulatedLoadTransformer {
 
-  def apply(clusters: Seq[Cluster]): Seq[AccumulatedLoad] = {
+  def createAccumulatedLoad(id: LoadId, group: GroupId, label: String, loads: Iterable[Load], amplitudePerSlotMetadata: DataTypeMetadata): AccumulatedLoad =
+    AccumulatedLoad(id, group, label, loads)(amplitudePerSlotMetadata)
 
-    ???
 
-/*    val builder = ApplianceLoadBuilder
+  def apply(clusters: Seq[Cluster], dataTypeMetadata: DataTypeMetadata): Seq[AccumulatedLoad] = {
 
-    var applianceCounter: Int = -1
+    def createLoad(id: LoadId, groupId: GroupId, values: DenseVector[Double], label: String): SingleLoad = {
+
+      def createFlexibleLoad(): FlexibleLoad =
+        FlexibleLoad(id, groupId, label, 0, DenseVector[Double](values.toScalaVector():_*))
+
+      def createFixedLoad(): FixedLoad = FixedLoad(id, groupId, label, DenseVector[Double](values.toScalaVector():_*))
+
+      if (TemplateForSyntheticProfilesReader.FlexibleLoads.contains(label)) createFlexibleLoad()
+      else createFixedLoad()
+
+    }
+
 
     clusters.map { cluster =>
 
       val pointsInCluster = Cluster.flatten(cluster)
 
-      pointsInCluster.map { pointInCluster =>
+      val loads = pointsInCluster.flatMap { pointInCluster =>
 
+        var applianceCounter: Int = -1
         val dataIterator  = pointInCluster.data(breeze.linalg.*, ::).iterator.toList
         val labelIterator = pointInCluster.dataLabels.toIterator.toList
 
         def buildAppliance(dv: DenseVector[Double], label: String = "") = {
           applianceCounter = applianceCounter + 1
-          builder(applianceCounter, dv.toScalaVector(), label, replaceWithLabel = Some("-p" + pointInCluster.id + "-" + label))
+          createLoad(applianceCounter, pointInCluster.id, dv, label)
         }
-
-        if (labelIterator.nonEmpty) dataIterator.zip(labelIterator).map {
+        dataIterator.zip(labelIterator).map {
           case (dv, label) =>
             buildAppliance(dv, label)
-        } else
-          dataIterator.map { dv =>
-            buildAppliance(dv)
-          }
-
+        }
       }
-
-    }*/
-
-
+      createAccumulatedLoad(cluster.id, cluster.id, cluster.name, loads, dataTypeMetadata)
+    }
   }
 
-  def apply(accumulatedLoads: Seq[AccumulatedLoad], dataTypeMetadata: DataTypeMetadata): Seq[Cluster] = {
-
-    val pointRegex = """-p(\d+)-""".r
+  def reverse(accumulatedLoads: Seq[AccumulatedLoad], dataTypeMetadata: DataTypeMetadata): Seq[Cluster] = {
 
     accumulatedLoads.map { accumulatedLoad =>
       val cluster = Cluster(accumulatedLoad.id, accumulatedLoad.label, Set.empty[Point], 1, None)(dataTypeMetadata)
       accumulatedLoad.loads.filter(_.isInstanceOf[FlexibleLoadSuperTask]).foreach(_.asInstanceOf[FlexibleLoadSuperTask].computeAmplitudePerSlotWithRestValueOnly = false)
-      val points = accumulatedLoad.loads.filter(!_.isInstanceOf[FlexibleLoadSubTask]).toList.groupBy(l => pointRegex.findFirstMatchIn(l.label).get.group(1)).map {
-        case ((key, loads)) =>
-          val vectorList = loads.map(l => DenseVector(l.amplitudePerSlot.toArray))
+      val points = accumulatedLoad.loads.filter(!_.isInstanceOf[FlexibleLoadSubTask]).toList.groupBy(l => l.group).map {
+        case ((group, loads)) =>
+          val vectorList = loads.map(l => l.amplitudePerSlot.toDenseVector)
           val labelList  = loads.map(_.label)
           val data       = DenseMatrix(vectorList: _*)
-          Point(key.toInt, data, labelList, Some(cluster))(dataTypeMetadata)
+          Point(group, data, labelList, Some(cluster))(dataTypeMetadata)
       }
       cluster ++= points
     }

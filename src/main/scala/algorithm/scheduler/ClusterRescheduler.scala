@@ -13,7 +13,9 @@ object ClusterRescheduler {
 
   def apply(clusters: List[Cluster], settings: ReschedulerSettings): List[AccumulatedLoad] = {
 
-    val clustersAsAccumulatedLoad = ClusterAndAccumulatedLoadTransformer.apply(clusters).toList
+    if (clusters.isEmpty) return Nil
+
+    val clustersAsAccumulatedLoad = ClusterAndAccumulatedLoadTransformer.apply(clusters, clusters.head.dataTypeMetadata).toList
 
     clustersAsAccumulatedLoad.foreach(AccumulatedLoad.Mutate.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
       _,
@@ -25,7 +27,5 @@ object ClusterRescheduler {
                     settings.userOrderings,
                     settings.schedulerAlgorithmOrderings)
   }
-
-  def apply(cluster: Cluster, settings: ReschedulerSettings): AccumulatedLoad = apply(List(cluster), settings).head
 
 }

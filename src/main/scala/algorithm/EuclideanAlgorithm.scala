@@ -56,7 +56,7 @@ object EuclideanAlgorithm {
       clustererOutput = clustererOutput,
       reschedulerOutput = ReschedulerOutput(
         reschedulerSettings,
-        ClusterAndAccumulatedLoadTransformer(reschedulerResult, clustererOutput.clusters.head.dataTypeMetadata).toList)
+        ClusterAndAccumulatedLoadTransformer.reverse(reschedulerResult, clustererOutput.clusters.head.dataTypeMetadata).toList)
     )
 
   }

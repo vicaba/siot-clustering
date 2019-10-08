@@ -5,14 +5,9 @@ import scheduler_model.load.Load.LoadId
 import scala.io.Source
 import scala.util.Try
 
-
-trait TemplateForSyntheticProfilesReader {
+object TemplateForSyntheticProfilesReader {
 
   import Appliances._
-
-  type SingleLoadOutputType
-
-  type AccumulatedLoadOutputType
 
   object Appliances {
     val FridgeFreezer    = "FRIDGE_FREEZER"
@@ -55,6 +50,16 @@ trait TemplateForSyntheticProfilesReader {
     WashingMachine,
     WasherDryer
   )
+
+}
+
+
+trait TemplateForSyntheticProfilesReader {
+
+  type SingleLoadOutputType
+
+  type AccumulatedLoadOutputType
+
 
   trait LoadBuilder extends ((Int, Vector[Double], String, Option[String]) => SingleLoadOutputType) {
     def apply(id: Int, values: Vector[Double], label: String, replaceWithLabel: Option[String] = None): SingleLoadOutputType
