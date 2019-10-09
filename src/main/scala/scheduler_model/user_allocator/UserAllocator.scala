@@ -57,7 +57,7 @@ object UserAllocator {
     val accumulatedLoads =
       AccumulatedLoad.keepLoadOrder(0, 0, "AccumulatedLoad with users", fixedLoads ::: usersAsFlexibleLoads)(amplitudePerSlotMetadata)
 
-    val allocationResult = SchedulerAlgorithm.reschedule(accumulatedLoads, metricTransformation = NoTransformation, verbose = true)
+    val allocationResult = SchedulerAlgorithm.reschedule(accumulatedLoads, metricTransformation = NoTransformation)
 
     // Reorder per "users" input
     val order = users.map(_.id)

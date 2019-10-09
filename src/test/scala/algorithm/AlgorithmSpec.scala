@@ -66,9 +66,6 @@ class AlgorithmSpec extends FeatureSpec with GivenWhenThen {
         val unscheduledLoadsPar = Metric.par(stepsList.head.clustererOutput.clusters)
         val scheduledLoadsPar   = Metric.par(stepsList.head.reschedulerOutput.clusters)
 
-        println(s"PAR for unscheduled loads: $unscheduledLoadsPar.")
-        println(s"PAR for scheduled loads: $scheduledLoadsPar.")
-
         info(s"PAR for unscheduled loads: $unscheduledLoadsPar.")
         info(s"PAR for scheduled loads: $scheduledLoadsPar.")
 
@@ -96,7 +93,7 @@ class AlgorithmSpec extends FeatureSpec with GivenWhenThen {
                       subFoldersAndIds.map(_._2),
                       windowSize = 30)
 
-      for (i <- 1 to 6) {
+      for (i <- 2 to 2) {
         execute(i, points)
       }
     }

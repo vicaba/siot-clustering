@@ -9,7 +9,7 @@ import crossfold.CrossFoldValidation.{MonteCarlo, Percentage}
 import metrics.Par
 import play.api.libs.json.Json
 import algorithm.serialization.AlgorithmJsonSerializer._
-import reader.{EgaugeReader, SyntheticProfilesReaderForEuclideanClusterer, SyntheticProfilesReaderForScheduler}
+import reader.{EgaugeReader, SyntheticProfilesReaderForEuclideanClusterer}
 import types.clusterer.immutable.Point
 
 object Main {
@@ -30,15 +30,15 @@ object Main {
 
     val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 3) yield (i + "/", i)).toList
 
-    val points = SyntheticProfilesReaderForEuclideanClusterer
+/*    val points = SyntheticProfilesReaderForEuclideanClusterer
       .applyDefault(MainFolder,
         subFoldersAndIds.map(_._1),
         AppliancesOutputFileName,
         LightingOutputFileName,
         subFoldersAndIds.map(_._2),
-        windowSize = 30)
+        windowSize = 30)*/
 
-    //val points = EgaugeReader(Configuration.userProfilesFile)
+    val points = EgaugeReader(Configuration.userProfilesFile)
 
 /*    val testBatchRunSettingsBuilder =
       new BatchRunSettingsBuilder(points,
@@ -54,7 +54,7 @@ object Main {
                                   List(Par.withParAggregate),
                                   (points, k) => points.size + points.size/3)
 
-    crossFoldValidation(batchRunSettingsBuilder)
+    crossFoldValidationClusterer(batchRunSettingsBuilder)
 
     val filePath = "w" match {
       case "w" => "/Users/vcaballero/Projects/jupyter-notebook/siot-eclustering-viz/files"
