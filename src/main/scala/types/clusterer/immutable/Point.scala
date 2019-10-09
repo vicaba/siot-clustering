@@ -24,6 +24,8 @@ case class Point(
     */
   override def size: Int = data.rows
 
+  override def userWiseSize: Int = 1
+
   override def hashCode(): Int = this.id
 
   override def toString: String = s"Point($id, $syntheticValue, $assignedToCluster)"

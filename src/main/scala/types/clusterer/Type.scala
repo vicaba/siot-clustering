@@ -138,6 +138,8 @@ trait Type {
 
   def size: Int
 
+  def userWiseSize: Int
+
   def flatten(): Set[Point]
 
   /**

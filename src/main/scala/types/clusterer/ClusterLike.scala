@@ -10,7 +10,7 @@ trait ClusterLike extends Type {
 
   def points: scala.collection.Set[ContainedElement]
 
-  override def toString: String = s"Cluster($id, $size)"
+  override def toString: String = s"Cluster($id, $userWiseSize)"
 
 }
 

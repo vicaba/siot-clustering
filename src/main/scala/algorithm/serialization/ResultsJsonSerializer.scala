@@ -50,7 +50,7 @@ object ResultsJsonSerializer {
           .aggregateOf(step.clusters), //steps._1.aggregatedMetric,
         maxMetricKey(ClustererKey) -> step.clusters.map(step.settings.metric(_)).max,
         TotalMetricKey             -> step.settings.metric(step.clusters),
-        ClustersKey                -> step.clusters.map(_.size)
+        ClustersKey                -> step.clusters.map(_.userWiseSize)
       )
 
     def clustererOutputListAsJson(stepsList: List[ClustererOutput]): List[JsObject] = {
@@ -68,7 +68,7 @@ object ResultsJsonSerializer {
           .aggregateOf(step.clusters), //steps._1.aggregatedMetric,
         maxMetricKey(ReschedulerKey) -> step.clusters.map(step.settings.metric(_)).max,
         TotalMetricKey               -> step.settings.metric(step.clusters),
-        ClustersKey                  -> step.clusters.map(_.size)
+        ClustersKey                  -> step.clusters.map(_.userWiseSize)
       )
 
     def reschedulerOutputListAsJson(stepsList: List[ReschedulerOutput]): List[JsObject] = {

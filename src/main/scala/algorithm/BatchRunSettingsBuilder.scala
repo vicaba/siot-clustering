@@ -37,8 +37,8 @@ class BatchRunSettingsBuilder(val points: Vector[Point],
             numberOfClusters,
             metric,
             new BiasedAverageDistanceTransformation,
-            List(UserAllocator.DefaultOrdering),
-            List(SchedulerAlgorithm.DefaultOrdering)
+            UserAllocator.DefaultOrderings,
+            SchedulerAlgorithm.DefaultOrderings
           )
         )
       }

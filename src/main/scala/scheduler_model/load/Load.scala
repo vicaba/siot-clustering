@@ -18,12 +18,20 @@ object Load {
   val loadOrderingByAmplitude: Ordering[Load] =
     (x: Load, y: Load) => implicitly[Ordering[Double]].compare(x.totalEnergy, y.totalEnergy)
 
-  val loadListOrderingByMaxPositionInT: Ordering[List[Load]] =
-    (x: List[Load], y: List[Load]) =>
-      implicitly[Ordering[Int]].compare(x.map(_.startPositionInTime).max, y.map(_.startPositionInTime).max)
+  val loadListOrderingByMaxPositionInT: Ordering[List[Load]] = new Ordering[List[Load]] {
+    override def compare(x: List[Load], y: List[Load]): LoadId = {
+      // if x or y are empty, "max" throws an exception, guard clauses
+      if (x.isEmpty && y.isEmpty) return 0
+      val intOrdering = implicitly[Ordering[Int]]
+      if (x.isEmpty) return intOrdering.compare(0, y.map(_.startPositionInTime).max)
+      if (y.isEmpty) return intOrdering.compare(x.map(_.startPositionInTime).max, 0)
+      intOrdering.compare(x.map(_.startPositionInTime).max, y.map(_.startPositionInTime).max)
+    }
+  }
 
   val loadListOrderingByAmplitude: Ordering[List[Load]] =
     (x: List[Load], y: List[Load]) =>
+    // Nil[Int].sum == 0
       implicitly[Ordering[Double]].compare(x.map(_.totalEnergy).sum, y.map(_.totalEnergy).sum)
 
   implicit def toVector[X <: Load]: DenseVectorReprOps[X] = new DenseVectorReprOps[X] {

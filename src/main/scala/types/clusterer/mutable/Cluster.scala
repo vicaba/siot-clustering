@@ -135,6 +135,8 @@ case class Cluster private[types] (override val id: Int,
 
   override def size: Int = _points.foldLeft(0)(_ + _.size)
 
+  override def userWiseSize: Int = _points.foldLeft(0)(_ + _.userWiseSize)
+
   private def typeTransform(_type: Type): Type = _type match {
     case p: Point   => p.setCluster(this)
     case c: Cluster => c.topLevel_=(Some(this)).hierarchyLevel_=(this._hierarchyLevel - 1)
