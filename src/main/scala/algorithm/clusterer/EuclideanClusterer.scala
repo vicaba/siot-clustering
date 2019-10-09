@@ -278,12 +278,20 @@ object EuclideanClusterer {
 
   def apply(settings: EuclideanClustererSettings): List[Cluster] = {
 
-    def randomCluster(numberOfClusters: Int, points: Seq[Cluster]): LinearSeq[Cluster] =
-      points.grouped(points.size / numberOfClusters).zipWithIndex.map { case (points, idx) =>
+    def randomCluster(numberOfClusters: Int, points: Seq[Cluster]): LinearSeq[Cluster] = {
 
+      val groups = points.grouped(points.size / numberOfClusters).zipWithIndex.map { case (points, idx) =>
         Cluster(-idx, UUID.randomUUID().toString, points.toSet, 1, None)(
           points.head.dataTypeMetadata)
       }.toList
+      if (groups.size > numberOfClusters) {
+        val extraGroup = groups.last
+        Cluster.flatten(extraGroup).zip(Stream.range(0, groups.size - 1)).foreach { case (p, cIdx) =>
+          groups(cIdx) += p
+        }
+        groups.init
+      } else groups
+    }
 
 
     val result = metricReductionCluster(
@@ -292,6 +300,8 @@ object EuclideanClusterer {
       randomCluster(settings.numberOfClusters, _),
       settings.improveIterations
     ).toList
+
+    assert(result.size == settings.numberOfClusters)
 
     result
 
