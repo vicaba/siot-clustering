@@ -1,6 +1,7 @@
 package algorithm
 
 import batch.GenBatchRun
+import breeze.linalg.sum
 import metrics.{Metric, Par}
 import org.scalatest.{FeatureSpec, GivenWhenThen}
 import org.scalatest.Matchers._
@@ -11,7 +12,7 @@ class AlgorithmSpec extends FeatureSpec with GivenWhenThen {
 
   feature("complete algorithm process works as expected") {
 
-/*    scenario("given two points clustered in one single cluster") {
+    /*    scenario("given two points clustered in one single cluster") {
 
       Given("Some points")
 
@@ -51,14 +52,10 @@ class AlgorithmSpec extends FeatureSpec with GivenWhenThen {
 
         Given("Some points")
 
-
         And("Algorithm settings")
 
         val testBatchRunSettingsBuilder =
-          new BatchRunSettingsBuilder(points,
-            List(numberOfClusters),
-            List(Par.withParAggregate),
-            (_, _) => 1)
+          new BatchRunSettingsBuilder(points, List(numberOfClusters), List(Par.withParAggregate), (_, _) => 1)
 
         When("clustered and rescheduled")
 
@@ -67,7 +64,7 @@ class AlgorithmSpec extends FeatureSpec with GivenWhenThen {
         Then("PAR should be lower")
 
         val unscheduledLoadsPar = Metric.par(stepsList.head.clustererOutput.clusters)
-        val scheduledLoadsPar = Metric.par(stepsList.head.reschedulerOutput.clusters)
+        val scheduledLoadsPar   = Metric.par(stepsList.head.reschedulerOutput.clusters)
 
         println(s"PAR for unscheduled loads: $unscheduledLoadsPar.")
         println(s"PAR for scheduled loads: $scheduledLoadsPar.")
@@ -77,28 +74,33 @@ class AlgorithmSpec extends FeatureSpec with GivenWhenThen {
 
         scheduledLoadsPar should be < unscheduledLoadsPar
 
+        val unscheduledLoadsTotalEnergy: Double =
+          sum(sum(stepsList.flatMap(_.reschedulerOutput.clusters.map(_.syntheticValue))))
+        val scheduledLoadsTotalEnergy: Double =
+          sum(sum(stepsList.flatMap(_.reschedulerOutput.clusters.map(_.syntheticValue))))
+
+        scheduledLoadsTotalEnergy shouldBe unscheduledLoadsTotalEnergy
+
       }
 
-      val MainFolder = "files/syn_loads/"
-      val AppliancesOutputFileName = "appliance_output.csv"
-      val LightingOutputFileName = "lighting_output.csv"
-      val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 5) yield (i + "/", i)).toList
+      val MainFolder                            = "files/syn_loads/"
+      val AppliancesOutputFileName              = "appliance_output.csv"
+      val LightingOutputFileName                = "lighting_output.csv"
+      val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 10) yield (i + "/", i)).toList
 
       val points = SyntheticProfilesReaderForEuclideanClusterer
         .applyDefault(MainFolder,
-          subFoldersAndIds.map(_._1),
-          AppliancesOutputFileName,
-          LightingOutputFileName,
-          subFoldersAndIds.map(_._2),
-          windowSize = 30)
+                      subFoldersAndIds.map(_._1),
+                      AppliancesOutputFileName,
+                      LightingOutputFileName,
+                      subFoldersAndIds.map(_._2),
+                      windowSize = 30)
 
-      for (i <- 1 to 1) {
+      for (i <- 1 to 6) {
         execute(i, points)
       }
     }
 
   }
 
-
 }
-

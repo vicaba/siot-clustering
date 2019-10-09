@@ -9,38 +9,38 @@ import org.scalatest.Matchers._
 import reader.TemplateForSyntheticProfilesReader
 import types.clusterer.DataTypeMetadata
 import types.clusterer.immutable.Point
+import types.clusterer.mutable.Cluster
 
 class AlgorithmSpec extends FlatSpec with GivenWhenThen {
 
   Given("A user with two loads")
 
-  val unscheduledLoads: Point = Point(
+  val rawUnscheduledLoads: Point = Point(
     1,
     DenseMatrix(
       (4.0, 4.0, 4.0, 3.0, 3.0),
       (1.0, 1.0, 0.0, 0.0, 0.0)
     ),
-    List(TemplateForSyntheticProfilesReader.Appliances.EInst,TemplateForSyntheticProfilesReader.Appliances.DishWasher)
+    List(TemplateForSyntheticProfilesReader.Appliances.EInst, TemplateForSyntheticProfilesReader.Appliances.DishWasher)
   )(DataTypeMetadata.generateDataTypeMetadata(forColumns = 5))
 
   And("Algorithm settings")
 
   val testBatchRunSettingsBuilder =
-    new BatchRunSettingsBuilder(Vector(unscheduledLoads),
-      List(1),
-      List(Par.withParAggregate),
-      (_, _) => 1)
+    new BatchRunSettingsBuilder(Vector(rawUnscheduledLoads), List(1), List(Par.withParAggregate), (_, _) => 1)
 
   When("clustered and rescheduled")
 
   val stepsList = GenBatchRun(testBatchRunSettingsBuilder.build)
 
-  val scheduledLoads = stepsList.head.reschedulerOutput.clusters
+  val unscheduledLoads: List[Cluster] = stepsList.head.clustererOutput.clusters
+
+  val scheduledLoads: List[Cluster] = stepsList.head.reschedulerOutput.clusters
 
   Then("ScheduledLoads PAR is lower or equal than UnscheduledLoads PAR.")
 
-  val unscheduledLoadsPar = Metric.par(unscheduledLoads)
-  val scheduledLoadsPar   = Metric.par(scheduledLoads)
+  val unscheduledLoadsPar: Double = Metric.par(unscheduledLoads)
+  val scheduledLoadsPar: Double   = Metric.par(scheduledLoads)
 
   scheduledLoadsPar should be < unscheduledLoadsPar
 
@@ -49,6 +49,14 @@ class AlgorithmSpec extends FlatSpec with GivenWhenThen {
 
   And("scheduledLoads total energy is equal to unscheduledLoads total energy")
 
-  sum(scheduledLoads.head.syntheticValue) shouldBe sum(unscheduledLoads.syntheticValue)
+  val totalEnergyScheduledLoads: Double      = sum(scheduledLoads.head.syntheticValue)
+  val totalEnergyUnscheduledLoads: Double    = sum(unscheduledLoads.head.syntheticValue)
+  val totalEnergyRawUnscheduledLoads: Double = sum(rawUnscheduledLoads.syntheticValue)
+
+  totalEnergyUnscheduledLoads shouldBe totalEnergyRawUnscheduledLoads
+
+  totalEnergyScheduledLoads shouldBe totalEnergyUnscheduledLoads
+
+  totalEnergyScheduledLoads shouldBe totalEnergyRawUnscheduledLoads
 
 }
