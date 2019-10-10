@@ -83,7 +83,7 @@ class AlgorithmSpec extends FeatureSpec with GivenWhenThen {
       val MainFolder                            = "files/syn_loads/"
       val AppliancesOutputFileName              = "appliance_output.csv"
       val LightingOutputFileName                = "lighting_output.csv"
-      val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 20) yield (i + "/", i)).toList
+      val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 24) yield (i + "/", i)).toList
 
       val points = SyntheticProfilesReaderForEuclideanClusterer
         .applyDefault(MainFolder,
@@ -93,7 +93,7 @@ class AlgorithmSpec extends FeatureSpec with GivenWhenThen {
                       subFoldersAndIds.map(_._2),
                       windowSize = 30)
 
-      for (i <- 2 to 2) {
+      for (i <- 1 to 6) {
         execute(i, points)
       }
     }

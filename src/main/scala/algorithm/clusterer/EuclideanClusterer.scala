@@ -258,7 +258,7 @@ object EuclideanClusterer {
 
   val chain: HeuristicChain = HeuristicChain(HeuristicDecorator(mirrorElementLocator))
 
-/*  def apply(settings: EuclideanClustererSettings): List[Cluster] = {
+  def apply(settings: EuclideanClustererSettings): List[Cluster] = {
 
     val result = metricReductionCluster(
       settings.points.map(Point.toCluster).toList,
@@ -269,14 +269,14 @@ object EuclideanClusterer {
 
     result
 
-  }*/
+  }
 
   def applyOnce(settings: EuclideanClustererSettings): List[Cluster] = {
     val result = cluster(settings.numberOfClusters, Int.MaxValue, settings.points.map(Point.toCluster).toList, chain, Some(MaxEnergyHeuristic))
     result.toList
   }
 
-  def apply(settings: EuclideanClustererSettings): List[Cluster] = {
+/*  def apply(settings: EuclideanClustererSettings): List[Cluster] = {
 
     def randomCluster(numberOfClusters: Int, points: Seq[Cluster]): LinearSeq[Cluster] = {
 
@@ -301,10 +301,10 @@ object EuclideanClusterer {
       settings.improveIterations
     ).toList
 
-    assert(result.size == settings.numberOfClusters)
+    //assert(result.size == settings.numberOfClusters)
 
     result
 
-  }
+  }*/
 
 }

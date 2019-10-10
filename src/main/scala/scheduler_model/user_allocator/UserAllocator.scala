@@ -29,7 +29,7 @@ object UserAllocator {
   def allocate(users: List[AccumulatedLoad],
     numberOfSlots: Int,
     windowSize: Int,
-    userOrdering: Ordering[AccumulatedLoad] = DefaultOrdering) = {
+    userOrdering: Ordering[AccumulatedLoad] = DefaultOrdering): List[List[Int]] = {
 
     val amplitudePerSlotMetadata = users.head.amplitudePerSlotMetadata
 
