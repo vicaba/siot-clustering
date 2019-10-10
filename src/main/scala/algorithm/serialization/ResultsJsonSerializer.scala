@@ -32,7 +32,7 @@ object ResultsJsonSerializer {
 
     def maxMetricKey(step: StepKey): String = stepToString(step) + ". max m"
 
-    val TotalMetricKey = "total m"
+    def totalMetricKey(step: StepKey) = stepToString(step) + ". total m"
 
     val ClustersKey = "clusters"
 
@@ -49,7 +49,7 @@ object ResultsJsonSerializer {
         aggregateMetricKey(ClustererKey) -> step.settings.metric
           .aggregateOf(step.clusters), //steps._1.aggregatedMetric,
         maxMetricKey(ClustererKey) -> step.clusters.map(step.settings.metric(_)).max,
-        TotalMetricKey             -> step.settings.metric(step.clusters),
+        totalMetricKey(ClustererKey)             -> step.settings.metric(step.clusters),
         ClustersKey                -> step.clusters.map(_.userWiseSize)
       )
 
@@ -67,7 +67,7 @@ object ResultsJsonSerializer {
         aggregateMetricKey(ReschedulerKey) -> step.settings.metric
           .aggregateOf(step.clusters), //steps._1.aggregatedMetric,
         maxMetricKey(ReschedulerKey) -> step.clusters.map(step.settings.metric(_)).max,
-        TotalMetricKey               -> step.settings.metric(step.clusters),
+        totalMetricKey(ReschedulerKey)               -> step.settings.metric(step.clusters),
         ClustersKey                  -> step.clusters.map(_.userWiseSize)
       )
 
