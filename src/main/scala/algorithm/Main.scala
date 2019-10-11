@@ -52,7 +52,7 @@ object Main {
       new BatchRunSettingsBuilder(points,
                                   (Configuration.BatchRun.KRange.from to Configuration.BatchRun.KRange.to).toList,
                                   List(Par.withParAggregate),
-                                  (points, k) => points.size + points.size/3)
+                                  (p, k) => p.size + p.size/3)
 
     crossFoldValidation(batchRunSettingsBuilder)
 
@@ -133,7 +133,7 @@ object Main {
     val monteCarlos = for (i <- BigDecimal(Configuration.CrossFold.SubsampleSize.from) to (Max, step = BigDecimal(0.1)))
       yield {
         val subsampleSize = Percentage.of(i / Max)
-        val splits = Math.floor((batchRunSettingsBuilder.points.size * subsampleSize.v).toDouble).toInt / 2
+        val splits = batchRunSettingsBuilder.points.size / 2
         MonteCarlo(splits, subsampleSize)
       }
     val stepsList = CrossFoldValidation.batchRunClusterer(monteCarlos.toList, batchRunSettingsBuilder)
