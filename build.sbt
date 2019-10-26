@@ -11,6 +11,13 @@ resourceDirectory in Test := baseDirectory.value / "test-resources"
 
 enablePlugins(JavaAppPackaging)
 
+/*
+javaOptions in Universal ++= Seq(
+  "-J-Xmx6g",
+  "-J-Xms128m",
+)
+*/
+
 lazy val deployTask = TaskKey[Unit]("deploy", "Copies assembly jar to remote location")
 
 deployTask := (Universal / packageBin map { _packageBin =>
