@@ -2,14 +2,14 @@ package scheduler_model.user_allocator
 
 import breeze.linalg.DenseVector
 import org.scalatest.{FeatureSpec, GivenWhenThen}
-import scheduler_model.load._
+import scheduler_model.load.{FlexibleLoad, _}
 import types.clusterer.DataTypeMetadata
 
 class UserAllocatorSpec extends FeatureSpec with GivenWhenThen {
 
   feature("Allocating users") {
 
-    scenario("Test scenario") {
+/*    scenario("Test scenario") {
 
       implicit val amplitudePerSlotMetadata = DataTypeMetadata.generateDataTypeMetadata(forColumns = 3)
 
@@ -35,6 +35,22 @@ class UserAllocatorSpec extends FeatureSpec with GivenWhenThen {
       for (i <- usersSimulation.indices) {
         println(s"User ${usersSimulation(i).id} at position ${usersPreferredSlots(i).head}")
       }
+    }*/
+
+    scenario("Users is spread in time") {
+
+      implicit val amplitudePerSlotMetadata = DataTypeMetadata.generateDataTypeMetadata(forColumns = 5)
+
+      val usersSimulation: List[AccumulatedLoad] = List(
+        AccumulatedLoad(100, 100, "100", List(
+          FixedLoad(101, 101, "101", DenseVector(1, 2, 2, 1, 1)),
+          FlexibleLoad(151, 151, "151", 0, DenseVector(2)),
+          FlexibleLoad(151, 152, "152", 0, DenseVector(2)))
+      ))
+
+      val usersPreferredSlots = UserAllocator.allocate(usersSimulation, 3, 1)
+
+      println(usersPreferredSlots)
     }
   }
 }

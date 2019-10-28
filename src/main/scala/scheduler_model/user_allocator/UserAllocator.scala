@@ -42,10 +42,10 @@ object UserAllocator {
 
     val usersAsFlexibleLoads = for (user <- users) yield {
 
-      val amplitudeInMinimumTimeSpan = representUserAsAmplitude(user, windowSize = Try(user.flexibleLoads.map(_.span).max).getOrElse(0))
+      val amplitudeInMinimumTimeSpan = representUserAsAmplitude(user, windowSize = Try(user.flexibleLoads.toList.map(_.span).max).getOrElse(0))
 
       val userAsAmplitude = if (Try(amplitudeInMinimumTimeSpan.max).getOrElse(0.0) >= max(accumulatedLoadWithFixedLoadsOnly.amplitudePerSlot)) {
-        val amplitudeInMaximumTimeSpan = representUserAsAmplitude(user, windowSize = Try(user.flexibleLoads.map(_.span).sum).getOrElse(0))
+        val amplitudeInMaximumTimeSpan = representUserAsAmplitude(user, windowSize = Try(user.flexibleLoads.toList.map(_.span).sum).getOrElse(0))
         amplitudeInMaximumTimeSpan
       } else amplitudeInMinimumTimeSpan
 
@@ -86,7 +86,7 @@ object UserAllocator {
     val orderedAllocationResult       = order.map(allocationResultAsMap)
 
     orderedAllocationResult.map { userAsFlexibleLoad =>
-      (for (i <- userAsFlexibleLoad.startPositionInTime until (userAsFlexibleLoad.startPositionInTime + windowSize))
+      (for (i <- userAsFlexibleLoad.startPositionInTime until (userAsFlexibleLoad.startPositionInTime + userAsFlexibleLoad.span))
         yield i).toList
     }
   }
