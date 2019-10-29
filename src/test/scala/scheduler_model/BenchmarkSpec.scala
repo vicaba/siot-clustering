@@ -440,11 +440,9 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
   ): BenchmarkResult = {
 
     val numberOfSlots    = users.head.span
-    val allFlexibleLoads = users.flatMap(_.flexibleLoads)
-    val windowSize       = Try(allFlexibleLoads.map(_.span).sum / allFlexibleLoads.size).getOrElse(1)
-    enableLog(verbose)(println(s"Num of slots = $numberOfSlots, SlotsWindowSize = $windowSize"))
+    enableLog(verbose)(println(s"Num of slots = $numberOfSlots"))
     val schedulerPreferredSlots =
-      UserAllocator.allocate(users = users, numberOfSlots = numberOfSlots, windowSize = windowSize)
+      UserAllocator.allocate(users)
 
     val referenceAverage = users.map(_.totalEnergy).sum / numberOfSlots / users.size
     //info(s"Reference average = $referenceAverage")

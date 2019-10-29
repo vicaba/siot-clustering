@@ -41,10 +41,8 @@ object Scheduler {
       logger.info("Running Scheduler for {} users", _clusters.length)
 
       val numberOfSlots = LoadOps.span(_clusters)
-      val allFlexibleLoads = _clusters.flatMap(_.flexibleLoads)
-      val windowSize = Try(allFlexibleLoads.map(_.span).sum / allFlexibleLoads.size).getOrElse(1)
       val schedulerPreferredSlots =
-        UserAllocator.allocate(users = _clusters, numberOfSlots = numberOfSlots, windowSize = windowSize, userOrdering)
+        UserAllocator.allocate(users = _clusters, userOrdering)
 
       val referenceAverage = _clusters.map(_.totalEnergy).sum / numberOfSlots / clusters.size
 

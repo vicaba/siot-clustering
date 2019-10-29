@@ -62,13 +62,9 @@ object UserAllocator {
     * consumption per slot flexibleLoad.totalEnergy / windowSize. Then it uses the rescheduler to assign each user to the best timeslots.+
     *
     * @param users
-    * @param numberOfSlots
-    * @param windowSize
     * @return A list in the same order as users with schedulerPreferredTimeSlots per each user as an inner List[Int]
     */
   def allocate(users: List[AccumulatedLoad],
-               numberOfSlots: Int,
-               windowSize: Int,
                userOrdering: Ordering[AccumulatedLoad] = DefaultOrdering): List[List[Int]] = {
 
     // TODO: Test this by comparing results of BenchmarkSpec and SchedulerSpec

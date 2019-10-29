@@ -2,6 +2,8 @@ package scheduler_model.user_allocator
 
 import breeze.linalg.DenseVector
 import org.scalatest.{FeatureSpec, GivenWhenThen}
+import org.scalatest.Matchers._
+
 import scheduler_model.load.{FlexibleLoad, _}
 import types.clusterer.DataTypeMetadata
 
@@ -48,9 +50,10 @@ class UserAllocatorSpec extends FeatureSpec with GivenWhenThen {
           FlexibleLoad(151, 152, "152", 0, DenseVector(2)))
       ))
 
-      val usersPreferredSlots = UserAllocator.allocate(usersSimulation, 3, 1)
+      val usersPreferredSlots = UserAllocator.allocate(usersSimulation)
 
-      println(usersPreferredSlots)
+      usersPreferredSlots should contain(List(3, 4))
+
     }
   }
 }
