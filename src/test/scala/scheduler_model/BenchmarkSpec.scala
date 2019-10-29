@@ -208,8 +208,8 @@ class BenchmarkSpec extends FeatureSpec with GivenWhenThen with Matchers {
       )
 
       val expectedTotalLoad: List[DenseVector[Double]] = List(
-        DenseVector[Double](10, 12, 10, 10, 8),
-        DenseVector[Double](8, 9, 10, 12, 11)
+        DenseVector[Double](10, 12, 10, 10, 10, 8),
+        DenseVector[Double](8, 9, 10, 10, 12, 11)
       )
 
       executeScenario(

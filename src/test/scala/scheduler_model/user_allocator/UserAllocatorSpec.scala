@@ -75,8 +75,8 @@ class UserAllocatorSpec extends FeatureSpec with GivenWhenThen {
           100,
           "100",
           List(FixedLoad(101, 101, "101", DenseVector(1, 2, 2, 1, 1)),
-               FlexibleLoad(151, 151, "151", 0, DenseVector(1)),
-               FlexibleLoad(151, 152, "152", 0, DenseVector(1)))
+            FlexibleLoad(151, 151, "151", 0, DenseVector(1)),
+            FlexibleLoad(151, 152, "152", 0, DenseVector(1)))
         ))
 
       val userRepresentationAsAmplitude = new UserRepresentationAsAmplitudeInMinTimeSpan(
@@ -86,6 +86,66 @@ class UserAllocatorSpec extends FeatureSpec with GivenWhenThen {
         UserAllocator.allocate(usersSimulation, userRepresentationAsAmplitude = userRepresentationAsAmplitude)
 
       usersPreferredSlots should contain(List(3, 4))
+
+    }
+
+    scenario("Flexible loads are spread in time") {
+
+      implicit val amplitudePerSlotMetadata = DataTypeMetadata.generateDataTypeMetadata(forColumns = 5)
+
+      val usersSimulation: List[AccumulatedLoad] = List(
+        AccumulatedLoad(
+          200,
+          200,
+          "200",
+          List(FixedLoad(201, 201, "201", DenseVector(0, 1, 1, 1, 1)),
+            FlexibleLoad(251, 251, "151", 0, DenseVector(1)),
+            FlexibleLoad(251, 252, "252", 0, DenseVector(2)))
+        ))
+
+      val userRepresentationAsAmplitude = new UserRepresentationAsAmplitudeInMinTimeSpan(
+        Some(MaxPeakGraterThanMaxFixedLoadsPeakCondition, new UserRepresentationAsAmplitudeInMaxTimeSpan()))
+
+      val usersPreferredSlots =
+        UserAllocator.allocate(usersSimulation, userRepresentationAsAmplitude = userRepresentationAsAmplitude)
+
+      usersPreferredSlots should contain(List(0, 1))
+
+      info(s"test1 $usersPreferredSlots.")
+
+    }
+
+    scenario("Users are spread in time") {
+
+      implicit val amplitudePerSlotMetadata = DataTypeMetadata.generateDataTypeMetadata(forColumns = 5)
+
+      val usersSimulation: List[AccumulatedLoad] = List(
+        AccumulatedLoad(
+          100,
+          100,
+          "100",
+          List(FixedLoad(101, 101, "101", DenseVector(1, 2, 2, 1, 1)),
+            FlexibleLoad(151, 151, "151", 0, DenseVector(1)),
+            FlexibleLoad(151, 152, "152", 0, DenseVector(1)))
+        ),
+        AccumulatedLoad(
+          200,
+          200,
+          "200",
+          List(FixedLoad(201, 201, "201", DenseVector(0, 1, 1, 1, 1)),
+            FlexibleLoad(251, 251, "151", 0, DenseVector(1)),
+            FlexibleLoad(251, 252, "252", 0, DenseVector(1)))
+        ))
+
+      val userRepresentationAsAmplitude = new UserRepresentationAsAmplitudeInMinTimeSpan(
+        Some(MaxPeakGraterThanMaxFixedLoadsPeakCondition, new UserRepresentationAsAmplitudeInMaxTimeSpan()))
+
+      val usersPreferredSlots =
+        UserAllocator.allocate(usersSimulation, userRepresentationAsAmplitude = userRepresentationAsAmplitude)
+
+      usersPreferredSlots should contain(List(3, 4))
+
+      println(usersPreferredSlots)
 
     }
 

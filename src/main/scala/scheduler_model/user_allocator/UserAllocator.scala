@@ -37,7 +37,7 @@ object UserAllocator {
 
     val usersAsFlexibleLoads = for (user <- users) yield {
 
-      val userAsAmplitude = userRepresentationAsAmplitude(user)
+      val userAsAmplitude = userRepresentationAsAmplitude(user, accumulatedLoadWithFixedLoadsOnly)
 
       FlexibleLoad(user.id, user.id, "User as FlexibleLoad", 0, DenseVector(userAsAmplitude.toArray))
 

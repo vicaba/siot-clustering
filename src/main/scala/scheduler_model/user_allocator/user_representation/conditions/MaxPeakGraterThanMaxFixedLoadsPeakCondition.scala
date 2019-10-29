@@ -6,6 +6,6 @@ import scheduler_model.load.AccumulatedLoad
 import scala.util.Try
 
 object MaxPeakGraterThanMaxFixedLoadsPeakCondition extends Condition {
-  override def apply(prevResult: Vector[Double], user: AccumulatedLoad): Boolean =
-    Try(prevResult.max).getOrElse(0.0) >= max(user.amplitudePerSlot)
+  override def apply(prevResult: Vector[Double], user: AccumulatedLoad, usersFixedLoad: AccumulatedLoad): Boolean =
+    Try(prevResult.max).getOrElse(0.0) >= max(usersFixedLoad.amplitudePerSlot)
 }
