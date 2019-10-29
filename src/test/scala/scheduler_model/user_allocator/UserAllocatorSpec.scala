@@ -3,15 +3,19 @@ package scheduler_model.user_allocator
 import breeze.linalg.DenseVector
 import org.scalatest.{FeatureSpec, GivenWhenThen}
 import org.scalatest.Matchers._
-
 import scheduler_model.load.{FlexibleLoad, _}
+import scheduler_model.user_allocator.user_representation.{
+  UserRepresentationAsAmplitudeInMaxTimeSpan,
+  UserRepresentationAsAmplitudeInMinTimeSpan
+}
+import scheduler_model.user_allocator.user_representation.conditions.MaxPeakGraterThanMaxFixedLoadsPeakCondition
 import types.clusterer.DataTypeMetadata
 
 class UserAllocatorSpec extends FeatureSpec with GivenWhenThen {
 
   feature("Allocating users") {
 
-/*    scenario("Test scenario") {
+    /*    scenario("Test scenario") {
 
       implicit val amplitudePerSlotMetadata = DataTypeMetadata.generateDataTypeMetadata(forColumns = 3)
 
@@ -39,21 +43,51 @@ class UserAllocatorSpec extends FeatureSpec with GivenWhenThen {
       }
     }*/
 
-    scenario("Users is spread in time") {
+    scenario("User is not spread in time") {
 
       implicit val amplitudePerSlotMetadata = DataTypeMetadata.generateDataTypeMetadata(forColumns = 5)
 
       val usersSimulation: List[AccumulatedLoad] = List(
-        AccumulatedLoad(100, 100, "100", List(
-          FixedLoad(101, 101, "101", DenseVector(1, 2, 2, 1, 1)),
-          FlexibleLoad(151, 151, "151", 0, DenseVector(2)),
-          FlexibleLoad(151, 152, "152", 0, DenseVector(2)))
-      ))
+        AccumulatedLoad(
+          100,
+          100,
+          "100",
+          List(FixedLoad(101, 101, "101", DenseVector(1, 2, 2, 1, 1)),
+               FlexibleLoad(151, 151, "151", 0, DenseVector(1)),
+               FlexibleLoad(151, 152, "152", 0, DenseVector(1)))
+        ))
 
-      val usersPreferredSlots = UserAllocator.allocate(usersSimulation)
+      val usersPreferredSlots = UserAllocator.allocate(usersSimulation,
+                                                       userRepresentationAsAmplitude =
+                                                         new UserRepresentationAsAmplitudeInMinTimeSpan())
+
+      usersPreferredSlots shouldNot contain(List(3, 4))
+
+    }
+
+    scenario("User is spread in time") {
+
+      implicit val amplitudePerSlotMetadata = DataTypeMetadata.generateDataTypeMetadata(forColumns = 5)
+
+      val usersSimulation: List[AccumulatedLoad] = List(
+        AccumulatedLoad(
+          100,
+          100,
+          "100",
+          List(FixedLoad(101, 101, "101", DenseVector(1, 2, 2, 1, 1)),
+               FlexibleLoad(151, 151, "151", 0, DenseVector(1)),
+               FlexibleLoad(151, 152, "152", 0, DenseVector(1)))
+        ))
+
+      val userRepresentationAsAmplitude = new UserRepresentationAsAmplitudeInMinTimeSpan(
+        Some(MaxPeakGraterThanMaxFixedLoadsPeakCondition, new UserRepresentationAsAmplitudeInMaxTimeSpan()))
+
+      val usersPreferredSlots =
+        UserAllocator.allocate(usersSimulation, userRepresentationAsAmplitude = userRepresentationAsAmplitude)
 
       usersPreferredSlots should contain(List(3, 4))
 
     }
+
   }
 }
