@@ -63,7 +63,7 @@ class SchedulerSpec extends FeatureSpec with GivenWhenThen {
       val AppliancesOutputFileName = "appliance_output.csv"
       val LightingOutputFileName   = "lighting_output.csv"
 
-      val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 3) yield (i + "/", i)).toList
+      val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 4) yield (i + "/", i)).toList
 
       val _unscheduledLoads: Seq[AccumulatedLoad] = SyntheticProfilesReaderForScheduler2
         .applyDefault(MainFolder,

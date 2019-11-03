@@ -19,11 +19,14 @@ object SchedulerAlgorithm {
     metricTransformation: MetricTransformation,
     referenceAverage: Double = 0.0,
     ordering: Ordering[Load] = DefaultOrdering,
-    verbose: Boolean = false): AccumulatedLoad = {
+    verbose: Boolean = false,
+    flexibleLoadTransformer: (FlexibleLoad, FlexibleLoad) => (FlexibleLoad, FlexibleLoad)): AccumulatedLoad = {
 
     def _reschedule(_acc: (AccumulatedLoad, AccumulatedLoad), _remainingFlexibleLoads: (List[FlexibleLoad], List[FlexibleLoad])): AccumulatedLoad =
       _remainingFlexibleLoads match {
         case (x :: xs, y :: ys) =>
+
+          // TODO: Feedback -> Transform here
           val newAcc = (_acc._1 += x, _acc._2 += y)
           rescheduleFlexibleLoad(newAcc, (x, y), preferredSlots, metricTransformation, referenceAverage, verbose)
           y.startPositionInTime = x.startPositionInTime

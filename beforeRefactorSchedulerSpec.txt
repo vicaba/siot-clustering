@@ -1,12 +1,12 @@
-Given 3 slots with 3 users and a flexible load each
+Given A user with two loads
 
 When Scheduling loads
 
-Then ScheduledLoads PAR is lower than UnscheduledLoads PAR.
+Then ScheduledLoads PAR is lower or equal than UnscheduledLoads PAR.
 
-PAR for unscheduled loads: 1.5.
+PAR for unscheduled loads: 1.25.
 
-PAR for scheduled loads: 1.2.
+PAR for scheduled loads: 1.0.
 
 And scheduledLoads total energy is equal to unscheduledLoads total energy
 
@@ -17,8 +17,8 @@ When Scheduling loads
 
 Then ScheduledLoads PAR is lower than UnscheduledLoads PAR.
 
-PAR for unscheduled loads: 3.5753681021081083.
+PAR for unscheduled loads: 2.525532559277293.
 
-PAR for scheduled loads: 3.4044334926591753.
+PAR for scheduled loads: 2.2708116119158515.
 
 And scheduledLoads total energy is equal to unscheduledLoads total energy
