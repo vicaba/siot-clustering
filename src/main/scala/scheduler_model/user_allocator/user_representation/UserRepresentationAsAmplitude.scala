@@ -1,13 +1,13 @@
 package scheduler_model.user_allocator.user_representation
 
-import scheduler_model.load.AccumulatedLoad
+import scheduler_model.load.{AccumulatedLoad, FlexibleLoadRepresentation}
 import scheduler_model.user_allocator.user_representation.conditions.Condition
 
 trait UserRepresentationAsAmplitude {
 
   val next: Option[(Condition, UserRepresentationAsAmplitude)]
 
-  final def apply(user: AccumulatedLoad, usersFixedLoad: AccumulatedLoad): Vector[Double] = {
+  final def apply(user: FlexibleLoadRepresentation, usersFixedLoad: AccumulatedLoad): Vector[Double] = {
     val amplitudePerSlot = applyInternal(user)
     next
       .map { _next =>
@@ -17,6 +17,6 @@ trait UserRepresentationAsAmplitude {
       .getOrElse(amplitudePerSlot)
   }
 
-  protected def applyInternal(user: AccumulatedLoad): Vector[Double]
+  protected def applyInternal(user: FlexibleLoadRepresentation): Vector[Double]
 }
 

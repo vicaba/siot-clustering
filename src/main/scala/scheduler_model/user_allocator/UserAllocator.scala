@@ -59,8 +59,15 @@ object UserAllocator {
 
   }
 
-  def representUserAsBestFlexibleLoad(accXY: => (AccumulatedLoad, AccumulatedLoad), xy: (FlexibleLoad, FlexibleLoad)): (FlexibleLoad, FlexibleLoad) = {
-
+  def representUserAsBestFlexibleLoad(userRepresentationAsAmplitude: UserRepresentationAsAmplitude)(acc: => AccumulatedLoad, xy: (FlexibleLoad, FlexibleLoad)): (FlexibleLoad, FlexibleLoad) = {
+    // TODO: This is the last thing done
+    if (xy._1.isInstanceOf[FlexibleLoadRepresentation]) {
+      val x = xy._1
+      val newX = userRepresentationAsAmplitude(xy._1, acc)
+      val fl = FlexibleLoad(x.id, x.id, "User as FlexibleLoad", 0, DenseVector(newX.toArray))
+      (fl, fl.copy())
+    }
+    else xy
   }
 
   def representUsersAsFlexibleLoadsInAccumulatedLoad(
