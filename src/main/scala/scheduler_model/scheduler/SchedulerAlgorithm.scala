@@ -21,13 +21,13 @@ object SchedulerAlgorithm {
       referenceAverage: Double = 0.0,
       ordering: Ordering[Load] = DefaultOrdering,
       verbose: Boolean = false,
-      flexibleLoadTransformer: (FlexibleLoad, FlexibleLoad) => (FlexibleLoad, FlexibleLoad)): AccumulatedLoad = {
+      flexibleLoadTransformer: ((AccumulatedLoad, AccumulatedLoad), (FlexibleLoad, FlexibleLoad)) => (FlexibleLoad, FlexibleLoad) = (_, loads) => (loads._1, loads._2)): AccumulatedLoad = {
 
     def _reschedule(_acc: (AccumulatedLoad, AccumulatedLoad),
                     _remainingFlexibleLoads: (List[FlexibleLoad], List[FlexibleLoad])): AccumulatedLoad =
       _remainingFlexibleLoads match {
         case (x :: xs, y :: ys) =>
-          val (transformedX, transformedY) = flexibleLoadTransformer(x, y)
+          val (transformedX, transformedY) = flexibleLoadTransformer((LoadOps.copy(_acc._1), LoadOps.copy(_acc._2)), (x, y))
           // TODO: Feedback -> Transform here
           val newAcc = (_acc._1 += transformedX, _acc._2 += transformedY)
           rescheduleFlexibleLoad(newAcc,

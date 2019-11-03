@@ -1,11 +1,15 @@
 package scheduler_model.user_allocator
 
-import breeze.linalg.{DenseVector, max}
+import breeze.linalg.{DenseVector, max, sum}
 import scheduler_model.load._
 import scheduler_model.scheduler.SchedulerAlgorithm
 import scheduler_model.scheduler.metric_transformer.NoTransformation
 import scheduler_model.user_allocator.user_representation.conditions.MaxPeakGraterThanMaxFixedLoadsPeakCondition
-import scheduler_model.user_allocator.user_representation.{UserRepresentationAsAmplitude, UserRepresentationAsAmplitudeInMaxTimeSpan, UserRepresentationAsAmplitudeInMinTimeSpan}
+import scheduler_model.user_allocator.user_representation.{
+  UserRepresentationAsAmplitude,
+  UserRepresentationAsAmplitudeInMaxTimeSpan,
+  UserRepresentationAsAmplitudeInMinTimeSpan
+}
 import types.clusterer.DataTypeMetadata
 
 import scala.util.Try
@@ -25,6 +29,39 @@ object UserAllocator {
   val DefaultUserRepresentationAsAmplitude: UserRepresentationAsAmplitudeInMinTimeSpan =
     new UserRepresentationAsAmplitudeInMinTimeSpan(
       Some(MaxPeakGraterThanMaxFixedLoadsPeakCondition, new UserRepresentationAsAmplitudeInMaxTimeSpan()))
+
+
+
+  def representUserAsFlexibleLoadRepresentationsInAccumulatedLoad(
+      users: List[AccumulatedLoad]
+  ): AccumulatedLoad = {
+
+    val amplitudePerSlotMetadata = users.head.amplitudePerSlotMetadata
+    val fixedLoads               = users.flatMap(_.fixedLoads)
+
+    val usersAsFlexibleLoads = for (user <- users) yield {
+
+      val userAmplitude       = sum(sum(user.flexibleLoads.map(_.amplitudePerSlot)))
+      val userMinLoadTimeSpan = Try(user.flexibleLoads.toList.map(_.span).max).getOrElse(0)
+      val userMaxTimeSpan     = Try(user.flexibleLoads.toList.map(_.span).sum).getOrElse(0)
+
+      FlexibleLoadRepresentation(user.id,
+                                 user.id,
+                                 "User as FlexibleLoad",
+                                 userAmplitude,
+                                 userMinLoadTimeSpan,
+                                 userMaxTimeSpan)
+
+    }
+
+    AccumulatedLoad.keepLoadOrder(0, 0, "AccumulatedLoad with users", fixedLoads ::: usersAsFlexibleLoads)(
+      amplitudePerSlotMetadata)
+
+  }
+
+  def representUserAsBestFlexibleLoad(accXY: => (AccumulatedLoad, AccumulatedLoad), xy: (FlexibleLoad, FlexibleLoad)): (FlexibleLoad, FlexibleLoad) = {
+
+  }
 
   def representUsersAsFlexibleLoadsInAccumulatedLoad(
       users: List[AccumulatedLoad],
