@@ -109,6 +109,39 @@ class UserAllocatorSpec extends FeatureSpec with GivenWhenThen {
 
     }
 
+    scenario(
+      "User with two flexible loads spanning 1 time-slot, should not be spread in time when min and max user representations are provided") {
+
+      implicit val amplitudePerSlotMetadata: DataTypeMetadata =
+        DataTypeMetadata.generateDataTypeMetadata(forColumns = 5)
+
+      Given("A user with one fixed load and two flexible loads")
+
+      val usersSimulation: List[AccumulatedLoad] = List(
+        AccumulatedLoad(
+          100,
+          100,
+          "100",
+          List(FixedLoad(101, 101, "101", DenseVector(0, 2, 2, 2, 1)),
+            FlexibleLoad(151, 151, "151", 0, DenseVector(1)),
+            FlexibleLoad(151, 152, "152", 0, DenseVector(1)))
+        ))
+
+      When(
+        "Allocating user with UserRepresentationAsAmplitudeInMinTimeSpan and UserRepresentationAsAmplitudeInMaxTimeSpan as heuristic")
+
+      val userRepresentationAsAmplitude = new UserRepresentationAsAmplitudeInMinTimeSpan(
+        Some(MaxPeakGraterThanMaxFixedLoadsPeakCondition, new UserRepresentationAsAmplitudeInMaxTimeSpan()))
+
+      val usersPreferredSlots =
+        UserAllocator.allocate(usersSimulation, userRepresentationAsAmplitude = userRepresentationAsAmplitude)
+
+      Then("the flexible loads should be spread in time")
+
+      usersPreferredSlots should contain(List(0))
+
+    }
+
     scenario("Users are spread in time using feedback") {
 
       implicit val amplitudePerSlotMetadata: DataTypeMetadata = DataTypeMetadata.generateDataTypeMetadata(forColumns = 5)
