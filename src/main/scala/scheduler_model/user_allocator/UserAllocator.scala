@@ -39,7 +39,7 @@ object UserAllocator {
 
     val usersAsFlexibleLoads = for (user <- users) yield {
 
-      val userAmplitude       = sum(sum(user.flexibleLoads.map(_.amplitudePerSlot)))
+      val userAmplitude       = sum(sum(user.flexibleLoads.toList.map(_.amplitudePerSlot)))
       val userMinLoadTimeSpan = Try(user.flexibleLoads.toList.map(_.span).max).getOrElse(0)
       val userMaxTimeSpan     = Try(user.flexibleLoads.toList.map(_.span).sum).getOrElse(0)
 
@@ -47,8 +47,8 @@ object UserAllocator {
                                  user.id,
                                  "User as FlexibleLoad",
                                  userAmplitude,
-                                 userMinLoadTimeSpan,
-                                 userMaxTimeSpan)
+                                 userMaxTimeSpan,
+                                 userMinLoadTimeSpan)
 
     }
 
