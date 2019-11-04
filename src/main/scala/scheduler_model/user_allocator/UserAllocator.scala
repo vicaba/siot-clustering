@@ -30,8 +30,6 @@ object UserAllocator {
     new UserRepresentationAsAmplitudeInMinTimeSpan(
       Some(MaxPeakGraterThanMaxFixedLoadsPeakCondition, new UserRepresentationAsAmplitudeInMaxTimeSpan()))
 
-
-
   def representUserAsFlexibleLoadRepresentationsInAccumulatedLoad(
       users: List[AccumulatedLoad]
   ): AccumulatedLoad = {
@@ -59,18 +57,17 @@ object UserAllocator {
 
   }
 
-  def representUserAsBestFlexibleLoad(userRepresentationAsAmplitude: UserRepresentationAsAmplitude)(acc: => AccumulatedLoad, xy: (FlexibleLoad, FlexibleLoad)): (FlexibleLoad, FlexibleLoad) = {
-    // TODO: This is the last thing done
-    if (xy._1.isInstanceOf[FlexibleLoadRepresentation]) {
-      val x = xy._1
-      val newX = userRepresentationAsAmplitude(xy._1, acc)
-      val fl = FlexibleLoad(x.id, x.id, "User as FlexibleLoad", 0, DenseVector(newX.toArray))
+  def representUserAsBestFlexibleLoad(userRepresentationAsAmplitude: UserRepresentationAsAmplitude)(
+      acc: => AccumulatedLoad,
+      xy: (FlexibleLoad, FlexibleLoad)): (FlexibleLoad, FlexibleLoad) = xy._1 match {
+    case x: FlexibleLoadRepresentation =>
+      val newX = userRepresentationAsAmplitude(x, acc)
+      val fl   = FlexibleLoad(x.id, x.id, "User as FlexibleLoad", 0, DenseVector(newX.toArray))
       (fl, fl.copy())
-    }
-    else xy
+    case _ => xy
   }
 
-  def representUsersAsFlexibleLoadsInAccumulatedLoad(
+  /*  def representUsersAsFlexibleLoadsInAccumulatedLoad(
       users: List[AccumulatedLoad],
       userRepresentationAsAmplitude: UserRepresentationAsAmplitude): AccumulatedLoad = {
 
@@ -89,7 +86,7 @@ object UserAllocator {
 
     AccumulatedLoad.keepLoadOrder(0, 0, "AccumulatedLoad with users", fixedLoads ::: usersAsFlexibleLoads)(
       amplitudePerSlotMetadata)
-  }
+  }*/
 
   /**
     * Allocates users along the complete timespan. The algorithm "transforms" each user as a flexible load of windowSize and
@@ -106,9 +103,12 @@ object UserAllocator {
     // TODO: Test this by comparing results of BenchmarkSpec and SchedulerSpec
     val sortedUsers = users.sorted(userOrdering)
 
-    val accumulatedLoads = representUsersAsFlexibleLoadsInAccumulatedLoad(sortedUsers, userRepresentationAsAmplitude)
+    val accumulatedLoads = representUserAsFlexibleLoadRepresentationsInAccumulatedLoad(sortedUsers)
 
-    val allocationResult = SchedulerAlgorithm.reschedule(accumulatedLoads, metricTransformation = NoTransformation)
+    val allocationResult = SchedulerAlgorithm.reschedule(
+      accumulatedLoads,
+      metricTransformation = NoTransformation,
+      flexibleLoadTransformer = representUserAsBestFlexibleLoad(userRepresentationAsAmplitude))
 
     // Reorder per "users" input
     val order                         = users.map(_.id)

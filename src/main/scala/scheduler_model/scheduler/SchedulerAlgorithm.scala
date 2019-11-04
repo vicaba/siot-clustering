@@ -21,7 +21,7 @@ object SchedulerAlgorithm {
       referenceAverage: Double = 0.0,
       ordering: Ordering[Load] = DefaultOrdering,
       verbose: Boolean = false,
-      flexibleLoadTransformer: (AccumulatedLoad, (FlexibleLoad, FlexibleLoad)) => (FlexibleLoad, FlexibleLoad) = (_, loads) => (loads._1, loads._2)): AccumulatedLoad = {
+      flexibleLoadTransformer: (=> AccumulatedLoad, (FlexibleLoad, FlexibleLoad)) => (FlexibleLoad, FlexibleLoad) = (_, loads) => (loads._1, loads._2)): AccumulatedLoad = {
 
     def _reschedule(_acc: (AccumulatedLoad, AccumulatedLoad),
                     _remainingFlexibleLoads: (List[FlexibleLoad], List[FlexibleLoad])): AccumulatedLoad =
