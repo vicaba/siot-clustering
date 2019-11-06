@@ -3,6 +3,7 @@ package scheduler_model.user_allocator
 import breeze.linalg.DenseVector
 import org.scalatest.{FeatureSpec, GivenWhenThen}
 import org.scalatest.Matchers._
+import org.scalatest.Inspectors._
 import scheduler_model.load.{FlexibleLoad, _}
 import scheduler_model.user_allocator.user_representation.{
   UserRepresentationAsAmplitudeInMaxTimeSpan,
@@ -171,6 +172,39 @@ class UserAllocatorSpec extends FeatureSpec with GivenWhenThen {
         UserAllocator.allocate(usersSimulation, userRepresentationAsAmplitude = userRepresentationAsAmplitude)
 
       usersPreferredSlots should contain(List(3, 4))
+
+      println(usersPreferredSlots)
+
+    }
+
+    scenario("Users are spread in time using feedback, FAILING") {
+
+      implicit val amplitudePerSlotMetadata: DataTypeMetadata = DataTypeMetadata.generateDataTypeMetadata(forColumns = 5)
+
+      val usersSimulation: List[AccumulatedLoad] = List(
+        AccumulatedLoad(500,
+          500,
+          "500",
+          List(
+            FixedLoad(101, 101, "101", DenseVector(4, 0, 4)),
+            FlexibleLoad(151, 151, "151", 0, DenseVector(11))
+          ))(DataTypeMetadata.generateDataTypeMetadata(forColumns = 3)),
+        AccumulatedLoad(600,
+          600,
+          "600",
+          List(
+            FixedLoad(201, 201, "201", DenseVector(4, 0, 4)),
+            FlexibleLoad(251, 251, "251", 0, DenseVector(12))
+          ))(DataTypeMetadata.generateDataTypeMetadata(forColumns = 3))
+      )
+
+      val userRepresentationAsAmplitude = new UserRepresentationAsAmplitudeInMinTimeSpan(
+        Some(MaxPeakGraterThanMaxFixedLoadsPeakCondition, new UserRepresentationAsAmplitudeInMaxTimeSpan()))
+
+      val usersPreferredSlots =
+        UserAllocator.allocate(usersSimulation, userRepresentationAsAmplitude = userRepresentationAsAmplitude)
+
+      usersPreferredSlots should contain allOf (List(1), List(0))
 
       println(usersPreferredSlots)
 

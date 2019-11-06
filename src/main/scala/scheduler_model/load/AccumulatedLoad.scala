@@ -15,6 +15,10 @@ object AccumulatedLoad {
       implicit amplitudePerSlotMetadata: DataTypeMetadata): AccumulatedLoad =
     new AccumulatedLoad(id, group, label, new scala.collection.mutable.HashSet[Load]() += load)
 
+  def apply(id: LoadId, group: GroupId, label: String, loads: mutable.Set[Load])(
+    implicit amplitudePerSlotMetadata: DataTypeMetadata): AccumulatedLoad =
+    new AccumulatedLoad(id, group, label, loads)
+
   def apply(id: LoadId, group: GroupId, label: String, loads: Iterable[Load])(
       implicit amplitudePerSlotMetadata: DataTypeMetadata): AccumulatedLoad =
     new AccumulatedLoad(id, group, label, mutableSetOf(loads))
