@@ -135,11 +135,8 @@ class AccumulatedLoad(
   }
 
   private[load] def copy(addSuperTaskSubTasks: Boolean): AccumulatedLoad = {
-    if (loads.isInstanceOf[scala.collection.mutable.LinkedHashSet[Load]]) {
-      val l = loads.companion.apply()
-      println("hola")
-    }
-    AccumulatedLoad(id, group, label, mutableSetOf(LoadOps.copy(loads, addSuperTaskSubTasks)))
+    val lcopy = loads.companion.apply[Load](LoadOps.copy(loads, addSuperTaskSubTasks).toSeq:_*)
+    AccumulatedLoad(id, group, label, lcopy)
   }
 
 }

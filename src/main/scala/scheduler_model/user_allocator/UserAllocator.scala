@@ -26,7 +26,7 @@ object UserAllocator {
   )
 
   val DefaultOrdering: Ordering[FlexibleLoadRepresentation] =
-    Load.flexibleLoadRepresentationOrderingByAmplitude
+    Load.flexibleLoadRepresentationOrderingByAmplitude.reverse
 
   val DefaultUserRepresentationAsAmplitude: UserRepresentationAsAmplitudeInMinTimeSpan =
     new UserRepresentationAsAmplitudeInMinTimeSpan(
