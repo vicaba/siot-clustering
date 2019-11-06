@@ -63,6 +63,7 @@ object SchedulerAlgorithm {
 
     if (remainingLoadsAfterRemovingFlexibleLoads.nonEmpty) {
       val (best, temporary) = prepareAccumulatedLoadForAlgorithm()
+      //println("order")
       _reschedule((best.acc, temporary.acc), (best.flexibleLoads, temporary.flexibleLoads))
     } else
       LoadOps.copy(acc, addSuperTaskSubTasks = true)

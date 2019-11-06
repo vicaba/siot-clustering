@@ -17,7 +17,7 @@ object Scheduler {
 
   def apply(clusters: List[AccumulatedLoad],
     metricTransformation: MetricTransformation,
-    userOrdering: Ordering[AccumulatedLoad] = UserAllocator.DefaultOrdering,
+    userOrdering: Ordering[FlexibleLoadRepresentation] = UserAllocator.DefaultOrdering,
     schedulerAlgorithmOrdering: Ordering[Load] = SchedulerAlgorithm.DefaultOrdering)
   : List[AccumulatedLoad] = {
 
@@ -38,7 +38,7 @@ object Scheduler {
 
       val _clusters: List[AccumulatedLoad] = LoadOps.copy(clusters).toList.asInstanceOf[List[AccumulatedLoad]]
 
-      logger.info("Running Scheduler for {} users", _clusters.length)
+      logger.info("Running Scheduler for {} users with ordering {}", _clusters.length, schedulerAlgorithmOrdering.toString)
 
       val numberOfSlots = LoadOps.span(_clusters)
       val schedulerPreferredSlots =
@@ -66,7 +66,7 @@ object Scheduler {
 
   def apply(clusters: List[AccumulatedLoad],
     metricTransformation: MetricTransformation,
-    userOrderings: List[Ordering[AccumulatedLoad]],
+    userOrderings: List[Ordering[FlexibleLoadRepresentation]],
     schedulerAlgorithmOrderings: List[Ordering[Load]])
   : List[AccumulatedLoad] = {
 

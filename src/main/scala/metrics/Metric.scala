@@ -17,6 +17,8 @@ object Metric {
 
   def par: Metric = Par.default
 
+  def parWithStdvAggregate: Par = Par.withStdvAggregate
+
   case class ProgressionResult(distance: Double, progression: Progression)
 
   sealed trait Progression {
@@ -106,6 +108,10 @@ trait Metric {
 
 object Par extends MetricCompanion {
 
+  val withStdvAggregate: Par = new Par {
+    override val aggregateOf: MetricCompanion#AggregateOf = StandardDeviationAggregate
+  }
+
   val withParAggregate: Par = new Par {
     override val aggregateOf: AggregateOf = ParAggregate
   }
@@ -123,6 +129,11 @@ object Par extends MetricCompanion {
   }
 
   override val default: Metric = withParAggregate
+
+  object StandardDeviationAggregate extends AggregateOf {
+    override def apply[T: DenseVectorReprOps](metric: Metric, list: Iterable[T]): Double =
+      stddev(list.map(e => metric(e)))
+  }
 
   object ParAggregate extends AggregateOf {
 

@@ -16,22 +16,25 @@ import scala.util.Try
 
 object UserAllocator {
 
-  val DefaultOrderings: List[Ordering[AccumulatedLoad]] = List(
-    Load.loadListOrderingByAmplitude.reverse,
-    Load.loadListOrderingByAmplitude,
-    Load.loadListOrderingByMaxPositionInT.reverse,
-    Load.loadListOrderingByMaxPositionInT,
-  ).map(_.on[AccumulatedLoad](_.flexibleLoads.toList))
+  val DefaultOrderings: List[Ordering[FlexibleLoadRepresentation]] = List(
+    Load.flexibleLoadRepresentationOrderingByAmplitude.reverse,
+    Load.flexibleLoadRepresentationOrderingByAmplitude,
+    Load.flexibleLoadRepresentationOrderingByMaxTimeSpan.reverse,
+    Load.flexibleLoadRepresentationOrderingByMaxTimeSpan,
+    Load.flexibleLoadRepresentationOrderingByMinTimeSpan.reverse,
+    Load.flexibleLoadRepresentationOrderingByMinTimeSpan,
+  )
 
-  val DefaultOrdering: Ordering[AccumulatedLoad] =
-    Load.loadListOrderingByAmplitude.reverse.on[AccumulatedLoad](_.flexibleLoads.toList)
+  val DefaultOrdering: Ordering[FlexibleLoadRepresentation] =
+    Load.flexibleLoadRepresentationOrderingByAmplitude
 
   val DefaultUserRepresentationAsAmplitude: UserRepresentationAsAmplitudeInMinTimeSpan =
     new UserRepresentationAsAmplitudeInMinTimeSpan(
       Some(MaxPeakGraterThanMaxFixedLoadsPeakCondition, new UserRepresentationAsAmplitudeInMaxTimeSpan()))
 
   def representUserAsFlexibleLoadRepresentationsInAccumulatedLoad(
-      users: List[AccumulatedLoad]
+      users: List[AccumulatedLoad],
+      userOrdering: Ordering[FlexibleLoadRepresentation]
   ): AccumulatedLoad = {
 
     val amplitudePerSlotMetadata = users.head.amplitudePerSlotMetadata
@@ -52,7 +55,7 @@ object UserAllocator {
 
     }
 
-    AccumulatedLoad.keepLoadOrder(0, 0, "AccumulatedLoad with users", fixedLoads ::: usersAsFlexibleLoads)(
+    AccumulatedLoad.keepLoadOrder(0, 0, "AccumulatedLoad with users", fixedLoads ::: usersAsFlexibleLoads.sorted(userOrdering))(
       amplitudePerSlotMetadata)
 
   }
@@ -96,17 +99,18 @@ object UserAllocator {
     * @return A list in the same order as users with schedulerPreferredTimeSlots per each user as an inner List[Int]
     */
   def allocate(users: List[AccumulatedLoad],
-               userOrdering: Ordering[AccumulatedLoad] = DefaultOrdering,
+               userOrdering: Ordering[FlexibleLoadRepresentation] = DefaultOrdering,
                userRepresentationAsAmplitude: UserRepresentationAsAmplitude = DefaultUserRepresentationAsAmplitude)
     : List[List[Int]] = {
 
     // TODO: Test this by comparing results of BenchmarkSpec and SchedulerSpec
-    val sortedUsers = users.sorted(userOrdering)
+    val sortedUsers = users
 
-    val accumulatedLoads = representUserAsFlexibleLoadRepresentationsInAccumulatedLoad(sortedUsers)
+    val accumulatedLoads = representUserAsFlexibleLoadRepresentationsInAccumulatedLoad(sortedUsers, userOrdering)
 
     val allocationResult = SchedulerAlgorithm.reschedule(
       accumulatedLoads,
+      ordering = Load.loadIdentityOrdering,
       metricTransformation = NoTransformation,
       flexibleLoadTransformer = representUserAsBestFlexibleLoad(userRepresentationAsAmplitude))
 

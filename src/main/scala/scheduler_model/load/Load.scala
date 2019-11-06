@@ -12,11 +12,22 @@ object Load {
   type LoadId = Int
   type GroupId = Int
 
+  val loadIdentityOrdering: Ordering[Load] = (_: Load, _: Load) => 0
+
   val loadOrderingByPositionInTime: Ordering[Load] =
     (x: Load, y: Load) => implicitly[Ordering[Int]].compare(x.startPositionInTime, y.startPositionInTime)
 
   val loadOrderingByAmplitude: Ordering[Load] =
     (x: Load, y: Load) => implicitly[Ordering[Double]].compare(x.totalEnergy, y.totalEnergy)
+
+  val flexibleLoadRepresentationOrderingByAmplitude: Ordering[FlexibleLoadRepresentation] =
+  (x: FlexibleLoadRepresentation, y: FlexibleLoadRepresentation) => implicitly[Ordering[Double]].compare(x.amplitude, y.amplitude)
+
+  val flexibleLoadRepresentationOrderingByMinTimeSpan: Ordering[FlexibleLoadRepresentation] =
+    (x: FlexibleLoadRepresentation, y: FlexibleLoadRepresentation) => implicitly[Ordering[Int]].compare(x.minTimeSpan, y.minTimeSpan)
+
+  val flexibleLoadRepresentationOrderingByMaxTimeSpan: Ordering[FlexibleLoadRepresentation] =
+    (x: FlexibleLoadRepresentation, y: FlexibleLoadRepresentation) => implicitly[Ordering[Int]].compare(x.maxTimeSpan, y.maxTimeSpan)
 
   val loadListOrderingByMaxPositionInT: Ordering[List[Load]] = new Ordering[List[Load]] {
     override def compare(x: List[Load], y: List[Load]): LoadId = {
