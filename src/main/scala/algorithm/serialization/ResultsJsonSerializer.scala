@@ -5,6 +5,7 @@ import breeze.linalg.max
 import crossfold.CrossFoldValidation.{CrossFoldTypeSettings, MonteCarlo}
 import metrics.{Metric, Par}
 import play.api.libs.json._
+import types.clusterer.mutable.Cluster
 
 object ResultsJsonSerializer {
 
@@ -45,7 +46,6 @@ object ResultsJsonSerializer {
         peakKey(ClustererKey) -> max(step.clusters.maxBy(c => max(c.syntheticValue)).syntheticValue),
         aggregateMetricKey(ClustererKey) -> step.settings.metric
           .aggregateOf(step.clusters), //steps._1.aggregatedMetric,
-        "stdv" -> Metric.parWithStdvAggregate.aggregateOf(step.clusters),
         maxMetricKey(ClustererKey) -> step.clusters.map(step.settings.metric(_)).max,
         totalMetricKey(ClustererKey)             -> step.settings.metric(step.clusters),
         ClustersKey                -> step.clusters.map(_.userWiseSize)
