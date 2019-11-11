@@ -43,7 +43,12 @@ object UserAllocator {
     val usersAsFlexibleLoads = for (user <- users) yield {
 
       val userAmplitude       = Try(sum(sum(user.flexibleLoads.toList.map(_.amplitudePerSlot)))).getOrElse(0.0)
-      val userMinLoadTimeSpan = Try(user.flexibleLoads.toList.map(_.span).max).getOrElse(0)
+
+      val userMinLoadTimeSpan = Try{
+        val superTasks = user.loads.toList.filter(_.isInstanceOf[FlexibleLoadSuperTask]).asInstanceOf[List[FlexibleLoadSuperTask]]
+        superTasks.map(_.aggregatees.map(_.span).sum).max
+      }.getOrElse(0)
+      //val userMinLoadTimeSpan = Try(user.flexibleLoads.toList.map(_.span).max).getOrElse(0)
       val userMaxTimeSpan     = Try(user.flexibleLoads.toList.map(_.span).sum).getOrElse(0)
 
       FlexibleLoadRepresentation(user.id,

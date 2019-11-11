@@ -5,6 +5,7 @@ import org.scalatest.{FeatureSpec, GivenWhenThen}
 import org.scalatest.Matchers._
 import org.scalatest.Inspectors._
 import scheduler_model.load.{FlexibleLoad, _}
+import scheduler_model.sequence_split.SequenceSplitByConsecutiveElements
 import scheduler_model.user_allocator.user_representation.{
   UserRepresentationAsAmplitudeInMaxTimeSpan,
   UserRepresentationAsAmplitudeInMinTimeSpan
@@ -13,6 +14,38 @@ import scheduler_model.user_allocator.user_representation.conditions.MaxPeakGrat
 import types.clusterer.DataTypeMetadata
 
 class UserAllocatorSpec extends FeatureSpec with GivenWhenThen {
+
+  feature("UserAllocator.representUserAsFlexibleLoadRepresentationsInAccumulatedLoad") {
+
+    scenario(
+      "representUserAsFlexibleLoadRepresentationsInAccumulatedLoad represents min-timespan of FlexibleLoadSuperTask with two aggregatees correctly") {
+
+      val accLoad = AccumulatedLoad.AutoSpanFromLoads.keepLoadOrder(
+        1,
+        1,
+        "acc",
+        List(
+          FlexibleLoad(1, 1, "Test", 0, DenseVector(1, 1, 0, 0, 1, 1, 1)),
+          FlexibleLoad(1, 2, "Test", 0, DenseVector(1, 1, 0, 0, 1, 1, 0)),
+        ))
+
+      AccumulatedLoad.Mutate.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
+        accLoad,
+        SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage)
+
+      val res = UserAllocator.representUserAsFlexibleLoadRepresentationsInAccumulatedLoad(List(accLoad),
+                                                                                          UserAllocator.DefaultOrdering)
+
+      val representation = res.flexibleLoads.toList.asInstanceOf[List[FlexibleLoadRepresentation]].head
+
+      assert(representation.minTimeSpan == 5)
+      assert(representation.maxTimeSpan == 9)
+
+      println("works")
+
+    }
+
+  }
 
   feature("UserAllocator allocates users with best effort") {
 
@@ -79,9 +112,11 @@ class UserAllocatorSpec extends FeatureSpec with GivenWhenThen {
 
     }
 
-    scenario("User with two flexible loads spanning 1 time-slot, should be spread in time when min and max user representations are provided (test2)") {
+    scenario(
+      "User with two flexible loads spanning 1 time-slot, should be spread in time when min and max user representations are provided (test2)") {
 
-      implicit val amplitudePerSlotMetadata: DataTypeMetadata = DataTypeMetadata.generateDataTypeMetadata(forColumns = 5)
+      implicit val amplitudePerSlotMetadata: DataTypeMetadata =
+        DataTypeMetadata.generateDataTypeMetadata(forColumns = 5)
 
       Given("A user with one fixed load and two flexible loads")
 
@@ -91,8 +126,8 @@ class UserAllocatorSpec extends FeatureSpec with GivenWhenThen {
           200,
           "200",
           List(FixedLoad(201, 201, "201", DenseVector(0, 1, 1, 1, 1)),
-            FlexibleLoad(251, 251, "151", 0, DenseVector(1)),
-            FlexibleLoad(251, 252, "252", 0, DenseVector(2)))
+               FlexibleLoad(251, 251, "151", 0, DenseVector(1)),
+               FlexibleLoad(251, 252, "252", 0, DenseVector(2)))
         ))
 
       When(
@@ -124,8 +159,8 @@ class UserAllocatorSpec extends FeatureSpec with GivenWhenThen {
           100,
           "100",
           List(FixedLoad(101, 101, "101", DenseVector(0, 2, 2, 2, 1)),
-            FlexibleLoad(151, 151, "151", 0, DenseVector(1)),
-            FlexibleLoad(151, 152, "152", 0, DenseVector(1)))
+               FlexibleLoad(151, 151, "151", 0, DenseVector(1)),
+               FlexibleLoad(151, 152, "152", 0, DenseVector(1)))
         ))
 
       When(
@@ -145,7 +180,8 @@ class UserAllocatorSpec extends FeatureSpec with GivenWhenThen {
 
     scenario("Users are spread in time using feedback") {
 
-      implicit val amplitudePerSlotMetadata: DataTypeMetadata = DataTypeMetadata.generateDataTypeMetadata(forColumns = 5)
+      implicit val amplitudePerSlotMetadata: DataTypeMetadata =
+        DataTypeMetadata.generateDataTypeMetadata(forColumns = 5)
 
       val usersSimulation: List[AccumulatedLoad] = List(
         AccumulatedLoad(
@@ -153,17 +189,18 @@ class UserAllocatorSpec extends FeatureSpec with GivenWhenThen {
           100,
           "100",
           List(FixedLoad(101, 101, "101", DenseVector(1, 2, 2, 1, 1)),
-            FlexibleLoad(151, 151, "151", 0, DenseVector(1)),
-            FlexibleLoad(151, 152, "152", 0, DenseVector(1)))
+               FlexibleLoad(151, 151, "151", 0, DenseVector(1)),
+               FlexibleLoad(151, 152, "152", 0, DenseVector(1)))
         ),
         AccumulatedLoad(
           200,
           200,
           "200",
           List(FixedLoad(201, 201, "201", DenseVector(0, 1, 1, 1, 1)),
-            FlexibleLoad(251, 251, "151", 0, DenseVector(1)),
-            FlexibleLoad(251, 252, "252", 0, DenseVector(1)))
-        ))
+               FlexibleLoad(251, 251, "151", 0, DenseVector(1)),
+               FlexibleLoad(251, 252, "252", 0, DenseVector(1)))
+        )
+      )
 
       val userRepresentationAsAmplitude = new UserRepresentationAsAmplitudeInMinTimeSpan(
         Some(MaxPeakGraterThanMaxFixedLoadsPeakCondition, new UserRepresentationAsAmplitudeInMaxTimeSpan()))
@@ -179,23 +216,24 @@ class UserAllocatorSpec extends FeatureSpec with GivenWhenThen {
 
     scenario("Users are spread in time using feedback, FAILING") {
 
-      implicit val amplitudePerSlotMetadata: DataTypeMetadata = DataTypeMetadata.generateDataTypeMetadata(forColumns = 5)
+      implicit val amplitudePerSlotMetadata: DataTypeMetadata =
+        DataTypeMetadata.generateDataTypeMetadata(forColumns = 5)
 
       val usersSimulation: List[AccumulatedLoad] = List(
         AccumulatedLoad(500,
-          500,
-          "500",
-          List(
-            FixedLoad(101, 101, "101", DenseVector(4, 0, 4)),
-            FlexibleLoad(151, 151, "151", 0, DenseVector(11))
-          ))(DataTypeMetadata.generateDataTypeMetadata(forColumns = 3)),
+                        500,
+                        "500",
+                        List(
+                          FixedLoad(101, 101, "101", DenseVector(4, 0, 4)),
+                          FlexibleLoad(151, 151, "151", 0, DenseVector(11))
+                        ))(DataTypeMetadata.generateDataTypeMetadata(forColumns = 3)),
         AccumulatedLoad(600,
-          600,
-          "600",
-          List(
-            FixedLoad(201, 201, "201", DenseVector(4, 0, 4)),
-            FlexibleLoad(251, 251, "251", 0, DenseVector(12))
-          ))(DataTypeMetadata.generateDataTypeMetadata(forColumns = 3))
+                        600,
+                        "600",
+                        List(
+                          FixedLoad(201, 201, "201", DenseVector(4, 0, 4)),
+                          FlexibleLoad(251, 251, "251", 0, DenseVector(12))
+                        ))(DataTypeMetadata.generateDataTypeMetadata(forColumns = 3))
       )
 
       val userRepresentationAsAmplitude = new UserRepresentationAsAmplitudeInMinTimeSpan(
