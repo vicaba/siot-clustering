@@ -47,7 +47,8 @@ object UserAllocator {
       val userMinLoadTimeSpan = Try{
         val superTasks = user.loads.toList.filter(_.isInstanceOf[FlexibleLoadSuperTask]).asInstanceOf[List[FlexibleLoadSuperTask]]
         superTasks.map(_.aggregatees.map(_.span).sum).max
-      }.getOrElse(0)
+      }.orElse(Try(user.flexibleLoads.toList.map(_.span).sum)).getOrElse(0)
+      // TODO: We are dragging FlexibleLoads due to the BenchmarkSpec. So there is a typing problem since we have to check for both cases.
       //val userMinLoadTimeSpan = Try(user.flexibleLoads.toList.map(_.span).max).getOrElse(0)
       val userMaxTimeSpan     = Try(user.flexibleLoads.toList.map(_.span).sum).getOrElse(0)
 
