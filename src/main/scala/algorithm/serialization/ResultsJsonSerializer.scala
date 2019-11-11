@@ -5,7 +5,6 @@ import breeze.linalg.max
 import crossfold.CrossFoldValidation.{CrossFoldTypeSettings, MonteCarlo}
 import metrics.{Metric, Par}
 import play.api.libs.json._
-import types.clusterer.mutable.Cluster
 
 object ResultsJsonSerializer {
 

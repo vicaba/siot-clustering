@@ -70,6 +70,25 @@ object Scheduler {
     schedulerAlgorithmOrderings: List[Ordering[Load]])
   : List[AccumulatedLoad] = {
 
+    val orderings = for {
+      userOrdering <- userOrderings
+      schedulerAlgorithmOrdering <- schedulerAlgorithmOrderings
+    } yield {
+      (userOrdering, schedulerAlgorithmOrdering)
+    }
+
+    var best: List[AccumulatedLoad] = apply(clusters, metricTransformation, orderings.head._1, orderings.head._2)
+    var bestMetric = Metric.par(best)
+
+    for (ordering <- orderings.tail) {
+      val res = apply(clusters, metricTransformation, ordering._1, ordering._2)
+      val resMetric = Metric.par(res)
+      if (resMetric < bestMetric) {
+        best = res
+        bestMetric = resMetric
+      }
+    }
+
     (for {
       userOrdering <- userOrderings
       schedulerAlgorithmOrdering <- schedulerAlgorithmOrderings
