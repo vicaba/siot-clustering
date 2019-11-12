@@ -88,13 +88,7 @@ object Scheduler {
         bestMetric = resMetric
       }
     }
-
-    (for {
-      userOrdering <- userOrderings
-      schedulerAlgorithmOrdering <- schedulerAlgorithmOrderings
-    } yield {
-      apply(clusters, metricTransformation, userOrdering, schedulerAlgorithmOrdering)
-    }) minBy (Metric.par(_))
+    best
   }
 
 }
