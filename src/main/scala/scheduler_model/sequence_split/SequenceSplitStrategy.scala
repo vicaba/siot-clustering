@@ -22,9 +22,9 @@ object SequenceSplitByConsecutiveElements {
   def withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage: SequenceSplitByConsecutiveElements = {
     val consecutiveValue: Seq[Double] => Double = seq => {
 
-      val average = seq.foldLeft(0.0) {
+/*      val average = seq.foldLeft(0.0) {
         case (acc, v) => acc + v
-      } / seq.size
+      } / seq.size*/
 
       val consecutiveValues = seq
         .foldLeft(Map.empty[Double, Int].withDefaultValue(0)) {
@@ -32,7 +32,8 @@ object SequenceSplitByConsecutiveElements {
         }
         .toList.sortWith { case (x, y) => x._2 > y._2}
 
-      consecutiveValues.filter(_._2 == consecutiveValues.maxBy(_._2)._2).collectFirst {case (elem, _) if elem < average => elem}.getOrElse(consecutiveValues.minBy(_._1)._1)
+      //consecutiveValues.filter(_._2 == consecutiveValues.maxBy(_._2)._2).collectFirst {case (elem, _) if elem < average => elem}.getOrElse(consecutiveValues.minBy(_._1)._1)
+      consecutiveValues.minBy(_._1)._1
     }
     SequenceSplitByConsecutiveElements(consecutiveValue)
   }
