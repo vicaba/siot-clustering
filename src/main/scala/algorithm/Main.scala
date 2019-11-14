@@ -28,7 +28,7 @@ object Main {
     val AppliancesOutputFileName = "appliance_output.csv"
     val LightingOutputFileName   = "lighting_output.csv"
 
-    val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 199) yield (i + "/", i)).toList
+    val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 49) yield (i + "/", i)).toList
 
     val points = SyntheticProfilesReaderForEuclideanClusterer
       .applyDefault(MainFolder,
@@ -114,7 +114,7 @@ object Main {
       for (i <- BigDecimal(Configuration.CrossFold.SubsampleSize.from) to (Max, step = BigDecimal(0.1)))
       yield {
         val subsampleSize = Percentage.of(i / Max)
-        val splits = 25//Math.floor((batchRunSettingsBuilder.points.size * subsampleSize.v).toDouble).toInt / 2
+        val splits = 3//Math.floor((batchRunSettingsBuilder.points.size * subsampleSize.v).toDouble).toInt / 2
         MonteCarlo(splits, subsampleSize)
       }
     val stepsList = CrossFoldValidation.batchRun(monteCarlos.toList, batchRunSettingsBuilder)
