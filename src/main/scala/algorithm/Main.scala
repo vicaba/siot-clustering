@@ -114,7 +114,7 @@ object Main {
       for (i <- BigDecimal(Configuration.CrossFold.SubsampleSize.from) to (Max, step = BigDecimal(0.1)))
       yield {
         val subsampleSize = Percentage.of(i / Max)
-        val splits = 25//Math.floor((batchRunSettingsBuilder.points.size * subsampleSize.v).toDouble).toInt / 2
+        val splits = 20//Math.floor((batchRunSettingsBuilder.points.size * subsampleSize.v).toDouble).toInt / 2
         MonteCarlo(splits, subsampleSize)
       }
     val stepsList = CrossFoldValidation.batchRun(monteCarlos.toList, batchRunSettingsBuilder)
