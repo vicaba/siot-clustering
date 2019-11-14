@@ -1,6 +1,11 @@
+import breeze.linalg
 import breeze.linalg._
 
 
-def f(l: => (Unit, Int)): Unit = ()
+val a = DenseVector(2, 2, 2)
 
-f((println("hola"), 2))
+val b = DenseVector(3, 3, 3)
+
+val c = DenseVector.vertcat(a,b)
+
+c.toString

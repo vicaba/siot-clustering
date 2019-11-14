@@ -1,6 +1,6 @@
 package scheduler_model.scheduler.metric_transformer
 
-import breeze.linalg.sum
+import breeze.linalg.{DenseVector, sum}
 import scheduler_model.load.{AccumulatedLoad, Load}
 import scheduler_model.scheduler.Movement
 
@@ -33,6 +33,7 @@ class BiasedAverageDistanceTransformation(val bias: Double = 0.50) extends Metri
 
     // TODO: It seems that removing bias works better
     distance + distance * (1 - slotsWithPriorityOverlapRatio)
+
   }
 
   private def computeSlotsWithPriorityOverlapRatio(load: Load, preferredSlots: List[Int]): Double =
@@ -43,12 +44,32 @@ class BiasedAverageDistanceTransformation(val bias: Double = 0.50) extends Metri
       numberOfOverlappedSlots.toDouble / load.span.toDouble
     }
 
+  private def computeAllDistance(referenceAverage: Double, accumulatedLoad: AccumulatedLoad, load: Load) = {
+    val slice = accumulatedLoad.amplitudePerSlot.toDenseVector
+      //.slice(load.startPositionInTime, load.startPositionInTime + load.span)
+    slice.foldLeft(0.0) {
+      case (accum, elem) =>
+        accum + Math.pow(referenceAverage - elem, 2)
+    }
+  }
+
+  private def computeAllDistanceMinusFl(referenceAverage: Double, accumulatedLoad: AccumulatedLoad, load: Load) = {
+    val slice1 = accumulatedLoad.amplitudePerSlot.toDenseVector
+    .slice(0, load.startPositionInTime)
+    val slice2 = accumulatedLoad.amplitudePerSlot.toDenseVector
+      .slice(load.startPositionInTime + load.span, accumulatedLoad.span)
+    DenseVector.vertcat(slice1, slice2).foldLeft(0.0) {
+      case (accum, elem) =>
+        accum + Math.pow(referenceAverage - elem, 2)
+    }
+  }
   private def computeDistance(referenceAverage: Double, accumulatedLoad: AccumulatedLoad, load: Load) = {
     val slice = accumulatedLoad.amplitudePerSlot.toDenseVector
       .slice(load.startPositionInTime, load.startPositionInTime + load.span)
     slice.foldLeft(0.0) {
       case (accum, elem) =>
-        accum + Math.abs(referenceAverage - elem)
+        accum + Math.pow(referenceAverage - elem, 2)
+        //accum + Math.abs(referenceAverage - elem)
     }
   }
 
