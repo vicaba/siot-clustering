@@ -14,7 +14,6 @@ object Load {
 
   val loadIdentityOrdering: Ordering[Load] =  new Ordering[Load] {
     def compare(x: Load, y: Load) = 0
-
     override def toString: String = "loadIdentityOrdering"
   }
 
@@ -23,8 +22,10 @@ object Load {
     override def toString: String = "loadIdentityOrdering"
   }
 
-  val loadOrderingByAmplitude: Ordering[Load] =
-    (x: Load, y: Load) => implicitly[Ordering[Double]].compare(x.totalEnergy, y.totalEnergy)
+  val loadOrderingByAmplitude: Ordering[Load] = new Ordering[Load] {
+    def compare(x: Load, y: Load): LoadId = implicitly[Ordering[Double]].compare(x.totalEnergy, y.totalEnergy)
+    override def toString: String = "loadOrderingByAmplitude"
+  }
 
   val flexibleLoadRepresentationOrderingByAmplitude: Ordering[FlexibleLoadRepresentation] =  new Ordering[FlexibleLoadRepresentation] {
     def compare(x: FlexibleLoadRepresentation, y: FlexibleLoadRepresentation): LoadId = implicitly[Ordering[Double]].compare(x.amplitude, y.amplitude)

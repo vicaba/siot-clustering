@@ -13,7 +13,7 @@ enablePlugins(JavaAppPackaging)
 
 
 javaOptions in Universal ++= Seq(
-  "-J-Xmx4g",
+  "-J-Xmx6g",
   "-J-Xms128m",
 )
 
