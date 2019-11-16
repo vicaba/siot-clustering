@@ -69,7 +69,7 @@ class AlgorithmSpec extends FeatureSpec with GivenWhenThen {
         info(s"PAR for unscheduled loads: $unscheduledLoadsPar.")
         info(s"PAR for scheduled loads: $scheduledLoadsPar.")
 
-        //scheduledLoadsPar should be < unscheduledLoadsPar
+        scheduledLoadsPar should be < unscheduledLoadsPar
 
         val unscheduledLoadsTotalEnergy: Double =
           sum(sum(stepsList.flatMap(_.reschedulerOutput.clusters.map(_.syntheticValue))))
@@ -93,7 +93,9 @@ class AlgorithmSpec extends FeatureSpec with GivenWhenThen {
                       subFoldersAndIds.map(_._2),
                       windowSize = 30)
 
-      for (i <- 1 to 6) {
+      println(Runtime.getRuntime.availableProcessors())
+
+      for (i <- 2 to 6) {
         execute(i, points)
       }
     }

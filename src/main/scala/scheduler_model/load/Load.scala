@@ -12,22 +12,34 @@ object Load {
   type LoadId = Int
   type GroupId = Int
 
-  val loadIdentityOrdering: Ordering[Load] = (_: Load, _: Load) => 0
+  val loadIdentityOrdering: Ordering[Load] =  new Ordering[Load] {
+    def compare(x: Load, y: Load) = 0
 
-  val loadOrderingByPositionInTime: Ordering[Load] =
-    (x: Load, y: Load) => implicitly[Ordering[Int]].compare(x.startPositionInTime, y.startPositionInTime)
+    override def toString: String = "loadIdentityOrdering"
+  }
+
+  val loadOrderingByPositionInTime: Ordering[Load] = new Ordering[Load] {
+    def compare(x: Load, y: Load): LoadId = implicitly[Ordering[Int]].compare(x.startPositionInTime, y.startPositionInTime)
+    override def toString: String = "loadIdentityOrdering"
+  }
 
   val loadOrderingByAmplitude: Ordering[Load] =
     (x: Load, y: Load) => implicitly[Ordering[Double]].compare(x.totalEnergy, y.totalEnergy)
 
-  val flexibleLoadRepresentationOrderingByAmplitude: Ordering[FlexibleLoadRepresentation] =
-  (x: FlexibleLoadRepresentation, y: FlexibleLoadRepresentation) => implicitly[Ordering[Double]].compare(x.amplitude, y.amplitude)
+  val flexibleLoadRepresentationOrderingByAmplitude: Ordering[FlexibleLoadRepresentation] =  new Ordering[FlexibleLoadRepresentation] {
+    def compare(x: FlexibleLoadRepresentation, y: FlexibleLoadRepresentation): LoadId = implicitly[Ordering[Double]].compare(x.amplitude, y.amplitude)
+    override def toString: String = "flexibleLoadRepresentationOrderingByAmplitude"
+  }
 
-  val flexibleLoadRepresentationOrderingByMinTimeSpan: Ordering[FlexibleLoadRepresentation] =
-    (x: FlexibleLoadRepresentation, y: FlexibleLoadRepresentation) => implicitly[Ordering[Int]].compare(x.minTimeSpan, y.minTimeSpan)
+  val flexibleLoadRepresentationOrderingByMinTimeSpan: Ordering[FlexibleLoadRepresentation] = new Ordering[FlexibleLoadRepresentation] {
+    def compare(x: FlexibleLoadRepresentation, y: FlexibleLoadRepresentation): LoadId = implicitly[Ordering[Int]].compare(x.minTimeSpan, y.minTimeSpan)
+    override def toString: String = "flexibleLoadRepresentationOrderingByMinTimeSpan"
+  }
 
-  val flexibleLoadRepresentationOrderingByMaxTimeSpan: Ordering[FlexibleLoadRepresentation] =
-    (x: FlexibleLoadRepresentation, y: FlexibleLoadRepresentation) => implicitly[Ordering[Int]].compare(x.maxTimeSpan, y.maxTimeSpan)
+  val flexibleLoadRepresentationOrderingByMaxTimeSpan: Ordering[FlexibleLoadRepresentation] = new Ordering[FlexibleLoadRepresentation] {
+    def compare(x: FlexibleLoadRepresentation, y: FlexibleLoadRepresentation): LoadId = implicitly[Ordering[Int]].compare(x.maxTimeSpan, y.maxTimeSpan)
+    override def toString: String = "flexibleLoadRepresentationOrderingByMaxTimeSpan"
+  }
 
   val loadListOrderingByMaxPositionInT: Ordering[List[Load]] = new Ordering[List[Load]] {
     override def compare(x: List[Load], y: List[Load]): LoadId = {
@@ -38,12 +50,17 @@ object Load {
       if (y.isEmpty) return intOrdering.compare(x.map(_.startPositionInTime).max, 0)
       intOrdering.compare(x.map(_.startPositionInTime).max, y.map(_.startPositionInTime).max)
     }
+
+    override def toString: String = "loadListOrderingByMaxPositionInT"
   }
 
-  val loadListOrderingByAmplitude: Ordering[List[Load]] =
-    (x: List[Load], y: List[Load]) =>
-    // Nil[Int].sum == 0
+  val loadListOrderingByAmplitude: Ordering[List[Load]] = new Ordering[List[Load]] {
+    def compare(x: List[Load], y: List[Load]): LoadId =
+      // Nil[Int].sum == 0
       implicitly[Ordering[Double]].compare(x.map(_.totalEnergy).sum, y.map(_.totalEnergy).sum)
+    override def toString: String = "loadListOrderingByAmplitude"
+  }
+
 
   implicit def toVector[X <: Load]: DenseVectorReprOps[X] = new DenseVectorReprOps[X] {
 

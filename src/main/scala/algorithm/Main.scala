@@ -15,6 +15,7 @@ import types.clusterer.immutable.Point
 object Main {
 
   def main(args: Array[String]): Unit = {
+    println(Runtime.getRuntime.availableProcessors())
     /*val points = Generator
       .generateRandom2DPoints(DenseVector(0.0, 0.0), 5, 189, 5)
       .zipWithIndex

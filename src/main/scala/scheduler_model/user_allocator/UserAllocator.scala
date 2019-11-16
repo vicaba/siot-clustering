@@ -18,11 +18,11 @@ object UserAllocator {
 
   val DefaultOrderings: List[Ordering[FlexibleLoadRepresentation]] = List(
     Load.flexibleLoadRepresentationOrderingByAmplitude.reverse,
-/*    Load.flexibleLoadRepresentationOrderingByAmplitude,
+    Load.flexibleLoadRepresentationOrderingByAmplitude,
     Load.flexibleLoadRepresentationOrderingByMaxTimeSpan.reverse,
     Load.flexibleLoadRepresentationOrderingByMaxTimeSpan,
     Load.flexibleLoadRepresentationOrderingByMinTimeSpan.reverse,
-    Load.flexibleLoadRepresentationOrderingByMinTimeSpan,*/
+    Load.flexibleLoadRepresentationOrderingByMinTimeSpan,
   )
 
   val DefaultOrdering: Ordering[FlexibleLoadRepresentation] =

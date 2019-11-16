@@ -14,12 +14,10 @@ object Scheduler {
 
   val logger = Logger("Scheduler")
 
-
   def apply(clusters: List[AccumulatedLoad],
-    metricTransformation: MetricTransformation,
-    userOrdering: Ordering[FlexibleLoadRepresentation] = UserAllocator.DefaultOrdering,
-    schedulerAlgorithmOrdering: Ordering[Load] = SchedulerAlgorithm.DefaultOrdering)
-  : List[AccumulatedLoad] = {
+            metricTransformation: MetricTransformation,
+            userOrdering: Ordering[FlexibleLoadRepresentation] = UserAllocator.DefaultOrdering,
+            schedulerAlgorithmOrdering: Ordering[Load] = SchedulerAlgorithm.DefaultOrdering): List[AccumulatedLoad] = {
 
     if (clusters.size == 1) {
       clusters.map { cluster =>
@@ -38,7 +36,12 @@ object Scheduler {
 
       val _clusters: List[AccumulatedLoad] = LoadOps.copy(clusters).toList.asInstanceOf[List[AccumulatedLoad]]
 
-      logger.info("Running Scheduler for {} users with ordering {}", _clusters.length, schedulerAlgorithmOrdering.toString)
+      logger.info(
+        "Running Scheduler for {} users with user allocator {} and scheduler orderings {}",
+        _clusters.length,
+        userOrdering.toString,
+        schedulerAlgorithmOrdering.toString
+      )
 
       val numberOfSlots = LoadOps.span(_clusters)
       val schedulerPreferredSlots =
@@ -46,7 +49,7 @@ object Scheduler {
 
       val referenceAverage = _clusters.map(_.totalEnergy).sum / numberOfSlots / clusters.size
 
-      val res = _clusters.zip(schedulerPreferredSlots).map {
+      val res = _clusters.zip(schedulerPreferredSlots).par.map {
         case (user, schedulingPreferredSlotsForUser) =>
           logger.info("Running Scheduler for user {} with {} points", user.id, user.loads.size)
           SchedulerAlgorithm.reschedule(
@@ -58,30 +61,47 @@ object Scheduler {
             verbose = false
           )
       }
-      res
+      res.toList
 
     }
 
   }
 
   def apply(clusters: List[AccumulatedLoad],
-    metricTransformation: MetricTransformation,
-    userOrderings: List[Ordering[FlexibleLoadRepresentation]],
-    schedulerAlgorithmOrderings: List[Ordering[Load]])
-  : List[AccumulatedLoad] = {
+            metricTransformation: MetricTransformation,
+            userOrderings: List[Ordering[FlexibleLoadRepresentation]],
+            schedulerAlgorithmOrderings: List[Ordering[Load]]): List[AccumulatedLoad] = {
+
+    if (clusters.size == 1) {
+      val orderings = SchedulerAlgorithm.DefaultOrderings
+
+      var best: List[AccumulatedLoad] =
+        apply(clusters, metricTransformation, UserAllocator.DefaultOrdering, orderings.head)
+      var bestMetric = Metric.par(best)
+
+      for (ordering <- orderings.tail) {
+        val res       = apply(clusters, metricTransformation, UserAllocator.DefaultOrdering, ordering)
+        val resMetric = Metric.par(res)
+        if (resMetric < bestMetric) {
+          best = res
+          bestMetric = resMetric
+        }
+      }
+      return best
+    }
 
     val orderings = for {
-      userOrdering <- userOrderings
+      userOrdering               <- userOrderings
       schedulerAlgorithmOrdering <- schedulerAlgorithmOrderings
     } yield {
       (userOrdering, schedulerAlgorithmOrdering)
     }
 
     var best: List[AccumulatedLoad] = apply(clusters, metricTransformation, orderings.head._1, orderings.head._2)
-    var bestMetric = Metric.par(best)
+    var bestMetric                  = Metric.par(best)
 
     for (ordering <- orderings.tail) {
-      val res = apply(clusters, metricTransformation, ordering._1, ordering._2)
+      val res       = apply(clusters, metricTransformation, ordering._1, ordering._2)
       val resMetric = Metric.par(res)
       if (resMetric < bestMetric) {
         best = res

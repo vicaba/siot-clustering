@@ -9,9 +9,9 @@ object SchedulerAlgorithm {
 
   val DefaultOrderings: List[Ordering[Load]] = List(
     Load.loadOrderingByAmplitude.reverse,
-/*    Load.loadOrderingByAmplitude,
+    Load.loadOrderingByAmplitude,
     Load.loadOrderingByPositionInTime.reverse,
-    Load.loadOrderingByPositionInTime,*/
+    Load.loadOrderingByPositionInTime,
   )
 
   def reschedule(
