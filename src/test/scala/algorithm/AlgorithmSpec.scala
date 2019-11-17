@@ -95,7 +95,7 @@ class AlgorithmSpec extends FeatureSpec with GivenWhenThen {
 
       println(Runtime.getRuntime.availableProcessors())
 
-      for (i <- 2 to 6) {
+      for (i <- 1 to 6) {
         execute(i, points)
       }
     }

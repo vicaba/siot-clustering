@@ -36,16 +36,18 @@ object Scheduler {
 
       val _clusters: List[AccumulatedLoad] = LoadOps.copy(clusters).toList.asInstanceOf[List[AccumulatedLoad]]
 
-      logger.info(
+/*      logger.info(
         "Running Scheduler for {} users with user allocator {} and scheduler orderings {}",
         _clusters.length,
         userOrdering.toString,
         schedulerAlgorithmOrdering.toString
-      )
+      )*/
+
+      logger.info("Running Scheduler for {} users with UserAllocatorBest", _clusters.length)
 
       val numberOfSlots = LoadOps.span(_clusters)
       val schedulerPreferredSlots =
-        UserAllocator.allocate(users = _clusters, userOrdering)
+        UserAllocator.allocateBest(users = _clusters)
 
       val referenceAverage = _clusters.map(_.totalEnergy).sum / numberOfSlots / clusters.size
 
@@ -90,7 +92,7 @@ object Scheduler {
       return best
     }
 
-    val orderings = for {
+/*    val orderings = for {
       userOrdering               <- userOrderings
       schedulerAlgorithmOrdering <- schedulerAlgorithmOrderings
     } yield {
@@ -101,14 +103,16 @@ object Scheduler {
     var bestMetric                  = Metric.par(best)
 
     for (ordering <- orderings.tail) {
-      val res       = apply(clusters, metricTransformation, ordering._1, ordering._2)
+      val res       = apply(clusters, metricTransformation, UserAllocator.DefaultOrdering, SchedulerAlgorithm.DefaultOrdering)
       val resMetric = Metric.par(res)
       if (resMetric < bestMetric) {
         best = res
         bestMetric = resMetric
       }
     }
-    best
+    best*/
+    // UserAllocatorOrdering and SchedulerAlgorithmOrdering are not used. instead, inside apply, we perform multiple orderigns for userAllocator
+    apply(clusters, metricTransformation, UserAllocator.DefaultOrdering, SchedulerAlgorithm.DefaultOrdering)
   }
 
 }

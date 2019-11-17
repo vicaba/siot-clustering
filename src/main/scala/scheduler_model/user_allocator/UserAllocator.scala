@@ -1,20 +1,22 @@
 package scheduler_model.user_allocator
 
+import algorithm.scheduler.Scheduler
 import breeze.linalg.{DenseVector, max, sum}
+import com.typesafe.scalalogging.Logger
+import metrics.Metric
 import scheduler_model.load._
 import scheduler_model.scheduler.SchedulerAlgorithm
 import scheduler_model.scheduler.metric_transformer.NoTransformation
 import scheduler_model.user_allocator.user_representation.conditions.MaxPeakGraterThanMaxFixedLoadsPeakCondition
-import scheduler_model.user_allocator.user_representation.{
-  UserRepresentationAsAmplitude,
-  UserRepresentationAsAmplitudeInMaxTimeSpan,
-  UserRepresentationAsAmplitudeInMinTimeSpan
-}
+import scheduler_model.user_allocator.user_representation.{UserRepresentationAsAmplitude, UserRepresentationAsAmplitudeInMaxTimeSpan, UserRepresentationAsAmplitudeInMinTimeSpan}
 import types.clusterer.DataTypeMetadata
 
 import scala.util.Try
 
 object UserAllocator {
+
+  val logger = Logger("UserAllocator")
+
 
   val DefaultOrderings: List[Ordering[FlexibleLoadRepresentation]] = List(
     Load.flexibleLoadRepresentationOrderingByAmplitude.reverse,
@@ -123,6 +125,58 @@ object UserAllocator {
     // Reorder per "users" input
     val order                         = users.map(_.id)
     val allocationResultFlexibleLoads = allocationResult.flexibleLoads.toList
+    val allocationResultAsMap         = allocationResultFlexibleLoads.map(_.id).zip(allocationResultFlexibleLoads).toMap
+    val orderedAllocationResult       = order.map(allocationResultAsMap)
+
+    orderedAllocationResult.map { userAsFlexibleLoad =>
+      (for (i <- userAsFlexibleLoad.startPositionInTime until (userAsFlexibleLoad.startPositionInTime + userAsFlexibleLoad.span))
+        yield i).toList
+    }
+  }
+
+  /**
+    * Allocates users along the complete timespan. The algorithm "transforms" each user as a flexible load of windowSize and
+    * consumption per slot flexibleLoad.totalEnergy / windowSize. Then it uses the rescheduler to assign each user to the best timeslots.+
+    *
+    * @param users
+    * @return A list in the same order as users with schedulerPreferredTimeSlots per each user as an inner List[Int]
+    */
+  def allocateBest(users: List[AccumulatedLoad],
+    userOrderings: List[Ordering[FlexibleLoadRepresentation]] = DefaultOrderings,
+    userRepresentationAsAmplitude: UserRepresentationAsAmplitude = DefaultUserRepresentationAsAmplitude)
+  : List[List[Int]] = {
+
+    // TODO: Test this by comparing results of BenchmarkSpec and SchedulerSpec
+    val sortedUsers = users
+
+    var best: AccumulatedLoad =
+      SchedulerAlgorithm.reschedule(
+        representUserAsFlexibleLoadRepresentationsInAccumulatedLoad(sortedUsers, userOrderings.head),
+        ordering = Load.loadIdentityOrdering,
+        metricTransformation = NoTransformation,
+        flexibleLoadTransformer = representUserAsBestFlexibleLoad(userRepresentationAsAmplitude))
+
+    var bestMetric = Metric.par(best)
+
+    for (ordering <- userOrderings.tail) {
+      logger.info("UserAllocatorBest. Ordering: {}", ordering.toString)
+      val accumulatedLoads = representUserAsFlexibleLoadRepresentationsInAccumulatedLoad(sortedUsers, ordering)
+      val res = SchedulerAlgorithm.reschedule(
+        accumulatedLoads,
+        ordering = Load.loadIdentityOrdering,
+        metricTransformation = NoTransformation,
+        flexibleLoadTransformer = representUserAsBestFlexibleLoad(userRepresentationAsAmplitude))
+
+      val resMetric = Metric.par(res)
+      if (resMetric < bestMetric) {
+        best = res
+        bestMetric = resMetric
+      }
+    }
+
+    // Reorder per "users" input
+    val order                         = users.map(_.id)
+    val allocationResultFlexibleLoads = best.flexibleLoads.toList
     val allocationResultAsMap         = allocationResultFlexibleLoads.map(_.id).zip(allocationResultFlexibleLoads).toMap
     val orderedAllocationResult       = order.map(allocationResultAsMap)
 
