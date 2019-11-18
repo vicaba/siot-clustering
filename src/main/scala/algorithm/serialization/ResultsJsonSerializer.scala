@@ -1,10 +1,13 @@
 package algorithm.serialization
 
+import java.util.UUID
+
 import algorithm.EuclideanAlgorithm.{ClustererAndReschedulerOutput, ClustererOutput, ReschedulerOutput}
 import breeze.linalg.max
 import crossfold.CrossFoldValidation.{CrossFoldTypeSettings, MonteCarlo}
 import metrics.{Metric, Par}
 import play.api.libs.json._
+import types.clusterer.mutable.Cluster
 
 object ResultsJsonSerializer {
 
@@ -19,7 +22,7 @@ object ResultsJsonSerializer {
     val KKey = "k"
 
     def stepToString(step: StepKey): String = step match {
-      case ClustererKey => "s1"
+      case ClustererKey   => "s1"
       case ReschedulerKey => "s2"
     }
 
@@ -30,6 +33,8 @@ object ResultsJsonSerializer {
     def maxMetricKey(step: StepKey): String = stepToString(step) + ". max m"
 
     def totalMetricKey(step: StepKey) = stepToString(step) + ". total m"
+
+    def totalPeakKey(step: StepKey): String = stepToString(step) + ". total peak"
 
     val ClustersKey = "clusters"
 
@@ -45,9 +50,13 @@ object ResultsJsonSerializer {
         peakKey(ClustererKey) -> max(step.clusters.maxBy(c => max(c.syntheticValue)).syntheticValue),
         aggregateMetricKey(ClustererKey) -> step.settings.metric
           .aggregateOf(step.clusters), //steps._1.aggregatedMetric,
-        maxMetricKey(ClustererKey) -> step.clusters.map(step.settings.metric(_)).max,
-        totalMetricKey(ClustererKey)             -> step.settings.metric(step.clusters),
-        ClustersKey                -> step.clusters.map(_.userWiseSize)
+        maxMetricKey(ClustererKey)   -> step.clusters.map(step.settings.metric(_)).max,
+        totalMetricKey(ClustererKey) -> step.settings.metric(step.clusters),
+        totalPeakKey(ClustererKey) -> {
+          val c = Cluster(0, UUID.randomUUID().toString, step.clusters, -1, None)(step.clusters.head.dataTypeMetadata)
+          max(c.syntheticValue)
+        },
+        ClustersKey -> step.clusters.map(_.userWiseSize)
       )
 
     def clustererOutputListAsJson(stepsList: List[ClustererOutput]): List[JsObject] = {
@@ -63,9 +72,13 @@ object ResultsJsonSerializer {
         peakKey(ReschedulerKey) -> max(step.clusters.maxBy(c => max(c.syntheticValue)).syntheticValue),
         aggregateMetricKey(ReschedulerKey) -> step.settings.metric
           .aggregateOf(step.clusters), //steps._1.aggregatedMetric,
-        maxMetricKey(ReschedulerKey) -> step.clusters.map(step.settings.metric(_)).max,
-        totalMetricKey(ReschedulerKey)               -> step.settings.metric(step.clusters),
-        ClustersKey                  -> step.clusters.map(_.userWiseSize)
+        maxMetricKey(ReschedulerKey)   -> step.clusters.map(step.settings.metric(_)).max,
+        totalMetricKey(ReschedulerKey) -> step.settings.metric(step.clusters),
+        totalPeakKey(ReschedulerKey) -> {
+          val c = Cluster(0, UUID.randomUUID().toString, step.clusters, -1, None)(step.clusters.head.dataTypeMetadata)
+          max(c.syntheticValue)
+        },
+        ClustersKey -> step.clusters.map(_.userWiseSize)
       )
 
     def reschedulerOutputListAsJson(stepsList: List[ReschedulerOutput]): List[JsObject] = {
