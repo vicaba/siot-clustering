@@ -15,11 +15,13 @@ trait Configuration {
 
   val summaryBatchRunFile: String
 
+  val configFile: String
+
 }
 
 object Configuration extends Configuration {
 
-  private lazy val conf: Config = ConfigFactory.load("application.conf")
+  lazy val conf: Config = ConfigFactory.load("application.conf")
 
   override val userProfilesFile: String = conf.getString("user-energy-profiles.in-file")
 
@@ -30,6 +32,9 @@ object Configuration extends Configuration {
   override val batchRunFile: String = conf.getString("output.batch-run-file")
 
   override val summaryBatchRunFile: String = conf.getString("output.summary-batch-run-file")
+
+  override val configFile: String = conf.getString("output.config-file")
+
 
   object ClusteringAlgorithm {
 
