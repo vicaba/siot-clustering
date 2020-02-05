@@ -1,5 +1,6 @@
 package algorithm
 
+import collection.shuffler.Shuffler
 import metrics.Metric
 import types.clusterer.immutable.Point
 trait Settings {
@@ -15,5 +16,7 @@ trait Settings {
 trait ClustererSettings extends Settings {
 
   val points: scala.Vector[Point]
+
+  val shuffler: Shuffler
 
 }

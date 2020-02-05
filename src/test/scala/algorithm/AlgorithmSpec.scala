@@ -46,7 +46,7 @@ class AlgorithmSpec extends FeatureSpec with GivenWhenThen {
       Metric.par(stepsList.head.clustererOutput.clusters.head) should be > Metric.par(stepsList.head.reschedulerOutput.clusters.head)
     }*/
 
-    scenario("given six points clustered in multiple clusters") {
+    /*scenario("given six points clustered in multiple clusters") {
 
       def execute(numberOfClusters: Int, points: Vector[Point]): Unit = {
 
@@ -98,7 +98,7 @@ class AlgorithmSpec extends FeatureSpec with GivenWhenThen {
       for (i <- 1 to 6) {
         execute(i, points)
       }
-    }
+    }*/
 
   }
 

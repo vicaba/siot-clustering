@@ -187,12 +187,7 @@ object Cluster {
 
   }
 
-  /**
-  * Extracts points from clusters.
-    * @param cl
-    * @return
-    */
-  def flatten(cl: TraversableOnce[Cluster]): Set[Point] = {
+  def flattenAsList(cl: TraversableOnce[Cluster]): List[Point] = {
 
     @tailrec
     def _flatten(types: List[Type], accum: List[Point]): List[Point] = types match {
@@ -204,9 +199,15 @@ object Cluster {
         }
     }
 
-    _flatten(cl.toList, Nil).toSet
+    _flatten(cl.toList, Nil)
 
   }
+  /**
+  * Extracts points from clusters.
+    * @param cl
+    * @return
+    */
+  def flatten(cl: TraversableOnce[Cluster]): Set[Point] = flattenAsList(cl).toSet
 
   def flatten(c: Cluster): Set[Point] = flatten(List(c))
 
