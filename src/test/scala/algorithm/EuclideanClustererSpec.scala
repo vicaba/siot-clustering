@@ -3,7 +3,7 @@ package algorithm
 import algorithm.clusterer.EuclideanClusterer
 import algorithm.clusterer.EuclideanClustererSettings
 import breeze.linalg.{DenseMatrix, DenseVector}
-import collection.shuffler.Keep
+import collection.shuffler.{Keep, Random}
 import metrics.{Metric, Par}
 import org.scalatest.Matchers._
 import org.scalatest.{FeatureSpec, GivenWhenThen}
@@ -58,20 +58,24 @@ class EuclideanClustererSpec extends FeatureSpec with GivenWhenThen {
 
     }
 
-    scenario("If points ARE shuffled, the result is deterministic") {
+    scenario("If points ARE shuffled, the result is non-deterministic") {
 
       Given("10 compatible points")
       // Stored in val points
 
       When("asked to assign each point to a cluster among 3 clusters")
-      val runSettings = EuclideanClustererSettings(3, points, Par.withAverageAggregate, improveIterations = 1, Keep)
+      val runSettings = EuclideanClustererSettings(3,
+                                                   points,
+                                                   Par.withAverageAggregate,
+                                                   improveIterations = 1,
+                                                   Random(scala.util.Random))
 
       val result  = EuclideanClusterer(runSettings)
       val result2 = EuclideanClusterer(runSettings)
 
       Then("both results are NOT the same")
 
-      Cluster.flattenAsList(result).map(_.id) shouldBe Cluster.flattenAsList(result2).map(_.id)
+      Cluster.flattenAsList(result).map(_.id) shouldNot be(Cluster.flattenAsList(result2).map(_.id))
 
     }
 
