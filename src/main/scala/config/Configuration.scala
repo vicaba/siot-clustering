@@ -17,6 +17,8 @@ trait Configuration {
 
   val configFile: String
 
+  val releaseBaseFile: String
+
 }
 
 object Configuration extends Configuration {
@@ -34,6 +36,8 @@ object Configuration extends Configuration {
   override val summaryBatchRunFile: String = conf.getString("output.summary-batch-run-file")
 
   override val configFile: String = conf.getString("output.config-file")
+
+  override val releaseBaseFile: String = conf.getString("release.base")
 
 
   object ClusteringAlgorithm {
