@@ -3,7 +3,7 @@ package scheduler_model.benchmark
 import breeze.linalg.DenseVector
 import org.scalatest.FeatureSpec
 import scheduler_model.load.{AccumulatedLoad, FixedLoad, FlexibleLoad}
-import scheduler_model.BenchmarkS._
+import scheduler_model.benchmark.BenchmarkHelper._
 import scheduler_model.scheduler.metric_transformer.BiasedAverageDistanceTransformation
 
 class B1 extends FeatureSpec {
