@@ -1,11 +1,6 @@
-import breeze.linalg
-import breeze.linalg._
+import config.Configuration
+
+(1 to 100).toList.grouped(36).toList.foreach( l => println(l.size))
 
 
-val a = DenseVector(2, 2, 2)
-
-val b = DenseVector(3, 3, 3)
-
-val c = DenseVector.vertcat(a,b)
-
-c.toString
+Configuration.summaryBatchRunFile.split('.').head

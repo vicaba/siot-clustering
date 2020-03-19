@@ -18,4 +18,11 @@ object GenBatchRun {
     }
   }
 
+  def deferredApply(settings: List[(EuclideanAlgorithm.ClustererSettingsT, EuclideanAlgorithm.ReschedulerSettingsT)])
+  : List[() => ClustererAndReschedulerOutput] = {
+    settings.map {
+      case (clustererSettings, reschedulerSettings) =>
+        () => EuclideanAlgorithm.apply(clustererSettings, reschedulerSettings)
+    }
+  }
 }

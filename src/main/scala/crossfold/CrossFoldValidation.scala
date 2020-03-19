@@ -25,9 +25,12 @@ object CrossFoldValidation {
     }
   }
 
-  sealed trait CrossFoldTypeSettings
+  sealed trait CrossFoldTypeSettings {
+    val splits: Int
+    val subSampleSize: Percentage
+  }
 
-  case class MonteCarlo(splits: Int, subSampleSize: Percentage) extends CrossFoldTypeSettings
+  case class MonteCarlo(override val splits: Int, override val subSampleSize: Percentage) extends CrossFoldTypeSettings
 
   /**
     * Creates "splits" number of BatchRunSettingsBuilder taking a subsampleSize percentage of the total points
@@ -67,7 +70,18 @@ object CrossFoldValidation {
 
   def run(settings: CrossFoldTypeSettings,
                                    batchRunSettings: BatchRunSettingsBuilder)
-  : List[List[ClustererAndReschedulerOutput]] = settings match {
+  : List[List[ClustererAndReschedulerOutput]] = deferredRun(settings, batchRunSettings).map(_.map(_.apply()))
+
+  def batchRun(settings: List[CrossFoldTypeSettings],
+                                        batchRunSettings: BatchRunSettingsBuilder)
+  : List[(CrossFoldValidation.CrossFoldTypeSettings, List[List[ClustererAndReschedulerOutput]])] = {
+    val result = deferredBatchRun(settings, batchRunSettings)
+    result.map(t => (t._1, t._2.map(_.map(_.apply()))))
+  }
+
+  def deferredRun(settings: CrossFoldTypeSettings,
+    batchRunSettings: BatchRunSettingsBuilder)
+  : List[List[() => ClustererAndReschedulerOutput]] = settings match {
     case s: MonteCarlo =>
       val points = batchRunSettings.points
       val splits = for (i <- 0 until s.splits) yield {
@@ -76,13 +90,13 @@ object CrossFoldValidation {
       val bulkBatchRunSettings = splits.map(p => batchRunSettings.copy(points = p))
       bulkBatchRunSettings.zipWithIndex.map { case (builder, idx) =>
         logger.info("Split: {}.", idx)
-        GenBatchRun.apply(builder.build)
+        GenBatchRun.deferredApply(builder.build)
       }.toList
   }
 
-  def batchRun(settings: List[CrossFoldTypeSettings],
-                                        batchRunSettings: BatchRunSettingsBuilder)
-  : List[(CrossFoldValidation.CrossFoldTypeSettings, List[List[ClustererAndReschedulerOutput]])] =
-    settings.map(s => (s, run(s, batchRunSettings)))
+  def deferredBatchRun(settings: List[CrossFoldTypeSettings],
+    batchRunSettings: BatchRunSettingsBuilder)
+  : List[(CrossFoldValidation.CrossFoldTypeSettings, List[List[() => ClustererAndReschedulerOutput]])] =
+    settings.map(s => (s, deferredRun(s, batchRunSettings)))
 
 }
