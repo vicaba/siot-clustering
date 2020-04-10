@@ -35,15 +35,15 @@ object Main {
 
     val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 24) yield (i + "/", i)).toList
 
-    val points = SyntheticProfilesReaderForEuclideanClusterer
+    /*val points = SyntheticProfilesReaderForEuclideanClusterer
       .applyDefault(MainFolder,
         subFoldersAndIds.map(_._1),
         AppliancesOutputFileName,
         LightingOutputFileName,
         subFoldersAndIds.map(_._2),
-        windowSize = 30)
+        windowSize = 30)*/
 
-    //val points = EgaugeReader(Configuration.userProfilesFile)
+    val points = EgaugeReader(Configuration.userProfilesFile)
 
     /*    val testBatchRunSettingsBuilder =
           new BatchRunSettingsBuilder(points,
@@ -112,7 +112,7 @@ object Main {
 
   }
 
-  def crossFoldValidation(batchRunSettingsBuilder: BatchRunSettingsBuilder): Unit = {
+/*  def crossFoldValidation(batchRunSettingsBuilder: BatchRunSettingsBuilder): Unit = {
 
     val Max = BigDecimal(1.0)
     val monteCarlos = //List(MonteCarlo(1, Percentage.of(Max)))
@@ -129,7 +129,7 @@ object Main {
       p.write(Json.prettyPrint(Json.toJson(jsonList)).toString())
       p.close()
     }
-  }
+  }*/
 
   def deferredCrossFoldValidation(batchRunSettingsBuilder: BatchRunSettingsBuilder): Unit = {
 
@@ -146,7 +146,7 @@ object Main {
     stepsList.foreach { crossFoldValidationExperiment =>
       val crossFoldValidationExperimentSettings = crossFoldValidationExperiment._1
       val deferredExperiments = crossFoldValidationExperiment._2
-      deferredExperiments.grouped(13).zipWithIndex.foreach { case (groupForDeferredExperiment, groupIteration) =>
+      deferredExperiments.grouped(50).zipWithIndex.foreach { case (groupForDeferredExperiment, groupIteration) =>
         val groupForResolvedExperiment = groupForDeferredExperiment.map(_.map(_.apply()))
 
         val mockedStepsList: List[(CrossFoldValidation.CrossFoldTypeSettings, List[List[ClustererAndReschedulerOutput]])] =

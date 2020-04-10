@@ -2,6 +2,7 @@ package scheduler_model
 
 import breeze.linalg._
 import _root_.reader.TemplateForSyntheticProfilesReader
+import _root_.reader.EgaugeFlexibleLoads
 import scheduler_model.load.Load.{GroupId, LoadId}
 import scheduler_model.load._
 import types.clusterer.DataTypeMetadata
@@ -23,7 +24,7 @@ object ClusterAndAccumulatedLoadTransformer {
 
       def createFixedLoad(): FixedLoad = FixedLoad(id, groupId, label, DenseVector[Double](values.toScalaVector():_*))
 
-      if (TemplateForSyntheticProfilesReader.FlexibleLoads.contains(label)) createFlexibleLoad()
+      if (EgaugeFlexibleLoads.FlexibleLoads.contains(label)) createFlexibleLoad()
       else createFixedLoad()
 
     }

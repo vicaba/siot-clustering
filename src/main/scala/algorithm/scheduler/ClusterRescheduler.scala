@@ -4,7 +4,7 @@ import metrics.Metric
 import com.typesafe.scalalogging.Logger
 import scheduler_model.ClusterAndAccumulatedLoadTransformer
 import scheduler_model.load.{AccumulatedLoad, Load}
-import scheduler_model.sequence_split.SequenceSplitByConsecutiveElements
+import scheduler_model.sequence_split.{SequenceSplitByConsecutiveElements, SequenceSplitByZero}
 import types.clusterer.mutable.Cluster
 
 object ClusterRescheduler {
@@ -19,7 +19,7 @@ object ClusterRescheduler {
 
     clustersAsAccumulatedLoad.foreach(AccumulatedLoad.Mutate.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
       _,
-      SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage))
+      SequenceSplitByZero))
 
 
     Scheduler.apply(clustersAsAccumulatedLoad,
