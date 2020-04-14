@@ -23,7 +23,7 @@ lazy val deployTask = TaskKey[Unit]("deploy", "Copies assembly jar to remote loc
 deployTask := (Universal / packageBin map { _packageBin =>
   val username   = "vcaballero"
   val password   = "vcaballero"
-  val remoteHost = "172.16.2.78"
+  val remoteHost = "172.16.2.43"
   val localPath  = _packageBin.getPath
   val remotePath = "/home/vcaballero/" + _packageBin.getName
 
