@@ -33,7 +33,7 @@ object EuclideanClusterer {
     * @param keepClusteringHeuristic if set, the heuristic that indicates when a given cluster is "full"
     * @return higher level clusters
     */
-  def clustersToClusters(iterations: Int,
+  private def clustersToClusters(iterations: Int,
                          centroid: SyntheticDataType,
                          freeClusters: IndexedSeq[Cluster],
                          elementLocatorHeuristic: ElementLocatorHeuristic,
@@ -74,7 +74,7 @@ object EuclideanClusterer {
 
   }
 
-  def applyHeuristic(c: Cluster,
+  private def applyHeuristic(c: Cluster,
                      centroid: SyntheticDataType,
                      freeClusters: IndexedSeq[Cluster],
                      elementLocatorHeuristic: ElementLocatorHeuristic,
@@ -119,7 +119,7 @@ object EuclideanClusterer {
     * @return
     */
   @tailrec
-  def clustersToFixedClusters(fixedClusters: IndexedSeq[Cluster],
+  private def clustersToFixedClusters(fixedClusters: IndexedSeq[Cluster],
                               freeClusters: IndexedSeq[Cluster],
                               centroid: SyntheticDataType,
                               heuristic: ElementLocatorHeuristic): IndexedSeq[Cluster] = {
@@ -155,7 +155,7 @@ object EuclideanClusterer {
     * @param startHeuristic  if not empty, the heuristic to use to group the first level of clusters
     * @return
     */
-  def cluster(stopAtKClusters: Int,
+  private def cluster(stopAtKClusters: Int,
               stopAtIterationCount: Int,
               clusters: Seq[Cluster],
               heuristic: ElementLocatorHeuristic,
@@ -235,7 +235,7 @@ object EuclideanClusterer {
     * @param maxIterations    the maximum number of iterations to try to optimize metricToOptimize
     * @return the best solution found
     */
-  def metricReductionCluster(clusters: LinearSeq[Cluster],
+  private def metricReductionCluster(clusters: LinearSeq[Cluster],
                              metricToOptimize: Metric,
                              clusterer: LinearSeq[Cluster] => LinearSeq[Cluster],
                              maxIterations: Int,
@@ -261,7 +261,7 @@ object EuclideanClusterer {
 
   val chain: HeuristicChain = HeuristicChain(HeuristicDecorator(mirrorElementLocator))
 
-  /*  def apply(settings: EuclideanClustererSettings): List[Cluster] = {
+  def apply(settings: EuclideanClustererSettings): List[Cluster] = {
 
     val result = metricReductionCluster(
       settings.points.map(Point.toCluster).toList,
@@ -273,7 +273,7 @@ object EuclideanClusterer {
 
     result
 
-  }*/
+  }
 
   def applyOnce(settings: EuclideanClustererSettings): List[Cluster] = {
     val result = cluster(settings.numberOfClusters,
@@ -284,7 +284,7 @@ object EuclideanClusterer {
     result.toList
   }
 
-  def apply(settings: EuclideanClustererSettings): List[Cluster] = {
+/*  def apply(settings: EuclideanClustererSettings): List[Cluster] = {
 
     def randomCluster(numberOfClusters: Int, points: Seq[Cluster]): LinearSeq[Cluster] = {
 
@@ -318,6 +318,6 @@ object EuclideanClusterer {
 
     result
 
-  }
+  }*/
 
 }

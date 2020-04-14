@@ -19,7 +19,7 @@ object ClusterRescheduler {
 
     clustersAsAccumulatedLoad.foreach(AccumulatedLoad.Mutate.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
       _,
-      SequenceSplitByZero))
+      SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage))
 
 
     Scheduler.apply(clustersAsAccumulatedLoad,

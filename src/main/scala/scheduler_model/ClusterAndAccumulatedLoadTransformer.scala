@@ -24,7 +24,7 @@ object ClusterAndAccumulatedLoadTransformer {
 
       def createFixedLoad(): FixedLoad = FixedLoad(id, groupId, label, DenseVector[Double](values.toScalaVector():_*))
 
-      if (EgaugeFlexibleLoads.FlexibleLoads.contains(label)) createFlexibleLoad()
+      if (TemplateForSyntheticProfilesReader.FlexibleLoads.contains(label)) createFlexibleLoad()
       else createFixedLoad()
 
     }
