@@ -261,7 +261,7 @@ object EuclideanClusterer {
 
   val chain: HeuristicChain = HeuristicChain(HeuristicDecorator(mirrorElementLocator))
 
-  def apply(settings: EuclideanClustererSettings): List[Cluster] = {
+  /*  def apply(settings: EuclideanClustererSettings): List[Cluster] = {
 
     val result = metricReductionCluster(
       settings.points.map(Point.toCluster).toList,
@@ -273,7 +273,7 @@ object EuclideanClusterer {
 
     result
 
-  }
+  }*/
 
   def applyOnce(settings: EuclideanClustererSettings): List[Cluster] = {
     val result = cluster(settings.numberOfClusters,
@@ -284,35 +284,40 @@ object EuclideanClusterer {
     result.toList
   }
 
-  /*  def apply(settings: EuclideanClustererSettings): List[Cluster] = {
+  def apply(settings: EuclideanClustererSettings): List[Cluster] = {
 
     def randomCluster(numberOfClusters: Int, points: Seq[Cluster]): LinearSeq[Cluster] = {
 
-      val groups = points.grouped(points.size / numberOfClusters).zipWithIndex.map { case (points, idx) =>
-        Cluster(-idx, UUID.randomUUID().toString, points.toSet, 1, None)(
-          points.head.dataTypeMetadata)
-      }.toList
+      val groups = points
+        .grouped(points.size / numberOfClusters)
+        .zipWithIndex
+        .map {
+          case (points, idx) =>
+            Cluster(-idx, UUID.randomUUID().toString, points.toSet, 1, None)(points.head.dataTypeMetadata)
+        }
+        .toList
       if (groups.size > numberOfClusters) {
         val extraGroup = groups.last
-        Cluster.flatten(extraGroup).zip(Stream.range(0, groups.size - 1)).foreach { case (p, cIdx) =>
-          groups(cIdx) += p
+        Cluster.flatten(extraGroup).zip(Stream.range(0, groups.size - 1)).foreach {
+          case (p, cIdx) =>
+            groups(cIdx) += p
         }
         groups.init
       } else groups
     }
 
-
     val result = metricReductionCluster(
       settings.points.map(Point.toCluster).toList,
       Metric.par,
       randomCluster(settings.numberOfClusters, _),
-      settings.improveIterations
+      settings.improveIterations,
+      settings.shuffler
     ).toList
 
     //assert(result.size == settings.numberOfClusters)
 
     result
 
-  }*/
+  }
 
 }
