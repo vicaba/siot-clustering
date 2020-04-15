@@ -7,6 +7,7 @@ import algorithm.clusterer.keepclusteringheuristic.{KeepClusteringHeuristic, Max
 import algorithm.clusterer.elementlocatorheuristic.{ElementLocatorHeuristic, HeuristicChain, HeuristicDecorator}
 import algorithm.util.ClusteringOrder
 import collection.shuffler.Shuffler
+import config.GlobalConfig
 import eventmanager.EventManager
 import metrics.Metric
 import types.clusterer.DataTypeMetadata.SyntheticDataType
@@ -33,12 +34,13 @@ object EuclideanClusterer {
     * @param keepClusteringHeuristic if set, the heuristic that indicates when a given cluster is "full"
     * @return higher level clusters
     */
-  private def clustersToClusters(iterations: Int,
-                         centroid: SyntheticDataType,
-                         freeClusters: IndexedSeq[Cluster],
-                         elementLocatorHeuristic: ElementLocatorHeuristic,
-                         membersPerCluster: Int,
-                         keepClusteringHeuristic: Option[KeepClusteringHeuristic] = None): IndexedSeq[Cluster] = {
+  private def clustersToClusters(
+      iterations: Int,
+      centroid: SyntheticDataType,
+      freeClusters: IndexedSeq[Cluster],
+      elementLocatorHeuristic: ElementLocatorHeuristic,
+      membersPerCluster: Int,
+      keepClusteringHeuristic: Option[KeepClusteringHeuristic] = None): IndexedSeq[Cluster] = {
 
     @tailrec
     def clusterToClustersInternal(iterations: Int,
@@ -75,10 +77,10 @@ object EuclideanClusterer {
   }
 
   private def applyHeuristic(c: Cluster,
-                     centroid: SyntheticDataType,
-                     freeClusters: IndexedSeq[Cluster],
-                     elementLocatorHeuristic: ElementLocatorHeuristic,
-                     keepClusteringHeuristic: KeepClusteringHeuristic): (Cluster, IndexedSeq[Cluster]) = {
+                             centroid: SyntheticDataType,
+                             freeClusters: IndexedSeq[Cluster],
+                             elementLocatorHeuristic: ElementLocatorHeuristic,
+                             keepClusteringHeuristic: KeepClusteringHeuristic): (Cluster, IndexedSeq[Cluster]) = {
 
     @tailrec
     def applyHeuristicInternal(c: Cluster,
@@ -120,9 +122,9 @@ object EuclideanClusterer {
     */
   @tailrec
   private def clustersToFixedClusters(fixedClusters: IndexedSeq[Cluster],
-                              freeClusters: IndexedSeq[Cluster],
-                              centroid: SyntheticDataType,
-                              heuristic: ElementLocatorHeuristic): IndexedSeq[Cluster] = {
+                                      freeClusters: IndexedSeq[Cluster],
+                                      centroid: SyntheticDataType,
+                                      heuristic: ElementLocatorHeuristic): IndexedSeq[Cluster] = {
 
     if (freeClusters.nonEmpty) {
 
@@ -156,10 +158,10 @@ object EuclideanClusterer {
     * @return
     */
   private def cluster(stopAtKClusters: Int,
-              stopAtIterationCount: Int,
-              clusters: Seq[Cluster],
-              heuristic: ElementLocatorHeuristic,
-              startHeuristic: Option[KeepClusteringHeuristic]): LinearSeq[Cluster] = {
+                      stopAtIterationCount: Int,
+                      clusters: Seq[Cluster],
+                      heuristic: ElementLocatorHeuristic,
+                      startHeuristic: Option[KeepClusteringHeuristic]): LinearSeq[Cluster] = {
 
     if (clusters.isEmpty) return Nil
     if (stopAtKClusters == 1)
@@ -236,10 +238,10 @@ object EuclideanClusterer {
     * @return the best solution found
     */
   private def metricReductionCluster(clusters: LinearSeq[Cluster],
-                             metricToOptimize: Metric,
-                             clusterer: LinearSeq[Cluster] => LinearSeq[Cluster],
-                             maxIterations: Int,
-                             shuffler: Shuffler): LinearSeq[Cluster] = {
+                                     metricToOptimize: Metric,
+                                     clusterer: LinearSeq[Cluster] => LinearSeq[Cluster],
+                                     maxIterations: Int,
+                                     shuffler: Shuffler): LinearSeq[Cluster] = {
     var best: LinearSeq[Cluster] = null
 
     for (i <- 0 until maxIterations) {
@@ -261,7 +263,16 @@ object EuclideanClusterer {
 
   val chain: HeuristicChain = HeuristicChain(HeuristicDecorator(mirrorElementLocator))
 
-  def apply(settings: EuclideanClustererSettings): List[Cluster] = {
+  def apply(settings: EuclideanClustererSettings): List[Cluster] = GlobalConfig.instance.clustererType match {
+    case GlobalConfig.ClustererType.Euclidean =>
+      println("Euclidean Clusterer")
+      applyEuclidean(settings)
+    case GlobalConfig.ClustererType.Random =>
+      println("Random Clusterer")
+      applyRandom(settings)
+  }
+
+  private def applyEuclidean(settings: EuclideanClustererSettings): List[Cluster] = {
 
     val result = metricReductionCluster(
       settings.points.map(Point.toCluster).toList,
@@ -284,7 +295,7 @@ object EuclideanClusterer {
     result.toList
   }
 
-/*  def apply(settings: EuclideanClustererSettings): List[Cluster] = {
+  private def applyRandom(settings: EuclideanClustererSettings): List[Cluster] = {
 
     def randomCluster(numberOfClusters: Int, points: Seq[Cluster]): LinearSeq[Cluster] = {
 
@@ -318,6 +329,6 @@ object EuclideanClusterer {
 
     result
 
-  }*/
+  }
 
 }

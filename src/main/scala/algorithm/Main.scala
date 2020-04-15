@@ -47,7 +47,7 @@ object Main {
 
     val points = EgaugeReader(Configuration.userProfilesFile)
 
-    GlobalConfig.instance = EgaugeGlobalConfig()
+    GlobalConfig.instance = EgaugeGlobalConfig(clustererType = GlobalConfig.ClustererType.Random)
 
     /*    val testBatchRunSettingsBuilder =
           new BatchRunSettingsBuilder(points,
