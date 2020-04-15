@@ -68,7 +68,7 @@ class EuclideanClustererSpec extends FeatureSpec with GivenWhenThen {
                                                    points,
                                                    Par.withAverageAggregate,
                                                    improveIterations = 1,
-                                                   Random(scala.util.Random))
+                                                   Random(new scala.util.Random(5)))
 
       val result  = EuclideanClusterer(runSettings)
       val result2 = EuclideanClusterer(runSettings)
