@@ -68,8 +68,8 @@ class BiasedAverageDistanceTransformation(val bias: Double = 0.50) extends Metri
       .slice(load.startPositionInTime, load.startPositionInTime + load.span)
     slice.foldLeft(0.0) {
       case (accum, elem) =>
-        accum + Math.pow(referenceAverage - elem, 2)
-        //accum + Math.abs(referenceAverage - elem)
+        //accum + Math.pow(referenceAverage - elem, 2)
+        accum + Math.abs(referenceAverage - elem)
     }
   }
 

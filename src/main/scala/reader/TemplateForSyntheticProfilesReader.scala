@@ -44,12 +44,7 @@ object TemplateForSyntheticProfilesReader {
     val ElecSpaceHeating = "ELEC_SPACE_HEATING"
   }
 
-  val FlexibleLoads: List[String] = List(
-    DishWasher,
-    TumbleDryer,
-    WashingMachine,
-    WasherDryer
-  )
+  val FlexibleLoads: List[String] = SyntheticLoadsFlexibleLoadsKeys.flexibleLoads
 
 }
 

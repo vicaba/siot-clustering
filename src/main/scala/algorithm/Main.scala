@@ -5,7 +5,7 @@ import java.io.PrintWriter
 import algorithm.EuclideanAlgorithm.ClustererAndReschedulerOutput
 import algorithm.serialization.ResultsJsonSerializer
 import batch.GenBatchRun
-import config.Configuration
+import config.{Configuration, EgaugeGlobalConfig, GlobalConfig, SyntheticGlobalConfig}
 import crossfold.CrossFoldValidation
 import crossfold.CrossFoldValidation.{MonteCarlo, Percentage}
 import metrics.Par
@@ -35,15 +35,19 @@ object Main {
 
     val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 24) yield (i + "/", i)).toList
 
-    /*val points = SyntheticProfilesReaderForEuclideanClusterer
+/*    val points = SyntheticProfilesReaderForEuclideanClusterer
       .applyDefault(MainFolder,
         subFoldersAndIds.map(_._1),
         AppliancesOutputFileName,
         LightingOutputFileName,
         subFoldersAndIds.map(_._2),
-        windowSize = 30)*/
+        windowSize = 30)
+
+    GlobalConfig.instance = SyntheticGlobalConfig()*/
 
     val points = EgaugeReader(Configuration.userProfilesFile)
+
+    GlobalConfig.instance = EgaugeGlobalConfig()
 
     /*    val testBatchRunSettingsBuilder =
           new BatchRunSettingsBuilder(points,
