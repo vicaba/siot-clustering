@@ -9,7 +9,6 @@ import types.ops.SetOps._
 import types.clusterer.{DataTypeMetadata, Type}
 
 import scala.annotation.tailrec
-import scala.collection
 
 case class Cluster private[types] (override val id: Int,
                             name: String,
@@ -49,7 +48,7 @@ case class Cluster private[types] (override val id: Int,
     this
   }
 
-  override def points: collection.Set[Type] = _points.toSet
+  override def points: scala.collection.Set[Type] = _points.toSet
 
   def hierarchyLevel_=(_hierarchyLevel: Int): Cluster = {
     this._hierarchyLevel = _hierarchyLevel

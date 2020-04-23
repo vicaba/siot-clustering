@@ -8,7 +8,7 @@ import org.scalatest.Inspectors._
 import _root_.reader.TemplateForSyntheticProfilesReader
 import types.clusterer.immutable.Point
 import types.clusterer.mutable.Cluster
-import types.clusterer.{DataTypeMetadata, DataTypeMetadata4Columns}
+import types.clusterer.{DataTypeMetadata, DataTypeMetadata4Columns, Type}
 
 class ClusterAndAccumulatedLoadTransformerSpec extends FeatureSpec with GivenWhenThen {
 
@@ -38,7 +38,7 @@ class ClusterAndAccumulatedLoadTransformerSpec extends FeatureSpec with GivenWhe
 
       When("splitting them into two clusters")
 
-      val (group1, group2) = points.splitAt(points.size/2)
+      val (group1, group2) = points.splitAt(points.size / 2)
 
       val c1 = Cluster(-1, "-1", group1, 0, None)
       val c2 = Cluster(-4, "-1", group2, 0, None)
@@ -71,19 +71,29 @@ class ClusterAndAccumulatedLoadTransformerSpec extends FeatureSpec with GivenWhe
       val groupedClustersById = (clusters ++ clusters2).groupBy(_.id)
 
       groupedClustersById.foreach {
-        case (_, gClusters) =>
-
+        case (_, gClusters: Iterable[Cluster]) =>
+          // Cluster before rescheduling and cluster after rescheduling have the same size
+          // (they all have the size of one of them)
           all(gClusters.map(_.size)) shouldBe (gClusters.head.size)
 
-          forAll (gClusters.map(_.points)) { points =>
+          // For each list of points
+          forAll(gClusters.map(_.points)) { points: scala.collection.Set[Type] =>
+            // Double-check that the cluster.size is the same by comparing the length of the list of points
+            points.size shouldBe gClusters.head.points.size
 
+            // Pair any list of points with another list of points
             (points.toList ++ gClusters.head.points.toList).groupBy(_.id).map {
               case (_, gPoints) =>
-
+                // Any id of the list of points should be equal to the id of another list of points
+                // (assuming that both lists are ordered)
                 all(gPoints.map(_.id)) shouldBe (gPoints.head.id)
 
+                // Any syntheticValue of the list of points should be equal to the syntheticValue of another list of points
+                // (assuming that both lists are ordered)
                 all(gPoints.map(_.syntheticValue)) shouldBe (gPoints.head.syntheticValue)
 
+                // Both lists should contain the same elements
+                all(gPoints) shouldBe gPoints.head
 
             }
 
