@@ -1,6 +1,6 @@
 package algorithm.scheduler
 
-import scheduler_model.load.{FlexibleLoad, FlexibleLoadSubTask, FlexibleLoadSuperTask}
+import scheduler_model.load.{FlexibleLoad, FlexibleLoadSubTask}
 
 object UserDissatisfactionCalculator {
 
