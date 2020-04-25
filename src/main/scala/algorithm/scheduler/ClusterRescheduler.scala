@@ -1,27 +1,15 @@
 package algorithm.scheduler
 
-import metrics.Metric
 import com.typesafe.scalalogging.Logger
-import config.GlobalConfig
-import scheduler_model.ClusterAndAccumulatedLoadTransformer
-import scheduler_model.load.{AccumulatedLoad, Load}
-import scheduler_model.sequence_split.{SequenceSplitByConsecutiveElements, SequenceSplitByZero}
-import types.clusterer.mutable.Cluster
+import scheduler_model.load.AccumulatedLoad
 
 object ClusterRescheduler {
 
   val logger = Logger("Rescheduler")
 
-  def apply(clusters: List[Cluster], settings: ReschedulerSettings): List[AccumulatedLoad] = {
+  def apply(clustersAsAccumulatedLoad: List[AccumulatedLoad], settings: ReschedulerSettings): List[AccumulatedLoad] = {
 
-    if (clusters.isEmpty) return Nil
-
-    val clustersAsAccumulatedLoad = ClusterAndAccumulatedLoadTransformer.apply(clusters, clusters.head.dataTypeMetadata).toList
-
-    clustersAsAccumulatedLoad.foreach(AccumulatedLoad.Mutate.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
-      _,
-      GlobalConfig.instance.sequenceSplitStrategy))
-
+    if (clustersAsAccumulatedLoad.isEmpty) return Nil
 
     Scheduler.apply(clustersAsAccumulatedLoad,
                     settings.metricTransformation,

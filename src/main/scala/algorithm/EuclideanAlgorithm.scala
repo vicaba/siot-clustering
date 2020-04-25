@@ -3,6 +3,7 @@ package algorithm
 import algorithm.clusterer.{EuclideanClusterer, EuclideanClustererSettings}
 import algorithm.scheduler.{ClusterRescheduler, ReschedulerSettings}
 import com.typesafe.scalalogging.Logger
+import config.GlobalConfig
 import scheduler_model.ClusterAndAccumulatedLoadTransformer
 import scheduler_model.load.AccumulatedLoad
 import types.clusterer.Type
@@ -24,8 +25,8 @@ object EuclideanAlgorithm {
 
   private def clusterer(settings: ClustererSettingsT): List[Cluster] = EuclideanClusterer.apply(settings)
 
-  private def rescheduler(clusters: List[Cluster], settings: ReschedulerSettingsT): List[AccumulatedLoad] =
-    ClusterRescheduler.apply(clusters, settings)
+  private def rescheduler(clustersAsAccumulatedLoad: List[AccumulatedLoad], settings: ReschedulerSettingsT): List[AccumulatedLoad] =
+    ClusterRescheduler.apply(clustersAsAccumulatedLoad, settings)
 
   def apply(clustererSettings: ClustererSettingsT): ClustererOutput = {
 
@@ -48,7 +49,13 @@ object EuclideanAlgorithm {
 
     val clustersCopy = Type.deepCopy(clustererOutput.clusters).asInstanceOf[List[Cluster]]
 
-    val reschedulerResult = rescheduler(clustersCopy, reschedulerSettings)
+    val clustersAsAccumulatedLoad = ClusterAndAccumulatedLoadTransformer.apply(clustersCopy, clustersCopy.head.dataTypeMetadata).toList
+
+    clustersAsAccumulatedLoad.foreach(AccumulatedLoad.Mutate.splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(
+      _,
+      GlobalConfig.instance.sequenceSplitStrategy))
+
+    val reschedulerResult = rescheduler(clustersAsAccumulatedLoad, reschedulerSettings)
 
     logger.info("End")
 
