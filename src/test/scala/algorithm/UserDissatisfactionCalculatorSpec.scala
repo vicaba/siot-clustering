@@ -59,7 +59,7 @@ class UserDissatisfactionCalculatorSpec extends FeatureSpec with GivenWhenThen {
           accumulatedLoad1.flexibleLoads.toList
         )
 
-      assert(dissatisfaction == 0, "Dissatisfaction is not 0")
+      assert(dissatisfaction == 0, "Dissatisfaction is 0")
     }
 
     scenario("User dissatisfaction should be greater than 0 and equal to 2 if loads are moved in position") {
@@ -69,8 +69,8 @@ class UserDissatisfactionCalculatorSpec extends FeatureSpec with GivenWhenThen {
           accumulatedLoad2.flexibleLoads.toList
         )
 
-      assert(dissatisfaction > 0, "Dissatisfaction is not greater than 0")
-      assert(dissatisfaction == 2, "Dissatisfaction is not equal to 2")
+      assert(dissatisfaction > 0, "Dissatisfaction is greater than 0")
+      assert(dissatisfaction == 2, "Dissatisfaction is equal to 2")
     }
 
   }
@@ -84,7 +84,7 @@ class UserDissatisfactionCalculatorSpec extends FeatureSpec with GivenWhenThen {
           accumulatedLoad1
         )
 
-      assert(dissatisfaction == 0, "Dissatisfaction is not 0")
+      assert(dissatisfaction == 0, "Dissatisfaction is 0")
     }
 
     scenario("User dissatisfaction should be greater than 0 and equal to 2 if loads are moved in position") {
@@ -94,8 +94,8 @@ class UserDissatisfactionCalculatorSpec extends FeatureSpec with GivenWhenThen {
           accumulatedLoad2
         )
 
-      assert(dissatisfaction > 0, "Dissatisfaction is not greater than 0")
-      assert(dissatisfaction == 2, "Dissatisfaction is not equal to 2")
+      assert(dissatisfaction > 0, "Dissatisfaction is greater than 0")
+      assert(dissatisfaction == 2, "Dissatisfaction is equal to 2")
     }
 
   }
@@ -109,7 +109,7 @@ class UserDissatisfactionCalculatorSpec extends FeatureSpec with GivenWhenThen {
           List(accumulatedLoad1, accumulatedLoad3)
         )
 
-      assert(dissatisfaction == 0, "Dissatisfaction is not 0")
+      assert(dissatisfaction == 0, "Dissatisfaction is 0")
     }
 
     scenario("User dissatisfaction should be greater than 0 and equal to 2 if loads are moved in position") {
@@ -119,8 +119,8 @@ class UserDissatisfactionCalculatorSpec extends FeatureSpec with GivenWhenThen {
           List(accumulatedLoad2, accumulatedLoad4)
         )
 
-      assert(dissatisfaction > 0, "Dissatisfaction is not greater than 0")
-      assert(dissatisfaction == 2, "Dissatisfaction is not equal to 2")
+      assert(dissatisfaction > 0, "Dissatisfaction is greater than 0")
+      assert(dissatisfaction == 2, "Dissatisfaction is equal to 2")
     }
 
     scenario(
@@ -132,8 +132,8 @@ class UserDissatisfactionCalculatorSpec extends FeatureSpec with GivenWhenThen {
           List(accumulatedLoad2, accumulatedLoad4)
         )
 
-      assert(dissatisfaction > 0, "Dissatisfaction is not greater than 0")
-      assert(dissatisfaction == 2, "Dissatisfaction is not equal to 2")
+      assert(dissatisfaction > 0, "Dissatisfaction is greater than 0")
+      assert(dissatisfaction == 2, "Dissatisfaction is equal to 2")
     }
 
   }
