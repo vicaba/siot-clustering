@@ -60,6 +60,10 @@ class ClusterAndAccumulatedLoadTransformerSpec extends FeatureSpec with GivenWhe
 
       accumulatedLoadsMetric shouldBe clustersMetric
 
+      And("Accumulated loads should NOT be equal (id, group, label)")
+
+      assert(accumulatedLoads.distinct.size == accumulatedLoads.size, "Accumulated loads are distinct")
+
       When("transforming accumulated loads back to clusters")
 
       val clusters2 = ClusterAndAccumulatedLoadTransformer.reverse(accumulatedLoads, clusters.head.dataTypeMetadata)
