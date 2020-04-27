@@ -33,9 +33,9 @@ object Main {
     val AppliancesOutputFileName = "appliance_output.csv"
     val LightingOutputFileName = "lighting_output.csv"
 
-    val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 24) yield (i + "/", i)).toList
+    val subFoldersAndIds: List[(String, Int)] = (for (i <- 0 to 30) yield (i + "/", i)).toList
 
-/*    val points = SyntheticProfilesReaderForEuclideanClusterer
+    val points = SyntheticProfilesReaderForEuclideanClusterer
       .applyDefault(MainFolder,
         subFoldersAndIds.map(_._1),
         AppliancesOutputFileName,
@@ -43,11 +43,11 @@ object Main {
         subFoldersAndIds.map(_._2),
         windowSize = 30)
 
-    GlobalConfig.instance = SyntheticGlobalConfig()*/
+    GlobalConfig.instance = SyntheticGlobalConfig()
 
-    val points = EgaugeReader(Configuration.userProfilesFile)
+    /*val points = EgaugeReader(Configuration.userProfilesFile).take(10)
 
-    GlobalConfig.instance = EgaugeGlobalConfig()
+    GlobalConfig.instance = EgaugeGlobalConfig()*/
 
     /*    val testBatchRunSettingsBuilder =
           new BatchRunSettingsBuilder(points,
@@ -61,7 +61,7 @@ object Main {
       new BatchRunSettingsBuilder(points,
         (Configuration.BatchRun.KRange.from to Configuration.BatchRun.KRange.to).toList,
         List(Par.withParAggregate),
-        (p, k) => p.size + p.size / 3)
+        (p, k) => 1)
 
     deferredCrossFoldValidation(batchRunSettingsBuilder)
 
@@ -142,7 +142,7 @@ object Main {
       for (i <- BigDecimal(Configuration.CrossFold.SubsampleSize.from) to(Max, step = BigDecimal(0.1)))
         yield {
           val subsampleSize = Percentage.of(i / Max)
-          val splits = 200 //Math.floor((batchRunSettingsBuilder.points.size * subsampleSize.v).toDouble).toInt / 2
+          val splits = 1 //Math.floor((batchRunSettingsBuilder.points.size * subsampleSize.v).toDouble).toInt / 2
           MonteCarlo(splits, subsampleSize)
         }
     val stepsList = CrossFoldValidation.deferredBatchRun(monteCarlos.toList, batchRunSettingsBuilder)

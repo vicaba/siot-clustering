@@ -21,6 +21,8 @@ object ResultsJsonSerializer {
 
     val KKey = "k"
 
+    val UserDissatisfactionKey = "userDiss"
+
     def stepToString(step: StepKey): String = step match {
       case ClustererKey   => "s1"
       case ReschedulerKey => "s2"
@@ -78,7 +80,9 @@ object ResultsJsonSerializer {
           val c = Cluster(0, UUID.randomUUID().toString, step.clusters, -1, None)(step.clusters.head.dataTypeMetadata)
           max(c.syntheticValue)
         },
-        ClustersKey -> step.clusters.map(_.userWiseSize)
+        ClustersKey -> step.clusters.map(_.userWiseSize),
+        UserDissatisfactionKey -> step.userDissatisfaction
+
       )
 
     def reschedulerOutputListAsJson(stepsList: List[ReschedulerOutput]): List[JsObject] = {
