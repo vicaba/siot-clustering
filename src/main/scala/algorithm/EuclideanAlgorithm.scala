@@ -71,9 +71,9 @@ object EuclideanAlgorithm {
         ClusterAndAccumulatedLoadTransformer
           .reverse(reschedulerResult, clustererOutput.clusters.head.dataTypeMetadata)
           .toList,
-        UserDissatisfactionCalculator.flexibleLoadDissatisfaction(
-          unscheduledClustersAsAccumulatedLoad.flatMap(_.flexibleLoads),
-          scheduledClustersAsAccumulatedLoad.flatMap(_.flexibleLoads))
+        UserDissatisfactionCalculator.listOfAccumulatedLoadsDissatisfaction(
+          unscheduledClustersAsAccumulatedLoad,
+          scheduledClustersAsAccumulatedLoad)
       )
     )
 

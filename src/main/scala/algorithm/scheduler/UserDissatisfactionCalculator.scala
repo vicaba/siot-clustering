@@ -1,11 +1,22 @@
 package algorithm.scheduler
 
-import scheduler_model.load.{FlexibleLoad, FlexibleLoadSubTask}
+import scheduler_model.load.{AccumulatedLoad, FlexibleLoad, FlexibleLoadSubTask, Load}
 
 object UserDissatisfactionCalculator {
 
+  val sortByPredicate: Load => (Int, Int, String) = f => (f.id, f.group, f.label)
+
+  def listOfAccumulatedLoadsDissatisfaction(accumulatedLoadList1: List[AccumulatedLoad], accumulatedLoadList2: List[AccumulatedLoad]): Int = {
+    UserDissatisfactionCalculator.flexibleLoadDissatisfaction(
+      accumulatedLoadList1.flatMap(_.flexibleLoads),
+      accumulatedLoadList2.flatMap(_.flexibleLoads)
+    )
+  }
+
+  def accumulatedLoadsDissatisfaction(accumulatedLoad1: AccumulatedLoad, accumulatedLoad2: AccumulatedLoad): Int =
+    flexibleLoadDissatisfaction(accumulatedLoad1.flexibleLoads.toList, accumulatedLoad2.flexibleLoads.toList)
+
   def flexibleLoadDissatisfaction(flexibleLoads: List[FlexibleLoad], flexibleLoads2: List[FlexibleLoad]): Int = {
-    val sortByPredicate: FlexibleLoad => (Int, Int, String) = f => (f.id, f.group, f.label)
     (flexibleLoads.filter(_.isInstanceOf[FlexibleLoadSubTask]).sortBy(sortByPredicate)
       zip flexibleLoads2.filter(_.isInstanceOf[FlexibleLoadSubTask]).sortBy(sortByPredicate)).map {
       case (fl1, fl2) =>
