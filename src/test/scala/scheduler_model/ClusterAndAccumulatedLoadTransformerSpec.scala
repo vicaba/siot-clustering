@@ -58,7 +58,7 @@ class ClusterAndAccumulatedLoadTransformerSpec extends FeatureSpec with GivenWhe
       val clustersMetric         = Metric.par(clusters)
       val accumulatedLoadsMetric = Metric.par(accumulatedLoads)
 
-      //accumulatedLoadsMetric shouldBe clustersMetric
+      accumulatedLoadsMetric shouldBe clustersMetric
 
       When("transforming accumulated loads back to clusters")
 
