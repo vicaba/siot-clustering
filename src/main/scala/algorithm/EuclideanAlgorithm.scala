@@ -53,6 +53,10 @@ object EuclideanAlgorithm {
     val unscheduledClustersAsAccumulatedLoad =
       ClusterAndAccumulatedLoadTransformer.apply(clustersCopy, clustersCopy.head.dataTypeMetadata).toList
 
+    unscheduledClustersAsAccumulatedLoad.foreach(
+      AccumulatedLoad.Mutate
+        .splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(_, GlobalConfig.instance.sequenceSplitStrategy))
+
     val scheduledClustersAsAccumulatedLoad =
       ClusterAndAccumulatedLoadTransformer.apply(clustersCopy, clustersCopy.head.dataTypeMetadata).toList
 
@@ -73,7 +77,7 @@ object EuclideanAlgorithm {
           .toList,
         UserDissatisfactionCalculator.listOfAccumulatedLoadsDissatisfaction(
           unscheduledClustersAsAccumulatedLoad,
-          scheduledClustersAsAccumulatedLoad)
+          reschedulerResult)
       )
     )
 
