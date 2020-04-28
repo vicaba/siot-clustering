@@ -47,7 +47,8 @@ object ClusterAndAccumulatedLoadTransformer {
         }
         dataIterator.zip(labelIterator).map {
           case (dv, label) =>
-            buildAppliance(dv, label)
+            val res = buildAppliance(dv, label)
+            res
         }
       }
       createAccumulatedLoad(cluster.id, cluster.id, cluster.name, loads, dataTypeMetadata)
