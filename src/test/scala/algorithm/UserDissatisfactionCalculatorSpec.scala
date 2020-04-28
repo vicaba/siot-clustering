@@ -50,6 +50,16 @@ class UserDissatisfactionCalculatorSpec extends FeatureSpec with GivenWhenThen {
   AccumulatedLoad.Mutate
     .splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(accumulatedLoad2,
                                                                 GlobalConfig.instance.sequenceSplitStrategy)
+
+  AccumulatedLoad.Mutate
+    .splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(accumulatedLoad3,
+      GlobalConfig.instance.sequenceSplitStrategy)
+
+  AccumulatedLoad.Mutate
+    .splitFlexibleLoadsIntoTasksAndPrepareForSchedulerAlgorithm(accumulatedLoad4,
+      GlobalConfig.instance.sequenceSplitStrategy)
+
+
   feature("User dissatisfaction is properly computed with flexible loads") {
 
     scenario("User dissatisfaction should be 0 if loads are not moved in position") {
