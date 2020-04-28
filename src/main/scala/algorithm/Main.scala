@@ -142,7 +142,7 @@ object Main {
       for (i <- BigDecimal(Configuration.CrossFold.SubsampleSize.from) to(Max, step = BigDecimal(0.1)))
         yield {
           val subsampleSize = Percentage.of(i / Max)
-          val splits = 5000 //Math.floor((batchRunSettingsBuilder.points.size * subsampleSize.v).toDouble).toInt / 2
+          val splits = 500 //Math.floor((batchRunSettingsBuilder.points.size * subsampleSize.v).toDouble).toInt / 2
           MonteCarlo(splits, subsampleSize)
         }
     val stepsList = CrossFoldValidation.deferredBatchRun(monteCarlos.toList, batchRunSettingsBuilder)
@@ -150,7 +150,7 @@ object Main {
     stepsList.foreach { crossFoldValidationExperiment =>
       val crossFoldValidationExperimentSettings = crossFoldValidationExperiment._1
       val deferredExperiments = crossFoldValidationExperiment._2
-      deferredExperiments.grouped(500).zipWithIndex.foreach { case (groupForDeferredExperiment, groupIteration) =>
+      deferredExperiments.grouped(100).zipWithIndex.foreach { case (groupForDeferredExperiment, groupIteration) =>
         val groupForResolvedExperiment = groupForDeferredExperiment.map(_.map(_.apply()))
 
         val mockedStepsList: List[(CrossFoldValidation.CrossFoldTypeSettings, List[List[ClustererAndReschedulerOutput]])] =
