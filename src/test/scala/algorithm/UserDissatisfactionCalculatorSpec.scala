@@ -40,7 +40,7 @@ class UserDissatisfactionCalculatorSpec extends FeatureSpec with GivenWhenThen {
                                       "200",
                                       List(
                                         FixedLoad(201, 201, "201", DenseVector(3, 1, 0, 0, 2, 1)),
-                                        FlexibleLoad(251, 251, "251", 0, DenseVector(0, 0, 0, 5, 3, 0))
+                                        FlexibleLoad(251, 251, "251", 0, DenseVector(0, 0, 5, 3, 0, 0))
                                       ))
 
   AccumulatedLoad.Mutate
@@ -122,7 +122,7 @@ class UserDissatisfactionCalculatorSpec extends FeatureSpec with GivenWhenThen {
       assert(dissatisfaction == 0, "Dissatisfaction is 0")
     }
 
-    scenario("User dissatisfaction should be greater than 0 and equal to 2 if loads are moved in position") {
+    scenario("User dissatisfaction should be greater than 0 and equal to 3 if loads are moved in position") {
       val dissatisfaction =
         UserDissatisfactionCalculator.listOfAccumulatedLoadsDissatisfaction(
           List(accumulatedLoad1, accumulatedLoad3),
@@ -130,11 +130,11 @@ class UserDissatisfactionCalculatorSpec extends FeatureSpec with GivenWhenThen {
         )
 
       assert(dissatisfaction > 0, "Dissatisfaction is greater than 0")
-      assert(dissatisfaction == 2, "Dissatisfaction is equal to 2")
+      assert(dissatisfaction == 3, "Dissatisfaction is equal to 2")
     }
 
     scenario(
-      "User dissatisfaction should be greater than 0 and equal to 2 if loads are moved in position and " +
+      "User dissatisfaction should be greater than 0 and equal to 3 if loads are moved in position and " +
         "accumulated loads are not sorted") {
       val dissatisfaction =
         UserDissatisfactionCalculator.listOfAccumulatedLoadsDissatisfaction(
@@ -143,7 +143,7 @@ class UserDissatisfactionCalculatorSpec extends FeatureSpec with GivenWhenThen {
         )
 
       assert(dissatisfaction > 0, "Dissatisfaction is greater than 0")
-      assert(dissatisfaction == 2, "Dissatisfaction is equal to 2")
+      assert(dissatisfaction == 3, "Dissatisfaction is equal to 3")
     }
 
   }
