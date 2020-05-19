@@ -50,5 +50,5 @@ case class SyntheticGlobalConfig(
     override val sequenceSplitStrategy: SequenceSplitStrategy =
       SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage,
     override val clustererType: ClustererType = GlobalConfig.ClustererType.Euclidean,
-    override val schedulerType: SchedulerType = GlobalConfig.SchedulerType.Coordinated
+    override val schedulerType: SchedulerType = GlobalConfig.SchedulerType.UnCoordinated
 ) extends GlobalConfig
