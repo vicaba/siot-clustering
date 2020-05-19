@@ -41,3 +41,5 @@ case class SyntheticGlobalConfig(
       SequenceSplitByConsecutiveElements.withConsecutiveValueAsTheHighestCountAndConsecutiveValueBelowAverage,
     override val clustererType: ClustererType = GlobalConfig.ClustererType.Euclidean
 ) extends GlobalConfig
+
+

@@ -45,7 +45,7 @@ object Main {
 
     GlobalConfig.instance = SyntheticGlobalConfig()
 
-    /*val points = EgaugeReader(Configuration.userProfilesFile).take(10)
+    /*val points = EgaugeReader(Configuration.userProfilesFile)
 
     GlobalConfig.instance = EgaugeGlobalConfig()*/
 
@@ -61,7 +61,7 @@ object Main {
       new BatchRunSettingsBuilder(points,
         (Configuration.BatchRun.KRange.from to Configuration.BatchRun.KRange.to).toList,
         List(Par.withParAggregate),
-        (p, k) => 1)
+        (p, k) => 100)
 
     deferredCrossFoldValidation(batchRunSettingsBuilder)
 
@@ -142,7 +142,7 @@ object Main {
       for (i <- BigDecimal(Configuration.CrossFold.SubsampleSize.from) to(Max, step = BigDecimal(0.1)))
         yield {
           val subsampleSize = Percentage.of(i / Max)
-          val splits = 500 //Math.floor((batchRunSettingsBuilder.points.size * subsampleSize.v).toDouble).toInt / 2
+          val splits = 200 //Math.floor((batchRunSettingsBuilder.points.size * subsampleSize.v).toDouble).toInt / 2
           MonteCarlo(splits, subsampleSize)
         }
     val stepsList = CrossFoldValidation.deferredBatchRun(monteCarlos.toList, batchRunSettingsBuilder)
